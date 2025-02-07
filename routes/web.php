@@ -7,6 +7,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginAdminController;
 use App\Http\Controllers\LoginUserController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\SupportFormController;
+use App\Http\Controllers\UserSupportFormController;
 
 Route::get('login_admin', [LoginAdminController::class, 'login_admin'])->name('login_admin');
 Route::post('logins_admin', [LoginAdminController::class, 'logins_admin'])->name('logins_admin');
@@ -28,7 +30,11 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('admin_user_lock', [AdminUserController::class, 'lock'])->name('admin_user_lock');
 
     Route::get('admin_forms', [AdminController::class, 'admin_forms'])->name('admin_forms');
-    Route::post('support_forms_create', [AdminController::class, 'support_forms_create'])->name('support_forms_create');
+    Route::post('support_forms_create', [SupportFormController::class, 'support_forms_create'])->name('support_forms_create');
+    Route::get('/support_forms/{id}/edit', [SupportFormController::class, 'editform']);
+    // Route::post('/support_forms/{id}/update', [SupportFormController::class, 'update']);
+    Route::post('/support_forms/{id}/delete', [SupportFormController::class, 'destroy']);
+    Route::POST('support_forms_update', [SupportFormController::class, 'update'])->name('support_forms_update');
 
 });
 
@@ -38,14 +44,21 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::get('logout', [LoginUserController::class, 'logout'])->name('logout');
     Route::get('/', [UserController::class, 'index'])->name('index');
     Route::get('user', [UserController::class, 'index'])->name('user');
+    // Dữ liệu khách hàng
     Route::get('view_data_customer', [UserController::class, 'view_data_customer'])->name('view_data_customer');
     Route::get('detail_customer', [UserController::class, 'detail_customer'])->name('detail_customer');
     Route::post('update_customer', [UserController::class, 'update_customer'])->name('update_customer');
     Route::post('add_customer', [UserController::class, 'add_customer'])->name('add_customer');
+    // Dữ liệu tài khoản
     Route::get('view_data_account', [UserController::class, 'view_data_account'])->name('view_data_account');
     Route::get('detail_account', [UserController::class, 'detail_account'])->name('detail_account');
     Route::post('update_account', [UserController::class, 'update_account'])->name('update_account');
     Route::post('add_account', [UserController::class, 'add_account'])->name('add_account');
+    // Sử dụng biểu mẫu
+    Route::get('transaction_form', [UserSupportFormController::class, 'transaction_form'])->name('transaction_form');
+    Route::get('transaction_form/{id}', [UserSupportFormController::class, 'show'])->name('using_form');
+
+
     Route::group(['middleware' => ['usercontrol']], function () {
         Route::post('uploadfile_customer', [UserController::class, 'uploadfile_customer'])->name('uploadfile_customer');
         Route::post('uploadfile_account', [UserController::class, 'uploadfile_account'])->name('uploadfile_account');

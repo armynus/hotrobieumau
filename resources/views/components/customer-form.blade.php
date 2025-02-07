@@ -37,7 +37,7 @@
                             </div>
                             @if (($loop->iteration % 2) == 0) <!-- Chia hàng sau mỗi 2 input -->
                                 </div><div class="row">
-                            @endif\
+                            @endif
                         @endforeach
                         
                     </div>

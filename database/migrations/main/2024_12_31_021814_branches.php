@@ -10,6 +10,7 @@ return new class extends Migration {
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
             $table->string('branch_name');
+            $table->string('branch_code')->nullable();
             $table->string('database_name')->nullable();
             $table->string('status')->default('active');
             $table->timestamps();

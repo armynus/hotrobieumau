@@ -18,4 +18,5 @@
     <link rel="stylesheet" type="text/css" href="{{asset('css/sweetalert.css')}}">
     
     <input type = "hidden" name = "_token" value = '<?php echo csrf_token(); ?>'>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 

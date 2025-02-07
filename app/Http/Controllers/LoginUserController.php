@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Users;
+use App\Models\Branches;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -22,11 +23,14 @@ class LoginUserController extends Controller
             return redirect()->route('login')->with('error', 'Tài khoản đã bị khóa');
         }
         if ($result && Hash::check($credentials['password'], $result->password)) {
+            $branch = Branches::where('id', $result->branch_id)->first();          
             $request->session()->put('user_id', $result->id);
             $request->session()->put('user_name', $result->name);
             $request->session()->put('user_email', $result->email);
             $request->session()->put('user_role', $result->role_id);
             $request->session()->put('UserBranchId', $result->branch_id);
+            $request->session()->put('UserBranchCode', $branch->branch_code);
+            $request->session()->put('UserBranchName', $branch->branch_name);
             return redirect()->route('index');
         }
         return redirect()->route('login')->with('error', 'Email hoặc mật khẩu không đúng!');
@@ -37,6 +41,8 @@ class LoginUserController extends Controller
         Session::forget('user_email');
         Session::forget('user_role');
         Session::forget('UserBranchId');
+        Session::forget('UserBranchCode');
+        Session::forget('UserBranchName');
         return redirect()->route('login');
     }
 }

@@ -5,6 +5,7 @@ use App\Imports\CustomerInfoImport;
 use App\Models\AccountInfo;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\CustomerInfo;
+use App\Models\SupportForm;
 use App\Imports\AccountInfoImport;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 class UserController extends Controller
 {
     function index (){
+       
         return view('user.index');
     }
 

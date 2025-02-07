@@ -56,7 +56,7 @@
                 </a>
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{route('view_data_customer')}}">Thông tin khách hàng</a>
+                        <a class="collapse-item" href="{{route('transaction_form')}}">Biểu mẫu giao dịch</a>
                     </div>
                 </div>
             </li>

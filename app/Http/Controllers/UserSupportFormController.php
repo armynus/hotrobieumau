@@ -1,24 +1,23 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\SupportForm;
 
 use Illuminate\Http\Request;
-use App\Models\Branches;
-use App\Models\SupportForm;
-use Illuminate\Support\Facades\Storage;
 
-class AdminController extends Controller
+class UserSupportFormController extends Controller
 {
-    public function index(){
-        return view('admin.dashboard');
+    function transaction_form(){
+        $list_forms = SupportForm::get();
+        return view('user.page.form_trans', compact('list_forms'));
     }
-    public function branches(){
-        $list_branches = Branches::orderBy('id', 'desc')->get();
-        return view('admin.branches.list_branches', compact('list_branches'));
-    }
-    public function admin_forms(){
-        $list_forms =  SupportForm::orderBy('id', 'desc')->get();
-        $fields = [
+    public function show($id)
+    {
+        // Lấy dữ liệu biểu mẫu theo ID
+        $form = SupportForm::select('id','name','fields','file_template')->findOrFail($id);
+        // Chuyển đổi danh sách trường từ JSON sang mảng
+        $formfields = json_decode($form->fields, true);
+        $default_fields = [
             'custno' => 'Mã khách hàng',
             'idxacno'=> 'Số tài khoản',
             'name' => 'Tên khách hàng in hoa',
@@ -43,9 +42,15 @@ class AdminController extends Controller
             'place_name'  => 'Địa danh',
           
         ];
-        return view('admin.forms.list_form', compact('list_forms', 'fields'));
+        
+        $fields = [];
+        foreach ($formfields as $fieldKey) {
+            if (isset($default_fields[$fieldKey])) {
+                $fields[$fieldKey] = $default_fields[$fieldKey];
+            }
+        }
+        
+        return view('user.page.transaction_form', compact('form', 'fields'));
     }
-    
-
-
 }
+                                     

@@ -1,47 +1,13 @@
 @extends('user.layouts.app')
-@section('title', 'Đăng tải dữ liệu')
+@section('title', 'Biểu mẫu giao dịch')
    
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
-    <h1 class="h3 mb-2 text-gray-800">Dữ Liệu Khách Hàng</h1>
+    <h1 class="h3 mb-2 text-gray-800">Biểu mẫu giao dịch</h1>
     
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
-        <div class="mt-3 text-center">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadCustomModal" >
-                Đăng tải dữ liệu Excel  
-            </button>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCustomModal" >
-                Thêm mới khách hàng 
-            </button>
-        </div>
-       <!-- Modal -->
-        @include('user.partials.uploadcustom_modal')
-        <x-customer-form 
-            modalId="addCustomModal"
-            modalLabelId="addCustomModalLabel"
-            title="Đăng Tải File Dữ Liệu Khách Hàng"
-            :fields="$addFields"
-            :dateFields="['add_birthday', 'add_identity_date']"
-            closeText="Đóng" 
-            submitText="Thêm"
-            submitId="addCustomer"
-            formId="addCustomForm"
-        />
-        
-        <x-customer-form 
-            modalId="customerInfoModal"
-            modalLabelId="customerInfoModalLabel"
-            title="Chi tiết thông tin khách hàng"
-            :fields="$fields"
-            :dateFields="['birthday', 'identity_date', 'created_at', 'updated_at']"
-            :disabledFields="['custno', 'created_at', 'updated_at']"
-            closeText="Đóng"
-            submitText="Lưu"
-            submitId="updateCustomer"
-            formId="editCustomerForm"
-        />
         
         <x-alert-message />
         <div class="card-body"> 
@@ -50,49 +16,46 @@
                     <thead>
                         <tr>
                             <th>STT</th>
-                            <th>Mã KH</th>
-                            <th>Tên KH</th>
-                            <th>Số điện thoại</th>
-                            <th>CMND/CCCD</th>
-                            <th>Địa chỉ</th>
-                            <th>Chi tiết</th>
+                            <th>Tên biểu mẫu</th>
+                            <th>Lượt sử dụng</th>
+                            <th>Ngày tạo</th>
+                            <th>Ngày cập nhật</th>
+                            <th>Chức năng</th>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
                             <th>STT</th>
-                            <th>Mã KH</th>
-                            <th>Tên KH</th>
-                            <th>Số điện thoại</th>
-                            <th>CMND/CCCD</th>
-                            <th>Địa chỉ</th>
-                            <th>Chi tiết</th>
+                            <th>Tên biểu mẫu</th>
+                            <th>Lượt sử dụng</th>
+                            <th>Ngày tạo</th>
+                            <th>Ngày cập nhật</th>
+                            <th>Chức năng</th>
                         </tr>
                     </tfoot>
                     <tbody>
-                        @foreach($data as $key => $custom)
-                            <tr>
-                                <td>{{$custom->id}}</td>
-                                <td>{{$custom->custno}}</td>
-                                <td>{{$custom->nameloc}}</td>
-                                <td>{{$custom->phone_no}}</td>
-                                <td>{{$custom->identity_no}}</td> 
-                                <td>{{$custom->addrfull}}</td> 
-                                <td>
-                                    <button class="btn btn-info btn-icon-split detail_customer" 
-                                            data-toggle="modal" 
-                                            data-target="#customerInfoModal" 
-                                            data-id="{{ $custom->id }}">
-                                        <span class="text">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
-                                                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
+                        @foreach($list_forms as $key => $form)
+                        <tr>
+                            <td>{{$form->id}}</td>
+                            <td>{{$form->name}}</td>
+                            <td>{{$form->usage_count}}</td>
+                            <td>{{date('d/m/Y', strtotime($form->created_at)) }}</td>
+                            <td>{{date('d/m/Y', strtotime($form->updated_at)) }}</td>
+                            <td style="justify-content: center; align-items: flex-start; text-align: center; " >
+                                <a href="{{ route('using_form', ['id' => $form->id]) }}">
+                                    <button type="button"  data-toggle="modal" data-target="#editFormModal" class="btn btn-info btn-icon-split edit_form" data-form_id="{{$form->id}}">
+                                        <span class="text " >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
                                             </svg>
                                         </span>
                                     </button>
-                                </td>
-                            </tr>
+                                </a>
+                            </td>
+                        </tr>
                         @endforeach
-                        @include('user.partials.ajax_customerinfo')
+                        @include('admin.forms.partials.ajax_formmodal')
                     </tbody>
                 </table>
             </div>

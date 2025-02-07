@@ -16,7 +16,8 @@ class SupportForm extends Model
     protected $fillable = [
         'name',         // Tên biểu mẫu
         'fields',       // Danh sách các trường dữ liệu (lưu dưới dạng JSON)
-        'file_template' // Đường dẫn tới file mẫu biểu mẫu
+        'file_template', // Đường dẫn tới file mẫu biểu mẫu
+        'usage_count',  // lượt sử dụng
     ];
 
     // Tự động chuyển đổi cột 'fields' từ JSON sang mảng khi truy xuất
