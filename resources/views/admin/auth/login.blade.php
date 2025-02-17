@@ -41,11 +41,11 @@
                                         <div class="form-group">
                                             <input type="email" class="form-control form-control-user"
                                                 id="exampleInputEmail" aria-describedby="emailHelp"
-                                                placeholder="Nhập địa chỉ Email..." name="email">
+                                                placeholder="Nhập địa chỉ Email..." name="email" required>
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
-                                                id="exampleInputPassword" placeholder="Nhập mật khẩu" name="password">
+                                                id="exampleInputPassword" placeholder="Nhập mật khẩu" name="password" required>
                                         </div>
                                         <div class="form-group">
                                             

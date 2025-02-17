@@ -35,7 +35,6 @@ Route::group(['middleware' => ['admin']], function () {
     // Route::post('/support_forms/{id}/update', [SupportFormController::class, 'update']);
     Route::post('/support_forms/{id}/delete', [SupportFormController::class, 'destroy']);
     Route::POST('support_forms_update', [SupportFormController::class, 'update'])->name('support_forms_update');
-
 });
 
 Route::get('login', [LoginUserController::class, 'login'])->name('login');
@@ -57,6 +56,8 @@ Route::group(['middleware'=> ['tenant']], function(){
     // Sử dụng biểu mẫu
     Route::get('transaction_form', [UserSupportFormController::class, 'transaction_form'])->name('transaction_form');
     Route::get('transaction_form/{id}', [UserSupportFormController::class, 'show'])->name('using_form');
+    Route::get('/customers/search', [UserSupportFormController::class, 'search'])->name('customer.search');
+    Route::post('transaction_form_print', [UserSupportFormController::class, 'print'])->name('transaction_form_print');
 
 
     Route::group(['middleware' => ['usercontrol']], function () {

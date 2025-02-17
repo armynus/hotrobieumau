@@ -22,5 +22,8 @@ class AccountInfo extends Model
         'addrfull',      // Địa chỉ đầy đủ
     ];
     public $timestamps = true;
-
+    public function customer()
+    {
+        return $this->belongsTo(\App\Models\CustomerInfo::class, 'custseq', 'custno');
+    }
 }

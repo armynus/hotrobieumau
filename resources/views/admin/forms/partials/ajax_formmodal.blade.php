@@ -89,8 +89,9 @@ $(document).ready(function(){
                     const row = $(`button[data-form_id="${form.id}"]`).closest('tr');
 
                     row.find('td:nth-child(2)').text(form.name);
-                    row.find('td:nth-child(3)').text(form.file_template);
-                    row.find('td:nth-child(5)').text(formatted_updated_at);
+                    row.find('td:nth-child(3)').text(form.usage_count);
+                    row.find('td:nth-child(4)').text(form.file_template);
+                    row.find('td:nth-child(6)').text(formatted_updated_at);
 
                     $('#close_button').click();
 
@@ -197,6 +198,7 @@ $(document).ready(function(){
                     let newForm = `
                         <td>${Form.id}</td>
                         <td>${Form.name}</td>
+                        <td>${Form.usage_count}</td>
                         <td>${Form.file_template}</td>
                         <td>${formatted_created_at}</td>
                         <td>${formatted_updated_at}</td>

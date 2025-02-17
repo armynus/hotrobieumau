@@ -28,5 +28,8 @@ class CustomerInfo extends Model
         'birthday',             // ngày sinh
     ];
     public $timestamps = true;
-
+    public function accounts()
+    {
+        return $this->hasMany(\App\Models\AccountInfo::class, 'custseq', 'custno');
+    }
 }

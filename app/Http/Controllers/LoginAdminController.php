@@ -23,16 +23,21 @@ class LoginAdminController extends Controller
             ->where('email',$email)
             ->where('role_id',0)
             ->first();      
-        if($result->status != "active"){
-            return redirect()->route('login_admin')->with('error', 'Tài khoản đã bị khóa');
-        }
-        if ($result && Hash::check($password, $result->password)) {
-            Session::put('admin_id', $result->id);
-            Session::put('admin_name', $result->name);
-            Session::put('admin_email', $result->email);
-            return redirect()->route('admin');
-        } else {
-            return redirect()->route('login_admin')->with('error', 'Sai email hoặc mật khẩu');
+        if($result != null){
+            if($result->status != "active"){
+                return redirect()->route('login_admin')->with('error', 'Tài khoản đã bị khóa');
+            }
+            if ($result && Hash::check($password, $result->password)) {
+                Session::put('admin_id', $result->id);
+                Session::put('admin_name', $result->name);
+                Session::put('admin_email', $result->email);
+                return redirect()->route('admin');
+            } else {
+                return redirect()->route('login_admin')->with('error', 'Sai email hoặc mật khẩu');
+            }
+        }else{
+            return redirect()->route('login_admin')->with('error', 'Email hoặc mật khẩu không đúng!');
+
         }
     }
     public function logout_admin(){
