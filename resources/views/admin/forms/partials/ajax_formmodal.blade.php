@@ -39,6 +39,7 @@ $(document).ready(function(){
 
         let formId = $("#editForm input[name='form_id']").val();
         let formName = $("#edit_form_name").val().trim();
+        let formType = $("#edit_form_type").val();
         let fileInput = $("#edit_form_file")[0].files.length;
         let selectedFields = [];
 
@@ -50,6 +51,10 @@ $(document).ready(function(){
             swal("Vui lòng nhập tên biểu mẫu.");
             return;
         }
+        if (formType === null) {
+            swal("Vui lòng chọn loại biểu mẫu.");
+            return;
+        }
         if (selectedFields.length === 0) {
             swal("Vui lòng chọn ít nhất một trường dữ liệu.");
             return;
@@ -57,6 +62,7 @@ $(document).ready(function(){
         
         let formData = new FormData();
         formData.append("form_name", formName);
+        formData.append("form_type", formType);
         formData.append("form_id", formId);
         selectedFields.forEach(field => {
             formData.append("selected_fields[]", field);
@@ -78,26 +84,66 @@ $(document).ready(function(){
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
             },
             success: function(response) {
-                if (response.status === true) {
-                  
-                    swal("Thành công!", response.message, "success").then(() => {
-                       
-                    });
-                    const form = response.data;
-                    let updated_at = new Date(form.updated_at);
-                    let formatted_updated_at = updated_at.toLocaleDateString('en-GB');
-                    const row = $(`button[data-form_id="${form.id}"]`).closest('tr');
+            if (response.status === true) {
+                swal("Thành công!", response.message, "success");
 
-                    row.find('td:nth-child(2)').text(form.name);
-                    row.find('td:nth-child(3)').text(form.usage_count);
-                    row.find('td:nth-child(4)').text(form.file_template);
-                    row.find('td:nth-child(6)').text(formatted_updated_at);
+                const form = response.data;
+                let updated_at = new Date(form.updated_at);
+                let formatted_updated_at = updated_at.toLocaleDateString('en-GB');
 
-                    $('#close_button').click();
+                // Tìm dòng hiện tại trong bảng
+                const row = $(`button[data-form_id="${form.id}"]`).closest('tr');
+
+                // Kiểm tra xem có dùng DataTables không
+                let table = $('#dataTable').DataTable(); 
+
+                if ($.fn.DataTable.isDataTable('#dataTable')) {
+                    // Nếu đang dùng DataTables thì cập nhật hàng bằng API
+                    let rowIndex = table.row(row).index();
+                    table.row(rowIndex).data([
+                        form.id,
+                        form.name,
+                        form.form_type ? form.form_type.type_name : 'N/A', // Kiểm tra null
+                        form.usage_count || '0',
+                        form.file_template,
+                        formatted_created_at,
+                        formatted_updated_at,
+                        `
+                        <td style="text-align: center;">
+                            <button type="button"  data-toggle="modal" data-target="#editFormModal" class="btn btn-info btn-icon-split edit_form" data-form_id="${form.id}">
+                                <span class="text " >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                    </svg>
+                                </span>
+                            </button>
+                            <button  class="btn btn-danger btn-icon-split">
+                                <span class="icon text-white-50 cancel_order delete_form"  data-form_id="${form.id}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ban-fill" viewBox="0 0 16 16">
+                                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M2.71 12.584q.328.378.706.707l9.875-9.875a7 7 0 0 0-.707-.707l-9.875 9.875Z"/>
+                                        </svg>
+                                </span>
+                            </button>
+                        </td>
+                        `
+                    ]).draw(false); // Cập nhật hàng và không làm mất vị trí tìm kiếm
 
                 } else {
-                    swal("Lỗi!", response.message || "Không thể cập nhật biểu mẫu.", "error");
+                    // Nếu không dùng DataTables, cập nhật thủ công
+                    row.find('td:nth-child(2)').text(form.name);
+                    row.find('td:nth-child(3)').text(form.form_type ? form.form_type.type_name : 'N/A');
+                    row.find('td:nth-child(4)').text(form.usage_count);
+                    row.find('td:nth-child(5)').text(form.file_template);
+                    row.find('td:nth-child(7)').text(formatted_updated_at);
                 }
+
+                $('#close_button').click();
+
+            } else {
+                swal("Lỗi!", response.message || "Không thể cập nhật biểu mẫu.", "error");
+            }
+
             },
             error: function(xhr) {
                 let response = JSON.parse(xhr.responseText);
@@ -122,8 +168,10 @@ $(document).on("click", ".edit_form", function() {
         success: function(response) {
             if (response.status) {
                 let form = response.data;
+                console.log(form.form_type);
                 // Điền dữ liệu vào các trường input
                 $("#editForm input[name='form_name']").val(form.name);
+                $("#editForm select[name='form_type']").val(form.form_type);
                 $("#editForm input[name='form_id']").val(form.id);
 
                 // Đánh dấu các checkbox đã chọn
@@ -146,9 +194,9 @@ $(document).ready(function(){
         e.preventDefault(); // Ngăn chặn gửi form mặc định
 
         let formName = $("#add_form_name").val().trim();
+        let formType = $("#add_form_type").val();
         let fileInput = $("#add_form_file")[0].files.length;
         let selectedFields = [];
-
         // Duyệt qua tất cả các checkbox được chọn và lấy giá trị
         $("input[name='selected_fields[]']:checked").each(function() {
             selectedFields.push($(this).val());
@@ -157,6 +205,10 @@ $(document).ready(function(){
         // Kiểm tra xem tên biểu mẫu có được nhập không
         if (formName === "") {
             swal("Vui lòng nhập tên biểu mẫu.");
+            return;
+        }
+        if (formType === null) {
+            swal("Vui lòng chọn loại biểu mẫu.");
             return;
         }
 
@@ -172,6 +224,7 @@ $(document).ready(function(){
         // Tạo dữ liệu gửi lên
         let formData = new FormData();
         formData.append("form_name", formName);
+        formData.append("form_type", formType);
         formData.append("form_file", $("#add_form_file")[0].files[0]);
         $.each(selectedFields, function(index, value) {
             formData.append("selected_fields[]", value);
@@ -194,16 +247,20 @@ $(document).ready(function(){
 
                     let updated_at = new Date(Form.updated_at);
                     let formatted_updated_at = updated_at.toLocaleDateString('en-GB');
-                    // Thêm dòng mới
-                    let newForm = `
-                        <td>${Form.id}</td>
-                        <td>${Form.name}</td>
-                        <td>${Form.usage_count}</td>
-                        <td>${Form.file_template}</td>
-                        <td>${formatted_created_at}</td>
-                        <td>${formatted_updated_at}</td>
-                        <td style="justify-content: center; align-items: flex-start; text-align: center; " >
-                            <button type="button"  data-toggle="modal" data-target="#editFormModal" class="btn btn-info btn-icon-split edit_form" data-form_id="${Form.id}">
+                    let table = $('#dataTable').DataTable(); // Khởi tạo DataTables
+
+                    // Thêm dữ liệu vào DataTables API
+                    table.row.add([
+                        Form.id,
+                        Form.name,
+                        Form.form_type ? Form.form_type.type_name : 'N/A', // Kiểm tra null tránh lỗi
+                        Form.usage_count,
+                        Form.file_template,
+                        formatted_created_at,
+                        formatted_updated_at,
+                        `
+                        <td style="justify-content: center; align-items: flex-start; text-align: center;">
+                             <button type="button"  data-toggle="modal" data-target="#editFormModal" class="btn btn-info btn-icon-split edit_form" data-form_id="${Form.id}">
                                 <span class="text " >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                                         <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
@@ -212,16 +269,17 @@ $(document).ready(function(){
                                 </span>
                             </button>
                             <button  class="btn btn-danger btn-icon-split">
-                                <span class="icon text-white-50 cancel_order lock_form"  data-form_id="${Form.id}">
+                                <span class="icon text-white-50 cancel_order delete_form"  data-form_id="${Form.id}">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ban-fill" viewBox="0 0 16 16">
                                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M2.71 12.584q.328.378.706.707l9.875-9.875a7 7 0 0 0-.707-.707l-9.875 9.875Z"/>
                                         </svg>
                                 </span>
                             </button>
                         </td>
-                    `;
+                        
+                        `
+                    ]).draw(false); // Cập nhật lại bảng mà không reload trang
 
-                    $('table tbody').append(newForm);
                     swal({
                         title: "Thành công!",
                         text: response.message,

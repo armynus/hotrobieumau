@@ -18,6 +18,7 @@ class SupportFormController extends Controller
         // Kiểm tra validation
         $request->validate([
             'form_name' => 'required|string|max:255',
+            'form_type' => 'required|string|max:255',
             'form_file' => 'required|file|mimes:doc,docx|max:5120', // Giới hạn 5MB
             'selected_fields' => 'required|array|min:1',
         ]);
@@ -47,10 +48,13 @@ class SupportFormController extends Controller
         // Lưu dữ liệu vào database
         $supportForm = SupportForm::create([
             'name' => $request->form_name,
+            'form_type' => $request->form_type,
             'file_template' => $filePath,
             'fields' => json_encode($request->selected_fields),
         ]);
-
+        $supportForm = SupportForm::with(['formType:id,type_name'])
+        ->where('id', $supportForm->id) // Sửa lại where()
+        ->first(); // Lấy 1 record thay vì get() để tránh mảng kết quả
         return response()->json([
             'status' => true,
             'message' => 'Biểu mẫu đã được lưu thành công!',
@@ -83,6 +87,7 @@ class SupportFormController extends Controller
             
             $request->validate([
                 'form_name' => 'required|string|max:255',
+                'form_type' => 'required|string|max:255',
                 'form_file' => 'nullable|file|mimes:doc,docx|max:5120',
                 'selected_fields' => 'required|array|min:1',
             ]);
@@ -97,15 +102,14 @@ class SupportFormController extends Controller
                     'message' => 'Tên biểu mẫu đã tồn tại, vui lòng chọn tên khác.'
                 ], 400);
             }
-
-             // Nếu có file mới, kiểm tra xem file đã tồn tại chưa
+            // Nếu có file mới, kiểm tra xem file đã tồn tại chưa
             if ($request->hasFile('form_file')) {
                 $directory = 'forms/supportform/';
                 $fileName = $request->file('form_file')->getClientOriginalName();
                 $filePath = $directory . $fileName;
 
-                // 🔍 Kiểm tra nếu file đã tồn tại
-                if (Storage::disk('public')->exists($filePath)) {
+                // 🔍 Kiểm tra nếu file đã tồn tại, nhưng loại trừ file hiện tại của biểu mẫu
+                if ($filePath !== $form->file_template && Storage::disk('public')->exists($filePath)) {
                     return response()->json([
                         'status' => false,
                         'message' => 'File đã tồn tại. Vui lòng đổi tên hoặc chọn file khác.'
@@ -113,7 +117,7 @@ class SupportFormController extends Controller
                 }
 
                 // Xóa file cũ nếu có
-                if ($form->file_template) {
+                if ($form->file_template && $form->file_template !== $filePath) {
                     Storage::disk('public')->delete($form->file_template);
                 }
 
@@ -122,12 +126,15 @@ class SupportFormController extends Controller
                 $form->file_template = $filePath;
             }
 
-
             // Cập nhật dữ liệu
             $form->name = $request->form_name;
+            $form->form_type = $request->form_type;
             $form->fields = json_encode($selectedFields);
             $form->save();
-
+            // Lấy lại dữ liệu với formType
+            $form = SupportForm::with(['formType:id,type_name'])
+            ->where('id', $form->id) // Sửa lại where()
+            ->first(); // Lấy 1 record thay vì get() để tránh mảng kết quả
             return response()->json([
                 'status' => true,
                 'message' => 'Biểu mẫu đã được cập nhật thành công!',

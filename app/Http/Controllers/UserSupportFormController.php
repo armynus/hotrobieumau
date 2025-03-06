@@ -5,26 +5,30 @@ use App\Models\SupportForm;
 use App\Models\FormField;
 use App\Models\CustomerInfo;
 use App\Models\AccountInfo;
+use App\Models\FormType;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Illuminate\Http\Request;
 class UserSupportFormController extends Controller
 {
-    function transaction_form(){
-        $list_forms = SupportForm::get();
-        
-        return view('user.page.form_trans', compact('list_forms'));
+    function index($type){
+        $list_forms = SupportForm::where('form_type', $type)->get(); 
+        $form_type = FormType::where('id', $type)->value('type_name'); 
+        return view('user.page.list_forms', compact('list_forms', 'form_type'));
     }
-    public function show($id)
+    public function show($type, $id)
     {
-       
         // Lấy dữ liệu biểu mẫu theo ID
-        $form = SupportForm::select('id','name','fields','file_template')->findOrFail($id);
+        $form = SupportForm::select('id', 'name', 'fields', 'file_template')
+            ->where('form_type', $type) // Lọc theo type
+            ->findOrFail($id);
+
         // Chuyển đổi danh sách trường từ JSON sang mảng
         $formfields = json_decode($form->fields, true);
-        
-        $default_fields = FormField::all()->mapWithKeys(function($field) {
+
+        // Lấy danh sách các trường mặc định
+        $default_fields = FormField::all()->mapWithKeys(function ($field) {
             return [
                 $field->field_code => [
                     'field_name'  => $field->field_name,
@@ -33,14 +37,13 @@ class UserSupportFormController extends Controller
                 ]
             ];
         })->toArray();
-        $fields = [];
-        foreach ($formfields as $fieldKey) {
-            if (isset($default_fields[$fieldKey])) {
-                $fields[$fieldKey] = $default_fields[$fieldKey];
-            }
-        }
-        return view('user.page.transaction_form', compact('form', 'fields'));
+
+        // Tạo danh sách các trường hợp lệ cho biểu mẫu
+        $fields = array_intersect_key($default_fields, array_flip($formfields));
+
+        return view('user.page.transaction_form', compact('form', 'fields', 'type'));
     }
+
     
     public function search(Request $request)
     {
@@ -51,13 +54,14 @@ class UserSupportFormController extends Controller
             ->where('custno', 'like', '%' . $query . '%')
             ->orWhere('name', 'like', '%' . $query . '%')
             ->orWhere('nameloc', 'like', '%' . $query . '%')
-            ->limit(10)
+            ->orWhere('identity_no', 'like', '%' . $query . '%')
+            ->limit(15)
             ->get();
         // Định dạng dữ liệu trả về
         $results = $customers->map(function($customer) {
             return [
-                'label'    => $customer->custno . ' - ' . $customer->nameloc,
-                'value'    => $customer->custno,
+                'label'    => 'Mã KH ' . $customer->custno . ' - ' . $customer->nameloc . ' - '  . 'ID ' . $customer->identity_no,
+                'value'    => $customer->custno . ' - ' . $customer->nameloc ,
                 'customer' => $customer,
                 'accounts' => $customer->accounts, // Collection các tài khoản
             ];
@@ -69,7 +73,7 @@ class UserSupportFormController extends Controller
     {
         DB::beginTransaction(); // Bắt đầu transaction để đảm bảo tính toàn vẹn dữ liệu
         try {
-            // Nhận `form_id` và dữ liệu từ request
+            // Nhận form_id và dữ liệu từ request
             $formId = $request->input('form_id');
             $formData = $request->except(['_token', 'form_id']);
 
@@ -87,11 +91,14 @@ class UserSupportFormController extends Controller
 
             // Load template Word
             $templateProcessor = new TemplateProcessor($filePath);
-          
-            // Xử lý dữ liệu khách hàng và tài khoản
-            if (isset($formData['custno'])) {
-                $customer = CustomerInfo::where('custno', $formData['custno'])->first();
 
+            // Lấy giá trị của custno và idxacno từ form; nếu không có thì dùng giá trị ẩn
+            $custnoIdentifier  = $formData['custno']  ?? $formData['custno_hidden'];
+            $idxacnoIdentifier = $formData['idxacno'] ?? $formData['idxacno_hidden'];
+
+            // Xử lý dữ liệu khách hàng (CustomerInfo)
+            if ($custnoIdentifier) {
+                $customer = CustomerInfo::where('custno', $custnoIdentifier)->first();
                 if ($customer) {
                     // Cập nhật thông tin khách hàng
                     foreach ($customer->getFillable() as $field) {
@@ -101,66 +108,63 @@ class UserSupportFormController extends Controller
                     }
                     $customer->save();
                 } else {
-                    // Nếu không tồn tại, tạo mới khách hàng
+                    // Tạo mới khách hàng nếu chưa tồn tại
                     $customer = CustomerInfo::create([
-                        'custno' => $formData['custno'],
-                        'name' => $formData['name'] ?? '',
-                        'nameloc' => $formData['nameloc'] ?? '',
-                        'custtpcd' => $formData['custtpcd'] ?? '',
-                        'custdtltpcd' => $formData['custdtltpcd'] ?? '',
-                        'phone_no' => $formData['phone_no'] ?? '',
-                        'gender' => $formData['gender'] ?? '',
-                        'branch_code' => $formData['branch_code'] ?? '',
-                        'identity_no' => $formData['identity_no'] ?? '',
-                        'identity_date' => $formData['identity_date'] ?? '',
-                        'identity_place' => $formData['identity_place'] ?? '',
-                        'addrtpcd' => $formData['addrtpcd'] ?? '',
-                        'addr1' => $formData['addr1'] ?? '',
-                        'addr2' => $formData['addr2'] ?? '',
-                        'addr3' => $formData['addr3'] ?? '',
-                        'addrfull' => $formData['addrfull'] ?? '',
-                        'birthday' => $formData['birthday'] ?? '',
+                        'custno'          => $custnoIdentifier,
+                        'name'            => $formData['name'] ?? '',
+                        'nameloc'         => $formData['nameloc'] ?? '',
+                        'custtpcd'        => $formData['custtpcd'] ?? '',
+                        'custdtltpcd'     => $formData['custdtltpcd'] ?? '',
+                        'phone_no'        => $formData['phone_no'] ?? '',
+                        'gender'          => $formData['gender'] ?? '',
+                        'branch_code'     => $formData['branch_code'] ?? '',
+                        'identity_no'     => $formData['identity_no'] ?? '',
+                        'identity_date'   => $formData['identity_date'] ?? '',
+                        'identity_place'  => $formData['identity_place'] ?? '',
+                        'addrtpcd'        => $formData['addrtpcd'] ?? '',
+                        'addr1'           => $formData['addr1'] ?? '',
+                        'addr2'           => $formData['addr2'] ?? '',
+                        'addr3'           => $formData['addr3'] ?? '',
+                        'addrfull'        => $formData['addrfull'] ?? '',
+                        'birthday'        => $formData['birthday'] ?? '',
                     ]);
                 }
+            }
 
-                // Xử lý dữ liệu tài khoản nếu có `idxacno`
-                if (isset($formData['idxacno'])) {
-                    $account = AccountInfo::where('idxacno', $formData['idxacno'])->first();
-
-                    if ($account) {
-                        // Cập nhật thông tin tài khoản
-                        foreach ($account->getFillable() as $field) {
-                            if (isset($formData[$field])) {
-                                $account->$field = $formData[$field];
-                            }
+            // Xử lý dữ liệu tài khoản (AccountInfo)
+            if ($idxacnoIdentifier) {
+                $account = AccountInfo::where('idxacno', $idxacnoIdentifier)->first();
+                if ($account) {
+                    // Cập nhật thông tin tài khoản
+                    foreach ($account->getFillable() as $field) {
+                        if (isset($formData[$field])) {
+                            $account->$field = $formData[$field];
                         }
-                        $account->save();
-                    } else {
-                        // Nếu không tồn tại, tạo mới tài khoản
-                        $account = AccountInfo::create([
-                            'idxacno' => $formData['idxacno'],
-                            'custseq' => $customer->custno, // Gán khách hàng vừa tạo
-                            'custnm' => $formData['custnm'] ?? '',
-                            'stscd' => $formData['stscd'] ?? '',
-                            'ccycd' => $formData['ccycd'] ?? '',
-                            'lmtmtp' => $formData['lmtmtp'] ?? '',
-                            'minlmt' => $formData['minlmt'] ?? '',
-                            'addr1' => $formData['addr1'] ?? '',
-                            'addr2' => $formData['addr2'] ?? '',
-                            'addr3' => $formData['addr3'] ?? '',
-                            'addrfull' => $formData['addrfull'] ?? '',
-                        ]);
                     }
+                    $account->save();
+                } else {
+                    // Tạo mới tài khoản nếu chưa tồn tại
+                    $account = AccountInfo::create([
+                        'idxacno'   => $idxacnoIdentifier,
+                        'custseq'   => isset($customer) ? $customer->custno : null, // Nếu có khách hàng
+                        'custnm'    => $formData['custnm'] ?? '',
+                        'stscd'     => $formData['stscd'] ?? '',
+                        'ccycd'     => $formData['ccycd'] ?? '',
+                        'lmtmtp'    => $formData['lmtmtp'] ?? '',
+                        'minlmt'    => $formData['minlmt'] ?? '',
+                        'addr1'     => $formData['addr1'] ?? '',
+                        'addr2'     => $formData['addr2'] ?? '',
+                        'addr3'     => $formData['addr3'] ?? '',
+                        'addrfull'  => $formData['addrfull'] ?? '',
+                    ]);
                 }
             }
 
             // Gắn dữ liệu từ form vào file Word
             foreach ($formData as $key => $value) {
-                
                 if ($key === 'name') {
                     // Chuyển tên thành in hoa không dấu
                     $name = $this->convertToUppercaseWithoutAccents($value);
-
                     // Tạo mảng ký tự từ tên (giới hạn 26 ký tự)
                     $nameArray = mb_str_split($name);
                     $nameArray = array_slice($nameArray, 0, 26); // Giới hạn 26 ký tự
@@ -169,18 +173,26 @@ class UserSupportFormController extends Controller
                     while (count($nameArray) < 26) {
                         $nameArray[] = ' ';
                     }
-
-                    // Gắn từng ký tự vào biến tương ứng ($n1, $n2, ..., $n26)
+                    // Gán từng ký tự vào biến tương ứng ($n1, $n2, ..., $n26)
                     for ($i = 0; $i < 26; $i++) {
                         $templateProcessor->setValue('n' . ($i + 1), $nameArray[$i]);
                     }
-                } elseif (strpos($key, 'date') !== false || strpos($key, 'birthday') !== false) {
+                }
+                if (strpos($key, 'birthday') !== false || strpos($key, 'NgayGiaoDich') !== false) {
                     // Chuyển định dạng ngày tháng
                     $value = $this->convertDateFormat($value);
-                    $templateProcessor->setValue($key, $value ?? '');
-                } 
+                } elseif (strpos($key, 'NgayThangNam') !== false) {
+                    $value = $this->convertDateNowFormat($value);
+                }
+                // Nếu giá trị là số và các key liên quan thì format lại theo kiểu "1.000.000"
+                if (strpos($key, 'VonSucLD_So') !== false || strpos($key, 'SoDuTaiKhoan') !== false || strpos($key, 'HanMucTD_So') !== false) {
+                    $value = $this->formatNumber($value);
+                }
                 $templateProcessor->setValue($key, $value ?? '');
             }
+
+            // Tăng usage_count của biểu mẫu mỗi khi in
+            $form->increment('usage_count');
 
             // Tạo file Word trong bộ nhớ thay vì lưu vào ổ cứng
             $tempFile = tempnam(sys_get_temp_dir(), 'word');
@@ -195,6 +207,7 @@ class UserSupportFormController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
     public function convertDateFormat($date)
     {
         return $date ? date('d/m/Y', strtotime($date)) : '';
@@ -249,6 +262,9 @@ class UserSupportFormController extends Controller
         $string = str_pad($string, $maxLength);
         // Chèn ký tự phân tách giữa các chữ cái (ví dụ: khoảng trắng hoặc '▯')
         return implode(' ', mb_str_split($string));
+    }
+    function formatNumber($number) {
+        return number_format($number, 0, '', '.');
     }
 }
                                      

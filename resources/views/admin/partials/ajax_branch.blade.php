@@ -4,6 +4,7 @@
         $('#addBranch').click(function(){
             var _token = $('input[name="_token"]').val();
             var branch_name = $('#branch_name').val();
+            var branch_code = $('#branch_code').val();
             if (branch_name == '') {
                 swal("Vui lòng nhập tên chi nhánh - phòng giao dịch", {
                     icon: "error",
@@ -16,6 +17,7 @@
                 data:{
                     _token: _token,
                     branch_name: branch_name,
+                    branch_code: branch_code,
                 },
                 success: function(data){
                    if (data.status == true) {
@@ -27,7 +29,9 @@
 
                         let newBranch = `
                             <tr>
+                                <td>${data.branch.id}</td>
                                 <td>${data.branch.branch_name}</td>
+                                <td>${data.branch.branch_code}</td>
                                 <td>${formatted_created_at}</td> 
                                 <td>${formatted_updated_at}</td>
                                 <td><span class="badge badge-success">Hoạt động</span></td>
@@ -89,6 +93,7 @@
                 success: function (response) {
                     $('#edit_branch_id').val(response.branch.id);
                     $('#edit_branch_name').val(response.branch.branch_name);
+                    $('#edit_branch_code').val(response.branch.branch_code);
 
                    
                 },
@@ -103,6 +108,7 @@
         $('#updateBranchButton').on('click', function () {
             var branchId = $('#edit_branch_id').val();
             var branchName = $('#edit_branch_name').val();
+            var branchCode = $('#edit_branch_code').val();
             var _token = $('input[name="_token"]').val();
             if(branchName == ''){
                 swal("Vui lòng nhập tên chi nhánh!", {
@@ -110,8 +116,6 @@
                 });
                 return;
             }
-
-            
             // Gửi AJAX để cập nhật chi nhánh
             $.ajax({
                 url: '{{route('admin_branches_update')}}',
@@ -119,6 +123,7 @@
                 data: {
                     _token: _token, // Token CSRF
                     branch_name: branchName,
+                    branch_code: branchCode,
                     branch_id: branchId
                 },
                 success: function (response) {

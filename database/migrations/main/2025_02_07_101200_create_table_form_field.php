@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('data_type');
             // Giá trị placeholder cho input
             $table->string('placeholder')->nullable();
+            $table->string('value')->nullable();
 
             $table->timestamps();
         });

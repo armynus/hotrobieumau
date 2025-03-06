@@ -1,4 +1,4 @@
-@props(['mode', 'route', 'fields'])
+@props(['mode', 'route', 'fields', 'form_type'])
 
 <div class="modal fade" id="{{ $mode }}FormModal" tabindex="-1" aria-labelledby="{{ $mode }}FormModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -26,6 +26,15 @@
                         <label for="{{ $mode }}_form_name">Tên Biểu Mẫu</label>
                         <input type="text" class="form-control" id="{{ $mode }}_form_name" name="form_name" placeholder="Nhập tên biểu mẫu" required>
                     </div>
+                    <div class="form-group">
+                        <label for="{{ $mode }}_form_type">Phân Loại Biểu Mẫu</label>
+                        <select class="form-control" id="{{ $mode }}_form_type" name="form_type" required>
+                            <option value="" disabled selected>Chọn loại biểu mẫu</option>
+                            @foreach ($form_type as $type)
+                                <option value="{{ $type->id }}">{{ $type->type_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
                     <!-- Danh sách checkbox các trường dữ liệu -->
                     <div class="form-group">
@@ -36,7 +45,7 @@
                                     <div class="col-md-6">
                                         <div class="form-check">
                                             <input type="checkbox" class="form-check-input" id="{{ $mode }}_field_{{ $key }}" name="selected_fields[]" value="{{ $key }}">
-                                            <label class="form-check-label" for="{{ $mode }}_field_{{ $key }}">{{ $label }}</label>
+                                            <label class="form-check-label" for="{{ $mode }}_field_{{ $key }}">{{ $label }}  ({{ $key }}) </label>
                                         </div>
                                     </div>
                                     @if ($loop->iteration % 2 == 0 && !$loop->last)

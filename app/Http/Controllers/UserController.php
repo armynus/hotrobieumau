@@ -10,16 +10,21 @@ use App\Imports\AccountInfoImport;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
 {
     function index (){
-       
-        return view('user.index');
+        $customer_count = CustomerInfo::count();
+        $account_count = AccountInfo::count();
+        $form_count = SupportForm::count();
+        $branch = Session::get('UserBranchName');
+        $branch_code = Session::get('UserBranchCode');
+        return view('user.index', compact('customer_count', 'account_count','branch','form_count','branch_code'));
     }
 
     public function view_data_customer (){
-        $data = CustomerInfo::select('id', 'custno', 'nameloc', 'phone_no', 'identity_no', 'addrfull')->get();
+        $data = CustomerInfo::select('id', 'custno', 'nameloc', 'phone_no', 'identity_no')->get();
         $fields = [
             'custno' => 'Mã khách hàng',
             'name' => 'Tên khách hàng in hoa',
@@ -200,7 +205,7 @@ class UserController extends Controller
 
 
     public function view_data_account(){
-        $data = AccountInfo::select('id', 'idxacno', 'custseq', 'custnm', 'addrfull','stscd')->get();
+        $data = AccountInfo::select('id', 'idxacno', 'custseq', 'custnm','stscd')->get();
         $fields = [
             'idxacno'       => 'Mã tài khoản',
             'custseq'       => 'Mã khách hàng',

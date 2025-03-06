@@ -16,7 +16,11 @@
                 <input type="hidden" id="edit_branch_id" name="branch_id" value="">
                 <div class="form-group">
                     <label for="edit_branch_name">Tên Chi Nhánh</label>
-                    <input type="text" class="form-control" id="edit_branch_name" name="branch_name" placeholder="Nhập tên chi nhánh" required>
+                    <input type="text" class="form-control" id="edit_branch_name" name="edit_branch_name" placeholder="Nhập tên chi nhánh" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_branch_code">Tên Chi Nhánh</label>
+                    <input type="text" class="form-control" id="edit_branch_code" name="edit_branch_code" placeholder="Nhập tên chi nhánh" required>
                 </div>
             </div>
 

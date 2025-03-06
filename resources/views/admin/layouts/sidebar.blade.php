@@ -91,6 +91,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                    
                         <a class="collapse-item" href="{{route('admin_forms')}}">Danh sách biểu mẫu</a>
+                        <a class="collapse-item" href="{{route('admin_form_fields')}}">Danh sách trường dữ liệu</a>
                         
                     </div>
                 </div>

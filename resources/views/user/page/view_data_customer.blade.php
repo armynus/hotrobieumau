@@ -64,7 +64,6 @@
                             <th>Tên KH</th>
                             <th>Số điện thoại</th>
                             <th>CMND/CCCD</th>
-                            <th>Địa chỉ</th>
                             <th>Chi tiết</th>
                         </tr>
                     </thead>
@@ -75,7 +74,6 @@
                             <th>Tên KH</th>
                             <th>Số điện thoại</th>
                             <th>CMND/CCCD</th>
-                            <th>Địa chỉ</th>
                             <th>Chi tiết</th>
                         </tr>
                     </tfoot>
@@ -87,7 +85,6 @@
                                 <td>{{$custom->nameloc}}</td>
                                 <td>{{$custom->phone_no}}</td>
                                 <td>{{$custom->identity_no}}</td> 
-                                <td>{{$custom->addrfull}}</td> 
                                 <td>
                                     <button class="btn btn-info btn-icon-split detail_customer" 
                                             data-toggle="modal" 

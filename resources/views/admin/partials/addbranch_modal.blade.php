@@ -16,29 +16,11 @@
                 <div class="form-group">
                     <label for="branch_name">Tên Chi Nhánh</label>
                     <input type="text" class="form-control" id="branch_name" name="branch_name" placeholder="Nhập tên chi nhánh" >
-                    
-                </div>
-                {{-- <div class="form-group">
-                    <label for="branch_name">File thông tin khách hàng</label>
-                    <div class="col-sm-9">
-                        <div class="input-file-container">  
-                            <input class="input-file data_customer" id="my-file" type="file" name="data_customer" accept=".xls,.xlsx,.xlsm,.xlsb,.csv">
-                            <label tabindex="0" for="my-file" class="input-file-trigger">Chọn file</label>
-                        </div>
-                        <p class="file-return"></p>
-                    </div>                            
                 </div>
                 <div class="form-group">
-                    <label for="branch_name">File dữ liệu tài khoản</label>
-                    <div class="col-sm-9">
-                        <div class="input-file-container">  
-                            <input class="input-file data_account" id="my-file" type="file" name="data_account" accept=".xls,.xlsx,.xlsm,.xlsb,.csv">
-                            <label tabindex="0" for="my-file" class="input-file-trigger">Chọn file</label>
-                        </div>
-                        <p class="file-return"></p>
-                    </div>                            
-                </div> --}}
-                
+                    <label for="branch_code">Mã Chi Nhánh</label>
+                    <input type="text" class="form-control" id="branch_code" name="branch_code" placeholder="Nhập mã chi nhánh" >
+                </div>
             </div>
             
             <!-- Footer -->

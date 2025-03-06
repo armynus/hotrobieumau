@@ -9,6 +9,7 @@ use App\Http\Controllers\LoginUserController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\SupportFormController;
 use App\Http\Controllers\UserSupportFormController;
+use App\Http\Controllers\AdminFormFieldController;
 
 Route::get('login_admin', [LoginAdminController::class, 'login_admin'])->name('login_admin');
 Route::post('logins_admin', [LoginAdminController::class, 'logins_admin'])->name('logins_admin');
@@ -29,13 +30,20 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('admin_user_update', [AdminUserController::class, 'update'])->name('admin_user_update');
     Route::post('admin_user_lock', [AdminUserController::class, 'lock'])->name('admin_user_lock');
 
-    Route::get('admin_forms', [AdminController::class, 'admin_forms'])->name('admin_forms');
+    Route::get('admin/forms', [AdminController::class, 'admin_forms'])->name('admin_forms');
     Route::post('support_forms_create', [SupportFormController::class, 'support_forms_create'])->name('support_forms_create');
     Route::get('/support_forms/{id}/edit', [SupportFormController::class, 'editform']);
     // Route::post('/support_forms/{id}/update', [SupportFormController::class, 'update']);
     Route::post('/support_forms/{id}/delete', [SupportFormController::class, 'destroy']);
     Route::POST('support_forms_update', [SupportFormController::class, 'update'])->name('support_forms_update');
-});
+
+    Route::get('admin/form_fields', [AdminController::class, 'admin_form_fields'])->name('admin_form_fields');
+    Route::post('admin/add_form_field', [AdminFormFieldController::class, 'add_form_field'])->name('add_form_field');
+    Route::get('admin/form_fields/admin_edit_field', [AdminFormFieldController::class, 'admin_edit_field'])->name('admin_edit_field');
+    Route::post('admin/formfields/admin_update_field', [AdminFormFieldController::class, 'admin_update_field'])->name('admin_update_field');
+    Route::post('admin/formfields/admin_delete_field', [AdminFormFieldController::class, 'admin_delete_field'])->name('admin_delete_field');
+    
+}); 
 
 Route::get('login', [LoginUserController::class, 'login'])->name('login');
 Route::post('logins', [LoginUserController::class, 'logins'])->name('logins');
@@ -54,8 +62,8 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::post('update_account', [UserController::class, 'update_account'])->name('update_account');
     Route::post('add_account', [UserController::class, 'add_account'])->name('add_account');
     // Sử dụng biểu mẫu
-    Route::get('transaction_form', [UserSupportFormController::class, 'transaction_form'])->name('transaction_form');
-    Route::get('transaction_form/{id}', [UserSupportFormController::class, 'show'])->name('using_form');
+    Route::get('support_forms/{type}', [UserSupportFormController::class, 'index'])->name('support_forms.index'); // Danh sách biểu mẫu
+    Route::get('support_forms/{type}/{id}', [UserSupportFormController::class, 'show'])->name('support_forms.show'); // Chi tiết biểu mẫu
     Route::get('/customers/search', [UserSupportFormController::class, 'search'])->name('customer.search');
     Route::post('transaction_form_print', [UserSupportFormController::class, 'print'])->name('transaction_form_print');
 

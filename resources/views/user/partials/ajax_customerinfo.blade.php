@@ -28,62 +28,79 @@
                 method: 'POST',
                 data: formData,
                 success: function (response) {
-                    if (response.status === true) {
-                        var Customer = response.customer;
-                            // Xử lý các giá trị null thành khoảng trắng
-                            Customer.id = Customer.id || '';
-                            Customer.custno = Customer.custno || '';
-                            Customer.nameloc = Customer.nameloc || '';
-                            Customer.phone_no = Customer.phone_no || '';
-                            Customer.identity_no = Customer.identity_no || '';
-                            Customer.addrfull = Customer.addrfull || '';
-                        if(response.avaiable === true){
-                            // xác định row
-                            const row = $(`button[data-id="${Customer.id}"]`).closest('tr');
-                            row.find('td:nth-child(3)').text(Customer.nameloc);
-                            row.find('td:nth-child(4)').text(Customer.phone_no);
-                            row.find('td:nth-child(5)').text(Customer.identity_no);
-                            row.find('td:nth-child(6)').text(Customer.addrfull);
-                        }else{
-                            
-                            let newCustomer=`
-                                <td>${Customer.id}</td>
-                                <td>${Customer.custno}</td>
-                                <td>${Customer.nameloc}</td>
-                                <td>${Customer.phone_no}</td>
-                                <td>${Customer.identity_no}</td>
-                                <td>${Customer.addrfull}</td>
-                                <td>
-                                    <button class="btn btn-info btn-icon-split detail_customer" data-toggle="modal" data-target="#customerInfoModal" data-id="${Customer.id}">
-                                        <span class="text">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
-                                                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"></path>
-                                            </svg>
-                                        </span>
-                                    </button>
-                                </td>
-                            `;
-                            
-                            // Chèn dòng dữ liệu mới vào bảng
-                            $('table tbody').append(newCustomer);
-                        }
-                        swal({
-                            title: "Thành công!",
-                            text: response.message,
-                            icon: "success",
-                        }).then(() => {
-                            $('#close_button').click();
-                            fields.forEach(field => {
-                                $('#' + field).val('');
-                            });
-                        });
-                    } else {
+                    if (!response.status) {
                         swal({
                             title: "Lỗi!",
                             text: response.message || "Thêm thông tin khách hàng thất bại",
                             icon: "error",
                         });
+                        return;
                     }
+
+                    var Customer = response.customer;
+
+                    // Xử lý giá trị null thành chuỗi rỗng để tránh lỗi
+                    Customer.id = Customer.id || '';
+                    Customer.custno = Customer.custno || '';
+                    Customer.nameloc = Customer.nameloc || '';
+                    Customer.phone_no = Customer.phone_no || '';
+                    Customer.identity_no = Customer.identity_no || '';
+
+                    let table = $('#dataTable').DataTable(); // Lấy instance của DataTables
+
+                    if (response.avaiable === true) {
+                        // 🔹 CẬP NHẬT khách hàng đã có trong bảng
+                        let row = $(`button[data-id="${Customer.id}"]`).closest('tr');
+                        let dataRow = table.row(row);
+
+                        if (dataRow.data()) { // Kiểm tra nếu hàng tồn tại trong DataTable
+                            let rowData = dataRow.data(); // Lấy dữ liệu hiện có của hàng
+
+                            // Chỉ cập nhật cột dữ liệu, giữ nguyên cột button
+                            rowData[0] = Customer.id;
+                            rowData[1] = Customer.custno;
+                            rowData[2] = Customer.nameloc;
+                            rowData[3] = Customer.phone_no;
+                            rowData[4] = Customer.identity_no;
+
+                            dataRow.data(rowData).draw(false); // Cập nhật mà không reset pagination
+                        }
+                    } else {
+                        // 🔹 THÊM MỚI khách hàng vào bảng
+                        table.row.add([
+                            Customer.id,
+                            Customer.custno,
+                            Customer.nameloc,
+                            Customer.phone_no,
+                            Customer.identity_no,
+                            `<td style="text-align: center;">
+                                <button class="btn btn-info btn-icon-split detail_customer" 
+                                        data-toggle="modal" 
+                                        data-target="#customerInfoModal" 
+                                        data-id="${Customer.id}">
+                                    <span class="text">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
+                                            <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
+                                        </svg>
+                                    </span>
+                                </button>
+                            </td>`
+                        ]).draw(false); // Thêm mà không reset pagination
+                    }
+
+                    // Hiển thị thông báo thành công
+                    swal({
+                        title: "Thành công!",
+                        text: response.message,
+                        icon: "success",
+                    }).then(() => {
+                        $('#close_button').click();
+                        if (typeof fields !== 'undefined') { // Kiểm tra nếu fields tồn tại
+                            fields.forEach(field => {
+                                $('#' + field).val('');
+                            });
+                        }
+                    });
                 },
                 error: function (xhr) {
                     if (xhr.status === 422) {
@@ -102,6 +119,13 @@
                     }
                 },
             });
+        });
+    });
+    $(document).ready(function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
         });
 
         $('#updateCustomer').click(function () {
@@ -131,12 +155,35 @@
                         swal("Cập nhật thông tin khách hàng thành công", { icon: "success" });
 
                         const updatedCustomer = response.customer;
-                        const row = $(`button[data-id="${updatedCustomer.id}"]`).closest('tr');
+                        let table = $('#dataTable').DataTable(); // Lấy instance của DataTable
 
-                        row.find('td:nth-child(3)').text(updatedCustomer.nameloc);
-                        row.find('td:nth-child(4)').text(updatedCustomer.phone_no);
-                        row.find('td:nth-child(5)').text(updatedCustomer.identity_no);
-                        row.find('td:nth-child(6)').text(updatedCustomer.addrfull);
+                        // Tìm hàng dựa vào ID khách hàng
+                        let rowIndex = table.rows().eq(0).filter(function (index) {
+                            return table.cell(index, 0).data() == updatedCustomer.id;
+                        });
+
+                        if (rowIndex.length) {
+                            // Cập nhật hàng trong DataTable
+                            table.row(rowIndex).data([
+                                updatedCustomer.id,
+                                updatedCustomer.custno,
+                                updatedCustomer.nameloc,
+                                updatedCustomer.phone_no,
+                                updatedCustomer.identity_no,
+                                `<td style="text-align: center;">
+                                    <button class="btn btn-info btn-icon-split detail_customer" 
+                                            data-toggle="modal" 
+                                            data-target="#customerInfoModal" 
+                                            data-id="${updatedCustomer.id}">
+                                        <span class="text">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
+                                                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </td>`
+                            ]).draw(false); // Cập nhật mà không reset pagination
+                        }
 
                         $('#close_button').click();
                     } else {
@@ -149,44 +196,43 @@
             });
         });
 
-        $('.detail_customer').click(function () {
-            const customer_id = $(this).data('id');
-            console.log(customer_id);
-            const fields = [
-                'custno', 'name', 'nameloc', 'gender', 'birthday', 'phone_no',
-                'identity_no', 'identity_date', 'identity_place', 'addrtpcd',
-                'addr1', 'addr2', 'addr3', 'addrfull', 'custtpcd', 'custdtltpcd',
-                'branch_code', 'created_at', 'updated_at'
-            ];
+    });
+    $(document).on('click', '.detail_customer', function () {
+        var customer_id = $(this).data('id');
+        $.ajax({
+            url: '{{ route('detail_customer') }}',
+            method: 'GET',
+            data: { id: customer_id },
+            success: function (data) {
+                var fields = [
+                    'custno', 'name', 'nameloc', 'gender', 'birthday', 'phone_no',
+                    'identity_no', 'identity_date', 'identity_place', 'addrtpcd',
+                    'addr1', 'addr2', 'addr3', 'addrfull', 'custtpcd', 'custdtltpcd',
+                    'branch_code', 'created_at', 'updated_at'
+                ];
 
-            fields.forEach(field => $('#' + field).val(''));
-            $('#view_id').val(customer_id);
+                fields.forEach(field => $('#' + field).val(''));
+                $('#view_id').val(customer_id);
+                const dateFields = ['birthday', 'identity_date', 'created_at', 'updated_at'];
 
-            $.ajax({
-                url: '{{ route('detail_customer') }}',
-                method: 'GET',
-                data: { id: customer_id },
-                success: function (data) {
-                    const dateFields = ['birthday', 'identity_date', 'created_at', 'updated_at'];
-
-                    fields.forEach(field => {
-                        if (dateFields.includes(field)) {
-                            if (data.user[field]) {
-                                const isoDate = new Date(data.user[field]);
-                                const formattedDate = isoDate.toISOString().split('T')[0];
-                                $('#' + field).val(formattedDate);
-                            }
-                        } else {
-                            $('#' + field).val(data.user[field] || '');
+                fields.forEach(field => {
+                    if (dateFields.includes(field)) {
+                        if (data.user[field]) {
+                            const isoDate = new Date(data.user[field]);
+                            const formattedDate = isoDate.toISOString().split('T')[0];
+                            $('#' + field).val(formattedDate);
                         }
-                    });
-                },
-                error: function (data) {
-                    console.log(data);
-                }
-            });
+                    } else {
+                        $('#' + field).val(data.user[field] || '');
+                    }
+                });
+            },
+            error: function (data) {
+                console.log(data);
+            }
         });
     });
+
 </script>
 
 <script>

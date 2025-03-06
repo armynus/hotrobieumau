@@ -22,10 +22,10 @@ class BranchController extends Controller
         'status' => false,
       ]);
     }
-
     // 1. Tạo bản ghi chi nhánh trong bảng `branches`
     $branch = Branches::create([
       'branch_name' => $request->branch_name,
+      'branch_code' => $request->branch_code,
     ]);
     $databaseName = 'branch_' . $branch->id;
     Branches::where('id', $branch->id)->update(['database_name' => $databaseName]);
@@ -45,6 +45,7 @@ class BranchController extends Controller
       'status' => true,
     ]);
   }
+  
   function edit (Request $request) {
     $branch = Branches::where('id', $request->branch_id)->first();
     if (!$branch) {
@@ -58,6 +59,7 @@ class BranchController extends Controller
       'status' => true,
     ]);
   }
+  
   function update (Request $request) {
     $data = $request->all();
     $branch = Branches::where('id', $data['branch_id'])->first();
@@ -67,20 +69,23 @@ class BranchController extends Controller
         'status' => false,
       ]);
     }
-    if($branch->branch_name == $data['branch_name']) {
+    if($branch->branch_name == $data['branch_name'] && $branch->branch_code == $data['branch_code']) {
       return response()->json([
         'message' => 'Không có thay đổi.',
         'status' => false,
       ]);
     }
-    if (Branches::where('branch_name', $data['branch_name'])->first()) {
-      return response()->json([
-        'message' => 'Trùng tên chi nhánh.',
-        'status' => false,
-      ]);
+    if (Branches::where('branch_name', $data['branch_name'])
+        ->where('id', '!=', $data['branch_id']) // loại trừ chính nó
+        ->first()) {
+        return response()->json([
+            'message' => 'Trùng tên chi nhánh.',
+            'status' => false,
+        ]);
     }
     Branches::where('id', $data['branch_id'])->update([
       'branch_name' => $data['branch_name'],
+      'branch_code' => $data['branch_code'],
     ]);
     return response()->json([
       'message' => 'Cập nhật chi nhánh thành công.',

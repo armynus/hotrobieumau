@@ -60,7 +60,6 @@
                             <th>Mã KH</th>
                             <th>Tên KH</th>
                             <th>Loại TK</th>
-                            <th>Địa chỉ</th>
                             <th>Chi tiết</th>
                         </tr>
                     </thead>
@@ -71,7 +70,6 @@
                             <th>Mã khách hàng</th>
                             <th>Tên KH</th>
                             <th>Loại TK</th>
-                            <th>Địa chỉ</th>
                             <th>Chi tiết</th>
                         </tr>
                     </tfoot>
@@ -83,7 +81,6 @@
                                 <td>{{$account->custseq}}</td>
                                 <td>{{$account->custnm}}</td>
                                 <td>{{$account->stscd}}</td> 
-                                <td>{{$account->addrfull}}</td> 
                                 <td>
                                     <button class="btn btn-info btn-icon-split detail_account" 
                                             data-toggle="modal" 

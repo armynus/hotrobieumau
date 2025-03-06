@@ -4,7 +4,7 @@
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
-    <h1 class="h3 mb-2 text-gray-800">Biểu mẫu giao dịch</h1>
+    <h1 class="h3 mb-2 text-gray-800">Danh sách {{$form_type}}</h1>
     
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
@@ -36,13 +36,13 @@
                     <tbody>
                         @foreach($list_forms as $key => $form)
                         <tr>
-                            <td>{{$form->id}}</td>
+                            <td>{{$key}}</td>
                             <td>{{$form->name}}</td>
                             <td>{{$form->usage_count}}</td>
                             <td>{{date('d/m/Y', strtotime($form->created_at)) }}</td>
                             <td>{{date('d/m/Y', strtotime($form->updated_at)) }}</td>
                             <td style="justify-content: center; align-items: flex-start; text-align: center; " >
-                                <a href="{{ route('using_form', ['id' => $form->id]) }}">
+                                <a href="{{ route('forms.show', ['type' => $form->form_type, 'id' => $form->id]) }}">
                                     <button type="button"  data-toggle="modal" data-target="#editFormModal" class="btn btn-info btn-icon-split edit_form" data-form_id="{{$form->id}}">
                                         <span class="text " >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">

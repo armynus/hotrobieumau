@@ -1,4 +1,4 @@
-<a href="{{ $previous_page }}" class="btn btn-secondary btn-icon-split">
+<a href="{{ $previous_page }}" class="btn btn-warning btn-icon-split">
     <span class="icon text-white-50">
         <i class="fa fa-arrow-left" aria-hidden="true"></i>
     </span>

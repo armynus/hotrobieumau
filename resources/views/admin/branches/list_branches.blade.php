@@ -23,7 +23,9 @@
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
+                            <th>STT</th>
                             <th>Tên chi nhánh</th>
+                            <th>Mã chi nhánh</th>
                             <th>Dữ liệu</th>
                             <th>Ngày tạo</th>
                             <th>Ngày cập nhật</th>
@@ -33,7 +35,9 @@
                     </thead>
                     <tfoot>
                         <tr>
+                            <th>STT</th>
                             <th>Tên chi nhánh</th>
+                            <th>Mã chi nhánh</th>
                             <th>Dữ liệu</th>
                             <th>Ngày tạo</th>
                             <th>Ngày cập nhật</th>
@@ -44,7 +48,9 @@
                     <tbody>
                         @foreach($list_branches as $key => $branch)
                         <tr>
+                                <td>{{$key}}</td>
                                 <td>{{$branch->branch_name}}</td>
+                                <td>{{$branch->branch_code}}</td>
                                 <td>{{$branch->database_name}}</td>
                                 <td>{{date('d/m/Y', strtotime($branch->created_at)) }}</td>
                                 <td>{{date('d/m/Y', strtotime($branch->updated_at)) }}</td>

@@ -33,7 +33,7 @@ class CustomerInfoImport implements ToModel, WithHeadingRow
                     'addr2'           => $row['addr2'] ?? $customer->addr2,
                     'addr3'           => $row['addr3'] ?? $customer->addr3,
                     'addrfull'        => $row['addr1'] . ' ' . $row['addr2'] . ' ' . $row['addr3'] ?? $customer->addrfull,
-                    'birthday'        => $row['birthday'] ?? $customer->birthday,
+                    'birthday' => $this->formatBirthday($row['name_1'] ?? null),
                 ]);
 
                 return null; // Không tạo bản ghi mới
@@ -57,11 +57,24 @@ class CustomerInfoImport implements ToModel, WithHeadingRow
                 'addr2'           => $row['addr2'] ?? null,
                 'addr3'           => $row['addr3'] ?? null,
                 'addrfull'        => $row['addr1'] . ' ' . $row['addr2'] . ' ' . $row['addr3'] ?? null,
-                'birthday'        => $row['birthday'] ?? null,
+                'birthday' => $this->formatBirthday($row['name_1'] ?? null),
             ]);
         }
-
+        
         return null; // Bỏ qua nếu `custno` không tồn tại trong dòng Excel
+    }
+    private function formatBirthday($birthday)
+    {
+        if (!$birthday) {
+            return null;
+        }
+
+        // Định dạng đầu vào: YYYYMMDD
+        if (preg_match('/^\d{8}$/', $birthday)) {
+            return substr($birthday, 0, 4) . '-' . substr($birthday, 4, 2) . '-' . substr($birthday, 6, 2);
+        }
+
+        return null; // Nếu không đúng định dạng, bỏ qua
     }
 }
 

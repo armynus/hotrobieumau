@@ -3,6 +3,91 @@
 <script src="{{ asset('vendor/jquery/jquery-ui.min.js') }}"></script>
 
 <script>
+    // document.getElementById("pasteClipboardBtn").addEventListener("click", function() {
+    //     navigator.clipboard.readText().then(text => {
+    //         if (!text.trim()) {
+    //             alert("Clipboard trống!");
+    //             return;
+    //         }
+
+    //         // Tách dữ liệu bằng dấu tab (TSV - Tab Separated Values)
+    //         const dataArr = text.split("\t");
+
+    //         // Danh sách các input theo thứ tự (tùy chỉnh theo form của bạn)
+    //         // const fieldNames = [
+    //         //     "custno", "name", "name", "lastname", "nameloc", "nameloc", 
+    //         //     "nicknameloc", "custtpcd", "custdtltpcd", "phone_no", "gender", "branch_code", 
+    //         //     "birthday", "", "identity_no", "passno", "dlno", "telnoctry", 
+    //         //     "telno", "telnoextn", "addrtpcd", "addr1", "addr2", "addr3", "addr1", 
+    //         //     "addr2", "addr3", "statescd", "refno", "estno", 
+    //         //     "busno", "stscd", "issueby1", "issuedt1", "issueby2", "issuedt2", "", "", "", "", "", "", "", "", "",
+    //         //     "province", "district", "commune_ward", "", "usridop1", 
+    //         //     "", "", "", "", "ctrycdnatl",
+    //         // ];
+    //         // Duyệt qua danh sách và gán dữ liệu vào input tương ứng
+    //         fieldNames.forEach((field, index) => {
+    //             if (field && dataArr[index] !== undefined) {
+    //                 let inputField = document.querySelector(`input[name="${field}"]`);
+    //                 if (inputField) {
+    //                     inputField.value = dataArr[index].trim();
+    //                 }
+    //             }
+    //         });
+
+    //     }).catch(err => {
+    //         console.error("Lỗi khi lấy clipboard:", err);
+    //     });
+    // });
+
+    //Dán dữ liệu từ clipboard
+    document.getElementById('pasteClipboardBtn').addEventListener('click', async function () {
+        try {
+            const text = await navigator.clipboard.readText();
+            if (!text) return alert("Clipboard trống!");
+
+            // Chia dữ liệu theo tab, giữ nguyên dữ liệu đầu tiên
+            const values = text.replace(/^\s+|\s+$/g, '').split(/\t/);
+
+            // Chọn tất cả các input hợp lệ (trừ input bị loại trừ)
+            const inputs = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='_token']):not([disabled]):not([type='hidden']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
+
+            let valueIndex = 0;
+            inputs.forEach(input => {
+                if (valueIndex < values.length) {
+                    input.value = values[valueIndex] || ""; // Gán dữ liệu, giữ nguyên nếu có khoảng trắng đầu
+                    valueIndex++;
+                }
+            });
+
+        } catch (error) {
+            console.error("Lỗi clipboard:", error);
+            alert("Không thể lấy dữ liệu từ clipboard!");
+        }
+    });
+    // Sao chép từ clipboard
+    document.getElementById('copyClipboardBtn').addEventListener('click', function () {
+        try {
+            // Lấy tất cả các input hợp lệ (trừ các input bị loại trừ)
+            const inputs = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='_token']):not([disabled]):not([type='hidden']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
+
+            // Tạo dữ liệu dưới dạng chuỗi, các giá trị phân cách bằng tab ("\t")
+            const textToCopy = inputs.map(input => input.value.trim()).join("\t");
+
+            // Gán dữ liệu vào clipboard
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => alert("Đã sao chép dữ liệu vào clipboard!"))
+                .catch(err => {
+                    console.error("Lỗi khi sao chép:", err);
+                    alert("Không thể sao chép dữ liệu!");
+                });
+
+        } catch (error) {
+            console.error("Lỗi:", error);
+            alert("Đã xảy ra lỗi khi sao chép dữ liệu!");
+        }
+    });
+
+
     $(document).ready(function() {
         $('#print_form').click(function() {
             var formId = $(this).data('form_id');
@@ -10,20 +95,50 @@
             var formData = {};
             var hasEmptyField = false; // Biến để kiểm tra có trường nào bị trống không
 
-            // Duyệt qua tất cả các input và kiểm tra xem có bị trống không
+            // Duyệt qua tất cả các input và kiểm tra xem có bị trống không trừ trường hợp của input search
+      
             $.each(formDataArray, function(_, field) {
-                if (!field.value.trim()) {
+                let inputElement = $(`[name="${field.name}"]`);
+
+                // Nếu field có name là 'keyword', luôn thêm vào formData
+                if (field.name === 'keyword') {
+                    formData[field.name] = field.value;
+                    return true; // Tiếp tục vòng lặp
+                }
+
+                // Nếu input là hidden hoặc disabled → luôn thêm vào formData (không quan tâm rỗng hay không)
+                if (inputElement.attr("type") === "hidden" || inputElement.prop("disabled")) {
+                    formData[field.name] = field.value;
+                    return true; // Tiếp tục vòng lặp
+                }
+
+                if (inputElement.is("select")) {
+                    // Nếu giá trị rỗng, hoặc nếu giá trị là option mặc định (ví dụ, "Chọn giới tính")
+                    if (!field.value || field.value.trim() === "") {
+                        swal({
+                            title: "Cảnh báo!",
+                            text: "Vui lòng chọn thông tin cho " + field.name + "!",
+                            icon: "warning",
+                        });
+                        hasEmptyField = true;
+                        return false; // Dừng vòng lặp
+                    }
+                }
+                // Kiểm tra các input khác nếu có giá trị rỗng
+                else if (!field.value.trim()) {
                     swal({
                         title: "Cảnh báo!",
                         text: "Vui lòng nhập đầy đủ thông tin!",
                         icon: "warning",
                     });
                     hasEmptyField = true;
-                    return false;
-                } else {
-                    formData[field.name] = field.value;
+                    return false; // Dừng vòng lặp
                 }
+
+                // Gán dữ liệu bình thường
+                formData[field.name] = field.value;
             });
+
             if (hasEmptyField) return;
 
             // Tạo form ẩn để gửi dữ liệu tới server
@@ -57,6 +172,25 @@
             $form.submit();
             $form.remove();
         });
+    });
+    document.getElementById('resetFormBtn').addEventListener('click', function () {
+        try {
+            // Lấy tất cả input và select hợp lệ
+            const elements = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='DiaDanh']):not([name='_token']):not([name='NgayGiaoDich']):not([name='NgayThangNam']):not([name='branch']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
+
+            // Đặt lại giá trị mặc định
+            elements.forEach(el => {
+                if (el.tagName === "INPUT") {
+                    el.value = ""; // Xóa giá trị input
+                } else if (el.tagName === "SELECT") {
+                    el.selectedIndex = 0; // Chọn option đầu tiên trong select
+                }
+            });
+
+        } catch (error) {
+            console.error("Lỗi khi làm mới:", error);
+            alert("Không thể làm mới biểu mẫu!");
+        }
     });
 
 
@@ -127,12 +261,27 @@
                     $("#" + key).val(value);
                 }
             });
-            
+            if (customer.custno) {
+                $('#custno_hidden').val(customer.custno);
+            }
+
+            if (customer.accounts?.idxacno) {
+                $('#idxacno_hidden').val(customer.accounts.idxacno);
+            }
             // Xử lý trường "Số tài khoản" (idxacno) và "Loại tiền tệ" (ccycd)
             if (customer.accounts && customer.accounts.length > 1) {
                 // Nếu có nhiều tài khoản, hiển thị dạng select
                 renderSelect(customer);
-            } else {
+
+                // Lắng nghe sự kiện khi thay đổi select để cập nhật idxacno_hidden
+                $("#idxacno").on("click", function () {
+                    $("#idxacno_hidden").val($(this).val());
+                });
+
+                // Gán giá trị đầu tiên làm mặc định
+                $("#idxacno_hidden").val($("#idxacno").val());
+                
+            } else {    
                 // Nếu không có hoặc chỉ có 1 tài khoản:
                 // Nếu container đang chứa select, chuyển về input
                 // Kiểm tra nếu phần tử #idxacno tồn tại trước khi thực hiện thay đổi
@@ -140,17 +289,21 @@
                     if ($("#idxacno").prop("tagName") && $("#idxacno").prop("tagName").toLowerCase() === 'select') {
                         var inputHtml = '<input type="text" class="form-control" id="idxacno" name="idxacno" placeholder="">';
                         $("#idxacno").replaceWith(inputHtml);
-                    }
+                    }   
                 }
                 if (customer.accounts && customer.accounts.length === 1) {
+                    // Nếu chỉ có 1 tài khoản, gán trực tiếp
                     $("#idxacno").val(customer.accounts[0].idxacno);
                     $("#ccycd").val(customer.accounts[0].ccycd);
+                    $("#idxacno_hidden").val(customer.accounts[0].idxacno);
                 } else {
+                    // Không có tài khoản nào
                     $("#idxacno").val('');
                     $("#ccycd").val('');
+                    $("#idxacno_hidden").val('');
                 }
             }
         }
     });
-
+    
 </script>

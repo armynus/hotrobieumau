@@ -28,33 +28,52 @@
                     if (response.status === true) {
                         var Account = response.account;
 
-                         // Xử lý các giá trị null thành chuỗi rỗng
+                        // Xử lý các giá trị null thành chuỗi rỗng
                         Account.id = Account.id || '';
                         Account.idxacno = Account.idxacno || '';
                         Account.custseq = Account.custseq || '';
                         Account.custnm = Account.custnm || '';
                         Account.stscd = Account.stscd || '';
-                        Account.addrfull = Account.addrfull || '';
-                        
+
+                        let table = $('#dataTable').DataTable(); // Lấy instance của DataTable
+
                         if (response.avaiable === true) {
-                            // Xác định dòng cần cập nhật
-                            const row = $(`button[data-id="${Account.id}"]`).closest('tr');
-                            row.find('td:nth-child(2)').text(Account.idxacno);
-                            row.find('td:nth-child(3)').text(Account.custseq);
-                            row.find('td:nth-child(4)').text(Account.custnm);
-                            row.find('td:nth-child(5)').text(Account.stscd);
-                            row.find('td:nth-child(6)').text(Account.addrfull);
+                            // Tìm dòng cần cập nhật
+                            let rowIndex = table.rows().eq(0).filter(function (index) {
+                                return table.cell(index, 0).data() == Account.id;
+                            });
+
+                            if (rowIndex.length) {
+                                table.row(rowIndex).data([
+                                    Account.id,
+                                    Account.idxacno,
+                                    Account.custseq,
+                                    Account.custnm,
+                                    Account.stscd,
+                                    `<td style="text-align: center;">
+                                        <button class="btn btn-info btn-icon-split detail_account" 
+                                                data-toggle="modal" 
+                                                data-target="#AccountInfoModal" 
+                                                data-id="${Account.id}">
+                                            <span class="text">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
+                                                    <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
+                                                </svg>
+                                            </span>
+                                        </button>
+                                    </td>`
+                                ]).draw(false); // Cập nhật mà không reset pagination
+                            }
                         } else {
-                            // Thêm dòng mới
-                            let newAccount = `
-                                <td>${Account.id}</td>
-                                <td>${Account.idxacno}</td>
-                                <td>${Account.custseq}</td>
-                                <td>${Account.custnm}</td>
-                                <td>${Account.stscd}</td>
-                                <td>${Account.addrfull}</td>
-                                <td>
-                                     <button class="btn btn-info btn-icon-split detail_account" 
+                            // Thêm dòng mới vào DataTable
+                            table.row.add([
+                                Account.id,
+                                Account.idxacno,
+                                Account.custseq,
+                                Account.custnm,
+                                Account.stscd,
+                                `<td style="text-align: center;">
+                                    <button class="btn btn-info btn-icon-split detail_account" 
                                             data-toggle="modal" 
                                             data-target="#AccountInfoModal" 
                                             data-id="${Account.id}">
@@ -64,10 +83,8 @@
                                             </svg>
                                         </span>
                                     </button>
-                                </td>
-                            `;
-
-                            $('table tbody').append(newAccount);
+                                </td>`
+                            ]).draw(false);
                         }
 
                         swal({
@@ -111,8 +128,8 @@
         $('#updateAccount').click(function () {
             const id = $('#view_id').val();
             const fields = [
-                'custseq', 'custnm', 'stscd','ccycd','lmtmtp','minlmt',       
-                'addr1',  'addr2', 'addr3','addrfull',     
+                'custseq', 'custnm', 'stscd', 'ccycd', 'lmtmtp', 'minlmt',       
+                'addr1', 'addr2', 'addr3', 'addrfull'
             ];
 
             let formData = {
@@ -123,7 +140,6 @@
             fields.forEach(field => {
                 formData[field] = $('#' + field).val();
             });
-           
 
             $.ajax({
                 url: '{{ route('update_account') }}',
@@ -131,32 +147,53 @@
                 data: formData,
                 success: function (response) {
                     if (response.status === true) {
-                        console.log(response)
-                        console.log(response.account)
-                        // Hiển thị thông báo thành công
-                        swal("Cập nhật thông tin khách hàng thành công", { icon: "success" });
-                        // Cập nhật trực tiếp thông tin trên bảng
-                        const updatedAccount = response.account;
-                        const row = $(`button[data-id="${updatedAccount.id}"]`).closest('tr');
-                        // Thay đổi nội dung các cột
-                        row.find('td:nth-child(3)').text(updatedAccount.custseq);  // Tên KH
-                        row.find('td:nth-child(4)').text(updatedAccount.custnm); // Số điện thoại
-                        row.find('td:nth-child(5)').text(updatedAccount.stscd); // CMND/CCCD
-                        row.find('td:nth-child(6)').text(updatedAccount.addrfull);  // Địa chỉ
+                        let table = $('#dataTable').DataTable(); // Lấy instance của DataTable
 
-                
+                        const updatedAccount = response.account;
+
+                        // Tìm dòng chứa tài khoản có ID tương ứng
+                        let rowIndex = table.rows().eq(0).filter(function (index) {
+                            return table.cell(index, 0).data() == updatedAccount.id;
+                        });
+
+                        if (rowIndex.length) {
+                            // Cập nhật thông tin trên bảng DataTable
+                            table.row(rowIndex).data([
+                                updatedAccount.id,
+                                updatedAccount.idxacno || '',
+                                updatedAccount.custseq || '',
+                                updatedAccount.custnm || '',
+                                updatedAccount.stscd || '',
+                                `<td style="text-align: center;">
+                                    <button class="btn btn-info btn-icon-split detail_account" 
+                                            data-toggle="modal" 
+                                            data-target="#AccountInfoModal" 
+                                            data-id="${updatedAccount.id}">
+                                        <span class="text">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
+                                                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </td>`
+                            ]).draw(false);
+                        }
+
+                        swal("Cập nhật thông tin khách hàng thành công", { icon: "success" });
                     } else {
-                        alert('Cập nhật thông tin khách hàng thất bại');
+                        swal("Lỗi!", "Cập nhật thông tin khách hàng thất bại", "error");
                     }
                 },
                 error: function (xhr) {
                     console.error('Lỗi:', xhr.responseText);
+                    swal("Lỗi!", "Đã xảy ra lỗi trong quá trình xử lý", "error");
                 }
             });
         });
+
         
         // Xử lý khi click vào nút xem thông tin khách hàng
-        $('.detail_account').click(function(){
+        $(document).on('click', '.detail_account', function () {
             const account_id = $(this).data('id');
             // Danh sách các trường cần reset
             const fields = [

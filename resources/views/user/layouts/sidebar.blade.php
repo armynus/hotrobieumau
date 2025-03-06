@@ -2,7 +2,7 @@
     background-size: cover;">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{route('user')}}">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{route('index')}}">
                 <div class="sidebar-brand-icon ">
                     <img src="{{asset('hp-logo.png')}}" alt="" style="height: 50px">
                 </div>
@@ -46,20 +46,8 @@
                     </div>
                 </div>
             </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pass-fill" viewBox="0 0 16 16">
-                        <path d="M10 0a2 2 0 1 1-4 0H3.5A1.5 1.5 0 0 0 2 1.5v13A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-13A1.5 1.5 0 0 0 12.5 0zM4.5 5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1m0 2h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1 0-1"/>
-                      </svg>
-                    <span>Hỗ trợ biểu mẫu</span>
-                </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{route('transaction_form')}}">Biểu mẫu giao dịch</a>
-                    </div>
-                </div>
-            </li>
+            <x-sidebar-form-types />
+
 
         
 
