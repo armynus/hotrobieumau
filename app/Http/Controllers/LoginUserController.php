@@ -32,6 +32,9 @@ class LoginUserController extends Controller
                 $request->session()->put('UserBranchId', $result->branch_id);
                 $request->session()->put('UserBranchCode', $branch->branch_code);
                 $request->session()->put('UserBranchName', $branch->branch_name);
+                $request->session()->put('UserBranchAddr', $branch->branch_addr);
+                $request->session()->put('UserBranchPhone', $branch->branch_phone);
+                $request->session()->put('UserBranchFax', $branch->branch_fax);
                 return redirect()->route('index');
             }
             return redirect()->route('login')->with('error', 'Email hoặc mật khẩu không đúng!');

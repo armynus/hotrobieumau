@@ -89,7 +89,9 @@ $(document).ready(function(){
 
                 const form = response.data;
                 let updated_at = new Date(form.updated_at);
+                let created_at = new Date(form.created_at);
                 let formatted_updated_at = updated_at.toLocaleDateString('en-GB');
+                let formatted_created_at = created_at.toLocaleDateString('en-GB');
 
                 // Tìm dòng hiện tại trong bảng
                 const row = $(`button[data-form_id="${form.id}"]`).closest('tr');
@@ -100,8 +102,9 @@ $(document).ready(function(){
                 if ($.fn.DataTable.isDataTable('#dataTable')) {
                     // Nếu đang dùng DataTables thì cập nhật hàng bằng API
                     let rowIndex = table.row(row).index();
+                    let oldData = table.row(rowIndex).data(); // Lấy dữ liệu hàng hiện tại
                     table.row(rowIndex).data([
-                        form.id,
+                        oldData[0], // Giữ nguyên ID cũ
                         form.name,
                         form.form_type ? form.form_type.type_name : 'N/A', // Kiểm tra null
                         form.usage_count || '0',
@@ -135,6 +138,7 @@ $(document).ready(function(){
                     row.find('td:nth-child(3)').text(form.form_type ? form.form_type.type_name : 'N/A');
                     row.find('td:nth-child(4)').text(form.usage_count);
                     row.find('td:nth-child(5)').text(form.file_template);
+                    row.find('td:nth-child(7)').text(formatted_created_at);
                     row.find('td:nth-child(7)').text(formatted_updated_at);
                 }
 

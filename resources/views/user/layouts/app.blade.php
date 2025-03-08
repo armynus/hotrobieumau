@@ -58,6 +58,11 @@
     <!-- Logout Modal-->
     @include('user.partials.logout_modal')
 
+
+
+    <!-- Nhúng file dùng chung cho toàn bộ ứng dụng -->
+    @include('search_topbar')
+
     @stack('scripts') <!-- Thêm JS riêng -->
 </body>
 </html>

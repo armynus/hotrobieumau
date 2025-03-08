@@ -9,7 +9,7 @@
     <!-- Form biểu mẫu -->
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center mb-4">
-            <h5>Biểu Mẫu: {{$form->name }}</h5>
+             <h5><b>Biểu Mẫu: {{$form->name }}</b></h5>
             <x-back-page-button text="Quay lại danh sách biểu mẫu" />
 
         </div>
@@ -23,7 +23,7 @@
                     <div class="row mb-4 justify-content-center">
                         <div class="col-md-6">
                             <div class="input-group">
-                                <input type="search" class="form-control bg-light small" id="customer_search" placeholder="Tra cứu KH bằng mã KH hoặc tên hoặc CCCD/CMND" aria-label="Search" aria-describedby="basic-addon2" name="keyword">
+                                <input type="search" class="form-control bg-light small" id="customer_search" placeholder="Lấy thông tin khách hàng có sẵn để điền vào Form" aria-label="Search" aria-describedby="basic-addon2" name="keyword">
                                 <div class="input-group-append">
                                     <span class="btn btn-primary">
                                         <i class="fas fa-search fa-sm"></i>
@@ -59,10 +59,13 @@
                                             name="{{ $key }}" required
                                             placeholder="{{ $info['placeholder'] ?? '' }}"
                                             value="{{ 
-                                                    $key == 'NgayThangNam' || $key == 'NgayGiaoDich' ? now()->format('Y-m-d') : 
-                                                    ($key == 'branch' ? session('UserBranchName', '') : 
-                                                    ($key == 'branch_code' ? session('UserBranchCode', '') : '')) 
-                                            }}"
+                                                $key == 'NgayThangNam' || $key == 'NgayGiaoDich' ? now()->format('Y-m-d') : 
+                                                ($key == 'branch' ? session('UserBranchName', '') : 
+                                                ($key == 'DiaChi' ? session('UserBranchAddr', '') : 
+                                                ($key == 'SoFax' ? session('UserBranchFax', '') : 
+                                                ($key == 'DienThoai' ? session('UserBranchPhone', '') : 
+                                                ($key == 'GDichVien' ? session('user_name', '') : 
+                                                ($key == 'branch_code' ? session('UserBranchCode', '') : '')))))) }}"                                            
                                         >  
                                     @endif
                                 </div>

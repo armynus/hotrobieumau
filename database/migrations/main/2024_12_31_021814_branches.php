@@ -11,6 +11,9 @@ return new class extends Migration {
             $table->id();
             $table->string('branch_name');
             $table->string('branch_code')->nullable();
+            $table->string('branch_addr')->nullable();
+            $table->string('branch_phone')->nullable();
+            $table->string('branch_fax')->nullable();
             $table->string('database_name')->nullable();
             $table->string('status')->default('active');
             $table->timestamps();

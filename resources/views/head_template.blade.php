@@ -19,4 +19,5 @@
     
     <input type = "hidden" name = "_token" value = '<?php echo csrf_token(); ?>'>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="{{ asset('vendor/jquery/jquery-ui.css') }}" rel="stylesheet">
 

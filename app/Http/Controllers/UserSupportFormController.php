@@ -178,7 +178,7 @@ class UserSupportFormController extends Controller
                         $templateProcessor->setValue('n' . ($i + 1), $nameArray[$i]);
                     }
                 }
-                if (strpos($key, 'birthday') !== false || strpos($key, 'NgayGiaoDich') !== false) {
+                if (strpos($key, 'birthday') !== false || strpos($key, 'identity_date') !== false || strpos($key, 'NgayGiaoDich') !== false || strpos($key, 'NgayCCCDMoi') !== false || strpos($key, 'NgayCapDKKD') !== false) {
                     // Chuyển định dạng ngày tháng
                     $value = $this->convertDateFormat($value);
                 } elseif (strpos($key, 'NgayThangNam') !== false) {
@@ -189,6 +189,10 @@ class UserSupportFormController extends Controller
                     $value = $this->formatNumber($value);
                 }
                 $templateProcessor->setValue($key, $value ?? '');
+                // Nếu có key branch, tạo thêm biến 'ChiNhanhHOA' với giá trị được chuyển thành in hoa
+                if ($key === 'branch') {
+                    $templateProcessor->setValue('ChiNhanhHOA', $this->convertToUppercase($value));
+                }
             }
 
             // Tăng usage_count của biểu mẫu mỗi khi in
@@ -265,6 +269,9 @@ class UserSupportFormController extends Controller
     }
     function formatNumber($number) {
         return number_format($number, 0, '', '.');
+    }
+    function convertToUppercase($text) {
+        return mb_strtoupper($text, 'UTF-8');
     }
 }
                                      
