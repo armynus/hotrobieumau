@@ -5,6 +5,10 @@
             var _token = $('input[name="_token"]').val();
             var branch_name = $('#branch_name').val();
             var branch_code = $('#branch_code').val();
+            var branch_addr = $('#branch_addr').val();
+            var branch_phone = $('#branch_phone').val();
+            var branch_fax = $('#branch_fax').val();
+            var branch_place = $('#branch_place').val();
             if (branch_name == '') {
                 swal("Vui lòng nhập tên chi nhánh - phòng giao dịch", {
                     icon: "error",
@@ -18,6 +22,10 @@
                     _token: _token,
                     branch_name: branch_name,
                     branch_code: branch_code,
+                    branch_addr: branch_addr,
+                    branch_phone: branch_phone,
+                    branch_fax: branch_fax,
+                    branch_place: branch_place,
                 },
                 success: function(data){
                    if (data.status == true) {
@@ -32,7 +40,11 @@
                                 <td>${data.branch.id}</td>
                                 <td>${data.branch.branch_name}</td>
                                 <td>${data.branch.branch_code}</td>
-                                <td>${formatted_created_at}</td> 
+                                <td>${data.branch.branch_addr}</td>
+                                <td>${data.branch.branch_phone}</td>
+                                <td>${data.branch.branch_fax}</td>
+                                <td>${data.branch.branch_place}</td>
+                                <td>branch_${data.branch.id}</td>
                                 <td>${formatted_updated_at}</td>
                                 <td><span class="badge badge-success">Hoạt động</span></td>
                                 <td style="justify-content: center; align-items: flex-start; text-align: center;">
@@ -94,6 +106,10 @@
                     $('#edit_branch_id').val(response.branch.id);
                     $('#edit_branch_name').val(response.branch.branch_name);
                     $('#edit_branch_code').val(response.branch.branch_code);
+                    $('#edit_branch_addr').val(response.branch.branch_addr);
+                    $('#edit_branch_phone').val(response.branch.branch_phone);
+                    $('#edit_branch_fax').val(response.branch.branch_fax);
+                    $('#edit_branch_place').val(response.branch.branch_place);
 
                    
                 },
@@ -109,6 +125,10 @@
             var branchId = $('#edit_branch_id').val();
             var branchName = $('#edit_branch_name').val();
             var branchCode = $('#edit_branch_code').val();
+            var branch_addr = $('#edit_branch_addr').val();
+            var branch_phone = $('#edit_branch_phone').val();
+            var branch_fax = $('#edit_branch_fax').val();
+            var branch_place = $('#edit_branch_place').val();
             var _token = $('input[name="_token"]').val();
             if(branchName == ''){
                 swal("Vui lòng nhập tên chi nhánh!", {
@@ -124,6 +144,10 @@
                     _token: _token, // Token CSRF
                     branch_name: branchName,
                     branch_code: branchCode,
+                    branch_addr: branch_addr,
+                    branch_phone: branch_phone,
+                    branch_fax: branch_fax,
+                    branch_place: branch_place,
                     branch_id: branchId
                 },
                 success: function (response) {

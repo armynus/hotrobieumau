@@ -162,7 +162,7 @@ class UserSupportFormController extends Controller
 
             // Gắn dữ liệu từ form vào file Word
             foreach ($formData as $key => $value) {
-                if ($key === 'name') {
+                if ($key === 'nameloc') {
                     // Chuyển tên thành in hoa không dấu
                     $name = $this->convertToUppercaseWithoutAccents($value);
                     // Tạo mảng ký tự từ tên (giới hạn 26 ký tự)
@@ -178,9 +178,49 @@ class UserSupportFormController extends Controller
                         $templateProcessor->setValue('n' . ($i + 1), $nameArray[$i]);
                     }
                 }
-                if (strpos($key, 'birthday') !== false || strpos($key, 'identity_date') !== false || strpos($key, 'NgayGiaoDich') !== false || strpos($key, 'NgayCCCDMoi') !== false || strpos($key, 'NgayCapDKKD') !== false) {
+                if ($key === 'idxacno') {
+                    $templateProcessor->setValue('idxacno',$value);
+                    // Chia tách số thành các ký tự riêng lẻ
+                    $stkArray = $this->convertNumberToVariables($value);
+                
+                    // Giới hạn mảng chỉ 16 số
+                    $stkArray = array_slice($stkArray, 0, 16);
+                
+                    // Nếu chưa đủ 16 số thì thêm khoảng trắng
+                    while (count($stkArray) < 16) {
+                        $stkArray['s' . (count($stkArray) + 1)] = ' ';
+                    }
+                
+                    // Gán từng ký tự vào biến tương ứng ($s1, $s2, ..., $s16)
+                    foreach ($stkArray as $key => $value) {
+                        $templateProcessor->setValue($key, $value);
+                    }
+
+                }
+                
+                if (strpos($key, 'NgayHen') !== false || strpos($key, 'birthday') !== false || strpos($key, 'identity_date') !== false || strpos($key, 'NgayGiaoDich') !== false || strpos($key, 'NgayCCCDMoi') !== false || strpos($key, 'NgayCapDKKD') !== false) {
                     // Chuyển định dạng ngày tháng
                     $value = $this->convertDateFormat($value);
+                    
+                    if (strpos($key, 'birthday') !== false) {
+                        $dateVars = $this->convertDateToVariablesBirthDay($value ?? '');
+                        // Kiểm tra xem $dateVars có là mảng không
+                        if (!empty($dateVars) && is_array($dateVars)) {
+                            foreach ($dateVars as $varName => $varValue) {
+                                $templateProcessor->setValue($varName, (string)$varValue); // Ép về string
+                            }
+                        }
+                    }
+                    if (strpos($key, 'identity_date') !== false) {
+                        $dateVars = $this->convertDateToVariablesIdentity($value ?? '');
+                        // Kiểm tra xem $dateVars có là mảng không
+                        if (!empty($dateVars) && is_array($dateVars)) {
+                            foreach ($dateVars as $varName => $varValue) {
+                                $templateProcessor->setValue($varName, (string)$varValue); // Ép về string
+                            }
+                        }
+                    }
+                    
                 } elseif (strpos($key, 'NgayThangNam') !== false) {
                     $value = $this->convertDateNowFormat($value);
                 }
@@ -188,11 +228,12 @@ class UserSupportFormController extends Controller
                 if (strpos($key, 'VonSucLD_So') !== false || strpos($key, 'SoDuTaiKhoan') !== false || strpos($key, 'HanMucTD_So') !== false) {
                     $value = $this->formatNumber($value);
                 }
-                $templateProcessor->setValue($key, $value ?? '');
+                $templateProcessor->setValue($key, (string) ($value ?? ''));
                 // Nếu có key branch, tạo thêm biến 'ChiNhanhHOA' với giá trị được chuyển thành in hoa
                 if ($key === 'branch') {
                     $templateProcessor->setValue('ChiNhanhHOA', $this->convertToUppercase($value));
                 }
+         
             }
 
             // Tăng usage_count của biểu mẫu mỗi khi in
@@ -205,7 +246,7 @@ class UserSupportFormController extends Controller
             DB::commit();
 
             // Trả về file Word để tải xuống trực tiếp
-            return response()->download($tempFile, $form->name . time() . '.docx')->deleteFileAfterSend(true);
+            return response()->download($tempFile, $form->name .'_' .  date('H-i_d-m-Y') . '.docx')->deleteFileAfterSend(true);
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback nếu có lỗi
             return response()->json(['error' => $e->getMessage()], 500);
@@ -214,7 +255,18 @@ class UserSupportFormController extends Controller
 
     public function convertDateFormat($date)
     {
-        return $date ? date('d/m/Y', strtotime($date)) : '';
+        // Nếu date không tồn tại, trả về chuỗi trống
+        if (!$date) return '';
+        
+        try {
+            $timestamp = strtotime($date);
+            if ($timestamp === false) return '';
+            
+            // Đảm bảo format luôn có đủ số 0
+            return date('d/m/Y', $timestamp);
+        } catch (Exception $e) {
+            return '';
+        }
     }
     public function convertDateNowFormat($date)
     {
@@ -227,6 +279,7 @@ class UserSupportFormController extends Controller
 
         return "ngày $day tháng $month năm $year";
     }
+    
     public function convertToUppercaseWithoutAccents($string) {
         $unwanted_array = array(
             'à' => 'a', 'á' => 'a', 'ạ' => 'a', 'ả' => 'a', 'ã' => 'a',
@@ -273,5 +326,69 @@ class UserSupportFormController extends Controller
     function convertToUppercase($text) {
         return mb_strtoupper($text, 'UTF-8');
     }
+
+    function convertDateToVariablesBirthDay($date) {
+        if (empty($date)) return [];
+    
+        // Loại bỏ dấu "/"
+        $dateStr = str_replace('/', '', $date);
+    
+        // Đảm bảo đủ 8 ký tự, thiếu thì thêm "0"
+        $paddedDate = str_pad($dateStr, 8, '0', STR_PAD_LEFT);
+    
+        return [
+            '1' => $paddedDate[0] === '0' ? '0 ' : $paddedDate[0],
+            '2' => $paddedDate[1] === '0' ? '0 ' : $paddedDate[1],
+            '3' => $paddedDate[2] === '0' ? '0 ' : $paddedDate[2],
+            '4' => $paddedDate[3] === '0' ? '0 ' : $paddedDate[3],
+            '5' => $paddedDate[4] === '0' ? '0 ' : $paddedDate[4],
+            '6' => $paddedDate[5] === '0' ? '0 ' : $paddedDate[5],
+            '7' => $paddedDate[6] === '0' ? '0 ' : $paddedDate[6],
+            '8' => $paddedDate[7] === '0' ? '0 ' : $paddedDate[7],
+        ];
+    }
+    function convertDateToVariablesIdentity($date) {
+        if (empty($date)) return [];
+    
+        // Loại bỏ dấu "/" trong chuỗi date
+        $dateStr = str_replace('/', '', $date);
+        
+        // Đảm bảo chuỗi có đủ 8 ký tự, nếu thiếu thì thêm "0" phía trước
+        $paddedDate = str_pad($dateStr, 8, '0', STR_PAD_LEFT);
+        
+        // Gán các ký tự với key từ "9" đến "16"
+        return [
+            'a' => $paddedDate[0] === '0' ? '0 ' : $paddedDate[0],
+            'b' => $paddedDate[1] === '0' ? '0 ' : $paddedDate[1],
+            'c' => $paddedDate[2] === '0' ? '0 ' : $paddedDate[2],
+            'd' => $paddedDate[3] === '0' ? '0 ' : $paddedDate[3],
+            'e' => $paddedDate[4] === '0' ? '0 ' : $paddedDate[4],
+            'f' => $paddedDate[5] === '0' ? '0 ' : $paddedDate[5],
+            'g' => $paddedDate[6] === '0' ? '0 ' : $paddedDate[6],
+            'h' => $paddedDate[7] === '0' ? '0 ' : $paddedDate[7],
+        ];
+    }
+    function convertNumberToVariables($number) {
+        if (empty($number)) return [];
+        
+        // Chuyển số thành mảng ký tự
+        $digits = str_split($number);
+        
+        // Đảm bảo đủ 16 ký tự, nếu thiếu thêm khoảng trắng
+        while (count($digits) < 16) {
+            $digits[] = ' ';
+        }
+    
+        // Trả về mảng ký tự tương ứng từ s1 -> s16
+        $result = [];
+        foreach ($digits as $index => $digit) {
+            $result['s' . ($index + 1)] = ($digit === '0') ? '0 ' : $digit;
+        }
+    
+        return $result;
+    }
+    
+    
+    
 }
                                      

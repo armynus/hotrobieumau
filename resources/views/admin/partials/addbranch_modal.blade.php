@@ -21,6 +21,22 @@
                     <label for="branch_code">Mã Chi Nhánh</label>
                     <input type="text" class="form-control" id="branch_code" name="branch_code" placeholder="Nhập mã chi nhánh" >
                 </div>
+                <div class="form-group">
+                    <label for="branch_addr">Địa Chỉ Chi Nhánh</label>
+                    <input type="text" class="form-control" id="branch_addr" name="branch_addr" placeholder="Nhập địa chỉ chi nhánh" >
+                </div>
+                <div class="form-group">
+                    <label for="branch_phone">SĐT Chi Nhánh</label>
+                    <input type="text" class="form-control" id="branch_phone" name="branch_phone" placeholder="Nhập SĐT chi nhánh" >
+                </div>
+                <div class="form-group">
+                    <label for="branch_fax">Số Fax Chi Nhánh</label>
+                    <input type="text" class="form-control" id="branch_fax" name="branch_fax" placeholder="Nhập số Fax chi nhánh" >
+                </div>
+                <div class="form-group">
+                    <label for="branch_place">Địa Danh Chi Nhánh</label>
+                    <input type="text" class="form-control" id="branch_place" name="branch_place" placeholder="Nhập địa danh chi nhánh" >
+                </div>
             </div>
             
             <!-- Footer -->

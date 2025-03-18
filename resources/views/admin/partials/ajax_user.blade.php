@@ -1,5 +1,27 @@
 
 <script>
+    $(document).on('click', '.edit_user', function () {
+        var user_id = $(this).data('user_id');
+        $.ajax({
+            url: '{{route('admin_user_edit')}}',
+            method: 'GET',
+            data: {
+                user_id: user_id,
+            },
+            success: function(data){
+                
+                $('#edit_user_id').val(data.user.id);
+                $('#edit_name').val(data.user.name);
+                $('#edit_email').val(data.user.email);
+                $('#edit_branch').val(data.user.branch_id);
+                $('#edit_user_id').val(data.user.id);
+                $('#edit_role_id').val(data.user.role_id);
+            },
+            error: function(data){
+                console.log(data);
+            }
+        });
+    });
     $(document).ready(function(){
         $('.lock_user').click(function(){
             var user_id = $(this).data('user_id');
@@ -131,28 +153,7 @@
                 }
             });
         })
-        $('.edit_user').click(function(){
-            var user_id = $(this).data('user_id');
-            $.ajax({
-                url: '{{route('admin_user_edit')}}',
-                method: 'GET',
-                data: {
-                    user_id: user_id,
-                },
-                success: function(data){
-                   
-                    $('#edit_user_id').val(data.user.id);
-                    $('#edit_name').val(data.user.name);
-                    $('#edit_email').val(data.user.email);
-                    $('#edit_branch').val(data.user.branch_id);
-                    $('#edit_user_id').val(data.user.id);
-                    $('#edit_role_id').val(data.user.role_id);
-                },
-                error: function(data){
-                    console.log(data);
-                }
-            });
-        });
+        
         $('#addUser').click(function(){
             var _token = $('input[name="_token"]').val();
             var name = $('#name').val();
@@ -189,61 +190,82 @@
                     branch_id: branch_id,
                     role_id: role_id,
                 },
-                success: function(data){
-                   if (data.status == true) {
-                        let created_at = new Date(data.user.created_at); // Chuyển chuỗi thành đối tượng Date
-                        let formatted_created_at = created_at.toLocaleDateString('en-GB'); // Định dạng dd/mm/yyyy
+                success: function(data) {
+                    if (!data.status) {
+                        swal({
+                            title: "Lỗi!",
+                            text: data.message || "Thêm tài khoản thất bại",
+                            icon: "error",
+                        });
+                        return;
+                    }
 
-                        let updated_at = new Date(data.user.updated_at);
-                        let formatted_updated_at = updated_at.toLocaleDateString('en-GB');
-                        
-                        let newUser=`
-                            <td>${data.user.name}</td>
-                            <td>${data.user.email}</td>
-                            <td>${data.branch_name}</td>
-                            <td>${data.role_name}</td>
-                            <td>${formatted_created_at}</td>
-                            <td>${formatted_created_at}</td>
-                            <td style="justify-content: center; align-items: flex-start; text-align: center; " >
+                    let user = data.user;
+                    let table = $('#dataTable').DataTable();
+
+                    // Xử lý giá trị null thành chuỗi rỗng để tránh lỗi
+                    user.name = user.name || '';
+                    user.email = user.email || '';
+                    data.branch_name = data.branch_name || '';
+                    data.role_name = data.role_name || '';
+
+                    let created_at = new Date(user.created_at).toLocaleDateString('en-GB');
+                    let updated_at = new Date(user.updated_at).toLocaleDateString('en-GB');
+
+                    if (data.avaiable === true) {
+                        // CẬP NHẬT thông tin nếu người dùng đã tồn tại
+                        let row = $(`span.edit_user[data-user_id="${user.id}"]`).closest('tr');
+                        let dataRow = table.row(row);
+
+                        if (dataRow.data()) {
+                            let rowData = dataRow.data();
+                            rowData[1] = user.name;
+                            rowData[2] = user.email;
+                            rowData[3] = data.branch_name;
+                            rowData[4] = data.role_name;
+                            rowData[5] = created_at;
+                            rowData[6] = updated_at;
+                            dataRow.data(rowData).draw(false);
+                        }
+                    } else {
+                        // THÊM MỚI người dùng vào bảng
+                        table.row.add([
+                            user.id,
+                            user.name,
+                            user.email,
+                            data.branch_name,
+                            data.role_name,
+                            created_at,
+                            updated_at,
+                            `<td style="justify-content: center; align-items: flex-start; text-align: center;">
                                 <button type="button"  data-toggle="modal" data-target="#editUserModal" class="btn btn-info btn-icon-split" >
-                                    <span class="text edit_user" data-user_id="${data.user.id}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                        <span class="text edit_user" data-user_id="${user.id}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                <button class="btn btn-danger btn-icon-split">
+                                    <span class="icon text-white-50 cancel_order lock_user" data-user_id="${user.id}" data-status="${user.id}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ban-fill" viewBox="0 0 16 16">
+                                            <path d="M16 8A8 8 0 1 1 0 8a 8 8 0 0 1 16 0M2.71 12.584q.328.378.706.707l9.875-9.875a7 7 0 0 0-.707-.707l-9.875 9.875Z"/>
                                         </svg>
                                     </span>
                                 </button>
-                                <button  class="btn btn-danger btn-icon-split">
-                                    <span class="icon text-white-50 cancel_order lock_user"  data-user_id="${data.user.id}" data-status="${data.user.id}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ban-fill" viewBox="0 0 16 16">
-                                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M2.71 12.584q.328.378.706.707l9.875-9.875a7 7 0 0 0-.707-.707l-9.875 9.875Z"/>
-                                            </svg>
-                                    </span>
-                                    
-                                </button>
-                            </td>
-                        `;
+                            </td>`
+                        ]).draw(false);
+                    }
 
-                        
-                        // Chèn dòng dữ liệu mới vào bảng
-                        $('table tbody').append(newUser);
-                        
-                        // Hiển thị thông báo thành công (tuỳ chọn)
-                        swal("Thành công!", "Thêm tài khoản thành công.", {
-                            icon: "success",
-                        });
-                        // Đóng modal và reset form
-                        var cancel = document.querySelector('#close_button');
+                    swal("Thành công!", "Thêm tài khoản thành công.", {
+                        icon: "success",
+                    }).then(() => {
+                        $('#close_button').click();
                         $('#name').val('');
                         $('#email').val('');
                         $('#password').val('');
                         $('#branch').val('');
-                        
-                    } else {
-                        swal(data.message, {
-                            icon: "error",
-                        });
-                    }
+                    });
                 },
                 error: function(data){
                     var errors = data.responseJSON;

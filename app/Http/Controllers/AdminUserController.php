@@ -14,7 +14,7 @@ class AdminUserController extends Controller
             join('branches', 'users.branch_id', '=', 'branches.id')
             ->select('users.*', 'branches.branch_name as branch_name')
             ->where('role_id', '!=', 0)
-            ->orderBy('users.id', 'desc')
+            ->orderBy('users.id', 'asc')
             ->get();
         $list_branch = Branches::select('id', 'branch_name')->get();
         return view('admin.users.list_user', compact('list_user','list_branch'));

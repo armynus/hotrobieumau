@@ -40,31 +40,137 @@
     // });
 
     //Dán dữ liệu từ clipboard
-    document.getElementById('pasteClipboardBtn').addEventListener('click', async function () {
-        try {
-            const text = await navigator.clipboard.readText();
-            if (!text) return alert("Clipboard trống!");
+    // document.getElementById('pasteClipboardBtn').addEventListener('click', async function () {
+    //     try {
+    //         const text = await navigator.clipboard.readText();
+    //         if (!text) return alert("Clipboard trống!");
 
-            // Chia dữ liệu theo tab, giữ nguyên dữ liệu đầu tiên
-            const values = text.replace(/^\s+|\s+$/g, '').split(/\t/);
+    //         // Chia dữ liệu theo tab, giữ nguyên dữ liệu đầu tiên
+    //         const values = text.replace(/^\s+|\s+$/g, '').split(/\t/);
 
-            // Chọn tất cả các input hợp lệ (trừ input bị loại trừ)
-            const inputs = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='_token']):not([disabled]):not([type='hidden']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
+    //         // Chọn tất cả các input hợp lệ (trừ input bị loại trừ)
+    //         const inputs = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='_token']):not([disabled]):not([type='hidden']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
 
-            let valueIndex = 0;
-            inputs.forEach(input => {
-                if (valueIndex < values.length) {
-                    input.value = values[valueIndex] || ""; // Gán dữ liệu, giữ nguyên nếu có khoảng trắng đầu
-                    valueIndex++;
-                }
-            });
+    //         let valueIndex = 0;
+    //         inputs.forEach(input => {
+    //             if (valueIndex < values.length) {
+    //                 input.value = values[valueIndex] || ""; // Gán dữ liệu, giữ nguyên nếu có khoảng trắng đầu
+    //                 valueIndex++;
+    //             }
+    //         });
 
-        } catch (error) {
-            console.error("Lỗi clipboard:", error);
-            alert("Không thể lấy dữ liệu từ clipboard!");
-        }
-    });
+    //     } catch (error) {
+    //         console.error("Lỗi clipboard:", error);
+    //         alert("Không thể lấy dữ liệu từ clipboard!");
+    //     }
+    // });
     // Sao chép từ clipboard
+    // document.getElementById('copyClipboardBtn').addEventListener('click', function () {
+    //     try {
+    //         // Lấy tất cả các input hợp lệ (trừ các input bị loại trừ)
+    //         const inputs = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='_token']):not([disabled]):not([type='hidden']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
+
+    //         // Tạo dữ liệu dưới dạng chuỗi, các giá trị phân cách bằng tab ("\t")
+    //         const textToCopy = inputs.map(input => input.value.trim()).join("\t");
+
+    //         // Gán dữ liệu vào clipboard
+    //         navigator.clipboard.writeText(textToCopy)
+    //             .then(() => alert("Đã sao chép dữ liệu vào clipboard!"))
+    //             .catch(err => {
+    //                 console.error("Lỗi khi sao chép:", err);
+    //                 alert("Không thể sao chép dữ liệu!");
+    //             });
+
+    //     } catch (error) {
+    //         console.error("Lỗi:", error);
+    //         alert("Đã xảy ra lỗi khi sao chép dữ liệu!");
+    //     }
+    // });
+    // document.getElementById('pasteClipboardBtn').addEventListener('click', function () {
+    //     try {
+    //         // Phương pháp đọc clipboard tương thích nhiều trình duyệt
+    //         const readFromClipboard = function(callback) {
+    //             // Phương pháp 1: Dùng Clipboard API (hiện đại)
+    //             if (navigator.clipboard && navigator.clipboard.readText) {
+    //                 navigator.clipboard.readText()
+    //                     .then(text => callback(text))
+    //                     .catch(err => {
+    //                         console.error("Lỗi đọc clipboard API:", err);
+    //                         // Thử phương pháp dự phòng
+    //                         fallbackReadFromClipboard(callback);
+    //                     });
+    //                 return;
+    //             }
+                
+    //             // Nếu không có Clipboard API, dùng phương pháp dự phòng
+    //             fallbackReadFromClipboard(callback);
+    //         };
+            
+    //         // Phương pháp dự phòng sử dụng execCommand và paste event
+    //         const fallbackReadFromClipboard = function(callback) {
+    //             // Tạo textarea tạm thời
+    //             const textarea = document.createElement('textarea');
+    //             textarea.style.position = 'fixed';
+    //             textarea.style.opacity = '0';
+    //             document.body.appendChild(textarea);
+                
+    //             // Lắng nghe sự kiện paste
+    //             const handlePaste = function(e) {
+    //                 const clipboardData = e.clipboardData || window.clipboardData;
+    //                 const pastedText = clipboardData.getData('text');
+    //                 callback(pastedText);
+                    
+    //                 // Dọn dẹp
+    //                 document.removeEventListener('paste', handlePaste);
+    //                 document.body.removeChild(textarea);
+    //             };
+                
+    //             // Đăng ký sự kiện paste
+    //             document.addEventListener('paste', handlePaste);
+                
+    //             // Yêu cầu người dùng paste
+    //             textarea.focus();
+    //             alert("Hãy nhấn Ctrl+V để dán dữ liệu từ clipboard");
+                
+    //             // Thiết lập timeout để dọn dẹp nếu người dùng không dán
+    //             setTimeout(() => {
+    //                 if (document.body.contains(textarea)) {
+    //                     document.removeEventListener('paste', handlePaste);
+    //                     document.body.removeChild(textarea);
+    //                 }
+    //             }, 10000); // 10 giây timeout
+    //         };
+            
+    //         // Xử lý dữ liệu từ clipboard
+    //         readFromClipboard(function(text) {
+    //             if (!text) {
+    //                 alert("Clipboard trống!");
+    //                 return;
+    //             }
+
+    //             // Chia dữ liệu theo tab, giữ nguyên dữ liệu đầu tiên
+    //             const values = text.replace(/^\s+|\s+$/g, '').split(/\t/);
+
+    //             // Chọn tất cả các input hợp lệ (trừ input bị loại trừ)
+    //             const inputs = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='_token']):not([disabled]):not([type='hidden']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
+
+    //             let valueIndex = 0;
+    //             inputs.forEach(input => {
+    //                 if (valueIndex < values.length) {
+    //                     input.value = values[valueIndex] || ""; // Gán dữ liệu, giữ nguyên nếu có khoảng trắng đầu
+    //                     valueIndex++;
+    //                 }
+    //             });
+                
+    //             alert("Đã điền dữ liệu từ clipboard!");
+    //         });
+
+    //     } catch (error) {
+    //         console.error("Lỗi:", error);
+    //         alert("Đã xảy ra lỗi khi lấy dữ liệu từ clipboard!");
+    //     }
+    // });
+    
     document.getElementById('copyClipboardBtn').addEventListener('click', function () {
         try {
             // Lấy tất cả các input hợp lệ (trừ các input bị loại trừ)
@@ -73,20 +179,46 @@
             // Tạo dữ liệu dưới dạng chuỗi, các giá trị phân cách bằng tab ("\t")
             const textToCopy = inputs.map(input => input.value.trim()).join("\t");
 
-            // Gán dữ liệu vào clipboard
-            navigator.clipboard.writeText(textToCopy)
-                .then(() => alert("Đã sao chép dữ liệu vào clipboard!"))
-                .catch(err => {
-                    console.error("Lỗi khi sao chép:", err);
-                    alert("Không thể sao chép dữ liệu!");
-                });
+            // Phương pháp sao chép tương thích với nhiều trình duyệt hơn
+            const copyToClipboard = function(text) {
+                // Phương pháp 1: Dùng Clipboard API (hiện đại)
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    return navigator.clipboard.writeText(text)
+                        .then(() => true)
+                        .catch(() => false);
+                }
+                
+                // Phương pháp 2: Dùng phương pháp execCommand (cũ)
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';  // Tránh làm cuộn trang
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    return successful;
+                } catch (err) {
+                    document.body.removeChild(textarea);
+                    return false;
+                }
+            };
+
+            // Thực hiện sao chép
+            const result = copyToClipboard(textToCopy);
+            if (result) {
+                alert("Đã sao chép dữ liệu vào clipboard!");
+            } else {
+                alert("Không thể sao chép dữ liệu vào clipboard!");
+            }
 
         } catch (error) {
             console.error("Lỗi:", error);
             alert("Đã xảy ra lỗi khi sao chép dữ liệu!");
         }
     });
-
 
     $(document).ready(function() {
         $('#print_form').click(function() {

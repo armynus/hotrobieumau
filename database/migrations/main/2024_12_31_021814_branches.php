@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('branch_addr')->nullable();
             $table->string('branch_phone')->nullable();
             $table->string('branch_fax')->nullable();
+            $table->string('branch_place')->nullable();
             $table->string('database_name')->nullable();
             $table->string('status')->default('active');
             $table->timestamps();

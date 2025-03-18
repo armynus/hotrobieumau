@@ -60,12 +60,15 @@
                                             placeholder="{{ $info['placeholder'] ?? '' }}"
                                             value="{{ 
                                                 $key == 'NgayThangNam' || $key == 'NgayGiaoDich' ? now()->format('Y-m-d') : 
+                                                ($key == 'QuocTich' ? 'Việt Nam' : 
+                                                ($key == 'NgayHen' ? now()->addDays(7)->format('Y-m-d') : 
                                                 ($key == 'branch' ? session('UserBranchName', '') : 
                                                 ($key == 'DiaChi' ? session('UserBranchAddr', '') : 
                                                 ($key == 'SoFax' ? session('UserBranchFax', '') : 
                                                 ($key == 'DienThoai' ? session('UserBranchPhone', '') : 
                                                 ($key == 'GDichVien' ? session('user_name', '') : 
-                                                ($key == 'branch_code' ? session('UserBranchCode', '') : '')))))) }}"                                            
+                                                ($key == 'DiaDanh' ? session('UserBranchPlace', '') : 
+                                                ($key == 'branch_code' ? session('UserBranchCode', '') : ''))))))))) }}"                                            
                                         >  
                                     @endif
                                 </div>
@@ -136,7 +139,6 @@
     <script src="{{asset('js/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js')}}" type="text/javascript"></script>
     @include('user.partials.ajax_transaction_form')
 
-    
 @endpush
 
 

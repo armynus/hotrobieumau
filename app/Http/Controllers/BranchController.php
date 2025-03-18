@@ -26,7 +26,11 @@ class BranchController extends Controller
     $branch = Branches::create([
       'branch_name' => $request->branch_name,
       'branch_code' => $request->branch_code,
-    ]);
+      'branch_addr' => $request->branch_addr,
+      'branch_phone' => $request->branch_phone,
+      'branch_fax' => $request->branch_fax,
+      'branch_place' => $request->branch_place,
+    ]); 
     $databaseName = 'branch_' . $branch->id;
     Branches::where('id', $branch->id)->update(['database_name' => $databaseName]);
     // 2. Tự động tạo database mới cho chi nhánh
@@ -69,12 +73,12 @@ class BranchController extends Controller
         'status' => false,
       ]);
     }
-    if($branch->branch_name == $data['branch_name'] && $branch->branch_code == $data['branch_code']) {
-      return response()->json([
-        'message' => 'Không có thay đổi.',
-        'status' => false,
-      ]);
-    }
+    // if($branch->branch_name == $data['branch_name'] && $branch->branch_code == $data['branch_code']) {
+    //   return response()->json([
+    //     'message' => 'Không có thay đổi.',
+    //     'status' => false,
+    //   ]);
+    // }
     if (Branches::where('branch_name', $data['branch_name'])
         ->where('id', '!=', $data['branch_id']) // loại trừ chính nó
         ->first()) {
@@ -82,10 +86,14 @@ class BranchController extends Controller
             'message' => 'Trùng tên chi nhánh.',
             'status' => false,
         ]);
-    }
+    } 
     Branches::where('id', $data['branch_id'])->update([
       'branch_name' => $data['branch_name'],
       'branch_code' => $data['branch_code'],
+      'branch_addr' => $data['branch_addr'],
+      'branch_phone' => $data['branch_phone'],
+      'branch_fax' => $data['branch_fax'],
+      'branch_place' => $data['branch_place'],
     ]);
     return response()->json([
       'message' => 'Cập nhật chi nhánh thành công.',

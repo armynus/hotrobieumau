@@ -25,9 +25,12 @@
                         <tr>
                             <th>STT</th>
                             <th>Tên chi nhánh</th>
-                            <th>Mã chi nhánh</th>
+                            <th>Code</th>
+                            <th>Địa chỉ</th>
+                            <th>SĐT</th>
+                            <th>Số Fax</th>
+                            <th>Địa danh</th>
                             <th>Dữ liệu</th>
-                            <th>Ngày tạo</th>
                             <th>Ngày cập nhật</th>
                             <th>Trạng thái</th>
                             <th>Chức năng</th>
@@ -37,13 +40,16 @@
                         <tr>
                             <th>STT</th>
                             <th>Tên chi nhánh</th>
-                            <th>Mã chi nhánh</th>
+                            <th>Code</th>
+                            <th>Địa chỉ</th>
+                            <th>SĐT</th>
+                            <th>Số Fax</th>
+                            <th>Địa danh</th>
                             <th>Dữ liệu</th>
-                            <th>Ngày tạo</th>
                             <th>Ngày cập nhật</th>
                             <th>Trạng thái</th>
                             <th>Chức năng</th>
-                        </tr>
+                        </tr>   
                     </tfoot>
                     <tbody>
                         @foreach($list_branches as $key => $branch)
@@ -51,8 +57,11 @@
                                 <td>{{$key}}</td>
                                 <td>{{$branch->branch_name}}</td>
                                 <td>{{$branch->branch_code}}</td>
+                                <td>{{$branch->branch_addr}}</td>
+                                <td>{{$branch->branch_phone}}</td>
+                                <td>{{$branch->branch_fax}}</td>
+                                <td>{{$branch->branch_place}}</td>
                                 <td>{{$branch->database_name}}</td>
-                                <td>{{date('d/m/Y', strtotime($branch->created_at)) }}</td>
                                 <td>{{date('d/m/Y', strtotime($branch->updated_at)) }}</td>
                                 @if($branch->status == 'active' )
                                 <td><span class="badge badge-success">Hoạt động</span></td>

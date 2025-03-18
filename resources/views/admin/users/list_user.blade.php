@@ -23,6 +23,7 @@
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
+                            <th>STT</th>
                             <th>Tên người dùng</th>
                             <th>Email</th>
                             <th>Chi nhánh</th>
@@ -34,6 +35,7 @@
                     </thead>
                     <tfoot>
                         <tr>
+                            <th>STT</th>
                             <th>Tên người dùng</th>
                             <th>Email</th>
                             <th>Chi nhánh</th>
@@ -46,6 +48,7 @@
                     <tbody>
                         @foreach($list_user as $key => $user)
                             <tr>
+                                <td>{{$key}}</td>
                                 <td>{{$user->name}}</td>
                                 <td>{{$user->email}}</td>
                                 <td>{{$user->branch_name}}</td>
