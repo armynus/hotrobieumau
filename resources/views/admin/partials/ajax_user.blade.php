@@ -101,7 +101,7 @@
             }
            
         });
-        $('#updateUser').click(function () {
+        $('#updateUser').click(function(){
             var _token = $('input[name="_token"]').val();
             var user_id = $('#edit_user_id').val();
             var name = $('#edit_name').val();
@@ -109,21 +109,23 @@
             var password = $('#edit_password').val();
             var branch_id = $('#edit_branch').val();
             var role_id = $('#edit_role_id').val();
+            
             // Danh sách điều kiện kiểm tra
             var errors = [
                 { condition: !name, message: "Vui lòng nhập tên nhân viên" },
                 { condition: !email, message: "Vui lòng nhập email" },
-                { condition: !password, message: "Vui lòng nhập mật khẩu" },
-                { condition: password.length < 6, message: "Mật khẩu phải có ít nhất 6 ký tự" },
                 { condition: !branch_id, message: "Vui lòng chọn chi nhánh" },
                 { condition: !role_id, message: "Vui lòng chọn chức vụ" },
             ];
+
+            // Lặp qua các điều kiện và hiển thị lỗi nếu có
             for (var i = 0; i < errors.length; i++) {
                 if (errors[i].condition) {
                     swal(errors[i].message, { icon: "error" });
                     return;
                 }
             }
+
             $.ajax({
                 url: '{{route('admin_user_update')}}',
                 method: 'POST',
@@ -136,23 +138,62 @@
                     branch_id: branch_id,
                     role_id: role_id,
                 },
-                success: function (response) {
-                    if (response.status == false) {
-                        swal(response.message, {
-                            icon: "warning",
+                success: function(data) {
+                    if (!data.status) {
+                        swal({
+                            title: "Lỗi!",
+                            text: data.message || "Cập nhật tài khoản thất bại",
+                            icon: "error",
                         });
                         return;
                     }
-                    alert('Cập nhật tài khoản thành công!');
-                    var cancel = document.querySelector('#close_button');
-                    location.reload(); // Reload lại trang
+
+                    // Lấy dữ liệu từ response
+                    let user = data.user || {};
+                    let table = $('#dataTable').DataTable();
+
+                    // Xử lý giá trị null thành chuỗi rỗng để tránh lỗi
+                    user.name = user.name || '';
+                    user.email = user.email || '';
+                    data.branch_name = data.branch_name || '';
+                    data.role_name = data.role_name || '';
+
+                    let created_at = new Date(user.created_at).toLocaleDateString('en-GB');
+                    let updated_at = new Date(user.updated_at).toLocaleDateString('en-GB');
+
+                    // Tìm dòng cần cập nhật trong DataTable
+                    let row = $(`span.edit_user[data-user_id="${user_id}"]`).closest('tr');
+                    let dataRow = table.row(row);
+
+                    if (dataRow.data()) {
+                        let rowData = dataRow.data();
+                        // Cập nhật dữ liệu của dòng
+                        rowData[1] = user.name;
+                        rowData[2] = user.email;
+                        rowData[3] = data.branch_name;
+                        rowData[4] = data.role_name;
+                        rowData[5] = created_at;
+                        rowData[6] = updated_at;
+                        
+                        // Cập nhật lại dòng trong DataTable
+                        dataRow.data(rowData).draw(false);
+                    }
+
+                    swal("Thành công!", "Cập nhật tài khoản thành công.", {
+                        icon: "success",
+                    }).then(() => {
+                        // Đóng modal sau khi cập nhật thành công
+                        $('#close_button').click();
+                    });
                 },
-                error: function (error) {
+                error: function(xhr, status, error){
                     console.error('Có lỗi xảy ra:', error);
-                    alert('Không thể cập nhật tài khoản.');
+                    swal("Lỗi!", "Không thể cập nhật tài khoản.", {
+                        icon: "error",
+                    });
                 }
             });
-        })
+        });
         
         $('#addUser').click(function(){
             var _token = $('input[name="_token"]').val();

@@ -16,6 +16,8 @@ Route::post('logins_admin', [LoginAdminController::class, 'logins_admin'])->name
 
 Route::group(['middleware' => ['admin']], function () {
     Route::get('logout_admin', [LoginAdminController::class, 'logout_admin'])->name('logout_admin');
+    Route::get('change_password_admin/{admin_id}', [LoginAdminController::class, 'change_password_admin'])->name('change_password_admin');
+    Route::post('reset_password_admin', [LoginAdminController::class, 'reset_password_admin'])->name('reset_password_admin');
     Route::get('admin', [AdminController::class, 'index'])->name('admin');
     Route::get('admin/branches', [AdminController::class, 'branches'])->name('admin_branches');
     Route::get('admin_branches_create', [BranchController::class, 'create'])->name('admin_branches_create');
@@ -49,6 +51,8 @@ Route::get('login', [LoginUserController::class, 'login'])->name('login');
 Route::post('logins', [LoginUserController::class, 'logins'])->name('logins');
 Route::group(['middleware'=> ['tenant']], function(){
     Route::get('logout', [LoginUserController::class, 'logout'])->name('logout');
+    Route::get('change_password_user/{user_id}', [LoginUserController::class, 'change_password_user'])->name('change_password_user');
+    Route::post('reset_password_user', [LoginUserController::class, 'reset_password_user'])->name('reset_password_user');
     Route::get('/', [UserController::class, 'index'])->name('index');
     Route::get('user', [UserController::class, 'index'])->name('user');
     // Dữ liệu khách hàng

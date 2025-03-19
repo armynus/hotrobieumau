@@ -9,7 +9,7 @@
     <div id="collapseForms" class="collapse" aria-labelledby="headingForms" data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
             @foreach($formTypes as $formType)
-                <a class="collapse-item" href="{{ route('forms.index', ['type' => $formType->id]) }}">
+                <a class="collapse-item" href="{{ route('support_forms.index', ['type' => $formType->id]) }}">
                     {{ $formType->type_name }}
                 </a>
                 

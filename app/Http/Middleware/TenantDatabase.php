@@ -28,12 +28,12 @@ class TenantDatabase
             // Đặt kết nối hiện tại là `tenant`
             DB::purge('tenant');
             DB::reconnect('tenant');
-            // 3. Chạy migration chỉ trong thư mục `branch`
-            config(['database.connections.tenant.database' => $databaseName]);
-            Artisan::call('migrate', [
-                '--path' => 'database/migrations/branch', // Chỉ chạy migration của chi nhánh
-                '--database' => 'tenant',                // Chạy trên kết nối tenant
-            ]);
+            // // 3. Chạy migration chỉ trong thư mục `branch`
+            // config(['database.connections.tenant.database' => $databaseName]);
+            // Artisan::call('migrate', [
+            //     '--path' => 'database/migrations/branch', // Chỉ chạy migration của chi nhánh
+            //     '--database' => 'tenant',                // Chạy trên kết nối tenant
+            // ]);
         }
 
         return $next($request);

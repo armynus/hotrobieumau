@@ -31,7 +31,7 @@ class AdminUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'status' => 'active',      //0 đã kích hoạt, 1 chưa kích hoạt
-            'role_id' => 1,     //1 là nhân viên, 0 là quản trị viên
+            'role_id' => $request->role_id,     //1 là nhân viên, 0 là quản trị viên
             'branch_id' => $request->branch_id
         ]);
         if($request->role_id == 0){
@@ -62,12 +62,28 @@ class AdminUserController extends Controller
         $user->email = $request->email;
         $user->branch_id = $request->branch_id;
         $user->role_id = $request->role_id;
-        $user->password = Hash::make($request->password);
+        
+        // Kiểm tra nếu mật khẩu được gửi lên và không rỗng
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+        // Nếu mật khẩu rỗng, giữ nguyên mật khẩu cũ
+        
         $user->save();
-        // $branch_name = Branches::where('id', $request->branch_id)->first();
+        
+        // Lấy thông tin chi nhánh và vai trò để trả về
+        $branch_name = Branches::where('id', $request->branch_id)->first()->branch_name ?? '';
+        if($user->role_id == 1){
+            $role_name = 'Kiểm soát';
+        }else{
+            $role_name = 'Nhân viên';
+        }
         return response()->json([
-            'success'=>'Cập nhật tài khoản thành công!',
+            'message' => 'Cập nhật tài khoản thành công!',
             'status' => true,
+            'user' => $user,
+            'branch_name' => $branch_name,
+            'role_name' => $role_name
         ]);
     }
     function lock (Request $request) {
@@ -85,11 +101,11 @@ class AdminUserController extends Controller
             'status' => true,
           ]);
         } else {
-          Users::where('id', $request->user_id)->update(['status' => 'active']);
+          Users::where('id', $request->user_id)->update(['status' => 'active', 'failed_login_attempts'=> '0']);
           return response()->json([
             'message' => 'Mở khóa tài khoản thành công.',
             'status' => true,
           ]);
         }
-      }
+    }
 }
