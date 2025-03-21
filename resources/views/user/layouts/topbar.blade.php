@@ -11,7 +11,7 @@
         @csrf
         <div class="input-group">
            
-            <input type="search" class="form-control bg-light border-0 small" placeholder="Tra cứu KH bằng mã KH hoặc tên hoặc CCCD/CMND"
+            <input type="search" class="form-control bg-light border-0 small" placeholder="Tra cứu các biểu mẫu đang được hỗ trợ bằng tên"
                 aria-label="Search" aria-describedby="basic-addon2" name="search_topbar" id="search_topbar" >
             <div class="input-group-append">
                 <button class="btn btn-primary" type="submit">

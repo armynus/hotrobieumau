@@ -61,8 +61,8 @@
 
 
     <!-- Nhúng file dùng chung cho toàn bộ ứng dụng -->
-    @include('search_topbar')
-
+ 
     @stack('scripts') <!-- Thêm JS riêng -->
+    @include('search_topbar')
 </body>
 </html>

@@ -9,6 +9,7 @@ use App\Http\Controllers\LoginUserController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\SupportFormController;
 use App\Http\Controllers\UserSupportFormController;
+use App\Http\Controllers\UserSearchController;
 use App\Http\Controllers\AdminFormFieldController;
 
 Route::get('login_admin', [LoginAdminController::class, 'login_admin'])->name('login_admin');
@@ -69,6 +70,7 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::get('support_forms/{type}', [UserSupportFormController::class, 'index'])->name('support_forms.index'); // Danh sách biểu mẫu
     Route::get('support_forms/{type}/{id}', [UserSupportFormController::class, 'show'])->name('support_forms.show'); // Chi tiết biểu mẫu
     Route::get('/customers/search', [UserSupportFormController::class, 'search'])->name('customer.search');
+    Route::get('/support_form/search', [UserSearchController::class, 'search'])->name('support_form.search');
     Route::post('transaction_form_print', [UserSupportFormController::class, 'print'])->name('transaction_form_print');
 
 
