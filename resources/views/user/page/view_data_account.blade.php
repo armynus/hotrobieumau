@@ -50,9 +50,9 @@
             formId="addAccountForm"
         />
         <x-alert-message />
-        <div class="card-body"> 
+        <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="accountTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>STT</th>
@@ -63,43 +63,10 @@
                             <th>Chi tiết</th>
                         </tr>
                     </thead>
-                    <tfoot> 
-                        <tr>
-                            <th>STT</th>
-                            <th>Mã tài khoản</th>
-                            <th>Mã khách hàng</th>
-                            <th>Tên KH</th>
-                            <th>Loại TK</th>
-                            <th>Chi tiết</th>
-                        </tr>
-                    </tfoot>
-                    <tbody>
-                        @foreach($data as $key => $account)
-                            <tr>
-                                <td>{{$account->id}}</td>
-                                <td>{{$account->idxacno}}</td>
-                                <td>{{$account->custseq}}</td>
-                                <td>{{$account->custnm}}</td>
-                                <td>{{$account->stscd}}</td> 
-                                <td>
-                                    <button class="btn btn-info btn-icon-split detail_account" 
-                                            data-toggle="modal" 
-                                            data-target="#AccountInfoModal" 
-                                            data-id="{{ $account->id }}">
-                                        <span class="text">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
-                                                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
-                                            </svg>
-                                        </span>
-                                    </button>
-                                </td>
-                            </tr>
-                        @endforeach
-                        @include('user.partials.ajax_accountinfo')
-                    </tbody>
+                    
                 </table>
             </div>
-        </div>
+        </div>        
     </div>
 
 </div>
@@ -123,6 +90,7 @@
     <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
     <!-- include jQuery validate library -->
     <script src="{{asset('js/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js')}}" type="text/javascript"></script>
+    @include('user.partials.ajax_accountinfo')
     
     <script>
         document.querySelector("html").classList.add('js');

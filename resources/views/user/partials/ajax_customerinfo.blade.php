@@ -1,6 +1,37 @@
 
 <script>
     $(document).ready(function () {
+        $('#customerTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('customers.data') }}", // Route lấy dữ liệu
+            columns: [
+                { data: 'id', name: 'id' },
+                { data: 'custno', name: 'custno' },
+                { data: 'nameloc', name: 'nameloc' },
+                { data: 'phone_no', name: 'phone_no' },
+                { data: 'identity_no', name: 'identity_no' },
+                {
+                    data: 'id',
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false,
+                    render: function (data) {
+                        return `<button class="btn btn-info detail_customer" 
+                                    data-toggle="modal" 
+                                    data-target="#customerInfoModal" 
+                                    data-id="${data}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
+                                                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
+                                            </svg>
+                                </button>`;
+                    }
+                }
+            ]
+        });
+    });
+
+    $(document).ready(function () {
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -46,7 +77,7 @@
                     Customer.phone_no = Customer.phone_no || '';
                     Customer.identity_no = Customer.identity_no || '';
 
-                    let table = $('#dataTable').DataTable(); // Lấy instance của DataTables
+                    let table = $('#customerTable').DataTable(); // Lấy instance của DataTables
 
                     if (response.avaiable === true) {
                         // 🔹 CẬP NHẬT khách hàng đã có trong bảng
@@ -155,7 +186,7 @@
                         swal("Cập nhật thông tin khách hàng thành công", { icon: "success" });
 
                         const updatedCustomer = response.customer;
-                        let table = $('#dataTable').DataTable(); // Lấy instance của DataTable
+                        let table = $('#customerTable').DataTable(); // Lấy instance của DataTable
 
                         // Tìm hàng dựa vào ID khách hàng
                         let rowIndex = table.rows().eq(0).filter(function (index) {
@@ -240,6 +271,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         const birthday = document.getElementById('birthday'); // Lấy thẻ input
         const dateInput = document.getElementById('identity_date'); // Lấy thẻ input
+        const add_birthday = document.getElementById('add_birthday'); // Lấy thẻ input
+        const add_dateInput = document.getElementById('add_identity_date'); // Lấy thẻ input
 
         // Lấy ngày hiện tại
         const today = new Date();
@@ -248,6 +281,8 @@
         // Gán ngày tối đa cho thẻ input
         birthday.setAttribute('max', maxDate);
         dateInput.setAttribute('max', maxDate);
+        add_birthday.setAttribute('max', maxDate);
+        add_dateInput.setAttribute('max', maxDate);
     });
     // Xử lý khi nhập địa chỉ 1, 2, 3
     document.addEventListener('DOMContentLoaded', function () {

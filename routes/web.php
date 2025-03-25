@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginAdminController;
 use App\Http\Controllers\LoginUserController;
@@ -57,15 +59,19 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::get('/', [UserController::class, 'index'])->name('index');
     Route::get('user', [UserController::class, 'index'])->name('user');
     // Dữ liệu khách hàng
-    Route::get('view_data_customer', [UserController::class, 'view_data_customer'])->name('view_data_customer');
-    Route::get('detail_customer', [UserController::class, 'detail_customer'])->name('detail_customer');
-    Route::post('update_customer', [UserController::class, 'update_customer'])->name('update_customer');
-    Route::post('add_customer', [UserController::class, 'add_customer'])->name('add_customer');
+    Route::get('view_data_customer', [CustomerController::class, 'view_data_customer'])->name('view_data_customer');
+    Route::get('detail_customer', [CustomerController::class, 'detail_customer'])->name('detail_customer');
+    Route::post('update_customer', [CustomerController::class, 'update_customer'])->name('update_customer');
+    Route::post('add_customer', [CustomerController::class, 'add_customer'])->name('add_customer');
+    Route::get('/customers/data', [CustomerController::class, 'getData'])->name('customers.data');
+
     // Dữ liệu tài khoản
-    Route::get('view_data_account', [UserController::class, 'view_data_account'])->name('view_data_account');
-    Route::get('detail_account', [UserController::class, 'detail_account'])->name('detail_account');
-    Route::post('update_account', [UserController::class, 'update_account'])->name('update_account');
-    Route::post('add_account', [UserController::class, 'add_account'])->name('add_account');
+    Route::get('view_data_account', [AccountController::class, 'view_data_account'])->name('view_data_account');
+    Route::get('detail_account', [AccountController::class, 'detail_account'])->name('detail_account');
+    Route::post('update_account', [AccountController::class, 'update_account'])->name('update_account');
+    Route::post('add_account', [AccountController::class, 'add_account'])->name('add_account');
+    Route::get('/accounts/data', [AccountController::class, 'getDataAccounts'])->name('accounts.data');
+
     // Sử dụng biểu mẫu
     Route::get('support_forms/{type}', [UserSupportFormController::class, 'index'])->name('support_forms.index'); // Danh sách biểu mẫu
     Route::get('support_forms/{type}/{id}', [UserSupportFormController::class, 'show'])->name('support_forms.show'); // Chi tiết biểu mẫu
@@ -75,7 +81,7 @@ Route::group(['middleware'=> ['tenant']], function(){
 
 
     Route::group(['middleware' => ['usercontrol']], function () {
-        Route::post('uploadfile_customer', [UserController::class, 'uploadfile_customer'])->name('uploadfile_customer');
-        Route::post('uploadfile_account', [UserController::class, 'uploadfile_account'])->name('uploadfile_account');
+        Route::post('uploadfile_customer', [CustomerController::class, 'uploadfile_customer'])->name('uploadfile_customer');
+        Route::post('uploadfile_account', [AccountController::class, 'uploadfile_account'])->name('uploadfile_account');
     });
 });
