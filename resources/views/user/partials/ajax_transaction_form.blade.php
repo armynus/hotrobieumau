@@ -86,90 +86,90 @@
     //         alert("Đã xảy ra lỗi khi sao chép dữ liệu!");
     //     }
     // });
-    // document.getElementById('pasteClipboardBtn').addEventListener('click', function () {
-    //     try {
-    //         // Phương pháp đọc clipboard tương thích nhiều trình duyệt
-    //         const readFromClipboard = function(callback) {
-    //             // Phương pháp 1: Dùng Clipboard API (hiện đại)
-    //             if (navigator.clipboard && navigator.clipboard.readText) {
-    //                 navigator.clipboard.readText()
-    //                     .then(text => callback(text))
-    //                     .catch(err => {
-    //                         console.error("Lỗi đọc clipboard API:", err);
-    //                         // Thử phương pháp dự phòng
-    //                         fallbackReadFromClipboard(callback);
-    //                     });
-    //                 return;
-    //             }
+    document.getElementById('pasteClipboardBtn').addEventListener('click', function () {
+        try {
+            // Phương pháp đọc clipboard tương thích nhiều trình duyệt
+            const readFromClipboard = function(callback) {
+                // Phương pháp 1: Dùng Clipboard API (hiện đại)
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    navigator.clipboard.readText()
+                        .then(text => callback(text))
+                        .catch(err => {
+                            console.error("Lỗi đọc clipboard API:", err);
+                            // Thử phương pháp dự phòng
+                            fallbackReadFromClipboard(callback);
+                        });
+                    return;
+                }
                 
-    //             // Nếu không có Clipboard API, dùng phương pháp dự phòng
-    //             fallbackReadFromClipboard(callback);
-    //         };
+                // Nếu không có Clipboard API, dùng phương pháp dự phòng
+                fallbackReadFromClipboard(callback);
+            };
             
-    //         // Phương pháp dự phòng sử dụng execCommand và paste event
-    //         const fallbackReadFromClipboard = function(callback) {
-    //             // Tạo textarea tạm thời
-    //             const textarea = document.createElement('textarea');
-    //             textarea.style.position = 'fixed';
-    //             textarea.style.opacity = '0';
-    //             document.body.appendChild(textarea);
+            // Phương pháp dự phòng sử dụng execCommand và paste event
+            const fallbackReadFromClipboard = function(callback) {
+                // Tạo textarea tạm thời
+                const textarea = document.createElement('textarea');
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
                 
-    //             // Lắng nghe sự kiện paste
-    //             const handlePaste = function(e) {
-    //                 const clipboardData = e.clipboardData || window.clipboardData;
-    //                 const pastedText = clipboardData.getData('text');
-    //                 callback(pastedText);
+                // Lắng nghe sự kiện paste
+                const handlePaste = function(e) {
+                    const clipboardData = e.clipboardData || window.clipboardData;
+                    const pastedText = clipboardData.getData('text');
+                    callback(pastedText);
                     
-    //                 // Dọn dẹp
-    //                 document.removeEventListener('paste', handlePaste);
-    //                 document.body.removeChild(textarea);
-    //             };
+                    // Dọn dẹp
+                    document.removeEventListener('paste', handlePaste);
+                    document.body.removeChild(textarea);
+                };
                 
-    //             // Đăng ký sự kiện paste
-    //             document.addEventListener('paste', handlePaste);
+                // Đăng ký sự kiện paste
+                document.addEventListener('paste', handlePaste);
                 
-    //             // Yêu cầu người dùng paste
-    //             textarea.focus();
-    //             alert("Hãy nhấn Ctrl+V để dán dữ liệu từ clipboard");
+                // Yêu cầu người dùng paste
+                textarea.focus();
+                alert("Hãy nhấn Ctrl+V để dán dữ liệu từ clipboard");
                 
-    //             // Thiết lập timeout để dọn dẹp nếu người dùng không dán
-    //             setTimeout(() => {
-    //                 if (document.body.contains(textarea)) {
-    //                     document.removeEventListener('paste', handlePaste);
-    //                     document.body.removeChild(textarea);
-    //                 }
-    //             }, 10000); // 10 giây timeout
-    //         };
+                // Thiết lập timeout để dọn dẹp nếu người dùng không dán
+                setTimeout(() => {
+                    if (document.body.contains(textarea)) {
+                        document.removeEventListener('paste', handlePaste);
+                        document.body.removeChild(textarea);
+                    }
+                }, 10000); // 10 giây timeout
+            };
             
-    //         // Xử lý dữ liệu từ clipboard
-    //         readFromClipboard(function(text) {
-    //             if (!text) {
-    //                 alert("Clipboard trống!");
-    //                 return;
-    //             }
+            // Xử lý dữ liệu từ clipboard
+            readFromClipboard(function(text) {
+                if (!text) {
+                    alert("Clipboard trống!");
+                    return;
+                }
 
-    //             // Chia dữ liệu theo tab, giữ nguyên dữ liệu đầu tiên
-    //             const values = text.replace(/^\s+|\s+$/g, '').split(/\t/);
+                // Chia dữ liệu theo tab, giữ nguyên dữ liệu đầu tiên
+                const values = text.replace(/^\s+|\s+$/g, '').split(/\t/);
 
-    //             // Chọn tất cả các input hợp lệ (trừ input bị loại trừ)
-    //             const inputs = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='_token']):not([disabled]):not([type='hidden']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
+                // Chọn tất cả các input hợp lệ (trừ input bị loại trừ)
+                const inputs = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='_token']):not([disabled]):not([type='hidden']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
 
-    //             let valueIndex = 0;
-    //             inputs.forEach(input => {
-    //                 if (valueIndex < values.length) {
-    //                     input.value = values[valueIndex] || ""; // Gán dữ liệu, giữ nguyên nếu có khoảng trắng đầu
-    //                     valueIndex++;
-    //                 }
-    //             });
+                let valueIndex = 0;
+                inputs.forEach(input => {
+                    if (valueIndex < values.length) {
+                        input.value = values[valueIndex] || ""; // Gán dữ liệu, giữ nguyên nếu có khoảng trắng đầu
+                        valueIndex++;
+                    }
+                });
                 
-    //             alert("Đã điền dữ liệu từ clipboard!");
-    //         });
+                alert("Đã điền dữ liệu từ clipboard!");
+            });
 
-    //     } catch (error) {
-    //         console.error("Lỗi:", error);
-    //         alert("Đã xảy ra lỗi khi lấy dữ liệu từ clipboard!");
-    //     }
-    // });
+        } catch (error) {
+            console.error("Lỗi:", error);
+            alert("Đã xảy ra lỗi khi lấy dữ liệu từ clipboard!");
+        }
+    });
     
     document.getElementById('copyClipboardBtn').addEventListener('click', function () {
         try {

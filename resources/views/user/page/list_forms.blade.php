@@ -55,7 +55,6 @@
                             </td>
                         </tr>
                         @endforeach
-                        @include('admin.forms.partials.ajax_formmodal')
                     </tbody>
                 </table>
             </div>

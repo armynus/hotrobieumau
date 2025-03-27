@@ -5,8 +5,11 @@ namespace App\Imports;
 use App\Models\CustomerInfo;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\ShouldQueue;
 
-class CustomerInfoImport implements ToModel, WithHeadingRow
+class CustomerInfoImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatchInserts
 {
     public function model(array $row)
     {
@@ -62,6 +65,15 @@ class CustomerInfoImport implements ToModel, WithHeadingRow
         }
         
         return null; // Bỏ qua nếu `custno` không tồn tại trong dòng Excel
+    }
+    public function chunkSize(): int
+    {
+        return 1000;
+    }
+    // 🔹 Giúp nhập dữ liệu nhanh hơn bằng cách chèn theo nhóm
+    public function batchSize(): int
+    {
+        return 500;
     }
     private function formatBirthday($birthday)
     {
