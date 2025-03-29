@@ -29,6 +29,7 @@ class AdminFormFieldController extends Controller
                 }),
             ],
             'placeholder' => 'nullable|string|max:255',
+            'value' => 'nullable|string|max:255',
             'data_type' => 'required|string|max:50',
         ], [
             'field_name.required' => 'Vui lòng nhập tên trường dữ liệu.',
@@ -38,7 +39,7 @@ class AdminFormFieldController extends Controller
             'data_type.required' => 'Vui lòng chọn kiểu dữ liệu.',
         ]);
 
-        $formField = FormField::create($request->only(['field_name', 'field_code', 'placeholder', 'data_type']));
+        $formField = FormField::create($request->only(['field_name', 'field_code', 'placeholder', 'data_type','value']));
 
         return response()->json([
             'status' => true,
@@ -48,7 +49,7 @@ class AdminFormFieldController extends Controller
     }
     
     public function admin_edit_field(Request $request ){
-        $field = FormField::where('id', $request->field_id)->select('id', 'field_name', 'field_code', 'data_type','placeholder')->first();
+        $field = FormField::where('id', $request->field_id)->select('id', 'field_name', 'field_code', 'data_type','placeholder','value')->first();
         return response()->json([
             'field' => $field,
         ]);
@@ -79,6 +80,7 @@ class AdminFormFieldController extends Controller
                     }),
             ],
             'placeholder' => 'nullable|string|max:255',
+            'value' => 'nullable|string|max:255',
             'data_type'   => 'required|string|max:50',
         ], [
             'field_name.required' => 'Vui lòng nhập tên trường dữ liệu.',
@@ -92,8 +94,8 @@ class AdminFormFieldController extends Controller
         $formField = FormField::findOrFail($request->field_id);
         
         // Cập nhật dữ liệu
-        $formField->update($request->only([ 'field_name', 'field_code', 'placeholder', 'data_type']));
-
+        $formField->update($request->only(['field_name', 'field_code', 'placeholder', 'data_type', 'value']));
+        
         return response()->json([
             'status'     => true,
             'form_field' => $formField,

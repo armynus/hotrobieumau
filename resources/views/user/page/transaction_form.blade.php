@@ -59,17 +59,21 @@
                                             name="{{ $key }}" required
                                             placeholder="{{ $info['placeholder'] ?? '' }}"
                                             value="{{ 
-                                                $key == 'NgayThangNam' || $key == 'NgayGiaoDich' ? now()->format('Y-m-d') : 
-                                                ($key == 'QuocTich' ? 'Việt Nam' : 
-                                                ($key == 'NgayHen' ? now()->addDays(7)->format('Y-m-d') : 
-                                                ($key == 'branch' ? session('UserBranchName', '') : 
-                                                ($key == 'DiaChi' ? session('UserBranchAddr', '') : 
-                                                ($key == 'SoFax' ? session('UserBranchFax', '') : 
-                                                ($key == 'DienThoai' ? session('UserBranchPhone', '') : 
-                                                ($key == 'GDichVien' ? session('user_name', '') : 
-                                                ($key == 'DiaDanh' ? session('UserBranchPlace', '') : 
-                                                ($key == 'branch_code' ? session('UserBranchCode', '') : ''))))))))) }}"                                            
+                                                $info['value'] ?? (
+                                                    $key == 'NgayThangNam' || $key == 'NgayGiaoDich' ? now()->format('Y-m-d') : 
+                                                    ($key == 'QuocTich' ? 'Việt Nam' : 
+                                                    ($key == 'NgayHen' ? now()->addDays(7)->format('Y-m-d') : 
+                                                    ($key == 'branch' ? session('UserBranchName', '') : 
+                                                    ($key == 'DiaChi' ? session('UserBranchAddr', '') : 
+                                                    ($key == 'SoFax' ? session('UserBranchFax', '') : 
+                                                    ($key == 'DienThoai' ? session('UserBranchPhone', '') : 
+                                                    ($key == 'GDichVien' ? session('user_name', '') : 
+                                                    ($key == 'DiaDanh' ? session('UserBranchPlace', '') : 
+                                                    ($key == 'branch_code' ? session('UserBranchCode', '') : '')))))))))) 
+                                            }}"
+                                            {{ $key == 'SoThe' ? 'maxlength=4' : '' }}                                            
                                         >  
+                                
                                     @endif
                                 </div>
                             </div>

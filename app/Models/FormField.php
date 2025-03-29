@@ -17,6 +17,7 @@ class FormField extends Model
         'field_name',    // Tên mô tả của trường
         'data_type',     // Loại dữ liệu (string, date, number, ...)
         'placeholder',   // Placeholder cho input
+        'value',   // value cho input
     ];
     public $timestamps = true;
 

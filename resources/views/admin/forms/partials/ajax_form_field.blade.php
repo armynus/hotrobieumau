@@ -6,6 +6,7 @@
             var field_name = $('#field_name').val();
             var field_code = $('#field_code').val();
             var placeholder = $('#placeholder').val();
+            var value = $('#value').val();
             var data_type = $('#data_type').val();
 
             if (!field_name || !field_code || !data_type) {
@@ -21,6 +22,7 @@
                     field_name: field_name,
                     field_code: field_code,
                     placeholder: placeholder,
+                    value: value,
                     data_type: data_type,
                 },
                 success: function (data) {
@@ -65,6 +67,7 @@
                                     <td>${data.form_field.field_code}</td>
                                     <td>${data.form_field.data_type}</td>
                                     <td>${data.form_field.placeholder || ''}</td>
+                                    <td>${data.form_field.value || ''}</td>
                                     <td>${new Date(data.form_field.created_at).toLocaleDateString('en-GB')}</td>
                                     <td style="justify-content: center; align-items: flex-start; text-align: center;">
                                         <button type="button"  data-toggle="modal" data-target="#editFormFieldModal" class="btn btn-info btn-icon-split edit_field" data-field_id="${data.form_field.id}">
@@ -122,6 +125,7 @@
                     $('#edit_field_name').val(response.field.field_name);
                     $('#edit_data_type').val(response.field.data_type);
                     $('#edit_placeholder').val(response.field.placeholder);
+                    $('#edit_value').val(response.field.value);
                 },
                 error: function (error) {
                     console.error('Có lỗi xảy ra:', error);
@@ -137,8 +141,8 @@
             var field_name  = $('#edit_field_name').val();
             var data_type   = $('#edit_data_type').val();
             var placeholder = $('#edit_placeholder').val();
+            var value       = $('#edit_value').val();
             var _token      = $('input[name="_token"]').val();
-
             if (!field_name || !field_code || !data_type) {
                 swal("Vui lòng nhập đầy đủ thông tin!", { icon: "error" });
                 return;
@@ -153,7 +157,8 @@
                     field_code: field_code,
                     field_name: field_name,
                     data_type: data_type,
-                    placeholder: placeholder
+                    placeholder: placeholder,
+                    value: value,
                 },
                 success: function (response) {
                     if (!response.status) {

@@ -14,7 +14,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
-                <a class="nav-link" href="">
+                <a class="nav-link" href="{{route('index')}}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Trang Chủ</span></a>
             </li>

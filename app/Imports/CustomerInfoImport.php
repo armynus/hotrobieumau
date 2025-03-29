@@ -29,14 +29,14 @@ class CustomerInfoImport implements ToModel, WithHeadingRow, WithChunkReading, W
                     'gender'          => $row['name_3'] ?? $customer->gender,
                     'branch_code'     => $row['name_2'] ?? $customer->branch_code,
                     'identity_no'     => $row['regno'] ?? $customer->identity_no,
-                    'identity_date'   => $row['identity_date'] ?? $customer->identity_date,
+                    'identity_date'   => $this->formatDate($row['issuedt1'] ?? $customer->identity_date),
                     'identity_place'  => $row['identity_place'] ?? $customer->identity_place,
                     'addrtpcd'        => $row['addrtpcd'] ?? $customer->addrtpcd,
                     'addr1'           => $row['addr1'] ?? $customer->addr1,
                     'addr2'           => $row['addr2'] ?? $customer->addr2,
                     'addr3'           => $row['addr3'] ?? $customer->addr3,
                     'addrfull'        => $row['addr1'] . ' ' . $row['addr2'] . ' ' . $row['addr3'] ?? $customer->addrfull,
-                    'birthday' => $this->formatBirthday($row['name_1'] ?? null),
+                    'birthday' => $this->formatDate($row['name_1'] ?? $customer->birthday),
                 ]);
 
                 return null; // Không tạo bản ghi mới
@@ -53,14 +53,14 @@ class CustomerInfoImport implements ToModel, WithHeadingRow, WithChunkReading, W
                 'gender'          => $row['name_3'] ?? null,
                 'branch_code'     => $row['name_2'] ?? null,
                 'identity_no'     => $row['regno'] ?? null,
-                'identity_date'   => $row['identity_date'] ?? null,
+                'identity_date'   => $this->formatDate($row['issuedt1'] ?? null),
                 'identity_place'  => $row['identity_place'] ?? null,
                 'addrtpcd'        => $row['addrtpcd'] ?? null,
                 'addr1'           => $row['addr1'] ?? null,
                 'addr2'           => $row['addr2'] ?? null,
                 'addr3'           => $row['addr3'] ?? null,
                 'addrfull'        => $row['addr1'] . ' ' . $row['addr2'] . ' ' . $row['addr3'] ?? null,
-                'birthday' => $this->formatBirthday($row['name_1'] ?? null),
+                'birthday' => $this->formatDate($row['name_1'] ?? null),
             ]);
         }
         
@@ -75,7 +75,7 @@ class CustomerInfoImport implements ToModel, WithHeadingRow, WithChunkReading, W
     {
         return 500;
     }
-    private function formatBirthday($birthday)
+    private function formatDate($birthday)
     {
         if (!$birthday) {
             return null;

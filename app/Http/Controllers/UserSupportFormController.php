@@ -10,6 +10,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Illuminate\Http\Request;
+use Exception;
 class UserSupportFormController extends Controller
 {
     function index($type){
@@ -33,6 +34,7 @@ class UserSupportFormController extends Controller
                 $field->field_code => [
                     'field_name'  => $field->field_name,
                     'data_type'   => $field->data_type,
+                    'value'       => $field->value,
                     'placeholder' => $field->placeholder,
                 ]
             ];
@@ -40,7 +42,7 @@ class UserSupportFormController extends Controller
 
         // Tạo danh sách các trường hợp lệ cho biểu mẫu
         $fields = array_intersect_key($default_fields, array_flip($formfields));
-
+        
         return view('user.page.transaction_form', compact('form', 'fields', 'type'));
     }
 
@@ -178,20 +180,20 @@ class UserSupportFormController extends Controller
                         $templateProcessor->setValue('n' . ($i + 1), $nameArray[$i]);
                     }
                 }
-                if ($key === 'idxacno') {
-                    $templateProcessor->setValue('idxacno',$value);
+                if ($key === 'SoThe') {
+                    $templateProcessor->setValue('SoThe',$value);
                     // Chia tách số thành các ký tự riêng lẻ
                     $stkArray = $this->convertNumberToVariables($value);
                 
-                    // Giới hạn mảng chỉ 16 số
-                    $stkArray = array_slice($stkArray, 0, 16);
+                    // Giới hạn mảng chỉ 4 số
+                    $stkArray = array_slice($stkArray, 0, 4);
                 
-                    // Nếu chưa đủ 16 số thì thêm khoảng trắng
-                    while (count($stkArray) < 16) {
+                    // Nếu chưa đủ 4 số thì thêm khoảng trắng
+                    while (count($stkArray) < 4) {
                         $stkArray['s' . (count($stkArray) + 1)] = ' ';
                     }
                 
-                    // Gán từng ký tự vào biến tương ứng ($s1, $s2, ..., $s16)
+                    // Gán từng ký tự vào biến tương ứng ($s1, $s2, ..., $4)
                     foreach ($stkArray as $key => $value) {
                         $templateProcessor->setValue($key, $value);
                     }
@@ -374,8 +376,8 @@ class UserSupportFormController extends Controller
         // Chuyển số thành mảng ký tự
         $digits = str_split($number);
         
-        // Đảm bảo đủ 16 ký tự, nếu thiếu thêm khoảng trắng
-        while (count($digits) < 16) {
+        // Đảm bảo đủ 4 ký tự, nếu thiếu thêm khoảng trắng
+        while (count($digits) < 4) {
             $digits[] = ' ';
         }
     
