@@ -164,6 +164,8 @@ class UserSupportFormController extends Controller
 
             // Gắn dữ liệu từ form vào file Word
             foreach ($formData as $key => $value) {
+                // Nếu không có giá trị thì gán chuỗi rỗng
+                $value = $value ?? ' ';
                 if ($key === 'nameloc') {
                     // Chuyển tên thành in hoa không dấu
                     $name = $this->convertToUppercaseWithoutAccents($value);
@@ -177,63 +179,74 @@ class UserSupportFormController extends Controller
                     }
                     // Gán từng ký tự vào biến tương ứng ($n1, $n2, ..., $n26)
                     for ($i = 0; $i < 26; $i++) {
-                        $templateProcessor->setValue('n' . ($i + 1), $nameArray[$i]);
+                        $templateProcessor->setValue('n' . ($i + 1), (string)$nameArray[$i]);
                     }
                 }
                 if ($key === 'SoThe') {
-                    $templateProcessor->setValue('SoThe',$value);
+                    $templateProcessor->setValue('SoThe', (string)$value);
                     // Chia tách số thành các ký tự riêng lẻ
                     $stkArray = $this->convertNumberToVariables($value);
-                
                     // Giới hạn mảng chỉ 4 số
-                    $stkArray = array_slice($stkArray, 0, 4);
-                
-                    // Nếu chưa đủ 4 số thì thêm khoảng trắng
-                    while (count($stkArray) < 4) {
-                        $stkArray['s' . (count($stkArray) + 1)] = ' ';
-                    }
-                
+                    $stkArray = array_values(array_slice($stkArray, 0, 4));
+                    $stkArray = array_pad($stkArray, 4, ' ');
                     // Gán từng ký tự vào biến tương ứng ($s1, $s2, ..., $4)
-                    foreach ($stkArray as $key => $value) {
-                        $templateProcessor->setValue($key, $value);
+                    foreach ($stkArray as $stkKey => $stkValue) {
+                        $templateProcessor->setValue('s' . ($stkKey + 1), (string)$stkValue);
                     }
 
                 }
                 
-                if (strpos($key, 'NgayHen') !== false || strpos($key, 'birthday') !== false || strpos($key, 'identity_date') !== false || strpos($key, 'NgayGiaoDich') !== false || strpos($key, 'NgayCCCDMoi') !== false || strpos($key, 'NgayCapDKKD') !== false) {
-                    // Chuyển định dạng ngày tháng
-                    $value = $this->convertDateFormat($value);
-                    
+                if (
+                    strpos($key, 'NgayHen') !== false ||
+                    strpos($key, 'birthday') !== false ||
+                    strpos($key, 'identity_date') !== false ||
+                    strpos($key, 'NgayGiaoDich') !== false ||
+                    strpos($key, 'NgayCCCDMoi') !== false ||
+                    strpos($key, 'NgayCapDKKD') !== false
+                ) {
+                    // Chuyển định dạng ngày tháng, nếu không có dữ liệu thì gán khoảng trắng
+                    $value = $this->convertDateFormat($value) ?? ' ';
+                    // Nếu là birthday, tách thành các biến phụ
                     if (strpos($key, 'birthday') !== false) {
-                        $dateVars = $this->convertDateToVariablesBirthDay($value ?? '');
-                        // Kiểm tra xem $dateVars có là mảng không
+                        $dateVars = $this->convertDateToVariablesBirthDay($value ?? ' ');
                         if (!empty($dateVars) && is_array($dateVars)) {
-                            foreach ($dateVars as $varName => $varValue) {
-                                $templateProcessor->setValue($varName, (string)$varValue); // Ép về string
+                            foreach ($dateVars as $dateKey => $dateValue) {
+                                $templateProcessor->setValue($dateKey, (string)$dateValue);
                             }
                         }
                     }
+                    // Nếu là identity_date, tách thành các biến phụ
                     if (strpos($key, 'identity_date') !== false) {
-                        $dateVars = $this->convertDateToVariablesIdentity($value ?? '');
-                        // Kiểm tra xem $dateVars có là mảng không
+                        $dateVars = $this->convertDateToVariablesIdentity($value ?? ' ');
                         if (!empty($dateVars) && is_array($dateVars)) {
-                            foreach ($dateVars as $varName => $varValue) {
-                                $templateProcessor->setValue($varName, (string)$varValue); // Ép về string
+                            foreach ($dateVars as $dateKey => $dateValue) {
+                                $templateProcessor->setValue($dateKey, (string)$dateValue);
                             }
                         }
                     }
-                    
                 } elseif (strpos($key, 'NgayThangNam') !== false) {
-                    $value = $this->convertDateNowFormat($value);
+                    $value = $this->convertDateNowFormat($value) ?? ' ';
                 }
-                // Nếu giá trị là số và các key liên quan thì format lại theo kiểu "1.000.000"
-                if (strpos($key, 'VonSucLD_So') !== false || strpos($key, 'SoDuTaiKhoan') !== false || strpos($key, 'HanMucTD_So') !== false) {
-                    $value = $this->formatNumber($value);
+                if (
+                    strpos($key, 'VonSucLD_So') !== false ||
+                    strpos($key, 'SoDuTaiKhoan') !== false ||
+                    strpos($key, 'HanMucTD_So') !== false
+                ) {
+                    $value = $this->formatNumber($value) ?? ' ';
                 }
-                $templateProcessor->setValue($key, (string) ($value ?? ''));
+                if (
+                    strpos($key, 'gender') !== false
+                ) {
+                    $value = !empty($value) ? '✓' : ' ';
+                    $templateProcessor->setValue($key, $value);
+                }
+                // Gán giá trị cuối cùng cho placeholder có tên trùng với $key
+                // $templateProcessor->setValue($key, (string) ($value ?? ' '));
+                $templateProcessor->setValue($key, (string)$value);
+
                 // Nếu có key branch, tạo thêm biến 'ChiNhanhHOA' với giá trị được chuyển thành in hoa
                 if ($key === 'branch') {
-                    $templateProcessor->setValue('ChiNhanhHOA', $this->convertToUppercase($value));
+                    $templateProcessor->setValue('ChiNhanhHOA', (string)$this->convertToUppercase($value) ?? ' ');
                 }
          
             }

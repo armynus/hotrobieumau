@@ -40,7 +40,7 @@
                         <div class="col-md-6">
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text bg-light border rounded" style="min-width: 210px; white-space: normal;">
+                                    <span class="input-group-text bg-light border rounded" data-for="{{$key}}" style="min-width: 210px; white-space: normal;">
                                         {{ $info['field_name'] }}
                                     </span>
                                 </div>

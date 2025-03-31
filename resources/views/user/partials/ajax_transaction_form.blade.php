@@ -250,91 +250,105 @@
         }
     });
 
-    $(document).ready(function() {
-        $('#print_form').click(function() {
+    $(document).ready(function () {
+        $('#print_form').click(function () {
             var formId = $(this).data('form_id');
             var formDataArray = $('#supportForm').serializeArray();
             var formData = {};
-            var hasEmptyField = false; // Biến để kiểm tra có trường nào bị trống không
+            var missingFields = []; // Lưu danh sách trường thiếu
 
-            // Duyệt qua tất cả các input và kiểm tra xem có bị trống không trừ trường hợp của input search
-      
-            $.each(formDataArray, function(_, field) {
-                let inputElement = $(`[name="${field.name}"]`);
+            // Duyệt qua tất cả input trong form
+            $.each(formDataArray, function (_, field) {
+                const messageElement = $(`span.input-group-text[data-for="${field.name}"]`);
+                const inputElement = $(`[name="${field.name}"]`);
+                const fieldValue = field.value || '';
 
-                // Nếu field có name là 'keyword', luôn thêm vào formData
-                if (field.name === 'keyword') {
-                    formData[field.name] = field.value;
-                    return true; // Tiếp tục vòng lặp
+                // Các trường hợp không cần kiểm tra: keyword, hidden, disabled
+                if (
+                    field.name === 'keyword' ||
+                    inputElement.attr("type") === "hidden" ||
+                    inputElement.prop("disabled")
+                ) {
+                    formData[field.name] = fieldValue;
+                    return;
                 }
 
-                // Nếu input là hidden hoặc disabled → luôn thêm vào formData (không quan tâm rỗng hay không)
-                if (inputElement.attr("type") === "hidden" || inputElement.prop("disabled")) {
-                    formData[field.name] = field.value;
-                    return true; // Tiếp tục vòng lặp
+                // Kiểm tra nếu trường bị trống
+                if (!fieldValue.trim()) {
+                    missingFields.push(messageElement.text() || field.name);
                 }
 
-                if (inputElement.is("select")) {
-                    // Nếu giá trị rỗng, hoặc nếu giá trị là option mặc định (ví dụ, "Chọn giới tính")
-                    if (!field.value || field.value.trim() === "") {
-                        swal({
-                            title: "Cảnh báo!",
-                            text: "Vui lòng chọn thông tin cho " + field.name + "!",
-                            icon: "warning",
-                        });
-                        hasEmptyField = true;
-                        return false; // Dừng vòng lặp
-                    }
-                }
-                // Kiểm tra các input khác nếu có giá trị rỗng
-                else if (!field.value.trim()) {
-                    swal({
-                        title: "Cảnh báo!",
-                        text: "Vui lòng nhập đầy đủ thông tin!",
-                        icon: "warning",
-                    });
-                    hasEmptyField = true;
-                    return false; // Dừng vòng lặp
-                }
-
-                // Gán dữ liệu bình thường
-                formData[field.name] = field.value;
+                // Luôn lưu dữ liệu vào formData
+                formData[field.name] = fieldValue;
             });
 
-            if (hasEmptyField) return;
+            // Hàm submit form ẩn
+            function submitForm() {
+                var $form = $('<form>', {
+                    method: 'POST',
+                    action: "{{ route('transaction_form_print') }}"
+                }).append($('<input>', {
+                    type: 'hidden',
+                    name: '_token',
+                    value: "{{ csrf_token() }}"
+                }));
 
-            // Tạo form ẩn để gửi dữ liệu tới server
-            var $form = $('<form>', {
-                method: 'POST',
-                action: "{{ route('transaction_form_print') }}",
-            }).append($('<input>', {
-                type: 'hidden',
-                name: '_token',
-                value: "{{ csrf_token() }}" // Laravel CSRF token
-            }));
+                // Thêm tất cả dữ liệu vào form ẩn
+                $.each(formData, function (name, value) {
+                    $form.append($('<input>', {
+                        type: 'hidden',
+                        name: name,
+                        value: value
+                    }));
+                });
 
-            // Thêm tất cả dữ liệu form vào form ẩn
-            $.each(formData, function(name, value) {
+                // Thêm form_id
                 $form.append($('<input>', {
                     type: 'hidden',
-                    name: name,
-                    value: value
+                    name: 'form_id',
+                    value: formId
                 }));
-            });
 
-            // Thêm form_id vào form ẩn
-            $form.append($('<input>', {
-                type: 'hidden',
-                name: 'form_id',
-                value: formId
-            }));
+                // Submit form ẩn
+                $('body').append($form);
+                $form.submit();
+                $form.remove();
+            }
 
-            // Đưa form vào body và submit
-            $('body').append($form);
-            $form.submit();
-            $form.remove();
+            // Nếu có trường thiếu dữ liệu, hiển thị danh sách gọn hơn
+            if (missingFields.length > 0) {
+                swal({
+                    title: "Cảnh báo!",
+                    text: "Bạn điền thiếu thông tin:\n " + missingFields.join("") + 
+                        "\n\nBạn muốn tiếp tục in hay điền đầy đủ thông tin?",
+                    icon: "warning",
+                    buttons: {
+                        cancel: {   
+                            text: "Điền đầy đủ",
+                            value: false,
+                            visible: true,
+                            className: "btn btn-success"
+                        },
+                        confirm: {
+                            text: "Tiếp tục in",
+                            value: true,
+                            visible: true,
+                            className: "btn btn-warning"
+                        }
+                    }
+                }).then((willPrint) => {
+                    if (willPrint) {
+                        submitForm();
+                    }
+                });
+            } else {
+                submitForm();
+            }
         });
     });
+
+
+
     document.getElementById('resetFormBtn').addEventListener('click', function () {
         try {
             // Lấy tất cả input và select hợp lệ
