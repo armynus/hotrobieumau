@@ -257,11 +257,11 @@
             var formData = {};
             var missingFields = []; // Lưu danh sách trường thiếu
 
-            // Duyệt qua tất cả input trong form
+            // Duyệt qua tất cả input trong form để xây dựng formData
             $.each(formDataArray, function (_, field) {
-                const messageElement = $(`span.input-group-text[data-for="${field.name}"]`);
-                const inputElement = $(`[name="${field.name}"]`);
-                const fieldValue = field.value || '';
+                var messageElement = $(`span.input-group-text[data-for="${field.name}"]`);
+                var inputElement = $(`[name="${field.name}"]`);
+                var fieldValue = field.value || '';
 
                 // Các trường hợp không cần kiểm tra: keyword, hidden, disabled
                 if (
@@ -272,14 +272,22 @@
                     formData[field.name] = fieldValue;
                     return;
                 }
-
+                
                 // Kiểm tra nếu trường bị trống
                 if (!fieldValue.trim()) {
                     missingFields.push(messageElement.text() || field.name);
                 }
 
-                // Luôn lưu dữ liệu vào formData
-                formData[field.name] = fieldValue;
+                // Nếu là checkbox (nhiều lựa chọn), lưu giá trị vào mảng
+                if (inputElement.attr("type") === "checkbox") {
+                    if (!formData[field.name]) {
+                        formData[field.name] = [];
+                    }
+                    formData[field.name].push(fieldValue);
+                } else {
+                    // Nếu không phải checkbox, lưu giá trị trực tiếp
+                    formData[field.name] = fieldValue;
+                }
             });
 
             // Hàm submit form ẩn
@@ -287,19 +295,32 @@
                 var $form = $('<form>', {
                     method: 'POST',
                     action: "{{ route('transaction_form_print') }}"
-                }).append($('<input>', {
+                });
+
+                $form.append($('<input>', {
                     type: 'hidden',
                     name: '_token',
                     value: "{{ csrf_token() }}"
                 }));
 
-                // Thêm tất cả dữ liệu vào form ẩn
+                // Duyệt qua formData và thêm input ẩn
                 $.each(formData, function (name, value) {
-                    $form.append($('<input>', {
-                        type: 'hidden',
-                        name: name,
-                        value: value
-                    }));
+                    if (Array.isArray(value)) {
+                        // Nếu value là mảng, thêm từng phần tử với name dạng name[]
+                        $.each(value, function (_, val) {
+                            $form.append($('<input>', {
+                                type: 'hidden',
+                                name: name + '[]',
+                                value: val
+                            }));
+                        });
+                    } else {
+                        $form.append($('<input>', {
+                            type: 'hidden',
+                            name: name,
+                            value: value
+                        }));
+                    }
                 });
 
                 // Thêm form_id
@@ -309,17 +330,17 @@
                     value: formId
                 }));
 
-                // Submit form ẩn
+                // Append form vào body và submit
                 $('body').append($form);
                 $form.submit();
                 $form.remove();
             }
 
-            // Nếu có trường thiếu dữ liệu, hiển thị danh sách gọn hơn
+            // Nếu có trường thiếu, hiện cảnh báo, ngược lại submit luôn
             if (missingFields.length > 0) {
                 swal({
                     title: "Cảnh báo!",
-                    text: "Bạn điền thiếu thông tin:\n " + missingFields.join("") + 
+                    text: "Bạn điền thiếu thông tin:\n " + missingFields.join(" ") + 
                         "\n\nBạn muốn tiếp tục in hay điền đầy đủ thông tin?",
                     icon: "warning",
                     buttons: {
@@ -346,6 +367,8 @@
             }
         });
     });
+
+
 
 
 

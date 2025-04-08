@@ -40,18 +40,69 @@
                         <div class="col-md-6">
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text bg-light border rounded" data-for="{{$key}}" style="min-width: 210px; white-space: normal;">
+                                    <span class="input-group-text bg-light border rounded" data-for="{{$key}}" >
                                         {{ $info['field_name'] }}
                                     </span>
                                 </div>
 
                                 <div id="{{ $key == 'idxacno' ? 'accountFieldWrapper' : '' }}" class="flex-grow-1">
                                     @if($key == 'gender')
-                                        <select class="form-control" id="gender" name="gender" required>
-                                            <option value="">Chọn giới tính</option>
-                                            <option value="Nam" {{ old('gender') == 'Nam' ? 'selected' : '' }}>Nam</option>
-                                            <option value="Nữ" {{ old('gender') == 'Nữ' ? 'selected' : '' }}>Nữ</option>
-                                        </select>
+                                        <x-select-input-to-check-box 
+                                            name="gender" 
+                                            :options="$gender" 
+                                            selected="{{ old('gender') }}" 
+                                            {{-- placeholder="Chọn giới tính"  --}}
+                                            :required="true" 
+                                        />
+                                    @elseif($key == 'NgheNghiepKH')
+                                        <x-select-input-to-check-box 
+                                            name="NgheNghiep" 
+                                            :options="$NgheNghiep" 
+                                            selected="{{ old('NgheNghiep') }}"  
+                                            :required="true" 
+                                        />
+                                    @elseif($key == 'ChucVuKH')
+                                        <x-select-input-to-check-box 
+                                            name="ChucVuKH" 
+                                            :options="$ChucVuKH" 
+                                            selected="{{ old('ChucVuKH') }}"  
+                                            :required="true" 
+                                        />
+                                    @elseif($key == 'ccycd')
+                                        <x-select-input-to-check-box 
+                                            name="ccycd" 
+                                            :options="$ccycd" 
+                                            selected="{{ old('ccycd') }}" 
+                                            :required="true" 
+                                        />
+                                    @elseif($key == 'HangThe')
+                                        <x-select-input-to-check-box 
+                                            name="HangThe" 
+                                            :options="$HangThe" 
+                                            selected="{{ old('HangThe') }}" 
+                                            :required="true" 
+                                        />
+                                    @elseif($key == 'LoaiThe')
+                                        <x-select-input-to-check-box 
+                                            name="LoaiThe" 
+                                            :options="$LoaiThe" 
+                                            selected="{{ old('LoaiThe') }}" 
+                                            :required="true" 
+                                        />
+                                    @elseif($key == 'SoTKTT')
+                                        <x-select-input-to-check-box 
+                                            name="SoTKTT" 
+                                            :options="$SoTKTT" 
+                                            selected="{{ old('SoTKTT') }}" 
+                                            :required="true" 
+                                        />
+                                    @elseif($key == 'ThuTuDong')
+                                        <x-check-value-to-check-box
+                                            name="ThuTuDong" 
+                                            :options="$ThuTuDong" 
+                                            selected="{{ old('ThuTuDong') }}" 
+                                            :required="false" 
+                                        />
                                     @else
                                         <input type="{{ $info['data_type'] ?? 'text' }}" 
                                             class="form-control" 

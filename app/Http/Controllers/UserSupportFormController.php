@@ -42,8 +42,66 @@ class UserSupportFormController extends Controller
 
         // Tạo danh sách các trường hợp lệ cho biểu mẫu
         $fields = array_intersect_key($default_fields, array_flip($formfields));
-        
-        return view('user.page.transaction_form', compact('form', 'fields', 'type'));
+
+        $gender = [
+            'Nam' => 'Nam',
+            'Nữ' => 'Nữ',
+        ];
+        $NgheNghiep = [
+            'Công chức/viên chức' => 'ccvc',
+            'Công an/bộ đội' => 'cabd',
+            'Giáo viên/bác sĩ' => 'gvbs',
+            'Kỹ sư' => 'ks',
+            'Công nhân' => 'cn',
+            'Nông dân' => 'nd',
+            'Luật sư, nhà chuyên môn về luật/kế toán thuế/tư vấn tài chính và đầu tư' => 'lsncm',
+            'Kinh doanh tự do' => 'kdtd',
+            'Hướng dẫn viên du lịch/tiếp viên hàng không' => 'hdvtvhk',
+            'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết' => 'ctgd',
+            'Học sinh/sinh viên' => 'hssv',
+            'Nội trợ' => 'nt',
+            'Khác' => 'nnkhac',
+        ];
+        $ChucVuKH = [
+            'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết' => 'ChucVu_CTGD',
+            'Cán bộ nhân viên' => 'ChucVu_CBNV',
+            'Chủ tịch/Giám đốc/Chức danh tương đương tại TC, DN khác' => 'ChucVu_CTTD',
+            'Quản lý cấp trung (Trưởng phòng, Phó TP, tương đương)' => 'ChucVu_QLCT',
+            'Khác' => 'ChucVu_Khac',
+        ];
+        $ccycd = [
+            'VND' => 'VND',
+            'USD' => 'USD',
+            'EUR' => 'EUR',
+            'Khác' => '',
+        ];
+        $SoTKTT= [
+            'Số TKTT ngẫu nhiên' => 'LoaiTK_Auto',
+            'Số TKTT yêu cầu' => 'LoaiTK_Chon',
+            'TKTT chuyên dùng' => 'LoaiTK_ChDung',
+        ];
+        $HangThe = [
+            'Vàng' => 'Check_Vang',
+            'Chuẩn' => 'Check_Chuan',
+        ];
+        $LoaiThe = [
+            'Thẻ ghi nợ nội địa' => 'Check_TheND',
+            'Lập Nghiệp' => 'Check_TheLN',
+            'JCB Debit' => 'Check_TheJCB',
+            'Thẻ liên kết thương hiệu' => 'Check_TheTH',
+            'Thẻ Visa Debit' => 'Check_TheVS',
+            'MasterCard Debit' => 'Check_TheMT',
+            'Thẻ Khác' => 'Check_TheKHAC',
+        ];
+        $ThuTuDong = [
+            'Nước' => 'Check_Nuoc',
+            'Điện' => 'Check_Dien',
+            'Viễn Thông' => 'Check_VienT',
+            'Học Phí' => 'Check_HocP',
+            'Bảo Hiểm' => 'Check_BH',     
+        ];
+        return view('user.page.transaction_form', compact('form', 'fields', 'type', 'gender', 
+        'NgheNghiep', 'ChucVuKH', 'ccycd', 'SoTKTT', 'LoaiThe','HangThe',  'ThuTuDong'));
     }
 
     
@@ -166,6 +224,15 @@ class UserSupportFormController extends Controller
             foreach ($formData as $key => $value) {
                 // Nếu không có giá trị thì gán chuỗi rỗng
                 $value = $value ?? ' ';
+               
+                if (is_array($value)) {
+                    $flatArray = [];
+                    array_walk_recursive($value, function($item) use (&$flatArray) {
+                        $flatArray[] = $item;
+                    });
+                    $value = implode(',', $flatArray);
+                }
+                
                 if ($key === 'nameloc') {
                     // Chuyển tên thành in hoa không dấu
                     $name = $this->convertToUppercaseWithoutAccents($value);
@@ -234,12 +301,9 @@ class UserSupportFormController extends Controller
                 ) {
                     $value = $this->formatNumber($value) ?? ' ';
                 }
-                if (
-                    strpos($key, 'gender') !== false
-                ) {
-                    $value = !empty($value) ? '✓' : ' ';
-                    $templateProcessor->setValue($key, $value);
-                }
+                 // Xử lý checkbox cho giới tính
+                // Xử lý checkbox sau khi tất cả dữ liệu đã được gán
+               
                 // Gán giá trị cuối cùng cho placeholder có tên trùng với $key
                 // $templateProcessor->setValue($key, (string) ($value ?? ' '));
                 $templateProcessor->setValue($key, (string)$value);
@@ -250,14 +314,64 @@ class UserSupportFormController extends Controller
                 }
          
             }
-
-            // Tăng usage_count của biểu mẫu mỗi khi in
-            $form->increment('usage_count');
-
-            // Tạo file Word trong bộ nhớ thay vì lưu vào ổ cứng
+            // Lưu file tạm trước khi chỉnh sửa XML
             $tempFile = tempnam(sys_get_temp_dir(), 'word');
             $templateProcessor->saveAs($tempFile);
-
+            // dd($formData['ThuTuDong']);
+            // Xử lý checkbox trong word SAU KHI đã lưu file tạm
+            if (isset($formData['gender'])) {
+                $valueChecked = $formData['gender']; // "Check_NAM" hoặc "Check_NU"
+                $this->updateCheckboxContentControl($tempFile, 'Check_NAM', $valueChecked === 'Nam');
+                $this->updateCheckboxContentControl($tempFile, 'Check_NU',  $valueChecked === 'Nữ');
+            }
+            if (isset($formData['NgheNghiep'])) {
+                $valueChecked = $formData['NgheNghiep'];
+                $this->updateCheckboxContentControl($tempFile, $valueChecked,  $valueChecked);
+            }
+            if (isset($formData['ChucVuKH'])) {
+                $valueChecked = $formData['ChucVuKH'];
+                $this->updateCheckboxContentControl($tempFile, $valueChecked,  $valueChecked);
+            }
+            if (isset($formData['ccycd'])) {
+                $valueChecked = $formData['ccycd'];
+                $this->updateCheckboxContentControl($tempFile, 'Check_VND', $valueChecked === 'VND');
+                $this->updateCheckboxContentControl($tempFile, 'Check_USD',  $valueChecked === 'USD');
+                $this->updateCheckboxContentControl($tempFile, 'Check_EUR',  $valueChecked === 'EUR');
+                $this->updateCheckboxContentControl($tempFile, 'Check_TienKhac',  $valueChecked === 'Khác');
+            }
+            if (isset($formData['SoTKTT'])) {
+                $valueChecked = $formData['SoTKTT'];
+                $this->updateCheckboxContentControl($tempFile, $valueChecked,  $valueChecked);
+            }
+            if (isset($formData['HangThe'])) {
+                $valueChecked = $formData['HangThe'];
+                $this->updateCheckboxContentControl($tempFile, $valueChecked,  $valueChecked);
+            }
+            if (isset($formData['LoaiThe'])) {
+                $valueChecked = $formData['LoaiThe'];
+                $this->updateCheckboxContentControl($tempFile, $valueChecked,  $valueChecked);
+            }
+            if (isset($formData['ThuTuDong'])) {
+                // Flatten mảng, lấy tất cả các giá trị thành 1 mảng đơn
+                $selected = [];
+                foreach ($formData['ThuTuDong'] as $item) {
+                    if (is_array($item)) {
+                        $selected = array_merge($selected, $item);
+                    } else {
+                        $selected[] = $item;
+                    }
+                }
+                
+                // Cập nhật checkbox dựa trên việc có trong mảng $selected hay không
+                $this->updateCheckboxContentControl($tempFile, 'Check_Nuoc', in_array('Check_Nuoc', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'Check_Dien', in_array('Check_Dien', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'Check_VienT', in_array('Check_VienT', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'Check_HocP', in_array('Check_HocP', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'Check_BH', in_array('Check_BH', $selected));
+            }
+            
+            // Tăng usage_count của biểu mẫu mỗi khi in
+            $form->increment('usage_count');
             DB::commit();
 
             // Trả về file Word để tải xuống trực tiếp
@@ -268,6 +382,105 @@ class UserSupportFormController extends Controller
         }
     }
 
+    // Ham xu ly checkbox
+    private function updateCheckboxContentControl($docxPath, $tag, $isChecked) {
+        $zip = new \ZipArchive();
+        if ($zip->open($docxPath) !== true) {
+            throw new \Exception("Không thể mở file DOCX: " . $zip->getStatusString());
+        }
+    
+        // Đọc nội dung XML từ file DOCX
+        $xmlContent = $zip->getFromName('word/document.xml');
+        if ($xmlContent === false) {
+            $zip->close();
+            throw new \Exception("Không thể đọc file XML");
+        }
+    
+        // Load XML với DOMDocument
+        $dom = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadXML($xmlContent);
+        libxml_clear_errors();
+    
+        // Tạo DOMXPath và đăng ký namespace
+        $xpath = new \DOMXPath($dom);
+        $xpath->registerNamespace('w', 'http://schemas.openxmlformats.org/wordprocessingml/2006/main');
+        $xpath->registerNamespace('w10', 'http://schemas.microsoft.com/office/word/2010/wordml');
+    
+        // Tìm các node <w:sdt> chứa checkbox với tag tương ứng
+        $query = "//w:sdt[.//w:tag[@w:val='{$tag}']]";
+        $sdtNodes = $xpath->query($query);
+        if ($sdtNodes === false || $sdtNodes->length === 0) {
+            $zip->close();
+            return; // Không ném lỗi nữa
+        }
+    
+        // Cập nhật thuộc tính checkbox (w14:checked)
+        foreach ($sdtNodes as $sdtNode) {
+            $checkedNodes = $xpath->query(".//w10:checked", $sdtNode);
+            if ($checkedNodes->length > 0) {
+                foreach ($checkedNodes as $checkedNode) {
+                    if ($checkedNode instanceof \DOMElement) {
+                        $checkedNode->setAttribute('w10:val', $isChecked ? '1' : '0');
+                    }
+                }
+            }
+    
+            // Cập nhật nội dung hiển thị bên trong w:sdtContent
+            $sdtContentNodes = $xpath->query(".//w:sdtContent", $sdtNode);
+            if ($sdtContentNodes->length > 0) {
+                foreach ($sdtContentNodes as $contentNode) {
+                    // Xóa tất cả các node con hiện có
+                    while ($contentNode->hasChildNodes()) {
+                        $contentNode->removeChild($contentNode->firstChild);
+                    }
+    
+                    // Tạo mới một w:r
+                    $w_ns = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+                    $rNode = $dom->createElementNS($w_ns, 'w:r');
+    
+                    // (Tùy chọn) Tạo w:rPr nếu cần sao chép font, kích thước, vv.
+                    // Ở đây mình tạo một w:rPr cơ bản như ví dụ trong file gốc
+                    $rPrNode = $dom->createElementNS($w_ns, 'w:rPr');
+                    $rFontsNode = $dom->createElementNS($w_ns, 'w:rFonts');
+                    $rFontsNode->setAttribute('w:ascii', 'Times New Roman');
+                    $rFontsNode->setAttribute('w:hAnsi', 'Times New Roman');
+                    $rPrNode->appendChild($rFontsNode);
+                    $szNode = $dom->createElementNS($w_ns, 'w:sz');
+                    $szNode->setAttribute('w:val', '22');
+                    $rPrNode->appendChild($szNode);
+                    $szCsNode = $dom->createElementNS($w_ns, 'w:szCs');
+                    $szCsNode->setAttribute('w:val', '22');
+                    $rPrNode->appendChild($szCsNode);
+                    $rNode->appendChild($rPrNode);
+    
+                    if ($isChecked) {
+                        // Tạo node <w:sym> để hiển thị tick checkbox giống như khi click tay
+                        $symNode = $dom->createElementNS($w_ns, 'w:sym');
+                        $symNode->setAttribute('w:font', 'Wingdings 2');
+                        $symNode->setAttribute('w:char', 'F052');
+                        $rNode->appendChild($symNode);
+                    } else {
+                        // Khi không chọn, hiển thị ô vuông rỗng, có thể dùng <w:t>
+                        $tNode = $dom->createElementNS($w_ns, 'w:t', '☐');
+                        $rNode->appendChild($tNode);
+                    }
+    
+                    // Thêm w:r mới vào w:sdtContent
+                    $contentNode->appendChild($rNode);
+                }
+            }
+        }
+    
+        // Lưu lại nội dung XML đã cập nhật vào file DOCX
+        $updatedXml = $dom->saveXML();
+        $zip->deleteName('word/document.xml');
+        $zip->addFromString('word/document.xml', $updatedXml);
+        $zip->close();
+    }
+    
+    
+    
     public function convertDateFormat($date)
     {
         // Nếu date không tồn tại, trả về chuỗi trống
@@ -336,6 +549,9 @@ class UserSupportFormController extends Controller
         return implode(' ', mb_str_split($string));
     }
     function formatNumber($number) {
+        // Chuyển giá trị về số, nếu không hợp lệ thì mặc định là 0
+        $number = is_numeric($number) ? (float)$number : 0;
+    
         return number_format($number, 0, '', '.');
     }
     function convertToUppercase($text) {
