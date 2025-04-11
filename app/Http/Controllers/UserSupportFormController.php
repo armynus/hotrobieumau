@@ -47,27 +47,28 @@ class UserSupportFormController extends Controller
             'Nam' => 'Nam',
             'Nữ' => 'Nữ',
         ];
-        $NgheNghiep = [
-            'Công chức/viên chức' => 'ccvc',
-            'Công an/bộ đội' => 'cabd',
-            'Giáo viên/bác sĩ' => 'gvbs',
-            'Kỹ sư' => 'ks',
-            'Công nhân' => 'cn',
-            'Nông dân' => 'nd',
-            'Luật sư, nhà chuyên môn về luật/kế toán thuế/tư vấn tài chính và đầu tư' => 'lsncm',
-            'Kinh doanh tự do' => 'kdtd',
-            'Hướng dẫn viên du lịch/tiếp viên hàng không' => 'hdvtvhk',
-            'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết' => 'ctgd',
-            'Học sinh/sinh viên' => 'hssv',
-            'Nội trợ' => 'nt',
-            'Khác' => 'nnkhac',
+        $NgheNghiepKH = [
+            'Công chức/viên chức' => 'Công chức/viên chức',
+            'Công an/bộ đội' => 'Công an/bộ đội',
+            'Giáo viên/bác sĩ' => 'Giáo viên/bác sĩ',
+            'Kỹ sư' => 'Kỹ sư',
+            'Công nhân' => 'Công nhân',
+            'Nông dân' => 'Nông dân',
+            'Luật sư, nhà chuyên môn về luật/kế toán thuế/tư vấn tài chính và đầu tư' => 'Luật sư, nhà chuyên môn về luật/kế toán thuế/tư vấn tài chính và đầu tư',
+            'Kinh doanh tự do' => 'Kinh doanh tự do',
+            'Hướng dẫn viên du lịch/tiếp viên hàng không' => 'Hướng dẫn viên du lịch/tiếp viên hàng không',
+            'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết' => 'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết',
+            'Học sinh/sinh viên' => 'Học sinh/sinh viên',
+            'Nội trợ' => 'Nội trợ',
+            'Khác' => '',
         ];
+        
         $ChucVuKH = [
-            'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết' => 'ChucVu_CTGD',
-            'Cán bộ nhân viên' => 'ChucVu_CBNV',
-            'Chủ tịch/Giám đốc/Chức danh tương đương tại TC, DN khác' => 'ChucVu_CTTD',
-            'Quản lý cấp trung (Trưởng phòng, Phó TP, tương đương)' => 'ChucVu_QLCT',
-            'Khác' => 'ChucVu_Khac',
+            'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết' => 'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết',
+            'Cán bộ nhân viên' => 'Cán bộ nhân viên',
+            'Chủ tịch/Giám đốc/Chức danh tương đương tại TC, DN khác' => 'Chủ tịch/Giám đốc/Chức danh tương đương tại TC, DN khác',
+            'Quản lý cấp trung (Trưởng phòng, Phó TP, tương đương)' => 'Quản lý cấp trung (Trưởng phòng, Phó TP, tương đương)',
+            'Khác' => '',
         ];
         $ccycd = [
             'VND' => 'VND',
@@ -100,8 +101,39 @@ class UserSupportFormController extends Controller
             'Học Phí' => 'Check_HocP',
             'Bảo Hiểm' => 'Check_BH',     
         ];
-        return view('user.page.transaction_form', compact('form', 'fields', 'type', 'gender', 
-        'NgheNghiep', 'ChucVuKH', 'ccycd', 'SoTKTT', 'LoaiThe','HangThe',  'ThuTuDong'));
+        $MobileBanking = [
+            'Agribank Plus' => 'MB_APLUS',
+            'E-Commerce' => 'MB_EC',
+            'SMS Banking' => 'MB_SMS',
+            'Liên kết Ví điện tử' => 'MB_VDT',
+            'Bank plus' => 'MB_BPLUS',
+        ];
+        $RetaileBanking=[
+            'Kênh giao dịch'=>[
+                'Mobile'=>'EBANK_Mobile',
+                'Internet'=>'EBANK_Internet',
+            ],
+            'Gói'=>[
+                'Phi tài chính'=>'Goi_PTC',
+                'Tài chính'=>'Goi_TC',
+            ],
+            'Phương Thức xác thực'=>[
+                'SMS OTP'=>'Goi_SMS',
+                'Soft OTP'=>'Goi_Soft',
+                'Token OTP'=>'Goi_Token',
+            ],
+        ];
+        $DichVuKhac=[
+            'Vay vốn' => 'DV_VV',
+            'Tiết kiệm' => 'DV_TK',
+            'Kiều hối' => 'DV_KH',
+            'Chuyển tiền nước ngoài' => 'DV_CTNN',
+            'Mua bán ngoại tệ' => 'DV_MBNT',
+            'Bảo hiểm' => 'DV_BH',
+            'Dịch vụ khác' => 'DV_KHAC',
+        ];
+        return view('user.page.transaction_form', compact('form', 'fields', 'type', 'gender', 'NgheNghiepKH', 'ChucVuKH', 
+        'ccycd', 'SoTKTT', 'LoaiThe','HangThe', 'ThuTuDong', 'MobileBanking', 'RetaileBanking', 'DichVuKhac'));
     }
 
     
@@ -219,12 +251,10 @@ class UserSupportFormController extends Controller
                     ]);
                 }
             }
-
             // Gắn dữ liệu từ form vào file Word
             foreach ($formData as $key => $value) {
                 // Nếu không có giá trị thì gán chuỗi rỗng
                 $value = $value ?? ' ';
-               
                 if (is_array($value)) {
                     $flatArray = [];
                     array_walk_recursive($value, function($item) use (&$flatArray) {
@@ -324,13 +354,45 @@ class UserSupportFormController extends Controller
                 $this->updateCheckboxContentControl($tempFile, 'Check_NAM', $valueChecked === 'Nam');
                 $this->updateCheckboxContentControl($tempFile, 'Check_NU',  $valueChecked === 'Nữ');
             }
-            if (isset($formData['NgheNghiep'])) {
-                $valueChecked = $formData['NgheNghiep'];
-                $this->updateCheckboxContentControl($tempFile, $valueChecked,  $valueChecked);
+            if (isset($formData['NgheNghiepKH'])) {
+                $valueChecked = $formData['NgheNghiepKH'];
+                $NgheNghiepKH = [
+                    'Công chức/viên chức' => 'ccvc',
+                    'Công an/bộ đội' => 'cabd',
+                    'Giáo viên/bác sĩ' => 'gvbs',
+                    'Kỹ sư' => 'ks',
+                    'Công nhân' => 'cn',
+                    'Nông dân' => 'nd',
+                    'Luật sư, nhà chuyên môn về luật/kế toán thuế/tư vấn tài chính và đầu tư' => 'lsncm',
+                    'Kinh doanh tự do' => 'kdtd',
+                    'Hướng dẫn viên du lịch/tiếp viên hàng không' => 'hdvtvhk',
+                    'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết' => 'ctgd',
+                    'Học sinh/sinh viên' => 'hssv',
+                    'Nội trợ' => 'nt',
+                    '' => 'nnkhac',
+                ];
+            
+                // Duyệt toàn bộ danh sách để gán checked/un-checked tương ứng
+                foreach ($NgheNghiepKH as $label => $tagName) {
+                    $isChecked = $valueChecked === $label;
+                    $this->updateCheckboxContentControl($tempFile, $tagName, $isChecked);
+                }
             }
+        
             if (isset($formData['ChucVuKH'])) {
                 $valueChecked = $formData['ChucVuKH'];
-                $this->updateCheckboxContentControl($tempFile, $valueChecked,  $valueChecked);
+                $ChucVuKH = [
+                    'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết' => 'ChucVu_CTGD',
+                    'Cán bộ nhân viên' => 'ChucVu_CBNV',
+                    'Chủ tịch/Giám đốc/Chức danh tương đương tại TC, DN khác' => 'ChucVu_CTTD',
+                    'Quản lý cấp trung (Trưởng phòng, Phó TP, tương đương)' => 'ChucVu_QLCT',
+                    '' => 'ChucVu_Khac',
+                ];
+                 // Duyệt toàn bộ danh sách để gán checked/un-checked tương ứng
+                 foreach ($ChucVuKH as $label => $tagName) {
+                    $isChecked = $valueChecked === $label;
+                    $this->updateCheckboxContentControl($tempFile, $tagName, $isChecked);
+                }
             }
             if (isset($formData['ccycd'])) {
                 $valueChecked = $formData['ccycd'];
@@ -351,6 +413,7 @@ class UserSupportFormController extends Controller
                 $valueChecked = $formData['LoaiThe'];
                 $this->updateCheckboxContentControl($tempFile, $valueChecked,  $valueChecked);
             }
+            // dd($formData['MobileBanking']);
             if (isset($formData['ThuTuDong'])) {
                 // Flatten mảng, lấy tất cả các giá trị thành 1 mảng đơn
                 $selected = [];
@@ -369,7 +432,61 @@ class UserSupportFormController extends Controller
                 $this->updateCheckboxContentControl($tempFile, 'Check_HocP', in_array('Check_HocP', $selected));
                 $this->updateCheckboxContentControl($tempFile, 'Check_BH', in_array('Check_BH', $selected));
             }
-            
+            if (isset($formData['MobileBanking'])) {
+                // Flatten mảng, lấy tất cả các giá trị thành 1 mảng đơn
+                $selected = [];
+                foreach ($formData['MobileBanking'] as $item) {
+                    if (is_array($item)) {
+                        $selected = array_merge($selected, $item);
+                    } else {
+                        $selected[] = $item;
+                    }
+                }
+                // Cập nhật checkbox dựa trên việc có trong mảng $selected hay không
+                $this->updateCheckboxContentControl($tempFile, 'MB_APLUS', in_array('MB_APLUS', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'MB_EC', in_array('MB_EC', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'MB_SMS', in_array('MB_SMS', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'MB_VDT', in_array('MB_VDT', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'MB_BPLUS', in_array('MB_BPLUS', $selected));
+            }
+            if (isset($formData['RetaileBanking'])) {
+                // Flatten mảng, lấy tất cả các giá trị thành 1 mảng đơn
+                $selected = [];
+                foreach ($formData['RetaileBanking'] as $item) {
+                    if (is_array($item)) {
+                        $selected = array_merge($selected, $item);
+                    } else {
+                        $selected[] = $item;
+                    }
+                }
+                // Cập nhật checkbox dựa trên việc có trong mảng $selected hay không
+                $this->updateCheckboxContentControl($tempFile, 'EBANK_Mobile', in_array('EBANK_Mobile', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'EBANK_Internet', in_array('EBANK_Internet', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'Goi_PTC', in_array('Goi_PTC', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'Goi_TC', in_array('Goi_TC', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'Goi_SMS', in_array('Goi_SMS', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'Goi_Soft', in_array('Goi_Soft', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'Goi_Token', in_array('Goi_Token', $selected));
+            }
+            if (isset($formData['DichVuKhac'])) {
+                // Flatten mảng, lấy tất cả các giá trị thành 1 mảng đơn
+                $selected = [];
+                foreach ($formData['DichVuKhac'] as $item) {
+                    if (is_array($item)) {
+                        $selected = array_merge($selected, $item);
+                    } else {
+                        $selected[] = $item;
+                    }
+                }
+                // Cập nhật checkbox dựa trên việc có trong mảng $selected hay không
+                $this->updateCheckboxContentControl($tempFile, 'DV_VV', in_array('DV_VV', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'DV_TK', in_array('DV_TK', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'DV_KH', in_array('DV_KH', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'DV_CTNN', in_array('DV_CTNN', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'DV_MBNT', in_array('DV_MBNT', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'DV_BH', in_array('DV_BH', $selected));
+                $this->updateCheckboxContentControl($tempFile, 'DV_KHAC', in_array('DV_KHAC', $selected));
+            }
             // Tăng usage_count của biểu mẫu mỗi khi in
             $form->increment('usage_count');
             DB::commit();

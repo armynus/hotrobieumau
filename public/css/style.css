@@ -157,18 +157,18 @@ select.form-control {
   flex-grow: 1;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
-  padding: 0.5rem;
+  padding: 0.3rem;
   min-height: 40px;
   background-color: white;
 }
 
 /* ==== CHECKBOX GROUP ==== */
-.checkbox-group {
+/* .checkbox-group {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
-}
+} */
 
 .checkbox-group label {
   white-space: normal;
@@ -194,4 +194,38 @@ select.form-control {
   .checkbox-wrapper {
     width: 100%;
   }
+}
+
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+  align-items: flex-start;
+}
+
+.checkbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+}
+
+.checkbox-label {
+  font-weight: bold;
+  color: #4F46E5; /* màu tím tím nổi bật như bạn đang dùng */
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
+.checkbox-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.checkbox-inline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }

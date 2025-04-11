@@ -56,9 +56,9 @@
                                         />
                                     @elseif($key == 'NgheNghiepKH')
                                         <x-select-input-to-check-box 
-                                            name="NgheNghiep" 
-                                            :options="$NgheNghiep" 
-                                            selected="{{ old('NgheNghiep') }}"  
+                                            name="NgheNghiepKH" 
+                                            :options="$NgheNghiepKH" 
+                                            selected="{{ old('NgheNghiepKH') }}"  
                                             :required="true" 
                                         />
                                     @elseif($key == 'ChucVuKH')
@@ -103,6 +103,28 @@
                                             selected="{{ old('ThuTuDong') }}" 
                                             :required="false" 
                                         />
+                                    @elseif($key == 'MobileBanking')
+                                        <x-check-value-to-check-box
+                                            name="MobileBanking" 
+                                            :options="$MobileBanking" 
+                                            selected="{{ old('MobileBanking') }}" 
+                                            :required="false" 
+                                        />
+                                    @elseif($key == 'RetaileBanking')
+                                        <x-check-value-to-check-box
+                                            name="RetaileBanking" 
+                                            :options="$RetaileBanking" 
+                                            selected="{{ old('RetaileBanking') }}" 
+                                            :required="false" 
+                                        />
+                                    @elseif($key == 'DichVuKhac')
+                                        <x-check-value-to-check-box
+                                            name="DichVuKhac" 
+                                            :options="$DichVuKhac" 
+                                            selected="{{ old('DichVuKhac') }}" 
+                                            :required="false" 
+                                        />
+                                    
                                     @else
                                         <input type="{{ $info['data_type'] ?? 'text' }}" 
                                             class="form-control" 
