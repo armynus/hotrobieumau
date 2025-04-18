@@ -375,7 +375,7 @@
     document.getElementById('resetFormBtn').addEventListener('click', function () {
         try {
             // Lấy tất cả input và select hợp lệ
-            const elements = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='DiaDanh']):not([name='_token']):not([name='NgayGiaoDich']):not([name='NgayThangNam']):not([name='branch']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
+            const elements = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='GDichVien']):not([name='DiaDanh']):not([name='_token']):not([name='NgayGiaoDich']):not([name='NgayThangNam']):not([name='branch']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
 
             // Đặt lại giá trị mặc định
             elements.forEach(el => {
@@ -435,74 +435,116 @@
             renderSelect(window.currentCustomer);
         }
     });
-
-    // Sự kiện autocomplete cho trường tìm kiếm khách hàng
-    $("#customer_search").autocomplete({
-        source: function(request, response) {
-            $.ajax({
-                url: "{{ route('customer.search') }}",
-                dataType: "json",
-                data: { query: request.term },
-                success: function(data) {
-                    response(data);
-                }
-            });
-        },
-        minLength: 2,
-        select: function(event, ui) {
-            var customer = ui.item.customer;
-            // Lưu đối tượng customer vào biến toàn cục để sử dụng cho toggle sau này
-            window.currentCustomer = customer;
-            
-            // Duyệt qua các thuộc tính của customer và điền vào form (nếu input có id trùng với key)
-            $.each(customer, function(key, value) {
-                if ($("#" + key).length) {
-                    $("#" + key).val(value);
-                }
-            });
-            if (customer.custno) {
-                $('#custno_hidden').val(customer.custno);
-            }
-
-            if (customer.accounts?.idxacno) {
-                $('#idxacno_hidden').val(customer.accounts.idxacno);
-            }
-            // Xử lý trường "Số tài khoản" (idxacno) và "Loại tiền tệ" (ccycd)
-            if (customer.accounts && customer.accounts.length > 1) {
-                // Nếu có nhiều tài khoản, hiển thị dạng select
-                renderSelect(customer);
-
-                // Lắng nghe sự kiện khi thay đổi select để cập nhật idxacno_hidden
-                $("#idxacno").on("click", function () {
-                    $("#idxacno_hidden").val($(this).val());
+    $(document).ready(function () {
+        // Sự kiện autocomplete cho trường tìm kiếm khách hàng
+        $("#customer_search").autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    url: "{{ route('customer.search') }}",
+                    dataType: "json",
+                    data: { query: request.term },
+                    success: function(data) {
+                        response(data);
+                    }
                 });
-
-                // Gán giá trị đầu tiên làm mặc định
-                $("#idxacno_hidden").val($("#idxacno").val());
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                var customer = ui.item.customer;
+                // Lưu đối tượng customer vào biến toàn cục để sử dụng cho toggle sau này
+                window.currentCustomer = customer;
                 
-            } else {    
-                // Nếu không có hoặc chỉ có 1 tài khoản:
-                // Nếu container đang chứa select, chuyển về input
-                // Kiểm tra nếu phần tử #idxacno tồn tại trước khi thực hiện thay đổi
-                if ($("#idxacno").length > 0) {
-                    if ($("#idxacno").prop("tagName") && $("#idxacno").prop("tagName").toLowerCase() === 'select') {
-                        var inputHtml = '<input type="text" class="form-control" id="idxacno" name="idxacno" placeholder="">';
-                        $("#idxacno").replaceWith(inputHtml);
-                    }   
+                // Duyệt qua các thuộc tính của customer và điền vào form (nếu input có id trùng với key)
+                $.each(customer, function(key, value) {
+                    if ($("#" + key).length) {
+                        $("#" + key).val(value);
+                    }
+                });
+                if (customer.custno) {
+                    $('#custno_hidden').val(customer.custno);
                 }
-                if (customer.accounts && customer.accounts.length === 1) {
-                    // Nếu chỉ có 1 tài khoản, gán trực tiếp
-                    $("#idxacno").val(customer.accounts[0].idxacno);
-                    $("#ccycd").val(customer.accounts[0].ccycd);
-                    $("#idxacno_hidden").val(customer.accounts[0].idxacno);
+
+                if (customer.accounts?.idxacno) {
+                    $('#idxacno_hidden').val(customer.accounts.idxacno);
+                }
+                // Xử lý trường "Số tài khoản" (idxacno) và "Loại tiền tệ" (ccycd)
+                if (customer.accounts && customer.accounts.length > 1) {
+                    // Nếu có nhiều tài khoản, hiển thị dạng select
+                    renderSelect(customer);
+
+                    // Lắng nghe sự kiện khi thay đổi select để cập nhật idxacno_hidden
+                    $("#idxacno").on("change", function () {
+                        var selectedIdxacno = $(this).val();
+                        $("#idxacno_hidden").val(selectedIdxacno);
+
+                        // Tìm object tài khoản tương ứng
+                        var selectedAccount = customer.accounts.find(function(account) {
+                            return account.idxacno === selectedIdxacno;
+                        });
+
+                        // Nếu tìm được tài khoản => cập nhật ccycd, fallback 'VND' nếu cần
+                        if (selectedAccount) {
+                            var ccycd = selectedAccount.ccycd;
+                            if (typeof ccycd !== 'string' || ccycd.trim() === '') {
+                                $("#ccycd").val('VND');
+                            } else {
+                                $("#ccycd").val(ccycd.trim());
+                            }
+                        } else {
+                            $("#ccycd").val('VND'); // Không tìm được account thì vẫn fallback
+                        }
+                    });
+
+                    // Gán giá trị đầu tiên làm mặc định
+                    $("#idxacno_hidden").val($("#idxacno").val());
+                    
+                } else {    
+                    // Nếu không có hoặc chỉ có 1 tài khoản:
+                    // Nếu container đang chứa select, chuyển về input
+                    // Kiểm tra nếu phần tử #idxacno tồn tại trước khi thực hiện thay đổi
+                    if ($("#idxacno").length > 0) {
+                        if ($("#idxacno").prop("tagName") && $("#idxacno").prop("tagName").toLowerCase() === 'select') {
+                            var inputHtml = '<input type="text" class="form-control" id="idxacno" name="idxacno" placeholder="">';
+                            $("#idxacno").replaceWith(inputHtml);
+                        }   
+                    }
+                    if (customer.accounts && customer.accounts.length === 1) {
+                        // Nếu chỉ có 1 tài khoản, gán trực tiếp
+                        var account = customer.accounts[0];
+                        $("#idxacno").val(account.idxacno);
+                        $("#idxacno_hidden").val(account.idxacno);
+
+                        // Kiểm tra và gán giá trị cho ccycd
+                        var ccycd = account.ccycd;
+                        if (typeof ccycd !== 'string' || ccycd.trim() === '') {
+                            $("#ccycd").val('VND');
+                        } else {
+                            $("#ccycd").val(ccycd.trim());
+                        }
+
+                    } else {
+                        // Không có tài khoản nào
+                        $("#idxacno").val('');
+                        $("#ccycd").val('   ');
+                        $("#idxacno_hidden").val('');
+                    }
+                }
+                if (customer.accounts && customer.accounts.length > 0) {
+                    // Lấy giá trị ccycd từ tài khoản đầu tiên
+                    var ccycd = customer.accounts[0].ccycd;
+
+                    // Ép kiểu về string, trim và check
+                    if (typeof ccycd !== 'string' || ccycd.trim() === '') {
+                        $("#ccycd").val('VND');
+                    } else {
+                        $("#ccycd").val(ccycd.trim());
+                    }
                 } else {
-                    // Không có tài khoản nào
-                    $("#idxacno").val('');
-                    $("#ccycd").val('');
-                    $("#idxacno_hidden").val('');
+                    $("#ccycd").val('VND');
                 }
             }
-        }
+        });
     });
+    
     
 </script>

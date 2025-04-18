@@ -72,7 +72,7 @@
                                         <x-select-input-to-check-box 
                                             name="ccycd" 
                                             :options="$ccycd" 
-                                            selected="{{ old('ccycd') }}" 
+                                            selected="{{'VND' ?? old('ccycd')}}" 
                                             :required="true" 
                                         />
                                     @elseif($key == 'HangThe')

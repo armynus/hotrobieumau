@@ -183,7 +183,7 @@ class UserSupportFormController extends Controller
 
             // Load template Word
             $templateProcessor = new TemplateProcessor($filePath);
-
+            
             // Lấy giá trị của custno và idxacno từ form; nếu không có thì dùng giá trị ẩn
             $custnoIdentifier  = $formData['custno']  ?? $formData['custno_hidden'];
             $idxacnoIdentifier = $formData['idxacno'] ?? $formData['idxacno_hidden'];
@@ -218,7 +218,8 @@ class UserSupportFormController extends Controller
                         'addr2'           => $formData['addr2'] ?? '',
                         'addr3'           => $formData['addr3'] ?? '',
                         'addrfull'        => $formData['addrfull'] ?? '',
-                        'birthday'        => $formData['birthday'] ?? '',
+                        'birthday'        => $this->formatDateIfNeeded($formData['birthday'] ?? ''),
+
                     ]);
                 }
             }
@@ -491,8 +492,11 @@ class UserSupportFormController extends Controller
             $form->increment('usage_count');
             DB::commit();
 
+            $originalFileName = pathinfo($filePath, PATHINFO_FILENAME); // 'my_template'
             // Trả về file Word để tải xuống trực tiếp
-            return response()->download($tempFile, $form->name .'_' .  date('H-i_d-m-Y') . '.docx')->deleteFileAfterSend(true);
+            // return response()->download($tempFile, $form->name .'_' .  date('H-i_d-m-Y') . '.docx')->deleteFileAfterSend(true);
+            return response()->download($tempFile, $originalFileName . '_' . date('H-i_d-m-Y') . '.docx')->deleteFileAfterSend(true);
+
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback nếu có lỗi
             return response()->json(['error' => $e->getMessage()], 500);
@@ -735,7 +739,28 @@ class UserSupportFormController extends Controller
     
         return $result;
     }
-    
+    private function formatDateIfNeeded($date)
+    {
+        // Nếu null hoặc rỗng thì trả về null
+        if (empty($date)) return null;
+
+        // Nếu đã đúng dạng yyyy-mm-dd rồi thì return luôn
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) return $date;
+
+        // Nếu dạng ddmmyyyy hoặc yyyymmdd thì xử lý
+        if (preg_match('/^\d{8}$/', $date)) {
+            // Kiểm tra xem có phải dạng yyyymmdd không
+            if (intval(substr($date, 0, 4)) > 1900) {
+                return substr($date, 0, 4) . '-' . substr($date, 4, 2) . '-' . substr($date, 6, 2);
+            }
+            // Ngược lại là dạng ddmmyyyy
+            return substr($date, 4, 4) . '-' . substr($date, 2, 2) . '-' . substr($date, 0, 2);
+        }
+
+        // Trường hợp khác thì trả về null để tránh lỗi
+        return null;
+    }
+
     
     
 }
