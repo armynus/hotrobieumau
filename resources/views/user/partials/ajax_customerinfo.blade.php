@@ -84,39 +84,41 @@
                         let row = $(`button[data-id="${Customer.id}"]`).closest('tr');
                         let dataRow = table.row(row);
 
-                        if (dataRow.data()) { // Kiểm tra nếu hàng tồn tại trong DataTable
-                            let rowData = dataRow.data(); // Lấy dữ liệu hiện có của hàng
+                        if (dataRow.data()) {
+                            // Cập nhật từng key trong object
+                            let updatedData = {
+                                ...dataRow.data(), // giữ nguyên action button
+                                id: Customer.id,
+                                custno: Customer.custno,
+                                nameloc: Customer.nameloc,
+                                phone_no: Customer.phone_no,
+                                identity_no: Customer.identity_no
+                            };
 
-                            // Chỉ cập nhật cột dữ liệu, giữ nguyên cột button
-                            rowData[0] = Customer.id;
-                            rowData[1] = Customer.custno;
-                            rowData[2] = Customer.nameloc;
-                            rowData[3] = Customer.phone_no;
-                            rowData[4] = Customer.identity_no;
-
-                            dataRow.data(rowData).draw(false); // Cập nhật mà không reset pagination
+                            dataRow.data(updatedData).draw(false);
                         }
                     } else {
                         // 🔹 THÊM MỚI khách hàng vào bảng
-                        table.row.add([
-                            Customer.id,
-                            Customer.custno,
-                            Customer.nameloc,
-                            Customer.phone_no,
-                            Customer.identity_no,
-                            `<td style="text-align: center;">
-                                <button class="btn btn-info btn-icon-split detail_customer" 
-                                        data-toggle="modal" 
-                                        data-target="#customerInfoModal" 
-                                        data-id="${Customer.id}">
-                                    <span class="text">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
-                                            <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
-                                        </svg>
-                                    </span>
-                                </button>
-                            </td>`
-                        ]).draw(false); // Thêm mà không reset pagination
+                        table.row.add({
+                            id: Customer.id,
+                            custno: Customer.custno,
+                            nameloc: Customer.nameloc,
+                            phone_no: Customer.phone_no,
+                            identity_no: Customer.identity_no,
+                            action: `
+                                <td style="text-align: center;">
+                                    <button class="btn btn-info btn-icon-split detail_customer" 
+                                            data-toggle="modal" 
+                                            data-target="#customerInfoModal" 
+                                            data-id="${Customer.id}">
+                                        <span class="text">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
+                                                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </td>`
+                        }).draw(false);
                     }
 
                     // Hiển thị thông báo thành công
@@ -195,25 +197,14 @@
 
                         if (rowIndex.length) {
                             // Cập nhật hàng trong DataTable
-                            table.row(rowIndex).data([
-                                updatedCustomer.id,
-                                updatedCustomer.custno,
-                                updatedCustomer.nameloc,
-                                updatedCustomer.phone_no,
-                                updatedCustomer.identity_no,
-                                `<td style="text-align: center;">
-                                    <button class="btn btn-info btn-icon-split detail_customer" 
-                                            data-toggle="modal" 
-                                            data-target="#customerInfoModal" 
-                                            data-id="${updatedCustomer.id}">
-                                        <span class="text">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
-                                                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
-                                            </svg>
-                                        </span>
-                                    </button>
-                                </td>`
-                            ]).draw(false); // Cập nhật mà không reset pagination
+                            table.row(rowIndex).data({
+                                id: updatedCustomer.id,
+                                custno: updatedCustomer.custno,
+                                nameloc: updatedCustomer.nameloc,
+                                phone_no: updatedCustomer.phone_no,
+                                identity_no: updatedCustomer.identity_no,
+                                
+                            }).draw(false); // Cập nhật mà không reset pagination
                         }
 
                         $('#close_button').click();

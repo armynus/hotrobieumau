@@ -13,6 +13,8 @@ use App\Http\Controllers\SupportFormController;
 use App\Http\Controllers\UserSupportFormController;
 use App\Http\Controllers\UserSearchController;
 use App\Http\Controllers\AdminFormFieldController;
+use App\Http\Controllers\AdminFormTypeController;
+use App\Http\Controllers\AdminSupFormTypeController;
 
 Route::get('login_admin', [LoginAdminController::class, 'login_admin'])->name('login_admin');
 Route::post('logins_admin', [LoginAdminController::class, 'logins_admin'])->name('logins_admin');
@@ -47,7 +49,19 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('admin/form_fields/admin_edit_field', [AdminFormFieldController::class, 'admin_edit_field'])->name('admin_edit_field');
     Route::post('admin/formfields/admin_update_field', [AdminFormFieldController::class, 'admin_update_field'])->name('admin_update_field');
     Route::post('admin/formfields/admin_delete_field', [AdminFormFieldController::class, 'admin_delete_field'])->name('admin_delete_field');
-    
+    // Quản lý thể loại biểu mẫu
+    Route::get('admin/form_type', [AdminFormTypeController::class, 'index'])->name('admin_form_type');
+    Route::get('admin/form_type/data', [AdminFormTypeController::class, 'getDataFormType'])->name('formtype.data');
+    Route::post('admin/form_type/create', [AdminFormTypeController::class, 'create'])->name('formtype.create');
+    Route::get('admin/form_type/edit', [AdminFormTypeController::class, 'edit'])->name('formtype.edit');
+    Route::post('admin/form_type/update', [AdminFormTypeController::class, 'update'])->name('formtype.update');
+    // Thể loại phụ biểu mẫu
+    Route::get('admin/sup_form_type', [AdminSupFormTypeController::class, 'index'])->name('admin_sup_form_type');
+    Route::get('admin/sup_form_type/data', [AdminSupFormTypeController::class, 'getDataSupFormType'])->name('supformtype.data');
+    Route::post('admin/sup_form_type/create', [AdminSupFormTypeController::class, 'create'])->name('supformtype.create');
+    Route::get('admin/sup_form_type/edit', [AdminSupFormTypeController::class, 'edit'])->name('supformtype.edit');
+    Route::post('admin/sup_form_type/update', [AdminSupFormTypeController::class, 'update'])->name('supformtype.update');
+    Route::post('admin/sup_form_type/delete', [AdminSupFormTypeController::class, 'delete'])->name('supformtype.delete');
 }); 
 
 Route::get('login', [LoginUserController::class, 'login'])->name('login');

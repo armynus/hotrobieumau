@@ -10,7 +10,7 @@
             </div>
             <div class="modal-body">
                 @csrf
-                @if($submitId == 'updateCustomer' || $submitId =='updateAccount')
+                @if($submitId == 'updateCustomer' || $submitId =='updateAccount' || $submitId == 'updateFormType')
                     <input type="hidden" id="view_id" name="view_id">
                 @endif
                 <div class="container-fluid">

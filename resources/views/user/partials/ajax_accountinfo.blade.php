@@ -77,35 +77,23 @@
                             });
 
                             if (rowIndex.length) {
-                                table.row(rowIndex).data([
-                                    Account.id,
-                                    Account.idxacno,
-                                    Account.custseq,
-                                    Account.custnm,
-                                    Account.stscd,
-                                    `<td style="text-align: center;">
-                                        <button class="btn btn-info btn-icon-split detail_account" 
-                                                data-toggle="modal" 
-                                                data-target="#AccountInfoModal" 
-                                                data-id="${Account.id}">
-                                            <span class="text">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
-                                                    <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
-                                                </svg>
-                                            </span>
-                                        </button>
-                                    </td>`
-                                ]).draw(false); // Cập nhật mà không reset pagination
+                                table.row(rowIndex).data({
+                                    id: Account.id,
+                                    idxacno: Account.idxacno || '',
+                                    custseq: Account.custseq || '',
+                                    custnm: Account.custnm || '',
+                                    stscd: Account.stscd || '',
+                                }).draw(false); // Cập nhật mà không reset pagination
                             }
                         } else {
                             // Thêm dòng mới vào DataTable
-                            table.row.add([
-                                Account.id,
-                                Account.idxacno,
-                                Account.custseq,
-                                Account.custnm,
-                                Account.stscd,
-                                `<td style="text-align: center;">
+                            table.row.add({
+                                id: Account.id,
+                                idxacno: Account.idxacno || '',
+                                custseq: Account.custseq || '',
+                                custnm: Account.custnm || '',
+                                stscd: Account.stscd || '',
+                                action: `
                                     <button class="btn btn-info btn-icon-split detail_account" 
                                             data-toggle="modal" 
                                             data-target="#AccountInfoModal" 
@@ -115,9 +103,8 @@
                                                 <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
                                             </svg>
                                         </span>
-                                    </button>
-                                </td>`
-                            ]).draw(false);
+                                    </button>`
+                            }).draw(false);
                         }
 
                         swal({
@@ -191,25 +178,26 @@
 
                         if (rowIndex.length) {
                             // Cập nhật thông tin trên bảng DataTable
-                            table.row(rowIndex).data([
-                                updatedAccount.id,
-                                updatedAccount.idxacno || '',
-                                updatedAccount.custseq || '',
-                                updatedAccount.custnm || '',
-                                updatedAccount.stscd || '',
-                                `<td style="text-align: center;">
-                                    <button class="btn btn-info btn-icon-split detail_account" 
-                                            data-toggle="modal" 
-                                            data-target="#AccountInfoModal" 
-                                            data-id="${updatedAccount.id}">
-                                        <span class="text">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
-                                                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
-                                            </svg>
-                                        </span>
-                                    </button>
-                                </td>`
-                            ]).draw(false);
+                            table.row(rowIndex).data({
+                                id: updatedAccount.id,
+                                idxacno: updatedAccount.idxacno || '',
+                                custseq: updatedAccount.custseq || '',
+                                custnm: updatedAccount.custnm || '',
+                                stscd: updatedAccount.stscd || '',
+                                action: `
+                                    <td style="text-align: center;">
+                                        <button class="btn btn-info btn-icon-split detail_account" 
+                                                data-toggle="modal" 
+                                                data-target="#AccountInfoModal" 
+                                                data-id="${updatedAccount.id}">
+                                            <span class="text">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
+                                                    <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
+                                                </svg>
+                                            </span>
+                                        </button>
+                                    </td>`
+                            }).draw(false);
                         }
 
                         swal("Cập nhật thông tin khách hàng thành công", { icon: "success" });

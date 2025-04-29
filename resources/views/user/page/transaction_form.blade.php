@@ -8,10 +8,9 @@
 
     <!-- Form biểu mẫu -->
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center mb-4">
-             <h5><b>Biểu Mẫu: {{$form->name }}</b></h5>
+        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-4">
+            <h5 class="mb-0"><b>Biểu Mẫu: {{ $form->name }}</b></h5>
             <x-back-page-button text="Quay lại danh sách biểu mẫu" />
-
         </div>
         <div class="card-body">
             <form id="supportForm">

@@ -62,7 +62,7 @@ class AccountController extends Controller
         return view('user.page.view_data_account', compact('data', 'fields', 'add_fields'));
     }
     public function uploadfile_account(Request $request){
-        ini_set('max_execution_time', 1500); // = 5 phút
+        ini_set('max_execution_time', 9000); // = 5 phút
         // Lưu file Excel tạm thời
         $file = $request->file('data_account');
         // Import dữ liệu từ file

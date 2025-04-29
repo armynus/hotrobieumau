@@ -15,4 +15,9 @@ class FormType extends Model
         'type_name',    // Tên mô tả của trường
     ];
     public $timestamps = true;
+    
+    public function supTypes()
+    {
+        return $this->hasMany(SupFormType::class, 'form_type_id');
+    }
 }

@@ -18,7 +18,8 @@ class SupportForm extends Model
         'fields',       // Danh sách các trường dữ liệu (lưu dưới dạng JSON)
         'file_template', // Đường dẫn tới file mẫu biểu mẫu
         'usage_count',  // lượt sử dụng
-        'form_type'     // thể loại form
+        'form_type',     // thể loại form
+        'sup_form_type_id', // thêm cái này
     ];
 
     // Tự động chuyển đổi cột 'fields' từ JSON sang mảng khi truy xuất
@@ -28,5 +29,9 @@ class SupportForm extends Model
     public function formType()
     {
         return $this->belongsTo(FormType::class, 'form_type', 'id');
+    }
+    public function supFormType()
+    {
+        return $this->belongsTo(SupFormType::class, 'sup_form_type_id');
     }
 }
