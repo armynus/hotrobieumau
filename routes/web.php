@@ -15,6 +15,7 @@ use App\Http\Controllers\UserSearchController;
 use App\Http\Controllers\AdminFormFieldController;
 use App\Http\Controllers\AdminFormTypeController;
 use App\Http\Controllers\AdminSupFormTypeController;
+use App\Http\Controllers\ScanQRCodeController;
 
 Route::get('login_admin', [LoginAdminController::class, 'login_admin'])->name('login_admin');
 Route::post('logins_admin', [LoginAdminController::class, 'logins_admin'])->name('logins_admin');
@@ -93,6 +94,8 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::get('/support_form/search', [UserSearchController::class, 'search'])->name('support_form.search');
     Route::post('transaction_form_print', [UserSupportFormController::class, 'print'])->name('transaction_form_print');
 
+    // Scan QR code with camera
+    Route::get('scan_qr_code', [ScanQRCodeController::class, 'index'])->name('scan_qr_code');
 
     Route::group(['middleware' => ['usercontrol']], function () {
         Route::post('uploadfile_customer', [CustomerController::class, 'uploadfile_customer'])->name('uploadfile_customer');
