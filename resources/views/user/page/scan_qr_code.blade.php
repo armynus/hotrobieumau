@@ -2,8 +2,7 @@
 
 @section('title', 'Biểu mẫu giao dịch')
 <head>
-  {{-- <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script> --}}
-  <script src="{{asset('js/zxing-libary.index.min.js')}}"></script>
+
   <style>
       #reader {
           width: 100%;
@@ -43,13 +42,11 @@
 <div class="container-fluid text-center">
   <h1 class="h3 mb-4 text-gray-800">Quét mã QR</h1>
 
-  <div class="card shadow mb-4 d-flex justify-content-center align-items-center p-4">
-      <x-alert-message />
-      
+  <div class="card shadow mb-4 d-flex justify-content-center align-items-center p-4">      
       <select id="camera-select" class="mb-3"></select>
 
-      <div id="video-wrapper" style="position: relative;">
-          <video id="video" width="500" height="380" autoplay muted style="border-radius: 8px; border: 2px solid #ccc;"></video>
+      <div id="video-wrapper" style="position: relative; width: 100%; max-width: 600px; aspect-ratio: 4/3;">
+        <video id="video" autoplay muted playsinline style="width: 100%; height: 100%; border-radius: 8px; border: 2px solid #ccc;"></video>
       </div>
 
       <div class="mt-3">
@@ -81,106 +78,13 @@
     <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
     <!-- include jQuery validate library -->
     <script src="{{asset('js/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js')}}" type="text/javascript"></script>
-    {{-- include HTML5 QR Code JS --}}
     
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-    const videoElement = document.getElementById('video');
-    const selectElement = document.getElementById('camera-select');
-    const resultElement = document.getElementById('result');
-    const startBtn = document.getElementById('start-scan');
-    const stopBtn = document.getElementById('stop-scan');
+     <!-- jsQR library - Thư viện quét QR code mạnh mẽ -->
+    <script src="{{asset('js/jsQR.min.js')}}"></script>
+    
+    <script src="{{asset('js/user/scan_camera.js')}}"></script>
 
-    const codeReader = new ZXing.BrowserMultiFormatReader();
-    let currentDeviceId = null;
-    let scanning = false;
-    let controls = null;
-
-    // Bắt đầu quét QR từ camera
-    async function startScan(deviceId) {
-        try {
-            if (scanning) {
-                console.warn("Đã đang quét. Reset lại...");
-                await codeReader.reset();
-                if (controls) controls.stop();
-            }
-
-            scanning = true;
-            resultElement.textContent = "📡 Đang quét...";
-            currentDeviceId = deviceId;
-
-            codeReader.decodeFromVideoDevice(deviceId, videoElement, (result, error, c) => {
-                controls = c;
-                if (result && scanning) {
-                    scanning = false;
-                    console.log("✅ Đã quét:", result.getText());
-                    resultElement.textContent = `✅ Mã QR: ${result.getText()}`;
-                    if (controls) controls.stop();
-                    codeReader.reset();
-                }
-            });
-        } catch (err) {
-            console.error("❌ Lỗi khi bắt đầu quét:", err);
-            resultElement.textContent = "❌ Không thể bắt đầu quét.";
-        }
-    }
-
-    // Tắt camera và dừng quét
-    async function stopScan() {
-        try {
-            if (scanning || controls) {
-                console.log("⛔ Dừng quét.");
-                scanning = false;
-                if (controls) controls.stop();
-                await codeReader.reset();
-                resultElement.textContent = "⏹️ Đã tắt quét.";
-            }
-        } catch (err) {
-            console.error("❌ Lỗi khi dừng quét:", err);
-        }
-    }
-
-    // Lấy danh sách camera
-    codeReader.listVideoInputDevices().then(devices => {
-        if (!devices.length) {
-            alert("❌ Không tìm thấy camera.");
-            return;
-        }
-
-        // Populate select box
-        devices.forEach((device, index) => {
-            const option = document.createElement('option');
-            option.value = device.deviceId;
-            option.text = device.label || `Camera ${index + 1}`;
-            selectElement.appendChild(option);
-        });
-
-        currentDeviceId = devices[0].deviceId;
-
-        // Event listeners
-        startBtn.addEventListener('click', () => {
-            const selectedId = selectElement.value;
-            startScan(selectedId);
-        });
-
-        stopBtn.addEventListener('click', stopScan);
-
-        selectElement.addEventListener('change', (e) => {
-            if (scanning) {
-                stopScan().then(() => {
-                    startScan(e.target.value);
-                });
-            }
-        });
-
-    }).catch(err => {
-        console.error("❌ Không truy cập được camera:", err);
-        alert("⚠️ Trình duyệt đang chặn camera hoặc không hỗ trợ.");
-    });
-});
-
-
-      </script>
+    
       
     
 @endpush

@@ -39,7 +39,7 @@ class SupportFormController extends Controller
             'form_file'       => 'required|file|mimes:doc,docx|max:5120',
             'selected_fields' => 'required|array|min:1',
         ]);
-
+        
         // Đảm bảo tên form chưa xài
         if (SupportForm::where('name', 'like', '%' . $request->form_name)->exists()) {
             return response()->json([

@@ -19,14 +19,19 @@ class AdminFormTypeController extends Controller
         // Find the FormType instance by ID
         $formType = FormType::find($request->id);
         if($formType){
-            if($formType->type_name == $request->type_name){
+            // Kiểm tra xem đã tồn tại type_name giống vậy chưa (trừ chính nó)
+            $isDuplicate = FormType::where('type_name', $request->type_name)
+                ->where('id', '!=', $request->id)
+                ->exists();
+
+            if ($isDuplicate) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Thể loại đã tồn tại',
+                    'message' => 'Trùng tên thể loại đã tồn tại',
                 ]);
             }
 
-            // Update the type_name field
+            // Cập nhật nếu không trùng
             $formType->type_name = $request->type_name;
             $formType->save();
             return response()->json([

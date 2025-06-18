@@ -12,7 +12,7 @@ class SidebarFormTypes extends Component
     public function __construct()
     {
 
-        $this->formTypes = cache()->remember('form_types', 3600, function () {
+        $this->formTypes = cache()->remember('form_types', 30, function () {
             return FormType::all();
         });
         
