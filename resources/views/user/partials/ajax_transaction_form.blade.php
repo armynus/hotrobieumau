@@ -115,6 +115,118 @@
             alert("Đã xảy ra lỗi khi lấy dữ liệu từ clipboard!");
         }
     });
+    document.getElementById('pasteClipboardDNBtn').addEventListener('click', function () {
+        try {
+            const fieldMapping = {
+                'nmloc': 'TenDoanhNghiep',
+                'regno': 'GiayDKKD',
+                // 'nm'    : '',
+                'busno'  : 'GiayDKKD',
+                'taxno'  : 'MaSoThueDN',
+                'custtpcd'  : 'custtpcd',
+                'custdtltpcd' : 'custdtltpcd',
+                'custno' : 'MaKHDN',
+                'idxacno': 'idxacno',
+                'ccycd'  : 'ccycd',
+                'name_4' : 'SoDienThoai',
+                'name_3' : 'gender',
+                'name_2' : 'branch_code',
+                'name_1' : 'NgayCapDKKD',
+                'issuedt1' : 'NgayCapMSTDN',
+                'identity_place' : 'NoiCapThueDN',
+                'addrtpcd' : 'addrtpcd',
+                'addr1': 'DiaChiDoanhNghiep',
+                'addr2': 'DiaChiDoanhNghiep',
+                'addr3': 'DiaChiDoanhNghiep',
+                'ctrycdnatl': 'QuocTich',
+                // Thêm ánh xạ khác nếu cần
+            };
+
+            const readFromClipboard = function(callback) {
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    navigator.clipboard.readText()
+                        .then(text => callback(text))
+                        .catch(err => {
+                            console.error("Lỗi đọc clipboard API:", err);
+                            fallbackReadFromClipboard(callback);
+                        });
+                    return;
+                }
+                fallbackReadFromClipboard(callback);
+            };
+
+            const fallbackReadFromClipboard = function(callback) {
+                const textarea = document.createElement('textarea');
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                
+                const handlePaste = function(e) {
+                    const clipboardData = e.clipboardData || window.clipboardData;
+                    const pastedText = clipboardData.getData('text');
+                    callback(pastedText);
+                    document.removeEventListener('paste', handlePaste);
+                    document.body.removeChild(textarea);
+                };
+                
+                document.addEventListener('paste', handlePaste);
+                textarea.focus();
+                alert("Hãy nhấn Ctrl+V để dán dữ liệu từ clipboard");
+                
+                setTimeout(() => {
+                    if (document.body.contains(textarea)) {
+                        document.removeEventListener('paste', handlePaste);
+                        document.body.removeChild(textarea);
+                    }
+                }, 10000);
+            };
+
+            readFromClipboard(function(text) {
+                if (!text) {
+                    alert("Clipboard trống!");
+                    return;
+                }
+
+                const rows = text.trim().split(/\n/);
+                const headers = rows[0].split(/\t/).map(h => h.trim().toLowerCase());
+                const values = rows[1].split(/\t/);
+
+                headers.forEach((header, index) => {
+                    const mappedField = fieldMapping[header] || header;
+                    let input = document.querySelector(`#supportForm input[name='${mappedField}'], #supportForm select[name='${mappedField}']`);
+
+                    if (values[index] !== undefined) {
+                        let value = values[index].trim();
+
+                        // Nếu input là kiểu "date" và giá trị có định dạng YYYYMMDD -> Chuyển sang YYYY-MM-DD
+                        if (input && input.type === "date" && /^\d{8}$/.test(value)) {
+                            value = `${value.substring(0, 4)}-${value.substring(4, 6)}-${value.substring(6, 8)}`;
+                        }
+
+                        // Xử lý địa chỉ: Ghép addr1, addr2, addr3 thành DiaChiDoanhNghiep
+                        if (['addr1', 'addr2', 'addr3'].includes(header)) {
+                            if (!window.addrParts) window.addrParts = {}; // Lưu giá trị tạm thời
+                            window.addrParts[header] = value;
+
+                            const fullAddress = ['addr1', 'addr2', 'addr3']
+                                .map(field => window.addrParts[field] || '') // Lấy giá trị addr1, addr2, addr3 (nếu có)
+                                .filter(part => part !== '') // Xóa khoảng trống
+                                .join(' ');
+
+                            let addrInput = document.querySelector(`#supportForm input[name='DiaChiDoanhNghiep']`);
+                            if (addrInput) addrInput.value = fullAddress;
+                        } else if (input) {
+                            input.value = value;
+                        }
+                    }
+                });
+
+            });
+        } catch (error) {
+            console.error("Lỗi:", error);
+            alert("Đã xảy ra lỗi khi lấy dữ liệu từ clipboard!");
+        }
+    });
 
     // document.getElementById('pasteClipboardBtn').addEventListener('click', function () {
     //     try {
