@@ -42,7 +42,7 @@ class UserSupportFormController extends Controller
 
         // Tạo danh sách các trường hợp lệ cho biểu mẫu
         $fields = array_intersect_key($default_fields, array_flip($formfields));
-
+       
         $gender = [
             'Nam' => 'Nam',
             'Nữ' => 'Nữ',
@@ -132,8 +132,13 @@ class UserSupportFormController extends Controller
             'Bảo hiểm' => 'DV_BH',
             'Dịch vụ khác' => 'DV_KHAC',
         ];
+        $nguoi = [
+            'Tuấn' => 'Tuấn',
+            'Trung' => 'Trung',
+            'Kiệt' => 'Kiệt',
+        ];
         return view('user.page.transaction_form', compact('form', 'fields', 'type', 'gender', 'NgheNghiepKH', 'ChucVuKH', 
-        'ccycd', 'SoTKTT', 'LoaiThe','HangThe', 'ThuTuDong', 'MobileBanking', 'RetaileBanking', 'DichVuKhac'));
+        'ccycd', 'SoTKTT', 'LoaiThe','HangThe', 'ThuTuDong', 'MobileBanking', 'RetaileBanking', 'DichVuKhac','nguoi'));
     }
 
     
@@ -323,6 +328,7 @@ class UserSupportFormController extends Controller
                         }
                     }
                 } elseif (strpos($key, 'NgayThangNam') !== false) {
+                    $templateProcessor->setValue('DateEng', (string)$this->convertDateNowFormatEng($value) ?? ' ');
                     $value = $this->convertDateNowFormat($value) ?? ' ';
                 }
                 if (
@@ -627,6 +633,17 @@ class UserSupportFormController extends Controller
         $year = date('Y', $timestamp);
 
         return "ngày $day tháng $month năm $year";
+    }
+    public function convertDateNowFormatEng($date)
+    {
+        if (!$date) return '';
+
+        $timestamp = strtotime($date);
+        $day = date('d', $timestamp);
+        $month = date('m', $timestamp);
+        $year = date('Y', $timestamp);
+
+        return "date $day month $month year $year";
     }
     
     public function convertToUppercaseWithoutAccents($string) {

@@ -53,6 +53,13 @@
                                             {{-- placeholder="Chọn giới tính"  --}}
                                             :required="true" 
                                         />
+                                    @elseif($key == 'nguoi')
+                                        <x-select-input-to-check-box 
+                                            name="nguoi" 
+                                            :options="$nguoi" 
+                                            selected="{{ old('nguoi') }}"  
+                                            :required="true" 
+                                        />
                                     @elseif($key == 'NgheNghiepKH')
                                         <x-select-input-to-check-box 
                                             name="NgheNghiepKH" 
@@ -132,7 +139,7 @@
                                             placeholder="{{ $info['placeholder'] ?? '' }}"
                                             value="{{ 
                                                 $info['value'] ?? (
-                                                    $key == 'NgayThangNam' || $key == 'NgayGiaoDich' ? now()->format('Y-m-d') : 
+                                                    $key == 'NgayThangNam' || $key == 'NgayGiaoDich' || $key == 'NgayUQ' || $key == 'NgayUQCQ' ? now()->format('Y-m-d') : 
                                                     ($key == 'QuocTich' ? 'Việt Nam' : 
                                                     ($key == 'NgayHen' ? now()->addDays(7)->format('Y-m-d') : 
                                                     ($key == 'branch' ? session('UserBranchName', '') : 
