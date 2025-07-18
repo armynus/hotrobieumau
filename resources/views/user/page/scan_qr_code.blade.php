@@ -1,6 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', 'Biểu mẫu giao dịch')
+@section('title', 'Quét mã QR')
 <head>
 
   <style>

@@ -16,6 +16,7 @@ use App\Http\Controllers\AdminFormFieldController;
 use App\Http\Controllers\AdminFormTypeController;
 use App\Http\Controllers\AdminSupFormTypeController;
 use App\Http\Controllers\ScanQRCodeController;
+use App\Http\Controllers\MergerLookupController;
 
 Route::get('login_admin', [LoginAdminController::class, 'login_admin'])->name('login_admin');
 Route::post('logins_admin', [LoginAdminController::class, 'logins_admin'])->name('logins_admin');
@@ -96,6 +97,20 @@ Route::group(['middleware'=> ['tenant']], function(){
 
     // Scan QR code with camera
     Route::get('scan_qr_code', [ScanQRCodeController::class, 'index'])->name('scan_qr_code');
+
+    // Search old provinces, districts, wards
+    Route::get('merger_lookup', [MergerLookupController::class, 'index'])->name('merger_lookup');
+    Route::get('merger_lookup/old_province_search', [MergerLookupController::class, 'old_provinces_search'])->name('old_provinces.search');
+    Route::get('merger_lookup/old_province_detail', [MergerLookupController::class, 'old_provinces_detail'])->name('old_provinces.detail');
+    Route::get('merger_lookup/old_district_search', [MergerLookupController::class, 'old_districts_search'])->name('old_districts.search');
+    Route::get('merger_lookup/old_district_detail', [MergerLookupController::class, 'old_districts_detail'])->name('old_districts.detail');
+    Route::get('merger_lookup/old_ward_search', [MergerLookupController::class, 'old_wards_search'])->name('old_wards.search');
+    Route::get('merger_lookup/old_ward_detail', [MergerLookupController::class, 'old_wards_detail'])->name('old_wards.detail');
+
+    Route::get('merger_lookup/new_ward_search', [MergerLookupController::class, 'new_wards_search'])->name('new_wards.search');
+    Route::get('merger_lookup/new_ward_detail', [MergerLookupController::class, 'new_wards_detail'])->name('new_wards.detail');
+    
+    
 
     Route::group(['middleware' => ['usercontrol']], function () {
         Route::post('uploadfile_customer', [CustomerController::class, 'uploadfile_customer'])->name('uploadfile_customer');

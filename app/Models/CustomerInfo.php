@@ -19,6 +19,7 @@ class CustomerInfo extends Model
         'branch_code',          // mã chi nhánh
         'identity_no',          // số chứng minh nhân dân
         'identity_date',        // ngày cấp chứng minh nhân dân / CCCD
+        'identity_outdate',     // ngày hết hạn CCCD/CMND
         'identity_place',       // nơi cấp chứng minh nhân dân / CCCD
         'addrtpcd',             // loại địa chỉ
         'addr1',                // địa chỉ 1
@@ -26,6 +27,8 @@ class CustomerInfo extends Model
         'addr3',                // địa chỉ 2
         'addrfull',             // địa chỉ đầy đủ
         'birthday',             // ngày sinh
+        'profnm',               // nghề nghiệp
+        'usridop1',             // nhân viên tạo
     ];
     public $timestamps = true;
     public function accounts()

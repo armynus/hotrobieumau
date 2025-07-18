@@ -47,6 +47,12 @@
                 </div>
             </li>
             <x-sidebar-form-types />
+            <li class="nav-item collapsed">
+                <a class="nav-link " href="{{ route('merger_lookup') }}">
+                    <i class="fas fa-fw fa-flag white" style="color:white;"></i>
+                    <span>Tra cứu xã/phường </span>
+                </a>
+            </li>
             @if(Session::get('user_role') =='1')
             <li class="nav-item collapsed">
                 <a class="nav-link " href="{{ route('scan_qr_code') }}">

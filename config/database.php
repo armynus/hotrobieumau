@@ -41,7 +41,7 @@ return [
             'journal_mode' => null,
             'synchronous' => null,
         ],
-
+        // Kết nối mặc định cho ứng dụng
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),

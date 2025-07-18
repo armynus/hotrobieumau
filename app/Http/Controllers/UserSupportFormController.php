@@ -86,13 +86,13 @@ class UserSupportFormController extends Controller
             'Chuẩn' => 'Check_Chuan',
         ];
         $LoaiThe = [
-            'Thẻ ghi nợ nội địa' => 'Check_TheND',
-            'Lập Nghiệp' => 'Check_TheLN',
-            'JCB Debit' => 'Check_TheJCB',
-            'Thẻ liên kết thương hiệu' => 'Check_TheTH',
-            'Thẻ Visa Debit' => 'Check_TheVS',
-            'MasterCard Debit' => 'Check_TheMT',
-            'Thẻ Khác' => 'Check_TheKHAC',
+            'Thẻ ghi nợ nội địa' => 'Thẻ ghi nợ nội địa',
+            'Lập Nghiệp' => 'Lập Nghiệp',
+            'JCB Debit' => 'JCB Debit',
+            'Thẻ liên kết thương hiệu' => 'Thẻ liên kết thương hiệu',
+            'Thẻ Visa Debit' => 'Thẻ Visa Debit',
+            'MasterCard Debit' => 'MasterCard Debit',
+            'Thẻ Khác' => 'Thẻ Khác',
         ];
         $ThuTuDong = [
             'Nước' => 'Check_Nuoc',
@@ -300,9 +300,14 @@ class UserSupportFormController extends Controller
                 }
                 
                 if (
+                    strpos($key, 'NgayUQCQ') !== false ||
+                    strpos($key, 'NgayThueCQ') !== false ||
+                    strpos($key, 'NgayCapMSTDN') !== false ||
+                    strpos($key, 'NgayUQ') !== false ||
                     strpos($key, 'NgayHen') !== false ||
                     strpos($key, 'birthday') !== false ||
                     strpos($key, 'identity_date') !== false ||
+                    strpos($key, 'identity_outdate') !== false ||
                     strpos($key, 'NgayGiaoDich') !== false ||
                     strpos($key, 'NgayCCCDMoi') !== false ||
                     strpos($key, 'NgayCapDKKD') !== false
@@ -321,6 +326,33 @@ class UserSupportFormController extends Controller
                     // Nếu là identity_date, tách thành các biến phụ
                     if (strpos($key, 'identity_date') !== false) {
                         $dateVars = $this->convertDateToVariablesIdentity($value ?? ' ');
+                        if (!empty($dateVars) && is_array($dateVars)) {
+                            foreach ($dateVars as $dateKey => $dateValue) {
+                                $templateProcessor->setValue($dateKey, (string)$dateValue);
+                            }
+                        }
+                    }
+                    // Nếu là identity_outdate, tách thành các biến phụ
+                    if (strpos($key, 'identity_outdate') !== false) {
+                        $dateVars = $this->convertOutDateToVariablesIdentity($value ?? ' ');
+                        if (!empty($dateVars) && is_array($dateVars)) {
+                            foreach ($dateVars as $dateKey => $dateValue) {
+                                $templateProcessor->setValue($dateKey, (string)$dateValue);
+                            }
+                        }
+                    }
+                    // Nếu là NgayCapDKKD, tách thành các biến phụ
+                    if (strpos($key, 'NgayCapDKKD') !== false) {
+                        $dateVars = $this->convertNgayCapDKKDToVariablesIdentity($value ?? ' ');
+                        if (!empty($dateVars) && is_array($dateVars)) {
+                            foreach ($dateVars as $dateKey => $dateValue) {
+                                $templateProcessor->setValue($dateKey, (string)$dateValue);
+                            }
+                        }
+                    }
+                    // Nếu là NgayCapDKKD, tách thành các biến phụ
+                    if (strpos($key, 'NgayCapMSTDN') !== false) {
+                        $dateVars = $this->convertNgayCapMSTDNToVariablesIdentity($value ?? ' ');
                         if (!empty($dateVars) && is_array($dateVars)) {
                             foreach ($dateVars as $dateKey => $dateValue) {
                                 $templateProcessor->setValue($dateKey, (string)$dateValue);
@@ -395,12 +427,28 @@ class UserSupportFormController extends Controller
                     'Quản lý cấp trung (Trưởng phòng, Phó TP, tương đương)' => 'ChucVu_QLCT',
                     '' => 'ChucVu_Khac',
                 ];
-                 // Duyệt toàn bộ danh sách để gán checked/un-checked tương ứng
-                 foreach ($ChucVuKH as $label => $tagName) {
+                // Duyệt toàn bộ danh sách để gán checked/un-checked tương ứng
+                foreach ($ChucVuKH as $label => $tagName) {
                     $isChecked = $valueChecked === $label;
                     $this->updateCheckboxContentControl($tempFile, $tagName, $isChecked);
                 }
             }
+            if (isset($formData['LoaiThe'])) {
+                $valueChecked = $formData['LoaiThe'];
+                $LoaiThe = [
+                    'Thẻ ghi nợ nội địa' => 'Check_TheND',
+                    'Lập Nghiệp' => 'Check_TheLN',
+                    'JCB Debit' => 'Check_TheJCB',
+                    'Thẻ liên kết thương hiệu' => 'Check_TheTH',
+                    'Thẻ Visa Debit' => 'Check_TheVS',
+                    'MasterCard Debit' => 'Check_TheMT',
+                    'Thẻ Khác' => 'Check_TheKHAC',
+                ];
+                // Duyệt toàn bộ danh sách để gán checked/un-checked tương ứng
+                foreach ($LoaiThe as $label => $tagName) {
+                    $isChecked = $valueChecked === $label;
+                    $this->updateCheckboxContentControl($tempFile, $tagName, $isChecked);
+                }            }
             if (isset($formData['ccycd'])) {
                 $valueChecked = $formData['ccycd'];
                 $this->updateCheckboxContentControl($tempFile, 'Check_VND', $valueChecked === 'VND');
@@ -414,10 +462,6 @@ class UserSupportFormController extends Controller
             }
             if (isset($formData['HangThe'])) {
                 $valueChecked = $formData['HangThe'];
-                $this->updateCheckboxContentControl($tempFile, $valueChecked,  $valueChecked);
-            }
-            if (isset($formData['LoaiThe'])) {
-                $valueChecked = $formData['LoaiThe'];
                 $this->updateCheckboxContentControl($tempFile, $valueChecked,  $valueChecked);
             }
             // dd($formData['MobileBanking']);
@@ -735,6 +779,69 @@ class UserSupportFormController extends Controller
             'f' => $paddedDate[5] === '0' ? '0 ' : $paddedDate[5],
             'g' => $paddedDate[6] === '0' ? '0 ' : $paddedDate[6],
             'h' => $paddedDate[7] === '0' ? '0 ' : $paddedDate[7],
+        ];
+    }
+    function convertOutDateToVariablesIdentity($date) {
+        if (empty($date)) return [];
+    
+        // Loại bỏ dấu "/" trong chuỗi date
+        $dateStr = str_replace('/', '', $date);
+        
+        // Đảm bảo chuỗi có đủ 8 ký tự, nếu thiếu thì thêm "0" phía trước
+        $paddedDate = str_pad($dateStr, 8, '0', STR_PAD_LEFT);
+        
+        // Gán các ký tự với key từ "9" đến "16"
+        return [
+            'a1' => $paddedDate[0] === '0' ? '0 ' : $paddedDate[0],
+            'a2' => $paddedDate[1] === '0' ? '0 ' : $paddedDate[1],
+            'a3' => $paddedDate[2] === '0' ? '0 ' : $paddedDate[2],
+            'a4' => $paddedDate[3] === '0' ? '0 ' : $paddedDate[3],
+            'a5' => $paddedDate[4] === '0' ? '0 ' : $paddedDate[4],
+            'a6' => $paddedDate[5] === '0' ? '0 ' : $paddedDate[5],
+            'a7' => $paddedDate[6] === '0' ? '0 ' : $paddedDate[6],
+            'a8' => $paddedDate[7] === '0' ? '0 ' : $paddedDate[7],
+        ];
+    }
+    function convertNgayCapDKKDToVariablesIdentity($date) {
+        if (empty($date)) return [];
+    
+        // Loại bỏ dấu "/" trong chuỗi date
+        $dateStr = str_replace('/', '', $date);
+        
+        // Đảm bảo chuỗi có đủ 8 ký tự, nếu thiếu thì thêm "0" phía trước
+        $paddedDate = str_pad($dateStr, 8, '0', STR_PAD_LEFT);
+        
+        // Gán các ký tự với key từ "9" đến "16"
+        return [
+            'b1' => $paddedDate[0] === '0' ? '0 ' : $paddedDate[0],
+            'b2' => $paddedDate[1] === '0' ? '0 ' : $paddedDate[1],
+            'b3' => $paddedDate[2] === '0' ? '0 ' : $paddedDate[2],
+            'b4' => $paddedDate[3] === '0' ? '0 ' : $paddedDate[3],
+            'b5' => $paddedDate[4] === '0' ? '0 ' : $paddedDate[4],
+            'b6' => $paddedDate[5] === '0' ? '0 ' : $paddedDate[5],
+            'b7' => $paddedDate[6] === '0' ? '0 ' : $paddedDate[6],
+            'b8' => $paddedDate[7] === '0' ? '0 ' : $paddedDate[7],
+        ];
+    }
+    function convertNgayCapMSTDNToVariablesIdentity($date) {
+        if (empty($date)) return [];
+    
+        // Loại bỏ dấu "/" trong chuỗi date
+        $dateStr = str_replace('/', '', $date);
+        
+        // Đảm bảo chuỗi có đủ 8 ký tự, nếu thiếu thì thêm "0" phía trước
+        $paddedDate = str_pad($dateStr, 8, '0', STR_PAD_LEFT);
+        
+        // Gán các ký tự với key từ "9" đến "16"
+        return [
+            'c1' => $paddedDate[0] === '0' ? '0 ' : $paddedDate[0],
+            'c2' => $paddedDate[1] === '0' ? '0 ' : $paddedDate[1],
+            'c3' => $paddedDate[2] === '0' ? '0 ' : $paddedDate[2],
+            'c4' => $paddedDate[3] === '0' ? '0 ' : $paddedDate[3],
+            'c5' => $paddedDate[4] === '0' ? '0 ' : $paddedDate[4],
+            'c6' => $paddedDate[5] === '0' ? '0 ' : $paddedDate[5],
+            'c7' => $paddedDate[6] === '0' ? '0 ' : $paddedDate[6],
+            'c8' => $paddedDate[7] === '0' ? '0 ' : $paddedDate[7],
         ];
     }
     function convertNumberToVariables($number) {

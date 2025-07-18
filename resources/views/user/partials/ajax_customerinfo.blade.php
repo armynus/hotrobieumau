@@ -43,7 +43,7 @@
                 'add_custno', 'add_name', 'add_nameloc', 'add_gender', 'add_birthday', 'add_phone_no',
                 'add_identity_no', 'add_identity_date', 'add_identity_place', 'add_addrtpcd',
                 'add_addr1', 'add_addr2', 'add_addr3', 'add_addrfull', 'add_custtpcd', 'add_custdtltpcd',
-                'add_branch_code',
+                'add_branch_code', 'add_profnm', 'add_usridop1', 'add_identity_outdate',
             ];
 
             let formData = {
@@ -167,7 +167,7 @@
                 'name', 'nameloc', 'gender', 'birthday', 'phone_no',
                 'identity_no', 'identity_date', 'identity_place', 'addrtpcd',
                 'addr1', 'addr2', 'addr3', 'addrfull', 'custtpcd', 'custdtltpcd',
-                'branch_code',
+                'branch_code', 'profnm', 'usridop1', 'identity_outdate',
             ];
 
             let formData = {
@@ -230,7 +230,7 @@
                     'custno', 'name', 'nameloc', 'gender', 'birthday', 'phone_no',
                     'identity_no', 'identity_date', 'identity_place', 'addrtpcd',
                     'addr1', 'addr2', 'addr3', 'addrfull', 'custtpcd', 'custdtltpcd',
-                    'branch_code', 'created_at', 'updated_at'
+                    'branch_code', 'created_at', 'updated_at', 'profnm', 'usridop1', 'identity_outdate',
                 ];
 
                 fields.forEach(field => $('#' + field).val(''));
