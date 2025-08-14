@@ -26,6 +26,12 @@ class CustomerInfo extends Model
         'addr2',                // địa chỉ 2
         'addr3',                // địa chỉ 2
         'addrfull',             // địa chỉ đầy đủ
+        'busno',                // số đăng ký kinh doanh
+        'busno_date',           // ngày cấp đăng ký kinh doanh
+        'busno_place',          // nơi cấp đăng ký kinh doanh
+        'taxno',                // mã số thuế
+        'taxno_date',           // ngày cấp mã số thuế
+        'taxno_place',          // nơi cấp mã số thuế
         'birthday',             // ngày sinh
         'profnm',               // nghề nghiệp
         'usridop1',             // nhân viên tạo

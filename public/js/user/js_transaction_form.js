@@ -1,9 +1,4 @@
-
-
-<script>
-    
-
-    document.getElementById('pasteClipboardBtn').addEventListener('click', function () {
+document.getElementById('pasteClipboardBtn').addEventListener('click', function () {
         try {
             const fieldMapping = {
                 'nmloc': 'nameloc',
@@ -297,9 +292,10 @@
 
             // Duyệt qua tất cả input trong form để xây dựng formData
             $.each(formDataArray, function (_, field) {
-                var messageElement = $(`label.field-label[for="${field.name}"]`);
+                var messageElement = $(`span.input-group-text[data-for="${field.name}"]`);
                 var inputElement = $(`[name="${field.name}"]`);
                 var fieldValue = field.value || '';
+
                 // Các trường hợp không cần kiểm tra: keyword, hidden, disabled
                 if (
                     field.name === 'keyword' ||
@@ -377,7 +373,7 @@
             if (missingFields.length > 0) {
                 swal({
                     title: "Cảnh báo!",
-                    text: "Bạn điền thiếu các trường thông tin:\n " + missingFields.join(" ") + 
+                    text: "Bạn điền thiếu thông tin:\n " + missingFields.join(" ") + 
                         "\n\nBạn muốn tiếp tục in hay điền đầy đủ thông tin?",
                     icon: "warning",
                     buttons: {
@@ -597,7 +593,7 @@
         if (!$wrap.length) { console.warn(wrapperId + " not found!"); return; }
 
         var currentVal = (typeof prefVal !== 'undefined') ? prefVal : ($("#" + fieldId).val() || '');
-        var $input = $('<input type="text" class="form-control" id="'+fieldId+'" name="'+fieldId+'" placeholder="Nhập thủ công">').val(currentVal);
+        var $input = $('<input type="text" class="form-control" id="'+fieldId+'" name="'+fieldId+'" placeholder="">').val(currentVal);
         $wrap.empty().append($input).append('<a href="#" class="toggle-select-input" data-field="'+fieldId+'">Chọn từ danh sách</a>');
 
         // sync hidden while typing for idxacno
@@ -675,7 +671,3 @@
             });
         }
     });
-
-
-
-</script>

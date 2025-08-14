@@ -44,6 +44,7 @@
                 'add_identity_no', 'add_identity_date', 'add_identity_place', 'add_addrtpcd',
                 'add_addr1', 'add_addr2', 'add_addr3', 'add_addrfull', 'add_custtpcd', 'add_custdtltpcd',
                 'add_branch_code', 'add_profnm', 'add_usridop1', 'add_identity_outdate',
+                'add_taxno', 'add_taxno_date', 'add_taxno_place', 'add_busno', 'add_busno_date', 'add_busno_place',
             ];
 
             let formData = {
@@ -168,6 +169,7 @@
                 'identity_no', 'identity_date', 'identity_place', 'addrtpcd',
                 'addr1', 'addr2', 'addr3', 'addrfull', 'custtpcd', 'custdtltpcd',
                 'branch_code', 'profnm', 'usridop1', 'identity_outdate',
+                'taxno', 'taxno_date', 'taxno_place', 'busno', 'busno_date', 'busno_place',
             ];
 
             let formData = {
@@ -231,6 +233,7 @@
                     'identity_no', 'identity_date', 'identity_place', 'addrtpcd',
                     'addr1', 'addr2', 'addr3', 'addrfull', 'custtpcd', 'custdtltpcd',
                     'branch_code', 'created_at', 'updated_at', 'profnm', 'usridop1', 'identity_outdate',
+                    'taxno', 'taxno_date', 'taxno_place', 'busno', 'busno_date', 'busno_place',
                 ];
 
                 fields.forEach(field => $('#' + field).val(''));

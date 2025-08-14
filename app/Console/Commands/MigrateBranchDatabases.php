@@ -14,7 +14,7 @@ class MigrateBranchDatabases extends Command
     public function handle()
     {
         $branches = Branches::all();
-
+        
         foreach ($branches as $branch) {
             $dbName = $branch->database_name;
 

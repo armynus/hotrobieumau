@@ -1,6 +1,52 @@
 @extends('user.layouts.app')
 @section('title', 'Biểu mẫu giao dịch')
-   
+   <style>
+    .field-label{
+  min-width: 200px;
+  padding: 0.375rem 0.75rem;
+  background: #c6deff;
+  border-radius: 8px;
+  color: #39404a;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 16px;
+}
+
+/* wrapper chứa input/select + link */
+.field-control{
+  position: relative;
+  padding-top: 0;
+  padding-bottom: 2px; /* chừa chỗ cho link */
+}
+
+/* đồng bộ style form-control (Bootstrap có rồi, đây chỉ tune) */
+.field-control .form-control{
+  border-radius: 8px;
+  border: 1px solid #e6e9ef;
+  padding: 0.375rem 0.75rem;
+}
+
+/* link toggle */
+.field-control a.toggle-manual-input,
+.field-control a.toggle-select-input{
+  position: absolute;
+  right: 4px;
+  bottom: 0;
+  font-size: 12px;
+  color: #2b7cff;
+  text-decoration: none;
+}
+
+/* mobile */
+@media (max-width: 768px){
+  .field-label{ min-width: 120px; font-size: 14px; }
+  .field-control a.toggle-manual-input{ right: 8px; }
+}
+
+    </style>
 @section('content')
 <div class="container-fluid">
     
@@ -15,6 +61,7 @@
         <div class="card-body">
             <form id="supportForm">
                 <input type="hidden" value="" id="custno_hidden" name="custno_hidden" >
+                <input type="hidden" value="" id="MaKHDN_hidden" name="MaKHDN_hidden" >
                 <input type="hidden" value="" id="idxacno_hidden" name="idxacno_hidden" >
                 @csrf
                 <div class="container">
@@ -22,29 +69,30 @@
                     <div class="row mb-4 justify-content-center">
                         <div class="col-md-6">
                             <div class="input-group">
-                                <input type="search" class="form-control bg-light small" id="customer_search" placeholder="Lấy thông tin khách hàng có sẵn để điền vào Form" aria-label="Search" aria-describedby="basic-addon2" name="keyword">
-                                <div class="input-group-append">
-                                    <span class="btn btn-primary">
+                                <input type="search" class="form-control bg-light small" id="customer_search" 
+                                placeholder="Nhấn Họ & Tên, CIF hoặc CCCD/CMND của KH để điền FORM" aria-label="Search" aria-describedby="basic-addon2" name="keyword">
+                                <div class="input-group-append" >
+                                    <span class="btn btn-primary" style="font-size: 24px;">
                                         <i class="fas fa-search fa-sm"></i>
                                     </span>
                                 </div>
                             </div>
+                          
                         </div>
                     </div>
+                    
                     @foreach($fields as $key => $info)
                         @if($loop->first || $loop->iteration % 2 == 1)
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                         @endif
 
                         <div class="col-md-6">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-light border rounded" data-for="{{$key}}" >
-                                        {{ $info['field_name'] }}
-                                    </span>
-                                </div>
+                            <div class="d-flex align-items-start">
+                                <label class="field-label me-2" for="{{ $key }}">
+                                    {{ $info['field_name'] }}
+                                </label>
 
-                                <div id="{{ $key == 'idxacno' ? 'accountFieldWrapper' : '' }}" class="flex-grow-1">
+                                <div class="field-control flex-grow-1" id="{{ $key }}Wrapper">
                                     @if($key == 'gender')
                                         <x-select-input-to-check-box 
                                             name="gender" 
@@ -154,6 +202,8 @@
                                         >  
                                 
                                     @endif
+                                    {{-- Link toggle sẽ được JS tự thêm; nhưng để phòng hờ khi JS chưa load: --}}
+                                    <noscript class="d-block mt-1 text-muted small">JS tắt — không thể toggle</noscript>
                                 </div>
                             </div>
                         </div>
@@ -162,7 +212,7 @@
                             </div>
                         @endif
                     @endforeach
-
+       
                        
             
                     <div class="row">
@@ -187,7 +237,7 @@
                                 </svg>
                             </span>
                             <span  class="btn btn-info" id="pasteClipboardDNBtn">
-                                Dán Clipboard Doanh Nghiệp
+                                Dán Clipboard Tổ Chức
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-fill" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5zm-2 0h1v1A2.5 2.5 0 0 0 6.5 5h3A2.5 2.5 0 0 0 12 2.5v-1h1a2 2 0 0 1 2 2V14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3.5a2 2 0 0 1 2-2"/>
                                 </svg>
@@ -226,8 +276,11 @@
     <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
     <!-- include jQuery validate library -->
     <script src="{{asset('js/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js')}}" type="text/javascript"></script>
+      <!-- Bao gồm jQuery và jQuery UI (nếu chưa có) -->
+    <link href="{{ asset('vendor/jquery/jquery-ui.css') }}" rel="stylesheet">
+    <script src="{{ asset('vendor/jquery/jquery-ui.min.js') }}"></script>
     @include('user.partials.ajax_transaction_form')
-
+    
 @endpush
 
 

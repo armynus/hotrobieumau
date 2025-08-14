@@ -40,6 +40,12 @@ class CustomerInfoImport implements ToModel, WithHeadingRow, WithChunkReading, W
                     'birthday'          => $this->formatDate($row['name_1'] ?? $customer->birthday),
                     'profnm'            => $row['profnm'] ?? $customer->profnm,
                     'usridop1'          => $row['usridop1'] ?? $customer->usridop1,
+                    'busno'             => $row['busno'] ?? $customer->busno,
+                    'busno_date'       => $this->formatDate($row['issuedt4'] ?? $customer->busno_date),
+                    'busno_place'      => $row['busno_place'] ?? $customer->busno_place,
+                    'taxno'             => $row['taxno'] ?? $customer->taxno,
+                    'taxno_date'       => $this->formatDate($row['issuedt6'] ?? $customer->taxno_date),
+                    'taxno_place'      => $row['taxno_place'] ?? $customer-> taxno_place,
                 ]);
 
                 return null; // Không tạo bản ghi mới
@@ -66,7 +72,13 @@ class CustomerInfoImport implements ToModel, WithHeadingRow, WithChunkReading, W
                 'addrfull'        => $row['addr1'] . ' ' . $row['addr2'] . ' ' . $row['addr3'] ?? null,
                 'birthday'        => $this->formatDate($row['name_1'] ?? null),
                 'profnm'          => $row['profnm'] ?? null,
-                'usridop1'        => $row['usridop1'] ?? null
+                'usridop1'        => $row['usridop1'] ?? null,
+                'busno'           => $row['busno'] ?? null,
+                'busno_date'      => $this->formatDate($row['issuedt4'] ?? null),
+                'busno_place'     => $row['busno_place'] ?? null,
+                'taxno'           => $row['taxno'] ?? null,
+                'taxno_date'      => $this->formatDate($row['issuedt6'] ?? null),
+                'taxno_place'     => $row['taxno_place'] ?? null,
             ]);
         }
         

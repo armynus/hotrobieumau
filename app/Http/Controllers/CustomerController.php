@@ -45,6 +45,12 @@ class CustomerController extends Controller
             'addr2' => 'Địa chỉ cấp 2',
             'addr3' => 'Địa chỉ cấp 3',
             'addrfull' => 'Địa chỉ đầy đủ',
+            'busno' => 'Số đăng ký kinh doanh',
+            'busno_date' => 'Ngày cấp đăng ký kinh doanh',
+            'busno_place' => 'Nơi cấp đăng ký kinh doanh',
+            'taxno' => 'Mã số thuế',
+            'taxno_date' => 'Ngày cấp mã số thuế',
+            'taxno_place' => 'Nơi cấp mã số thuế',
             'custtpcd' => 'Loại khách hàng',
             'custdtltpcd' => 'Chi tiết loại khách hàng',
             'branch_code' => 'Mã chi nhánh',
@@ -69,6 +75,12 @@ class CustomerController extends Controller
             'add_addr2' => 'Địa chỉ cấp 2',
             'add_addr3' => 'Địa chỉ cấp 3',
             'add_addrfull' => 'Địa chỉ đầy đủ',
+            'add_busno' => 'Số đăng ký kinh doanh',
+            'add_busno_date' => 'Ngày cấp đăng ký kinh doanh',
+            'add_busno_place' => 'Nơi cấp đăng ký kinh doanh',
+            'add_taxno' => 'Mã số thuế',
+            'add_taxno_date' => 'Ngày cấp mã số thuế',
+            'add_taxno_place' => 'Nơi cấp mã số thuế',
             'add_custtpcd' => 'Loại khách hàng',
             'add_custdtltpcd' => 'Chi tiết loại khách hàng',
             'add_branch_code' => 'Mã chi nhánh',
@@ -99,7 +111,8 @@ class CustomerController extends Controller
             'name', 'nameloc', 'gender', 'birthday', 'phone_no',
             'identity_no', 'identity_date', 'identity_place', 'addrtpcd', 
             'addr1', 'addr2', 'addr3', 'addrfull', 'custtpcd', 'custdtltpcd', 
-            'branch_code', 'profnm', 'usridop1', 'identity_outdate'
+            'branch_code', 'profnm', 'usridop1', 'identity_outdate', 'taxno', 
+            'taxno_date', 'taxno_place', 'busno', 'busno_date', 'busno_place',
         ]);
 
         // Chuyển các giá trị rỗng ('') thành null
@@ -147,6 +160,13 @@ class CustomerController extends Controller
                 'add_custdtltpcd'    => 'nullable|string|max:50',
                 'add_branch_code'    => 'nullable|string|max:50',
                 'add_usridop1'       => 'nullable|string|max:50',
+                'add_identity_outdate' => 'nullable|date',
+                'add_taxno'          => 'nullable|string|max:50',
+                'add_taxno_date'     => 'nullable|date',
+                'add_taxno_place'    => 'nullable|string|max:255',
+                'add_busno'          => 'nullable|string|max:50',
+                'add_busno_date'     => 'nullable|date',
+                'add_busno_place'    => 'nullable|string|max:255',
             ]);
 
 
@@ -171,6 +191,13 @@ class CustomerController extends Controller
                 'custdtltpcd'     => $request->input('add_custdtltpcd'),
                 'branch_code'     => $request->input('add_branch_code'),
                 'usridop1'        => $request->input('add_usridop1'),
+                'identity_outdate'=> $request->input('add_identity_outdate'),
+                'taxno'           => $request->input('add_taxno'),
+                'taxno_date'      => $request->input('add_taxno_date'),
+                'taxno_place'     => $request->input('add_taxno_place'),
+                'busno'           => $request->input('add_busno'),
+                'busno_date'      => $request->input('add_busno_date'),
+                'busno_place'     => $request->input('add_busno_place'),
             ];
             // Kiểm tra xem khách hàng đã tồn tại hay chưa
             $customer = CustomerInfo::where('custno', $validated['add_custno'])->first();
