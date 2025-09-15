@@ -137,12 +137,23 @@ class UserSupportFormController extends Controller
             'Trung' => 'Trung',
             'Kiệt' => 'Kiệt',
         ];
-        $NoicapCCCD = [
+        $identity_type = [
+            'Căn cước công dân' => 'Căn cước công dân',
+            'Chứng minh nhân dân' => 'Chứng minh nhân dân',
+            'Hộ chiếu' => 'Hộ chiếu',
+        ];
+        $identity_place = [
+            'Bộ Công An' => 'Bộ Công An',
+            'CCS QLHC VỀ TTXH' => 'CCS QLHC VỀ TTXH',
+        ];
+        $NoiCapCCCDMoi = [
             'Bộ Công An' => 'Bộ Công An',
             'CCS QLHC VỀ TTXH' => 'CCS QLHC VỀ TTXH',
         ];
         return view('user.page.transaction_form', compact('form', 'fields', 'type', 'gender', 'NgheNghiepKH', 'ChucVuKH', 
-        'ccycd', 'SoTKTT', 'LoaiThe','HangThe', 'ThuTuDong', 'MobileBanking', 'RetaileBanking', 'DichVuKhac','nguoi'));
+        'ccycd', 'SoTKTT', 'LoaiThe','HangThe', 'ThuTuDong', 'MobileBanking', 'RetaileBanking', 'DichVuKhac','nguoi',
+         'identity_place', 'NoiCapCCCDMoi', 'identity_type',
+        ));
     }
 
     
@@ -195,9 +206,9 @@ class UserSupportFormController extends Controller
             
             // Lấy giá trị của custno và idxacno từ form; nếu không có thì dùng giá trị ẩn
             // Xử lý dữ liệu khách hàng
-            $custnoKHCN  = $formData['custno']  ?? $formData['custno_hidden'] ?? null;
-            $custnoKHDN  = $formData['MaKHDN']  ?? $formData['MaKHDN_hidden'] ?? null;
-            $idxacnoIdentifier = $formData['idxacno'] ?? $formData['idxacno_hidden'] ?? null;
+            $custnoKHCN  = $formData['custno']  ?? $formData['custno_hidden'];
+            $custnoKHDN  = $formData['MaKHDN']  ?? $formData['MaKHDN_hidden'];
+            $idxacnoIdentifier = $formData['idxacno'] ?? $formData['idxacno_hidden'];
             // CUSTOMER INFO
             // =======================
             // Xử lý Khách hàng Doanh nghiệp
@@ -206,18 +217,19 @@ class UserSupportFormController extends Controller
                 $customerDN = CustomerInfo::where('custno', $custnoKHDN)->first();
 
                 $dataDN = [
-                    'custno'       => $formData['MaKHDN'],
-                    'nameloc'      => $formData['TenDoanhNghiep'] ?? '',
-                    'phone_no'     => $formData['SoDienThoai'] ?? '',
-                    'branch_code'  => $formData['branch_code'] ?? '',
-                    'addrtpcd'     => $formData['addrtpcd'] ?? '',
-                    'addrfull'     => $formData['DiaChiDoanhNghiep'] ?? '',
-                    'taxno'        => $formData['MaSoThueDN'] ?? '',
-                    'taxno_date'   => $this->formatDateIfNeeded($formData['NgayCapMSTDN'] ?? ''),
-                    'taxno_place'  => $formData['NoiCapThueDN'] ?? '',
-                    'busno'        => $formData['GiayDKKD'] ?? '',
-                    'busno_date'   => $this->formatDateIfNeeded($formData['NgayCapDKKD'] ?? ''),
-                    'busno_place'  => $formData['NoiCapDKKD'] ?? '',
+                    'custno'        => $formData['MaKHDN'],
+                    'nameloc'       => $formData['TenDoanhNghiep'] ?? '',
+                    'phone_no'      => $formData['SoDienThoai'] ?? '',
+                    'custtpcd'      => $formData['custtpcd'] ?? 'KHDN',
+                    'branch_code'   => $formData['branch_code'] ?? '',
+                    'addrtpcd'      => $formData['addrtpcd'] ?? '',
+                    'addrfull'      => $formData['DiaChiDoanhNghiep'] ?? '',
+                    'taxno'         => $formData['MaSoThueDN'] ?? '',
+                    'taxno_date'    => $this->formatDateIfNeeded($formData['NgayCapMSTDN'] ?? ''),
+                    'taxno_place'   => $formData['NoiCapThueDN'] ?? '',
+                    'busno'         => $formData['GiayDKKD'] ?? '',
+                    'busno_date'    => $this->formatDateIfNeeded($formData['NgayCapDKKD'] ?? ''),
+                    'busno_place'   => $formData['NoiCapDKKD'] ?? '',
                 ];
 
                 if ($customerDN) {
@@ -246,13 +258,15 @@ class UserSupportFormController extends Controller
                     'custno'        => $custnoKHCN,
                     'name'          => $formData['name'] ?? '',
                     'nameloc'       => $formData['nameloc'] ?? '',
-                    'custtpcd'      => $formData['custtpcd'] ?? '',
+                    'custtpcd'      => $formData['custtpcd'] ?? 'Cá nhân',
                     'custdtltpcd'   => $formData['custdtltpcd'] ?? '',
                     'phone_no'      => $formData['phone_no'] ?? '',
+                    'profnm'        => $formData['NgheNghiepKH'] ?? '',
                     'gender'        => $formData['gender'] ?? '',
                     'branch_code'   => $formData['branch_code'] ?? '',
                     'identity_no'   => $formData['identity_no'] ?? '',
                     'identity_date' => $formData['identity_date'] ?? '',
+                    'identity_outdate' => $this->formatDateIfNeeded($formData['identity_outdate'] ?? ''),
                     'identity_place'=> $formData['identity_place'] ?? '',
                     'addrtpcd'      => $formData['addrtpcd'] ?? '',
                     'addr1'         => $formData['addr1'] ?? '',
@@ -365,7 +379,8 @@ class UserSupportFormController extends Controller
                     strpos($key, 'identity_outdate') !== false ||
                     strpos($key, 'NgayGiaoDich') !== false ||
                     strpos($key, 'NgayCCCDMoi') !== false ||
-                    strpos($key, 'NgayCapDKKD') !== false
+                    strpos($key, 'NgayCapDKKD') !== false ||
+                    strpos($key, 'HanCCCDMoi') !== false 
                 ) {
                     // Chuyển định dạng ngày tháng, nếu không có dữ liệu thì gán khoảng trắng
                     $value = $this->convertDateFormat($value) ?? ' ';
@@ -415,7 +430,9 @@ class UserSupportFormController extends Controller
                         }
                     }
                 } elseif (strpos($key, 'NgayThangNam') !== false) {
-                    $templateProcessor->setValue('DateEng', (string)$this->convertDateNowFormatEng($value) ?? ' ');
+                    $templateProcessor->setValue('DateVietEng', (string)$this->convertDateNowFormatEng($value) ?? ' ');
+                    $templateProcessor->setValue('DateEng', (string)$this->convertDateNowFormatVietEng($value) ?? ' ');
+
                     $value = $this->convertDateNowFormat($value) ?? ' ';
                 }
                 if (
@@ -742,6 +759,17 @@ class UserSupportFormController extends Controller
         return "ngày $day tháng $month năm $year";
     }
     public function convertDateNowFormatEng($date)
+    {
+        if (!$date) return '';
+
+        $timestamp = strtotime($date);
+        $day = date('d', $timestamp);
+        $month = date('m', $timestamp);
+        $year = date('Y', $timestamp);
+
+        return "ngày (date) $day tháng (month) $month năm (year) $year";
+    }
+    public function convertDateNowFormatVietEng($date)
     {
         if (!$date) return '';
 

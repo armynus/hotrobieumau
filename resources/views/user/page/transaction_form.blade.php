@@ -70,7 +70,7 @@
                         <div class="col-md-6">
                             <div class="input-group">
                                 <input type="search" class="form-control bg-light small" id="customer_search" 
-                                placeholder="Nhấn Họ & Tên, CIF hoặc CCCD/CMND của KH để điền FORM" aria-label="Search" aria-describedby="basic-addon2" name="keyword">
+                                placeholder="Tìm theo Họ Tên, CIF hoặc CCCD/CMND của KH để điền FORM" aria-label="Search" aria-describedby="basic-addon2" name="keyword">
                                 <div class="input-group-append" >
                                     <span class="btn btn-primary" style="font-size: 24px;">
                                         <i class="fas fa-search fa-sm"></i>
@@ -106,6 +106,28 @@
                                             name="nguoi" 
                                             :options="$nguoi" 
                                             selected="{{ old('nguoi') }}"  
+                                            :required="true" 
+                                        />
+                                    
+                                    @elseif($key == 'identity_type')
+                                        <x-select-input-to-check-box 
+                                            name="identity_type" 
+                                            :options="$identity_type" 
+                                            selected="{{ old('identity_type') }}"  
+                                            :required="true" 
+                                        />
+                                    @elseif($key == 'identity_place')
+                                        <x-select-input-to-check-box 
+                                            name="identity_place" 
+                                            :options="$identity_place" 
+                                            selected="{{ old('identity_place') }}"  
+                                            :required="true" 
+                                        />
+                                    @elseif($key == 'NoiCapCCCDMoi')
+                                        <x-select-input-to-check-box 
+                                            name="NoiCapCCCDMoi" 
+                                            :options="$NoiCapCCCDMoi" 
+                                            selected="{{ old('NoiCapCCCDMoi') }}"  
                                             :required="true" 
                                         />
                                     @elseif($key == 'NgheNghiepKH')

@@ -56,7 +56,7 @@ class CustomerInfoImport implements ToModel, WithHeadingRow, WithChunkReading, W
                 'custno'          => $custno, 
                 'name'            => $row['nm'],
                 'nameloc'         => $row['nmloc'] ?? null,
-                'custtpcd'        => $row['custtpcd'] ?? null,
+                'custtpcd'        => $row['custtpcd'] ?? 'Cá nhân',
                 'custdtltpcd'     => $row['custdtltpcd'] ?? null,
                 'phone_no'        => $row['name_4'] ?? null,
                 'gender'          => $row['name_3'] ?? null,

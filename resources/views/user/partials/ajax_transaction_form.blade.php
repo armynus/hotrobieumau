@@ -9,6 +9,7 @@
                 'nmloc': 'nameloc',
                 'regno': 'identity_no',
                 'nm'    : 'name',
+                'profnm': 'NgheNghiepKH',
                 'custtpcd'  : 'custtpcd',
                 'custdtltpcd' : 'custdtltpcd',
                 'custno' : 'custno',
@@ -451,8 +452,9 @@
                 console.log('selected customer', customer);
 
                 // fill other fields (keeps user's logic)
-                if (customer.custtpcd == 'Cá nhân') {
+                if (customer.custtpcd == 'Cá nhân' || customer.custtpcd == '' || customer.custtpcd == null) {
                     $.each(customer, function(key, value) { if ($("#" + key).length) $("#" + key).val(value); });
+                    $('#NgheNghiepKH').val(customer.profnm || '');
                     $('#custno_hidden').val(customer.custno || '');
                 } else {
                     // Doanh nghiệp sẽ có các trường khác nhau, chỉ điền những trường cần thiết
@@ -597,7 +599,7 @@
         if (!$wrap.length) { console.warn(wrapperId + " not found!"); return; }
 
         var currentVal = (typeof prefVal !== 'undefined') ? prefVal : ($("#" + fieldId).val() || '');
-        var $input = $('<input type="text" class="form-control" id="'+fieldId+'" name="'+fieldId+'" placeholder="Nhập thủ công">').val(currentVal);
+        var $input = $('<input type="text" class="form-control" id="'+fieldId+'" name="'+fieldId+'" placeholder="">').val(currentVal);
         $wrap.empty().append($input).append('<a href="#" class="toggle-select-input" data-field="'+fieldId+'">Chọn từ danh sách</a>');
 
         // sync hidden while typing for idxacno
@@ -616,7 +618,9 @@
     
     $(function(){
 
-        // Tìm tất cả select có id trong form (sau khi DOM sẵn)
+        // Danh sách các select muốn mặc định thành input
+        var forceManualFields = ["identity_place", "NoiCapCCCDMoi", "NgheNghiepKH"]; 
+
         $("select[id]").each(function(){
             var $s = $(this);
             var id = $s.attr("id");
@@ -625,7 +629,7 @@
             // cache options html
             selectOptionsCache[id] = $s.html();
 
-            // ensure wrapper exists (Blade tạo idWrapper)
+            // ensure wrapper exists
             var wrapperId = id + "Wrapper";
             var $wrapper = $("#" + wrapperId);
             if(!$wrapper.length){
@@ -638,32 +642,32 @@
                 $wrapper.append('<a href="#" class="toggle-manual-input d-block mt-1" data-field="'+id+'">Nhập thủ công</a>');
             }
 
-            // --- IMPORTANT: Không auto-switch lúc init. Chỉ lắng nghe change để auto-switch khi user chọn "Khác"
+            // Nếu field này thuộc ngoại lệ → render input luôn
+            if (forceManualFields.includes(id)) {
+                renderInput(id, $s.val() || ""); 
+            }
+
+            // Chỉ lắng nghe change để auto-switch khi user chọn "Khác"
             $s.on('change', function(){
                 var val = $s.val();
                 var txt = $s.find("option:selected").text() || "";
-                // Nếu user chọn option rỗng hoặc option có text chứa "khác", ta tự mở input
                 if(val === "" || /khác/i.test(txt)){
-                    renderInput(id, ""); // chuyển sang input rỗng (hoặc có thể lấy từ data-attr nếu muốn)
+                    renderInput(id, "");
                     $("#" + id).focus();
                 }
             });
         });
 
-        
-
         // event delegation cho toggle link
         $(document).on("click", ".toggle-manual-input", function(e){
             e.preventDefault();
             var id = $(this).data('field');
-            // khi người dùng chủ động bấm "Nhập thủ công" thì chuyển, giữ value hiện tại
             renderInput(id, $("#" + id).val());
         });
 
         $(document).on("click", ".toggle-select-input", function(e){
             e.preventDefault();
             var id = $(this).data('field');
-            // khi quay về select, cố gắng giữ giá trị nếu trùng option; nếu value custom không có trong options thì sẽ không được chọn
             renderSelect(id);
         });
 
@@ -675,6 +679,7 @@
             });
         }
     });
+
 
 
 

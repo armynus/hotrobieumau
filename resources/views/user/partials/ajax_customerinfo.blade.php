@@ -1,5 +1,128 @@
 
 <script>
+    document.getElementById('pasteClipboardAddCusTomerBtn').addEventListener('click', function () {
+        try {
+            const fieldMapping = {
+                'custno': 'custno',
+                'nmloc': 'add_nameloc',
+                'nm'    : 'add_name',
+                'regno': 'add_identity_no',
+                'issuedt1' : 'add_identity_date',
+                'identity_place' : 'add_identity_place',
+                'custtpcd'  : 'add_custtpcd',
+                'custdtltpcd' : 'add_custdtltpcd',
+                'ctrycdnatl': 'add_ctrycdnatl',
+                'idxacno': 'add_idxacno',
+                'ccycd'  : 'add_ccycd',
+                'name_1' : 'add_birthday',
+                'name_2' : 'add_branch_code',
+                'name_3' : 'add_gender',
+                'name_4' : 'add_phone_no',
+                'name_5' : 'add_profnm',
+                'addrtpcd' : 'add_addrtpcd',
+                'addr1': 'add_addr1',
+                'addr2': 'add_addr2',
+                'addr3': 'add_addr3',
+                'taxno' : 'add_taxno',
+                'taxno_date' : 'issuedt6',
+                'busno' : 'add_busno',
+                'busno_date' : 'issuedt4',
+                'usridop1': 'add_usridop1',
+                // Thêm ánh xạ khác nếu cần
+            };
+
+            const readFromClipboard = function(callback) {
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    navigator.clipboard.readText()
+                        .then(text => callback(text))
+                        .catch(err => {
+                            console.error("Lỗi đọc clipboard API:", err);
+                            fallbackReadFromClipboard(callback);
+                        });
+                    return;
+                }
+                fallbackReadFromClipboard(callback);
+            };
+
+            const fallbackReadFromClipboard = function(callback) {
+                const textarea = document.createElement('textarea');
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                
+                const handlePaste = function(e) {
+                    const clipboardData = e.clipboardData || window.clipboardData;
+                    const pastedText = clipboardData.getData('text');
+                    callback(pastedText);
+                    document.removeEventListener('paste', handlePaste);
+                    document.body.removeChild(textarea);
+                };
+                
+                document.addEventListener('paste', handlePaste);
+                textarea.focus();
+                alert("Hãy nhấn Ctrl+V để dán dữ liệu từ clipboard");
+                
+                setTimeout(() => {
+                    if (document.body.contains(textarea)) {
+                        document.removeEventListener('paste', handlePaste);
+                        document.body.removeChild(textarea);
+                    }
+                }, 10000);
+            };
+
+            readFromClipboard(function(text) {
+                if (!text) {
+                    alert("Clipboard trống!");
+                    return;
+                }
+
+                const rows = text.trim().split(/\n/);
+                const headers = rows[0].split(/\t/).map(h => h.trim().toLowerCase());
+                const values = rows[1].split(/\t/);
+        
+                headers.forEach((header, index) => {
+                    const mappedField = fieldMapping[header] || header;
+                    let input = document.querySelector(`.modal-content input[name='${mappedField}'], .modal-content select[name='${mappedField}']`);
+
+                    if (values[index] !== undefined) {
+                        let value = values[index].trim();
+
+                        // Nếu input là kiểu "date" và giá trị có định dạng YYYYMMDD -> Chuyển sang YYYY-MM-DD
+                        if (input && input.type === "date" && /^\d{8}$/.test(value)) {
+                            value = `${value.substring(0, 4)}-${value.substring(4, 6)}-${value.substring(6, 8)}`;
+                        }
+
+                        // Xử lý địa chỉ: Ghép addr1, addr2, addr3 thành addrfull
+                        if (['addr1', 'addr2', 'addr3'].includes(header)) {
+                            if (!window.addrParts) window.addrParts = {}; // Lưu giá trị tạm thời
+                            window.addrParts[header] = value;
+
+                            const fullAddress = ['addr1', 'addr2', 'addr3']
+                                .map(field => window.addrParts[field] || '') // Lấy giá trị addr1, addr2, addr3 (nếu có)
+                                .filter(part => part !== '') // Xóa khoảng trống
+                                .join(' ');
+
+                            let addrInput = document.querySelector(`.modal-content input[name='add_addrfull']`);
+                            if (addrInput) addrInput.value = fullAddress;
+                        } else if (input) {
+                            input.value = value;
+                        }
+                        // Gắn dữ liệu vào thẻ input hidden custno
+                        if (['custno'].includes(header)) {
+                            let custnoInput = document.querySelector(`.modal-content input[name='custno_hidden']`);
+                            if (custnoInput) {
+                                custnoInput.value = value;
+                            }
+                        }
+                    }
+                });
+
+            });
+        } catch (error) {
+            console.error("Lỗi:", error);
+            alert("Đã xảy ra lỗi khi lấy dữ liệu từ clipboard!");
+        }
+    });
     $(document).ready(function () {
         $('#customerTable').DataTable({
             processing: true,
