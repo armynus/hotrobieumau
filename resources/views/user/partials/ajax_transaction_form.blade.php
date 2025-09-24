@@ -3,6 +3,7 @@
 <script>
     
 
+
     document.getElementById('pasteClipboardBtn').addEventListener('click', function () {
         try {
             const fieldMapping = {
@@ -410,25 +411,25 @@
 
 
 
-    document.getElementById('resetFormBtn').addEventListener('click', function () {
-        try {
-            // Lấy tất cả input và select hợp lệ
-            const elements = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='GDichVien']):not([name='DiaDanh']):not([name='_token']):not([name='NgayGiaoDich']):not([name='NgayThangNam']):not([name='branch']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
+    // document.getElementById('resetFormBtn').addEventListener('click', function () {
+    //     try {
+    //         // Lấy tất cả input và select hợp lệ
+    //         const elements = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='GDichVien']):not([name='DiaDanh']):not([name='_token']):not([name='NgayGiaoDich']):not([name='NgayThangNam']):not([name='branch']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
 
-            // Đặt lại giá trị mặc định
-            elements.forEach(el => {
-                if (el.tagName === "INPUT") {
-                    el.value = ""; // Xóa giá trị input
-                } else if (el.tagName === "SELECT") {
-                    el.selectedIndex = 0; // Chọn option đầu tiên trong select
-                }
-            });
+    //         // Đặt lại giá trị mặc định
+    //         elements.forEach(el => {
+    //             if (el.tagName === "INPUT") {
+    //                 el.value = ""; // Xóa giá trị input
+    //             } else if (el.tagName === "SELECT") {
+    //                 el.selectedIndex = 0; // Chọn option đầu tiên trong select
+    //             }
+    //         });
 
-        } catch (error) {
-            console.error("Lỗi khi làm mới:", error);
-            alert("Không thể làm mới biểu mẫu!");
-        }
-    });
+    //     } catch (error) {
+    //         console.error("Lỗi khi làm mới:", error);
+    //         alert("Không thể làm mới biểu mẫu!");
+    //     }
+    // });
 
 
     // --- autocomplete + account handling

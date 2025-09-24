@@ -17,6 +17,7 @@ use App\Http\Controllers\AdminFormTypeController;
 use App\Http\Controllers\AdminSupFormTypeController;
 use App\Http\Controllers\ScanQRCodeController;
 use App\Http\Controllers\MergerLookupController;
+use App\Http\Controllers\FormDraftController;
 
 Route::get('login_admin', [LoginAdminController::class, 'login_admin'])->name('login_admin');
 Route::post('logins_admin', [LoginAdminController::class, 'logins_admin'])->name('logins_admin');
@@ -74,6 +75,7 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::post('reset_password_user', [LoginUserController::class, 'reset_password_user'])->name('reset_password_user');
     Route::get('/', [UserController::class, 'index'])->name('index');
     Route::get('user', [UserController::class, 'index'])->name('user');
+    Route::get('getDataReccentForm', [UserController::class, 'getDataReccentForm'])->name('getDataReccentForm');
     // Dữ liệu khách hàng
     Route::get('view_data_customer', [CustomerController::class, 'view_data_customer'])->name('view_data_customer');
     Route::get('detail_customer', [CustomerController::class, 'detail_customer'])->name('detail_customer');
@@ -110,7 +112,9 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::get('merger_lookup/new_ward_search', [MergerLookupController::class, 'new_wards_search'])->name('new_wards.search');
     Route::get('merger_lookup/new_ward_detail', [MergerLookupController::class, 'new_wards_detail'])->name('new_wards.detail');
     
-    
+    // Lưu bản nháp biểu mẫu
+    Route::post('/form-draft/save', [FormDraftController::class,'save'])->name('form.draft.save');
+    Route::get('/form-draft/{formKey}', [FormDraftController::class,'get'])->name('form.draft.get');
 
     Route::group(['middleware' => ['usercontrol']], function () {
         Route::post('uploadfile_customer', [CustomerController::class, 'uploadfile_customer'])->name('uploadfile_customer');

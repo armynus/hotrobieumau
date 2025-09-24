@@ -34,4 +34,14 @@ class SupportForm extends Model
     {
         return $this->belongsTo(SupFormType::class, 'sup_form_type_id');
     }
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'support_form_usages', 'support_form_id', 'user_id')
+                    ->withPivot('used_at')
+                    ->orderBy('pivot_used_at', 'desc');
+    }
+    public function usages()
+    {
+        return $this->hasMany(SupportFormUsage::class, 'support_form_id');
+    }
 }

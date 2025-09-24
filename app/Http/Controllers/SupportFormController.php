@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 
 class SupportFormController extends Controller
 {
+    
     /**
      * Trả về slug folder dựa trên type_name trong DB
      */

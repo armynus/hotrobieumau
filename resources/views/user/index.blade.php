@@ -92,12 +92,25 @@
                 </div>
             </div>
         </div>
-
-        
-
-        
-     
-        
+    </div>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h5 class="m-0 font-weight-bold text-primary">Các Biểu Mẫu Sử Dụng Gần Đây (Tối đa 20)</h5>
+        </div>
+        <div class="card-body"> 
+            <div class="table-responsive">
+                <table class="table table-bordered" id="ReccentFormTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Tên Biểu Mẫu</th>
+                            <th>Sử Dụng Lần Cuối</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            
+        </div>
     </div>
 </div>
 @endsection
@@ -115,8 +128,64 @@
 
     <!-- Page level plugins -->
     <script src="{{asset('vendor/chart.js/Chart.min.js')}}"></script>
-
+    <script src="{{asset('vendor/datatables/jquery.dataTables.min.js')}}"></script>
+    <script src="{{asset('vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
     <!-- Page level custom scripts -->
     <script src="{{asset('js/demo/chart-area-demo.js')}}"></script>
     <script src="{{asset('js/demo/chart-pie-demo.js')}}"></script>
+    
+    <script>
+        $(document).ready(function () {
+            $('#ReccentFormTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('getDataReccentForm') }}", // Route lấy dữ liệu
+                order: [[1, 'desc']], // <--- sắp xếp theo cột used_at (index 1) giảm dần khi load
+                columns: [                    
+                    { data: 'name', name: 'name' },
+                    //used_at là thời gian sử dụng biểu mẫu định dạng đẹp lại
+                    {data: 'used_at', 
+                        render: function(data, type, row) {
+                            var date = new Date(data);
+                            var day = String(date.getDate()).padStart(2, '0');
+                            var month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+                            var year = date.getFullYear();
+                            var hours = String(date.getHours()).padStart(2, '0');
+                            var minutes = String(date.getMinutes()).padStart(2, '0');
+                            var seconds = String(date.getSeconds()).padStart(2, '0');
+                            return ` ${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+                        } 
+                    },
+                    // action column: use row.form_type at runtime
+                {
+                    data: 'id',
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false,
+                    render: function (id, type, row) {
+                        // fallbacks in case column name differs
+                        const typeId =  row.form_type ;
+                        const safeType = encodeURIComponent(typeId);
+                        const safeId = encodeURIComponent(id);
+
+                        // Build URL: /support_forms/show/type=<typeId>/id=<id>
+                        const href = `support_forms/${safeType}/${safeId}`;
+
+                        return `
+                            <a href="${href}">
+                                <button type="button" class="btn btn-info btn-icon-split" title="Mở biểu mẫu">
+                                    <span class="text">
+                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip-fill" viewBox="0 0 16 16">
+                                                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm7 6h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5"/>
+                                            </svg>
+                                    </span>
+                                </button>
+                            </a>
+                        `;
+                    }
+                }       
+                ]
+            });
+        });
+    </script>
 @endpush

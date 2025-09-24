@@ -9,8 +9,12 @@ class Users extends Model
     protected $table = 'users';
     protected $fillable = ['name', 'email', 'user_ipcas' , 'password', 'branch_id', 'status', 'role_id', 'failed_login_attempts'];
     public $timestamps = true;
-    // public function branches()
-    // {
-    //     return $this->belongsTo('App\Models\Branches');
-    // }
+    
+    
+    public function formUsages()
+    {
+        return $this->hasMany(SupportFormUsage::class, 'user_id');
+    }
+
+    
 }

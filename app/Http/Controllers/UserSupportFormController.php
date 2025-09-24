@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use \App\Services\FormUsageService;
 use App\Models\SupportForm;
 use App\Models\FormField;
 use App\Models\CustomerInfo;
@@ -20,6 +21,8 @@ class UserSupportFormController extends Controller
     }
     public function show($type, $id)
     {
+        FormUsageService::log($id);
+
         // Lấy dữ liệu biểu mẫu theo ID
         $form = SupportForm::select('id', 'name', 'fields', 'file_template')
             ->where('form_type', $type) // Lọc theo type
@@ -183,12 +186,13 @@ class UserSupportFormController extends Controller
     }
     public function print(Request $request)
     {
+        // FormUsageService::log($id);
         DB::beginTransaction(); // Bắt đầu transaction để đảm bảo tính toàn vẹn dữ liệu
         try {
             // Nhận form_id và dữ liệu từ request
             $formId = $request->input('form_id');
             $formData = $request->except(['_token', 'form_id']);
-
+            FormUsageService::log($formId);
             // Tìm biểu mẫu trong database
             $form = SupportForm::find($formId);
             if (!$form || !$form->file_template) {
