@@ -460,6 +460,7 @@
                 } else {
                     // Doanh nghiệp sẽ có các trường khác nhau, chỉ điền những trường cần thiết
                     $("#MaKHDN").val(customer.custno || '');
+                    $("#TKTC").val(customer.idxacno || '');
                     $("#TenDoanhNghiep").val(customer.nameloc || '');
                     $("#DiaChiDoanhNghiep").val(customer.addrfull || '');
                     $("#GiayDKKD").val(customer.busno || '');

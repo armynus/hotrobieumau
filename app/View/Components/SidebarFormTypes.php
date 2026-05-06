@@ -8,13 +8,14 @@ use App\Models\FormType;
 class SidebarFormTypes extends Component
 {
     public $formTypes;
-
+    public $isMenuOpen;
     public function __construct()
     {
 
         $this->formTypes = cache()->remember('form_types', 30, function () {
             return FormType::all();
         });
+        $this->isMenuOpen = request()->routeIs('support_forms.index', 'support_forms.show');
         
     }
 

@@ -97,7 +97,7 @@ class UserSupportFormController extends Controller
         ];
         $LoaiThe = [
             'Thẻ ghi nợ nội địa' => 'Thẻ ghi nợ nội địa',
-            'Lập Nghiệp' => 'Lập Nghiệp',
+            'Agribank Napas-Mastercard' => 'Agribank Napas-Mastercard',
             'JCB Debit' => 'JCB Debit',
             'Thẻ liên kết thương hiệu' => 'Thẻ liên kết thương hiệu',
             'Thẻ Visa Debit' => 'Thẻ Visa Debit',
@@ -217,14 +217,14 @@ class UserSupportFormController extends Controller
             
             // Lấy giá trị của custno và idxacno từ form; nếu không có thì dùng giá trị ẩn
             // Xử lý dữ liệu khách hàng
-            $custnoKHCN  = $formData['custno']  ?? $formData['custno_hidden'];
-            $custnoKHDN  = $formData['MaKHDN']  ?? $formData['MaKHDN_hidden'];
+            $custnoKHCN  = $formData['custno']  ?? $formData['custno_hidden'] ;
+            $custnoKHDN  = $formData['MaKHDN']  ?? $formData['MaKHDN_hidden'] ;
             $idxacnoIdentifier = $formData['idxacno'] ?? $formData['idxacno_hidden'];
             // CUSTOMER INFO
             // =======================
             // Xử lý Khách hàng Doanh nghiệp
             // =======================
-            if (!empty($custnoKHDN)) {
+            if (!empty($custnoKHDN) ?? $custnoKHDN !== ' ' ?? $custnoKHDN !== null) { 
                 $customerDN = CustomerInfo::where('custno', $custnoKHDN)->first();
 
                 $dataDN = [
@@ -262,7 +262,7 @@ class UserSupportFormController extends Controller
             // =======================
             // Xử lý Khách hàng Cá nhân
             // =======================
-            if (!empty($custnoKHCN)) {
+            if (!empty($custnoKHCN) ?? $custnoKHCN !== ' ' ?? $custnoKHCN !== null) {
                 $customerCN = CustomerInfo::where('custno', $custnoKHCN)->first();
 
                 $dataCN = [
@@ -307,7 +307,7 @@ class UserSupportFormController extends Controller
             // -------------------------
             // ACCOUNT INFO
             // -------------------------
-            if ($idxacnoIdentifier) {
+            if ($idxacnoIdentifier ?? $idxacnoIdentifier !== ' ' ?? $idxacnoIdentifier !== null) {
                 $account = AccountInfo::where('idxacno', $idxacnoIdentifier)->first();
 
                 // Nếu đã tồn tại → cập nhật
@@ -470,12 +470,12 @@ class UserSupportFormController extends Controller
                 if ($key === 'branch') {
                     $templateProcessor->setValue('ChiNhanhHOA', (string)$this->supportformService->convertToUppercase($value) ?? ' ');
                 }
-                if ($key === 'SoTienDoi' && isset($formData['TiGia']) && isset($formData['LoaiTienNhan'])) {
+                if ($key === 'SoTienDoi' || isset($formData['TyGia']) || isset($formData['LoaiTienNhan'])) {
                     $sotiendoi = is_numeric($formData['SoTienDoi']) ? (float)$formData['SoTienDoi'] : 0;
                     $sotiendoi_chu = ucfirst(num_to_vietnamese_words((int)$sotiendoi)) . ' ' . ($formData['ccycd'] ?? '');
                     $templateProcessor->setValue('SoTienDoi_Chu', $sotiendoi_chu);
-                    $tigia = is_numeric($formData['TiGia']) ? (float)$formData['TiGia'] : 0;
-                    $sotiennhan = $this->supportformService->ExchangeValue($sotiendoi, $tigia);
+                    $TyGia = is_numeric($formData['TyGia']) ? (float)$formData['TyGia'] : 0;
+                    $sotiennhan = $this->supportformService->ExchangeValue($sotiendoi, $TyGia);
                     $templateProcessor->setValue('SoTienNhan', (string)$this->supportformService->formatNumber($sotiennhan) ?? ' ');
                     // Gọi hàm đọc số thành chữ
                     $value_in_words = ucfirst(num_to_vietnamese_words((int)$sotiennhan)) . ' ' . ($formData['LoaiTienNhan'] ?? '');
@@ -536,7 +536,7 @@ class UserSupportFormController extends Controller
                 $valueChecked = $formData['LoaiThe'];
                 $LoaiThe = [
                     'Thẻ ghi nợ nội địa' => 'Check_TheND',
-                    'Lập Nghiệp' => 'Check_TheLN',
+                    'Agribank Napas-Mastercard' => 'Check_TheNapas',
                     'JCB Debit' => 'Check_TheJCB',
                     'Thẻ liên kết thương hiệu' => 'Check_TheTH',
                     'Thẻ Visa Debit' => 'Check_TheVS',
@@ -638,6 +638,7 @@ class UserSupportFormController extends Controller
                 $this->supportformService->updateCheckboxContentControl($tempFile, 'DV_KHAC', in_array('DV_KHAC', $selected));
             }
             // Tăng usage_count của biểu mẫu mỗi khi in
+            $form->timestamps = false; // Tắt cập nhật timestamp
             $form->increment('usage_count');
             DB::commit();
 

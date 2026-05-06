@@ -71,73 +71,73 @@ if (! function_exists('number_to_vietnamese_words')) {
     }
 }
 
-// alias for backward compatibility
-if (! function_exists('num_to_vietnamese_words')) {
-    function num_to_vietnamese_words($number): string
-    {
-        return number_to_vietnamese_words($number);
-    }
-}
-
-/**
- * Đọc 1 chunk (0..999)
- *
- * @param int $num
- * @param array $units (index 0 = 'không', 1='một' ...)
- * @param bool $isFirstChunk true nếu đây là chunk trái nhất (không in "không trăm" ở đầu)
- * @return string
- */
-if (! function_exists('_read_chunk')) {
-    function _read_chunk(int $num, array $units, bool $isFirstChunk = false): string
-    {
-        $hundreds = (int) floor($num / 100);
-        $tensUnits = $num % 100;
-        $tens = (int) floor($tensUnits / 10);
-        $unit = $tensUnits % 10;
-        $parts = [];
-
-        // hundreds
-        if ($hundreds > 0) {
-            $parts[] = $units[$hundreds] . ' trăm';
-        } elseif ($tensUnits > 0 && !$isFirstChunk) {
-            // chỉ thêm "không trăm" nếu không phải chunk đầu
-            $parts[] = 'không trăm';
+    // alias for backward compatibility
+    if (! function_exists('num_to_vietnamese_words')) {
+        function num_to_vietnamese_words($number): string
+        {
+            return number_to_vietnamese_words($number);
         }
+    }
 
-        // tens and units
-        if ($tens > 1) {
-            $parts[] = $units[$tens] . ' mươi';
+    /**
+     * Đọc 1 chunk (0..999)
+     *
+     * @param int $num
+     * @param array $units (index 0 = 'không', 1='một' ...)
+     * @param bool $isFirstChunk true nếu đây là chunk trái nhất (không in "không trăm" ở đầu)
+     * @return string
+     */
+    if (! function_exists('_read_chunk')) {
+        function _read_chunk(int $num, array $units, bool $isFirstChunk = false): string
+        {
+            $hundreds = (int) floor($num / 100);
+            $tensUnits = $num % 100;
+            $tens = (int) floor($tensUnits / 10);
+            $unit = $tensUnits % 10;
+            $parts = [];
 
-            // unit special cases
-            if ($unit === 1) {
-                $parts[] = 'mốt';
-            } elseif ($unit === 4) {
-                // 'tư' is used in some dialects (24 = hai mươi tư). If you prefer 'bốn', change here.
-                $parts[] = 'tư';
-            } elseif ($unit === 5) {
-                $parts[] = 'lăm';
-            } elseif ($unit > 0) {
-                $parts[] = $units[$unit];
+            // hundreds
+            if ($hundreds > 0) {
+                $parts[] = $units[$hundreds] . ' trăm';
+            } elseif ($tensUnits > 0 && !$isFirstChunk) {
+                // chỉ thêm "không trăm" nếu không phải chunk đầu
+                $parts[] = 'không trăm';
             }
-        } elseif ($tens === 1) {
-            $parts[] = 'mười';
-            if ($unit === 5) {
-                $parts[] = 'lăm';
-            } elseif ($unit > 0) {
-                $parts[] = $units[$unit];
-            }
-        } else { // tens == 0
-            if ($unit > 0) {
-                if ($hundreds > 0) {
-                    // e.g., 105 -> 'một trăm lẻ năm'
-                    $parts[] = 'lẻ ' . $units[$unit];
-                } else {
-                    // e.g., 5 -> 'năm'
+
+            // tens and units
+            if ($tens > 1) {
+                $parts[] = $units[$tens] . ' mươi';
+
+                // unit special cases
+                if ($unit === 1) {
+                    $parts[] = 'mốt';
+                } elseif ($unit === 4) {
+                    // 'tư' is used in some dialects (24 = hai mươi tư). If you prefer 'bốn', change here.
+                    $parts[] = 'tư';
+                } elseif ($unit === 5) {
+                    $parts[] = 'lăm';
+                } elseif ($unit > 0) {
                     $parts[] = $units[$unit];
                 }
+            } elseif ($tens === 1) {
+                $parts[] = 'mười';
+                if ($unit === 5) {
+                    $parts[] = 'lăm';
+                } elseif ($unit > 0) {
+                    $parts[] = $units[$unit];
+                }
+            } else { // tens == 0
+                if ($unit > 0) {
+                    if ($hundreds > 0) {
+                        // e.g., 105 -> 'một trăm lẻ năm'
+                        $parts[] = 'lẻ ' . $units[$unit];
+                    } else {
+                        // e.g., 5 -> 'năm'
+                        $parts[] = $units[$unit];
+                    }
+                }
             }
-        }
 
-        return trim(implode(' ', $parts));
+            return trim(implode(' ', $parts));
+        }
     }
-}
