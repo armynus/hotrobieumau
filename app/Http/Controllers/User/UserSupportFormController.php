@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
+use App\Http\Controllers\Controller;
+
 use \App\Services\FormUsageService;
 use \App\Services\SupportFormService;
 use App\Models\SupportForm;
@@ -228,7 +230,7 @@ class UserSupportFormController extends Controller
                 $customerDN = CustomerInfo::where('custno', $custnoKHDN)->first();
 
                 $dataDN = [
-                    'custno'        => $formData['MaKHDN'],
+                    'custno'        => $custnoKHDN,
                     'nameloc'       => $formData['TenDoanhNghiep'] ?? '',
                     'phone_no'      => $formData['SoDienThoai'] ?? '',
                     'custtpcd'      => $formData['custtpcd'] ?? 'KHDN',
@@ -242,7 +244,7 @@ class UserSupportFormController extends Controller
                     'busno_date'    => $this->supportformService->formatDateIfNeeded($formData['NgayCapDKKD'] ?? ''),
                     'busno_place'   => $formData['NoiCapDKKD'] ?? '',
                 ];
-
+            
                 if ($customerDN) {
                     $updateData = [];
                     foreach ($dataDN as $field => $value) {
@@ -464,8 +466,10 @@ class UserSupportFormController extends Controller
                 
                 // Gán giá trị cuối cùng cho placeholder có tên trùng với $key
                 // $templateProcessor->setValue($key, (string) ($value ?? ' '));
-                $templateProcessor->setValue($key, (string)$value);
-
+                $templateProcessor->setValue(
+                    $key,
+                    $this->supportformService->wordSafe($value)
+                );
                 // Nếu có key branch, tạo thêm biến 'ChiNhanhHOA' với giá trị được chuyển thành in hoa
                 if ($key === 'branch') {
                     $templateProcessor->setValue('ChiNhanhHOA', (string)$this->supportformService->convertToUppercase($value) ?? ' ');

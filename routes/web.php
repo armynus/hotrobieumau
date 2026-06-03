@@ -1,27 +1,30 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\BranchController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\AccountController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\LoginAdminController;
-use App\Http\Controllers\LoginUserController;
-use App\Http\Controllers\AdminUserController;
-use App\Http\Controllers\SupportFormController;
-use App\Http\Controllers\UserSupportFormController;
-use App\Http\Controllers\UserSearchController;
-use App\Http\Controllers\AdminFormFieldController;
-use App\Http\Controllers\AdminFormTypeController;
-use App\Http\Controllers\AdminSupFormTypeController;
-use App\Http\Controllers\ScanQRCodeController;
-use App\Http\Controllers\MergerLookupController;
-use App\Http\Controllers\FormDraftController;
+
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminFormFieldController;
+use App\Http\Controllers\Admin\AdminFormTypeController;
+use App\Http\Controllers\Admin\AdminSupFormTypeController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\LoginAdminController;
+use App\Http\Controllers\Admin\BranchController;
+use App\Http\Controllers\Admin\SupportFormController;
+
+use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\User\CustomerController;
+use App\Http\Controllers\User\AccountController;
+use App\Http\Controllers\User\LoginUserController;
+use App\Http\Controllers\User\UserSupportFormController;
+use App\Http\Controllers\User\UserSearchController;
+use App\Http\Controllers\User\ScanQRCodeController;
+use App\Http\Controllers\User\MergerLookupController;
+use App\Http\Controllers\User\FormDraftController;
 
 Route::get('login_admin', [LoginAdminController::class, 'login_admin'])->name('login_admin');
 Route::post('logins_admin', [LoginAdminController::class, 'logins_admin'])->name('logins_admin');
 
+// Các route khác dành cho người dùng và quản trị viên sẽ được đặt trong các nhóm middleware tương ứng
 Route::group(['middleware' => ['admin']], function () {
     Route::get('logout_admin', [LoginAdminController::class, 'logout_admin'])->name('logout_admin');
     Route::get('change_password_admin/{admin_id}', [LoginAdminController::class, 'change_password_admin'])->name('change_password_admin');
@@ -66,7 +69,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('admin/sup_form_type/update', [AdminSupFormTypeController::class, 'update'])->name('supformtype.update');
     Route::post('admin/sup_form_type/delete', [AdminSupFormTypeController::class, 'delete'])->name('supformtype.delete');
 }); 
-
+// Các route khác dành cho người dùng sẽ được đặt trong nhóm middleware 'tenant' để đảm bảo rằng chỉ người dùng đã đăng nhập mới có thể truy cập
 Route::get('login', [LoginUserController::class, 'login'])->name('login');
 Route::post('logins', [LoginUserController::class, 'logins'])->name('logins');
 Route::group(['middleware'=> ['tenant']], function(){
@@ -120,4 +123,8 @@ Route::group(['middleware'=> ['tenant']], function(){
         Route::post('uploadfile_customer', [CustomerController::class, 'uploadfile_customer'])->name('uploadfile_customer');
         Route::post('uploadfile_account', [AccountController::class, 'uploadfile_account'])->name('uploadfile_account');
     });
+
+    // Route văn thư quản lý văn bản
+    Route::get('documents/forward', [UserController::class, 'documents_forward'])->name('documents_forward');
+    
 });

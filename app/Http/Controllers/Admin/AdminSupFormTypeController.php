@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
+use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use App\Models\SupFormType;
@@ -156,7 +157,6 @@ class AdminSupFormTypeController extends Controller
                 ->select(['id', 'name', 'form_type_id', 'description', 'created_at', 'updated_at']);
 
             return DataTables::of($supformtype)
-                // Thêm cột form_type_name từ relationship
                 ->addIndexColumn()
                 ->addColumn('form_type_name', function (SupFormType $row) {
                     return optional($row->FormType)->type_name;

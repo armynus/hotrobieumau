@@ -36,4 +36,14 @@ class AppServiceProvider extends ServiceProvider
             return "<?php echo request()->routeIs({$expression}) ? 'show' : ''; ?>";
         });
     }
+    public function wordSafe($value)
+    {
+        $value = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/u', '', (string)$value);
+
+        return htmlspecialchars(
+            $value,
+            ENT_XML1 | ENT_QUOTES,
+            'UTF-8'
+        );
+    }
 }

@@ -8,6 +8,20 @@ use Illuminate\Support\Facades\Session;
 
 class SupportFormService
 {
+    public function wordSafe($value)
+    {
+        $value = preg_replace(
+            '/[\x00-\x08\x0B\x0C\x0E-\x1F]/u',
+            '',
+            (string)$value
+        );
+
+        return htmlspecialchars(
+            $value,
+            ENT_XML1 | ENT_QUOTES,
+            'UTF-8'
+        );
+    }
     // Ham xu ly checkbox
     public function updateCheckboxContentControl($docxPath, $tag, $isChecked) {
         $zip = new \ZipArchive();
