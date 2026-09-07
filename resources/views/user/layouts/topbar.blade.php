@@ -54,22 +54,36 @@
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i  class="fas fa-bell fa-fw" ></i>
             <!-- Counter - Alerts -->
-            <span data-count="0"  class="badge badge-danger badge-counter"></span>
-        
-
+            @if(isset($unreadCount) && $unreadCount > 0)
+                <span class="badge badge-danger badge-counter">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+            @endif
         </a>
         <!-- Dropdown - Alerts -->
         <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-            aria-labelledby="alertsDropdown" style="overflow: scroll; height:330px">
+            aria-labelledby="alertsDropdown" style="max-height: 330px; overflow-y: auto;">
             <h6 class="dropdown-header">
-                Thông báo gần đây
+                Văn bản chưa đọc
             </h6>
-            <span class="dropdown-notification" style="widht:100%; height:100%;">
-                
-                
-            </span>
             
-            <a class="dropdown-item text-center small text-gray-500" href="#">Xem Tất Cả</a>
+            @if(isset($latestUnreadDocs) && $latestUnreadDocs->count() > 0)
+                @foreach($latestUnreadDocs as $doc)
+                <a class="dropdown-item d-flex align-items-center" href="{{ route('document_detail', $doc->id) }}">
+                    <div class="mr-3">
+                        <div class="icon-circle {{ $doc->visibility === \App\Models\Document::VISIBILITY_SYSTEM ? 'bg-danger' : 'bg-primary' }}">
+                            <i class="fas fa-file-alt text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="small text-gray-500">{{ \Carbon\Carbon::parse($doc->issued_date ?? $doc->created_at)->format('d/m/Y') }}</div>
+                        <span class="font-weight-bold">{{ \Illuminate\Support\Str::limit($doc->document_code ?: 'Chưa cập nhật số, ký hiệu', 40) }}</span>
+                    </div>
+                </a>
+                @endforeach
+            @else
+                <a class="dropdown-item text-center small text-gray-500" href="#">Không có văn bản mới</a>
+            @endif
+            
+            <a class="dropdown-item text-center small text-gray-500" href="{{ route('documents_incoming') }}">Xem Tất Cả</a>
         </div>
     </li>
 

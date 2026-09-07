@@ -29,7 +29,7 @@ class FormDraftController extends Controller
         $userId = Session::get('user_id');
         if (!$userId) return response()->json(null, 204);
 
-        $draft = FormDraft::where('user_id', $userId)->where('form_key', $formKey)->first();
+        $draft = FormDraft::query()->where('user_id', $userId)->where('form_key', $formKey)->first();
         if (!$draft) return response()->json(null, 204);
 
         return response()->json(['payload' => $draft->payload]);

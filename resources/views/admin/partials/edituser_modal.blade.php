@@ -37,9 +37,34 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="edit_role_id">Chức Vụ</label>
-                    <select class="form-control" id="edit_role_id" name="edit_role_id">
+                    <label for="edit_department_id">Phòng Ban</label>
+                    <select class="form-control" id="edit_department_id" name="edit_department_id">
+                        <option value="">Chọn phòng ban</option>
+                        @foreach($list_department as $dept)
+                        <option value="{{$dept->id}}">{{$dept->department_name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit_position_id">Chức Vụ Thực Tế</label>
+                    <select class="form-control" id="edit_position_id" name="edit_position_id">
                         <option value="">Chọn chức vụ</option>
+                        @foreach($list_position as $pos)
+                        <option value="{{$pos->id}}">{{$pos->position_name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit_document_role">Vai Trò Văn Thư</label>
+                    <select class="form-control" id="edit_document_role" name="edit_document_role">
+                        <option value="user">Người dùng bình thường (Chỉ xem)</option>
+                        <option value="clerk">Văn thư (Đăng tải & Phân phối)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit_role_id">Quyền Hệ Thống</label>
+                    <select class="form-control" id="edit_role_id" name="edit_role_id">
+                        <option value="">Chọn quyền</option>
                         <option value="1">Kiểm soát</option>
                         <option value="2">Nhân viên</option>
                     </select>

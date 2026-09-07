@@ -7,19 +7,26 @@ use App\Http\Controllers\Admin\AdminFormFieldController;
 use App\Http\Controllers\Admin\AdminFormTypeController;
 use App\Http\Controllers\Admin\AdminSupFormTypeController;
 use App\Http\Controllers\Admin\AdminUserController;
-use App\Http\Controllers\Admin\LoginAdminController;
+use App\Http\Controllers\Admin\AdminDepartmentController;
+use App\Http\Controllers\Admin\AdminPositionController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\SupportFormController;
+
+use App\Http\Controllers\Auth\LoginAdminController;
+use App\Http\Controllers\Auth\LoginUserController;
 
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\CustomerController;
 use App\Http\Controllers\User\AccountController;
-use App\Http\Controllers\User\LoginUserController;
 use App\Http\Controllers\User\UserSupportFormController;
 use App\Http\Controllers\User\UserSearchController;
 use App\Http\Controllers\User\ScanQRCodeController;
 use App\Http\Controllers\User\MergerLookupController;
 use App\Http\Controllers\User\FormDraftController;
+use App\Http\Controllers\User\DocumentController;
+use App\Http\Controllers\User\DocumentApiController;
+use App\Http\Controllers\User\DocumentExportController;
+
 
 Route::get('login_admin', [LoginAdminController::class, 'login_admin'])->name('login_admin');
 Route::post('logins_admin', [LoginAdminController::class, 'logins_admin'])->name('logins_admin');
@@ -42,6 +49,18 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('admin_user_edit', [AdminUserController::class, 'edit'])->name('admin_user_edit');
     Route::post('admin_user_update', [AdminUserController::class, 'update'])->name('admin_user_update');
     Route::post('admin_user_lock', [AdminUserController::class, 'lock'])->name('admin_user_lock');
+
+    // Department Routes
+    Route::get('admin_department_list', [AdminDepartmentController::class, 'index'])->name('admin_department_list');
+    Route::post('admin_department_store', [AdminDepartmentController::class, 'store'])->name('admin_department_store');
+    Route::get('admin_department_edit', [AdminDepartmentController::class, 'edit'])->name('admin_department_edit');
+    Route::post('admin_department_update', [AdminDepartmentController::class, 'update'])->name('admin_department_update');
+
+    // Position Routes
+    Route::get('admin_position_list', [AdminPositionController::class, 'index'])->name('admin_position_list');
+    Route::post('admin_position_store', [AdminPositionController::class, 'store'])->name('admin_position_store');
+    Route::get('admin_position_edit', [AdminPositionController::class, 'edit'])->name('admin_position_edit');
+    Route::post('admin_position_update', [AdminPositionController::class, 'update'])->name('admin_position_update');
 
     Route::get('admin/forms', [AdminController::class, 'admin_forms'])->name('admin_forms');
     Route::post('support_forms_create', [SupportFormController::class, 'support_forms_create'])->name('support_forms_create');
@@ -125,6 +144,26 @@ Route::group(['middleware'=> ['tenant']], function(){
     });
 
     // Route văn thư quản lý văn bản
-    Route::get('documents/forward', [UserController::class, 'documents_forward'])->name('documents_forward');
+    Route::get('documents/forward', [DocumentController::class, 'documents_forward'])->name('documents_forward');
+    Route::get('documents/incoming', [DocumentController::class, 'incomingDocuments'])->name('documents_incoming');
+    Route::get('documents/outgoing', [DocumentController::class, 'outgoingDocuments'])->name('documents_outgoing');
+    Route::get('documents/register', [DocumentController::class, 'document_register'])->name('document_register');
+    Route::get('documents/incoming/register', [DocumentController::class, 'registerIncoming'])->name('documents_incoming_register');
+    Route::get('documents/outgoing/register', [DocumentController::class, 'registerOutgoing'])->name('documents_outgoing_register');
+    Route::get('documents/reports', [DocumentController::class, 'document_reports'])->name('document_reports');
+    Route::post('documents/export', DocumentExportController::class)
+        ->middleware('throttle:3,1')
+        ->name('documents_export');
+    Route::get('documents/{id}', [DocumentController::class, 'document_detail'])->name('document_detail');
+
+    // Các Route API cho hệ thống Văn bản mới xây dựng
+    Route::prefix('api/documents')->group(function () {
+        Route::get('/', [DocumentApiController::class, 'index'])->name('api.documents.index');
+        Route::post('/', [DocumentApiController::class, 'store'])->name('api.documents.store');
+        Route::get('/{id}', [DocumentApiController::class, 'show'])->name('api.documents.show');
+        Route::put('/{id}', [DocumentApiController::class, 'update'])->name('api.documents.update');
+        Route::delete('/{id}', [DocumentApiController::class, 'destroy'])->name('api.documents.destroy');
+        Route::post('/{id}/transfer', [DocumentApiController::class, 'transfer'])->name('api.documents.transfer');
+    });
     
 });

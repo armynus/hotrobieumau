@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Users;
 use App\Models\Branches;
+use App\Models\Department;
+use App\Models\Position;
 use Illuminate\Support\Facades\Hash;
 
 class AdminUserController extends Controller
@@ -18,7 +20,9 @@ class AdminUserController extends Controller
             ->orderBy('users.id', 'asc')
             ->get();
         $list_branch = Branches::select('id', 'branch_name')->get();
-        return view('admin.users.list_user', compact('list_user','list_branch'));
+        $list_department = Department::select('id', 'department_name')->get();
+        $list_position = Position::select('id', 'position_name')->get();
+        return view('admin.users.list_user', compact('list_user','list_branch', 'list_department', 'list_position'));
     }
     function store(Request $request){
         if( Users::where('email', $request->email)->first()){
@@ -33,7 +37,10 @@ class AdminUserController extends Controller
             'password' => Hash::make($request->password),
             'status' => 'active',      //0 đã kích hoạt, 1 chưa kích hoạt
             'role_id' => $request->role_id,     //1 là nhân viên, 0 là quản trị viên
-            'branch_id' => $request->branch_id
+            'branch_id' => $request->branch_id,
+            'department_id' => $request->department_id,
+            'position_id' => $request->position_id,
+            'document_role' => $request->document_role ?? 'user',
         ]);
         if($request->role_id == 0){
             $role_name = 'Quản trị viên';
@@ -52,7 +59,7 @@ class AdminUserController extends Controller
         ]);
     }
     function edit(Request $request){
-        $user = Users::where('id', $request->user_id)->select('id', 'name', 'email', 'branch_id','role_id')->first();
+        $user = Users::where('id', $request->user_id)->select('id', 'name', 'email', 'branch_id','role_id', 'department_id', 'position_id', 'document_role')->first();
         return response()->json([
             'user' => $user
         ]);
@@ -63,6 +70,9 @@ class AdminUserController extends Controller
         $user->email = $request->email;
         $user->branch_id = $request->branch_id;
         $user->role_id = $request->role_id;
+        $user->department_id = $request->department_id;
+        $user->position_id = $request->position_id;
+        $user->document_role = $request->document_role ?? 'user';
         
         // Kiểm tra nếu mật khẩu được gửi lên và không rỗng
         if ($request->filled('password')) {

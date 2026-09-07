@@ -44,17 +44,19 @@
             </li> --}}
 
             <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item {{ request()->routeIs('admin_list_staff', 'admin_list_staff') ? '' : 'active' }}">
-                <a class="nav-link  {{ request()->routeIs('admin_list_staff', 'admin_list_staff') ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseTwo"
+            <li class="nav-item {{ request()->routeIs('admin_list_staff', 'admin_department_list', 'admin_position_list') ? 'active' : '' }}">
+                <a class="nav-link  {{ request()->routeIs('admin_list_staff', 'admin_department_list', 'admin_position_list') ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
                         <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
                       </svg>
                     <span>Qlý người dùng</span>
                 </a>
-                <div id="collapseTwo" class="collapse @menuOpen('admin_list_staff', 'admin_list_staff')" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseTwo" class="collapse {{ request()->routeIs('admin_list_staff', 'admin_department_list', 'admin_position_list') ? 'show' : '' }}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item @active('admin_list_staff')" href="{{route('admin_list_staff')}}">Danh sách tài khoản</a>
+                        <a class="collapse-item {{ request()->routeIs('admin_list_staff') ? 'active' : '' }}" href="{{route('admin_list_staff')}}">Danh sách tài khoản</a>
+                        <a class="collapse-item {{ request()->routeIs('admin_department_list') ? 'active' : '' }}" href="{{route('admin_department_list')}}">Phòng ban</a>
+                        <a class="collapse-item {{ request()->routeIs('admin_position_list') ? 'active' : '' }}" href="{{route('admin_position_list')}}">Chức vụ</a>
                     </div>
                 </div>
             </li>

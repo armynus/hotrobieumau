@@ -23,6 +23,27 @@ class AppServiceProvider extends ServiceProvider
     {
         require_once app_path('Helpers/helpers.php');
 
+        // Gắn dữ liệu thông báo vào Topbar của user
+        \Illuminate\Support\Facades\View::composer('user.layouts.topbar', function ($view) {
+            $userId = \Illuminate\Support\Facades\Session::get('user_id');
+            if ($userId) {
+                $user = \App\Models\User::find($userId);
+                if ($user) {
+                    $docQueryService = app(\App\Services\DocumentQueryService::class);
+                    // Lấy các văn bản chưa đọc
+                    $query = $docQueryService->getDocumentsForUser($user, [
+                        'is_read' => false,
+                        'exclude_archive_imports' => true,
+                    ]);
+                    $unreadCount = $query->count();
+                    $latestUnreadDocs = $query->orderBy('created_at', 'desc')->take(5)->get();
+
+                    $view->with('unreadCount', $unreadCount)
+                         ->with('latestUnreadDocs', $latestUnreadDocs);
+                }
+            }
+        });
+
         
         // Active cho từng item con
         // Dùng: @active('tên_route')

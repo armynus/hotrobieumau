@@ -15,6 +15,4 @@ class Users extends Model
     {
         return $this->hasMany(SupportFormUsage::class, 'user_id');
     }
-
-    
 }

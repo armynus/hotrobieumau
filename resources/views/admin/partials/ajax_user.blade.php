@@ -16,6 +16,9 @@
                 $('#edit_branch').val(data.user.branch_id);
                 $('#edit_user_id').val(data.user.id);
                 $('#edit_role_id').val(data.user.role_id);
+                $('#edit_department_id').val(data.user.department_id);
+                $('#edit_position_id').val(data.user.position_id);
+                $('#edit_document_role').val(data.user.document_role);
             },
             error: function(data){
                 console.log(data);
@@ -109,6 +112,9 @@
             var password = $('#edit_password').val();
             var branch_id = $('#edit_branch').val();
             var role_id = $('#edit_role_id').val();
+            var department_id = $('#edit_department_id').val();
+            var position_id = $('#edit_position_id').val();
+            var document_role = $('#edit_document_role').val();
             
             // Danh sách điều kiện kiểm tra
             var errors = [
@@ -137,6 +143,9 @@
                     password: password,
                     branch_id: branch_id,
                     role_id: role_id,
+                    department_id: department_id,
+                    position_id: position_id,
+                    document_role: document_role,
                 },
                 success: function(data) {
                     if (!data.status) {
@@ -202,6 +211,9 @@
             var password = $('#password').val();
             var branch_id = $('#branch').val();
             var role_id = $('#role_id').val();
+            var department_id = $('#department_id').val();
+            var position_id = $('#position_id').val();
+            var document_role = $('#document_role').val();
             // Danh sách điều kiện kiểm tra
             var errors = [
                 { condition: !name, message: "Vui lòng nhập tên nhân viên" },
@@ -230,6 +242,9 @@
                     password: password,
                     branch_id: branch_id,
                     role_id: role_id,
+                    department_id: department_id,
+                    position_id: position_id,
+                    document_role: document_role,
                 },
                 success: function(data) {
                     if (!data.status) {
@@ -306,6 +321,9 @@
                         $('#email').val('');
                         $('#password').val('');
                         $('#branch').val('');
+                        $('#department_id').val('');
+                        $('#position_id').val('');
+                        $('#document_role').val('user');
                     });
                 },
                 error: function(data){
