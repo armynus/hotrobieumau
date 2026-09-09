@@ -119,9 +119,16 @@
     <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
         <form id="editDocumentForm">
             @csrf
-            <input type="hidden" name="direction">
-            <div class="modal-header"><h5 class="modal-title">Chỉnh sửa văn bản</h5><button type="button" class="close" data-dismiss="modal"><span>&times;</span></button></div>
+            <div class="modal-header"><h5 class="modal-title" id="editDocumentModalTitle">Chỉnh sửa văn bản</h5><button type="button" class="close" data-dismiss="modal"><span>&times;</span></button></div>
             <div class="modal-body">
+                <div class="form-group">
+                    <label>Phân loại văn bản <span class="text-danger">*</span></label>
+                    <select class="form-control" name="direction" required>
+                        <option value="incoming">Văn bản đến</option>
+                        <option value="outgoing">Văn bản đi</option>
+                        <option value="unclassified">Chưa phân loại</option>
+                    </select>
+                </div>
                 <div class="form-group"><label>Trích yếu (Tiêu đề) <span class="text-danger">*</span></label><textarea class="form-control" name="title" rows="3" required maxlength="5000"></textarea></div>
                 <div class="form-row">
                     <div class="form-group col-md-4 incoming-edit-field"><label>Số đến</label><input type="text" class="form-control" name="registry_number" maxlength="255"></div>
@@ -136,7 +143,7 @@
                     <div class="form-group col-md-6"><label>Mức độ ưu tiên</label><select class="form-control" name="priority" required><option value="normal">Bình thường</option><option value="urgent">Khẩn</option><option value="very_urgent">Hỏa tốc</option></select></div>
                     <div class="form-group col-md-6"><label>Độ mật</label><select class="form-control" name="security_level" required><option value="normal">Bình thường</option><option value="confidential">Mật</option><option value="secret">Tối mật</option><option value="top_secret">Tuyệt mật</option></select></div>
                 </div>
-                <div class="form-group"><label>Nơi / Đơn vị nhận văn bản</label><textarea class="form-control" name="recipient" rows="3" maxlength="5000"></textarea></div>
+                <div class="form-group"><label id="editRecipientLabel">Nơi / Đơn vị nhận văn bản</label><textarea class="form-control" name="recipient" rows="3" maxlength="5000"></textarea></div>
                 <div class="form-group outgoing-edit-field"><label>Đơn vị, người nhận bản lưu</label><textarea class="form-control" name="archive_recipient" rows="2" maxlength="5000"></textarea></div>
                 <div class="form-group"><label>Ký nhận</label><input type="text" class="form-control" name="receipt_signature" maxlength="255"></div>
                 <div class="form-group"><label>Mức độ công khai</label><select class="form-control" name="is_public_level" required><option value="0">Bình thường</option><option value="1">Công khai nội bộ chi nhánh</option><option value="2">Công khai toàn hệ thống</option></select></div>
@@ -236,6 +243,27 @@ $(document).ready(function() {
         });
     }
 
+    function ajaxErrorMessage(xhr, fallback) {
+        const response = xhr.responseJSON || {};
+        if (response.errors) {
+            const messages = Object.keys(response.errors).reduce(function(result, field) {
+                return result.concat(response.errors[field] || []);
+            }, []);
+            if (messages.length) return messages.join('\n');
+        }
+
+        return response.message || fallback;
+    }
+
+    function toggleEditDirectionFields(direction) {
+        const incoming = direction === 'incoming';
+        const outgoing = direction === 'outgoing';
+        $('.incoming-edit-field').toggle(incoming);
+        $('.outgoing-edit-field').toggle(outgoing);
+        $('#editDocumentModalTitle').text(outgoing ? 'Chỉnh sửa văn bản đi' : (incoming ? 'Chỉnh sửa văn bản đến' : 'Chỉnh sửa văn bản chưa phân loại'));
+        $('#editRecipientLabel').text(outgoing ? 'Nơi nhận văn bản' : (incoming ? 'Đơn vị hoặc người nhận' : 'Nơi gửi / nơi nhận'));
+    }
+
     function populateEditForm(doc) {
         const form = $('#editDocumentForm');
         ['title', 'registry_number', 'document_code', 'issuing_agency', 'signer', 'recipient', 'archive_recipient', 'copy_count', 'receipt_signature', 'notes'].forEach(function(field) { form.find('[name="' + field + '"]').val(doc[field] || ''); });
@@ -249,28 +277,34 @@ $(document).ready(function() {
         form.find('[name="priority"]').val(doc.priority || 'normal');
         form.find('[name="security_level"]').val(doc.security_level || 'normal');
         form.find('[name="is_public_level"]').val(doc.visibility === 'system' ? '2' : (doc.visibility === 'branch' ? '1' : '0'));
-        form.find('[name="direction"]').val(doc.direction || 'incoming');
-        $('.incoming-edit-field').toggle(doc.direction !== 'outgoing');
-        $('.outgoing-edit-field').toggle(doc.direction === 'outgoing');
+        const direction = doc.direction || 'unclassified';
+        form.find('[name="direction"]').val(direction);
+        toggleEditDirectionFields(direction);
     }
+
+    $('#editDocumentForm [name="direction"]').on('change', function() {
+        toggleEditDirectionFields(this.value);
+    });
 
     function bindDocument(doc, capabilities) {
         const visibility = visibilityLabel(doc);
+        const isIncoming = doc.direction === 'incoming';
         const isOutgoing = doc.direction === 'outgoing';
         $('#docTitle').text(doc.document_code || 'Chưa cập nhật số, ký hiệu');
         $('#documentSubTitle').text('Cập nhật lần cuối: ' + formatDate(doc.updated_at, true));
         $('#docVisibility').removeClass('badge-danger badge-primary badge-secondary').addClass(visibility.className).text(visibility.text);
-        const directionText = isOutgoing ? 'Văn bản đi' : 'Văn bản đến';
-        $('#docDirection').removeClass('badge-primary badge-success').addClass(isOutgoing ? 'badge-success' : 'badge-primary').text(directionText);
+        const directionText = isOutgoing ? 'Văn bản đi' : (isIncoming ? 'Văn bản đến' : 'Chưa phân loại');
+        const directionClass = isOutgoing ? 'badge-success' : (isIncoming ? 'badge-primary' : 'badge-secondary');
+        $('#docDirection').removeClass('badge-primary badge-success badge-secondary').addClass(directionClass).text(directionText);
         $('#docDirectionText').text(directionText);
         $('#docDocumentType').text((doc.document_type && doc.document_type.name) || '---');
-        $('.incoming-meta').toggle(!isOutgoing); $('.outgoing-meta').toggle(isOutgoing);
+        $('.incoming-meta').toggle(isIncoming); $('.outgoing-meta').toggle(isOutgoing);
         $('#backToDocumentList').attr('href', @json(route('documents_forward')));
         $('#docRegistryNumber').text(doc.registry_number || '---'); $('#docContentTitle').text(doc.title || 'Chưa cập nhật trích yếu');
         $('#docReceivedDate').text(formatDate(doc.received_date, false)); $('#docIssuedDate').text(formatDate(doc.issued_date, false));
         $('#docForwardedDate').text(formatDate(doc.forwarded_date, false)); $('#docAgency').text(doc.issuing_agency || '---');
         $('#docSigner').text(doc.signer || '---'); $('#docCopyCount').text(doc.copy_count || '---');
-        $('#docRecipientLabel').text(isOutgoing ? 'Nơi nhận văn bản' : 'Đơn vị hoặc người nhận');
+        $('#docRecipientLabel').text(isOutgoing ? 'Nơi nhận văn bản' : (isIncoming ? 'Đơn vị hoặc người nhận' : 'Nơi gửi / nơi nhận'));
         $('#docRecipient').text(doc.recipient || '---'); $('#docArchiveRecipient').text(doc.archive_recipient || '---');
         $('#docReceiptSignature').text(doc.receipt_signature || '---'); $('#docCreator').text((doc.creator && doc.creator.name) || '---');
         $('#docNotes').text(doc.notes || '---');
@@ -331,7 +365,7 @@ $(document).ready(function() {
         const button = $('#btnEditSubmit').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang lưu...');
         $.ajax({ url: '/api/documents/' + docId, type: 'PUT', data: $(this).serialize() }).done(function(response) {
             $('#editDocumentModal').modal('hide'); Swal.fire('Thành công', response.message, 'success'); loadDocument();
-        }).fail(function(xhr) { Swal.fire('Lỗi', (xhr.responseJSON && xhr.responseJSON.message) || 'Không thể cập nhật văn bản.', 'error'); })
+        }).fail(function(xhr) { Swal.fire('Lỗi', ajaxErrorMessage(xhr, 'Không thể cập nhật văn bản.'), 'error'); })
           .always(function() { button.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Lưu thay đổi'); });
     });
 

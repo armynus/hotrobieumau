@@ -60,6 +60,12 @@ class ImportDocumentArchiveTest extends TestCase
             'received_date' => null,
             'forwarded_date' => '2026-01-05',
         ], $command->archiveDateFields('2026-01-05', Document::DIRECTION_OUTGOING));
+
+        $this->assertSame([
+            'issued_date' => null,
+            'received_date' => null,
+            'forwarded_date' => null,
+        ], $command->archiveDateFields('2026-01-05', Document::DIRECTION_UNCLASSIFIED));
     }
 
     public function test_it_classifies_files_in_a_shared_folder_from_both_ledgers(): void
@@ -102,6 +108,25 @@ class ImportDocumentArchiveTest extends TestCase
 
         $this->assertNull($result['direction']);
         $this->assertTrue($result['ambiguous']);
+    }
+
+    public function test_it_keeps_unmatched_and_ambiguous_files_as_unclassified_when_requested(): void
+    {
+        $command = new ImportDocumentArchive;
+        $matcher = new DocumentLedgerMatcher;
+        $row = ['document_code' => '01/NHNo-TH'];
+        $indexes = [
+            Document::DIRECTION_INCOMING => $matcher->index([$row + ['received_date' => '2026-01-05']]),
+            Document::DIRECTION_OUTGOING => $matcher->index([$row + ['forwarded_date' => '2026-01-05']]),
+        ];
+
+        $unmatched = $command->classifyDocument('KHONG-CO-TRONG-SO', '2026-01-05', 'auto', 'unclassified', $indexes, $matcher);
+        $ambiguous = $command->classifyDocument('01-NHNo-TH', '2026-01-05', 'auto', 'unclassified', $indexes, $matcher);
+
+        $this->assertSame(Document::DIRECTION_UNCLASSIFIED, $unmatched['direction']);
+        $this->assertFalse($unmatched['ambiguous']);
+        $this->assertSame(Document::DIRECTION_UNCLASSIFIED, $ambiguous['direction']);
+        $this->assertTrue($ambiguous['ambiguous']);
     }
 
     public function test_ledger_matcher_rejects_a_single_historical_row_far_from_the_archive_date(): void

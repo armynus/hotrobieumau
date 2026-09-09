@@ -133,11 +133,11 @@ class DocumentApiController extends Controller
             'registry_number' => 'required_if:direction,incoming|nullable|string|max:255',
             'document_code' => 'required|string|max:255',
             'document_type_id' => 'nullable|integer|exists:document_types,id',
-            'issued_date' => 'nullable|date',
+            'issued_date' => 'required|date',
             'received_date' => 'required_if:direction,incoming|nullable|date',
             'forwarded_date' => 'required_if:direction,outgoing|nullable|date',
-            'issuing_agency' => 'required_if:direction,incoming|nullable|string|max:255',
-            'signer' => 'required_if:direction,outgoing|nullable|string|max:255',
+            'issuing_agency' => 'nullable|string|max:255',
+            'signer' => 'nullable|string|max:255',
             'recipient' => 'nullable|string|max:5000',
             'archive_recipient' => 'nullable|string|max:5000',
             'copy_count' => 'nullable|integer|min:1|max:100000',
@@ -145,11 +145,14 @@ class DocumentApiController extends Controller
             'notes' => 'nullable|string|max:5000',
             'priority' => 'nullable|in:normal,urgent,very_urgent',
             'security_level' => 'nullable|in:normal,confidential,secret,top_secret',
-            'files' => 'required|array',
+            'files' => 'nullable|array',
             'files.*' => 'file|max:51200', // 50MB max per file
             'is_public_level' => 'required|in:0,1,2',
             'to_branch_ids' => 'nullable|array',
             'to_branch_ids.*' => 'integer|distinct',
+        ], [
+            'issued_date.required' => 'Vui lòng nhập ngày, tháng văn bản.',
+            'issued_date.date' => 'Ngày, tháng văn bản không hợp lệ.',
         ]);
 
         try {
@@ -170,7 +173,7 @@ class DocumentApiController extends Controller
             $data['visibility'] = $visibility;
             $data['managing_branch_id'] = $user->branch_id;
 
-            $createResult = $this->documentService->createDocument($data, $request->file('files'), $user);
+            $createResult = $this->documentService->createDocument($data, $request->file('files') ?? [], $user);
             $document = $createResult['document'];
             $renamedFiles = $createResult['renamed_files'];
 
@@ -282,21 +285,17 @@ class DocumentApiController extends Controller
             ], 403);
         }
 
-        $direction = $document->direction ?: Document::DIRECTION_INCOMING;
-        $incomingRequired = $direction === Document::DIRECTION_INCOMING ? 'required' : 'nullable';
-        $outgoingRequired = $direction === Document::DIRECTION_OUTGOING ? 'required' : 'nullable';
-
         $validated = $request->validate([
-            'direction' => 'nullable|in:incoming,outgoing',
+            'direction' => 'required|in:incoming,outgoing,unclassified',
             'title' => 'required|string|max:5000',
-            'registry_number' => $incomingRequired.'|string|max:255',
+            'registry_number' => 'nullable|string|max:255',
             'document_code' => 'required|string|max:255',
             'document_type_id' => 'nullable|integer|exists:document_types,id',
             'issued_date' => 'nullable|date',
-            'received_date' => $incomingRequired.'|date',
-            'forwarded_date' => $outgoingRequired.'|date',
-            'issuing_agency' => $incomingRequired.'|string|max:255',
-            'signer' => $outgoingRequired.'|string|max:255',
+            'received_date' => 'nullable|date',
+            'forwarded_date' => 'nullable|date',
+            'issuing_agency' => 'nullable|string|max:255',
+            'signer' => 'nullable|string|max:255',
             'recipient' => 'nullable|string|max:5000',
             'archive_recipient' => 'nullable|string|max:5000',
             'copy_count' => 'nullable|integer|min:1|max:100000',
@@ -305,11 +304,18 @@ class DocumentApiController extends Controller
             'priority' => 'required|in:normal,urgent,very_urgent',
             'security_level' => 'required|in:normal,confidential,secret,top_secret',
             'is_public_level' => 'required|in:0,1,2',
+        ], [
+            'direction.required' => 'Vui lòng chọn phân loại văn bản.',
+            'direction.in' => 'Phân loại văn bản không hợp lệ.',
+            'title.required' => 'Vui lòng nhập trích yếu nội dung văn bản.',
+            'document_code.required' => 'Vui lòng nhập số, ký hiệu văn bản.',
+            'priority.required' => 'Vui lòng chọn mức độ ưu tiên.',
+            'security_level.required' => 'Vui lòng chọn độ mật.',
+            'is_public_level.required' => 'Vui lòng chọn mức độ công khai.',
         ]);
 
         $level = (int) $validated['is_public_level'];
         unset($validated['is_public_level']);
-        $validated['direction'] = $direction;
         $validated['visibility'] = match ($level) {
             2 => Document::VISIBILITY_SYSTEM,
             1 => Document::VISIBILITY_BRANCH,

@@ -25,7 +25,7 @@ class ImportDocumentArchive extends Command
         {--ledger= : File sổ Excel cho chế độ incoming/outgoing cũ}
         {--incoming-ledger= : Sổ văn bản đến dùng khi kho chứa chung hai loại}
         {--outgoing-ledger= : Sổ văn bản đi dùng khi kho chứa chung hai loại}
-        {--unmatched=skip : Với file không có trong sổ: skip, incoming hoặc outgoing}
+        {--unmatched=unclassified : Với file không có trong sổ: unclassified, skip, incoming hoặc outgoing}
         {--queue-ocr-missing : Xếp hàng OCR cho PDF không khớp/thiếu metadata sau khi nhập}
         {--visibility=branch : branch, private hoặc system}
         {--date-field=auto : auto, issued, received, forwarded hoặc both}
@@ -89,8 +89,8 @@ class ImportDocumentArchive extends Command
         }
 
         $unmatchedDirection = (string) $this->option('unmatched');
-        if (! in_array($unmatchedDirection, ['skip', Document::DIRECTION_INCOMING, Document::DIRECTION_OUTGOING], true)) {
-            $this->error('--unmatched chỉ nhận skip, incoming hoặc outgoing.');
+        if (! in_array($unmatchedDirection, [Document::DIRECTION_UNCLASSIFIED, 'skip', Document::DIRECTION_INCOMING, Document::DIRECTION_OUTGOING], true)) {
+            $this->error('--unmatched chỉ nhận unclassified, skip, incoming hoặc outgoing.');
 
             return self::FAILURE;
         }
@@ -175,6 +175,7 @@ class ImportDocumentArchive extends Command
             'ledger_ambiguous' => 0,
             'incoming' => 0,
             'outgoing' => 0,
+            'unclassified' => 0,
             'skipped_classification' => 0,
         ];
         $previewRows = [];
@@ -267,7 +268,11 @@ class ImportDocumentArchive extends Command
                     if (count($previewRows) < 20) {
                         $previewRows[] = [
                             $archiveDate->format('d/m/Y'),
-                            $fileDirection === Document::DIRECTION_OUTGOING ? 'Đi' : 'Đến',
+                            match ($fileDirection) {
+                                Document::DIRECTION_INCOMING => 'Đến',
+                                Document::DIRECTION_OUTGOING => 'Đi',
+                                default => 'Chưa phân loại',
+                            },
                             $documentCode,
                             $ledgerResult['row']['title'] ?? '—',
                             $file->getFilename(),
@@ -293,6 +298,7 @@ class ImportDocumentArchive extends Command
                             'direction' => $fileDirection,
                             'document_code' => $documentCode,
                             'visibility' => $visibility,
+                            '_archive_date' => $date,
                             '_ledger_source' => isset($ledgerPaths[$fileDirection]) ? basename($ledgerPaths[$fileDirection]) : null,
                             '_ledger_sheet' => $ledgerResult['row']['_sheet'] ?? null,
                             '_ledger_row' => $ledgerResult['row']['_row'] ?? null,
@@ -327,8 +333,8 @@ class ImportDocumentArchive extends Command
         }
 
         $this->newLine();
-        $this->table(['Đã quét', $dryRun ? 'Có thể nhập' : 'Đã nhập', 'Đến', 'Đi', 'Trùng', 'Bỏ qua phân loại', 'Không có ngày', 'Lỗi'], [[
-            $stats['found'], $stats['imported'], $stats['incoming'], $stats['outgoing'], $stats['duplicate'],
+        $this->table(['Đã quét', $dryRun ? 'Có thể nhập' : 'Đã nhập', 'Đến', 'Đi', 'Chưa phân loại', 'Trùng', 'Bỏ qua phân loại', 'Không có ngày', 'Lỗi'], [[
+            $stats['found'], $stats['imported'], $stats['incoming'], $stats['outgoing'], $stats['unclassified'], $stats['duplicate'],
             $stats['skipped_classification'], $stats['undated'], $stats['failed'],
         ]]);
 
@@ -434,11 +440,25 @@ class ImportDocumentArchive extends Command
                 ];
             }
 
-            return ['direction' => null, 'row' => null, 'ambiguous' => true, 'has_ledger' => true];
+            return [
+                'direction' => $unmatchedDirection === Document::DIRECTION_UNCLASSIFIED
+                    ? Document::DIRECTION_UNCLASSIFIED
+                    : null,
+                'row' => null,
+                'ambiguous' => true,
+                'has_ledger' => true,
+            ];
         }
 
         if (collect($results)->contains(fn (array $result) => $result['ambiguous'])) {
-            return ['direction' => null, 'row' => null, 'ambiguous' => true, 'has_ledger' => true];
+            return [
+                'direction' => $unmatchedDirection === Document::DIRECTION_UNCLASSIFIED
+                    ? Document::DIRECTION_UNCLASSIFIED
+                    : null,
+                'row' => null,
+                'ambiguous' => true,
+                'has_ledger' => true,
+            ];
         }
 
         return [
@@ -455,9 +475,11 @@ class ImportDocumentArchive extends Command
     public function archiveDateFields(string $date, string $direction, string $dateField = 'auto'): array
     {
         if ($dateField === 'auto') {
-            return $direction === Document::DIRECTION_OUTGOING
-                ? ['issued_date' => null, 'received_date' => null, 'forwarded_date' => $date]
-                : ['issued_date' => null, 'received_date' => $date, 'forwarded_date' => null];
+            return match ($direction) {
+                Document::DIRECTION_INCOMING => ['issued_date' => null, 'received_date' => $date, 'forwarded_date' => null],
+                Document::DIRECTION_OUTGOING => ['issued_date' => null, 'received_date' => null, 'forwarded_date' => $date],
+                default => ['issued_date' => null, 'received_date' => null, 'forwarded_date' => null],
+            };
         }
 
         return [

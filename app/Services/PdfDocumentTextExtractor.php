@@ -169,8 +169,13 @@ class PdfDocumentTextExtractor
     private function binary(string $configKey, string $fallback): ?string
     {
         $configured = trim((string) config('documents.metadata_extraction.'.$configKey, ''));
-        $name = $configured !== '' ? $configured : $fallback;
+        if ($configured !== '' && is_file($configured)) {
+            // ExecutableFinder chỉ phù hợp với tên cần dò trong PATH. Trên
+            // Windows, truyền thẳng C:/... vào finder sẽ bị ghép thêm PATH và
+            // trả về null dù file thật sự tồn tại.
+            return $configured;
+        }
 
-        return (new ExecutableFinder)->find($name);
+        return (new ExecutableFinder)->find($configured !== '' ? $configured : $fallback);
     }
 }

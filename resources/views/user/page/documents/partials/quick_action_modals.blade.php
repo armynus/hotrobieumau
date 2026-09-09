@@ -36,9 +36,16 @@
     <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
         <form id="quickEditDocumentForm">
             @csrf
-            <input type="hidden" name="direction" value="incoming">
             <div class="modal-header"><h5 class="modal-title" id="quickEditDocumentTitle">Chỉnh sửa văn bản</h5><button type="button" class="close" data-dismiss="modal"><span>&times;</span></button></div>
             <div class="modal-body">
+                <div class="form-group">
+                    <label>Phân loại văn bản <span class="text-danger">*</span></label>
+                    <select class="form-control" name="direction" required>
+                        <option value="incoming">Văn bản đến</option>
+                        <option value="outgoing">Văn bản đi</option>
+                        <option value="unclassified">Chưa phân loại</option>
+                    </select>
+                </div>
                 <div class="form-group"><label>Trích yếu (Tiêu đề) <span class="text-danger">*</span></label><textarea class="form-control" name="title" rows="3" required maxlength="5000"></textarea></div>
                 <div class="form-row">
                     <div class="form-group col-md-4 quick-incoming-field"><label>Số đến</label><input type="text" class="form-control" name="registry_number" maxlength="255"></div>

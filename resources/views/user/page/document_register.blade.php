@@ -56,8 +56,8 @@
                                 </select>
                             </div>
                             <div class="form-group col-md-6">
-                                <label>Ngày, tháng văn bản</label>
-                                <input type="text" class="form-control register-date-picker" name="issued_date" placeholder="dd/mm/yyyy">
+                                <label>Ngày, tháng văn bản <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control register-date-picker" name="issued_date" placeholder="dd/mm/yyyy" required>
                             </div>
 
                             @if($isOutgoing)
@@ -66,8 +66,8 @@
                                 <input type="text" class="form-control register-date-picker" name="forwarded_date" placeholder="dd/mm/yyyy">
                             </div>
                             <div class="form-group col-md-6">
-                                <label>Người ký văn bản <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="signer" maxlength="255" required>
+                                <label>Người ký văn bản</label>
+                                <input type="text" class="form-control" name="signer" maxlength="255">
                             </div>
                             <div class="form-group col-md-6">
                                 <label>Số lượng bản</label>
@@ -79,8 +79,8 @@
                                 <input type="text" class="form-control register-date-picker" name="received_date" placeholder="dd/mm/yyyy">
                             </div>
                             <div class="form-group col-md-6">
-                                <label>Tác giả / Cơ quan gửi <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="issuing_agency" maxlength="255" required>
+                                <label>Tác giả / Cơ quan gửi</label>
+                                <input type="text" class="form-control" name="issuing_agency" maxlength="255">
                             </div>
                             <div class="form-group col-md-6">
                                 <label>Ngày chuyển</label>
@@ -153,7 +153,7 @@
 
             <div class="col-xl-4">
                 <div class="card shadow mb-4 sticky-xl-top">
-                    <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">File đính kèm <span class="text-danger">*</span></h6></div>
+                    <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">File đính kèm <small class="text-muted">(Không bắt buộc)</small></h6></div>
                     <div class="card-body">
                         <label class="document-upload-zone" for="documentFiles" id="documentUploadZone">
                             <span class="document-upload-icon"><i class="fas fa-cloud-upload-alt"></i></span>
@@ -161,8 +161,9 @@
                             <span class="small text-muted mt-1">Nhấp hoặc kéo thả file vào đây</span>
                             <span class="btn btn-outline-primary btn-sm mt-3"><i class="fas fa-folder-open mr-1"></i> Duyệt file</span>
                         </label>
-                        <input type="file" class="d-none" id="documentFiles" name="files[]" multiple required>
+                        <input type="file" class="d-none" id="documentFiles" name="files[]" multiple>
                         <div id="selectedFileList" class="selected-file-list mt-3"></div>
+                        <small class="form-text text-muted">Có thể chỉ nhập thông tin để lưu và xuất sổ văn bản đến/đi mà không cần đính kèm file.</small>
                         <small class="form-text text-muted">Tên file đầu tiên sẽ tự điền vào Số, ký hiệu văn bản. Tối đa 50MB cho mỗi file.</small>
                     </div>
                 </div>

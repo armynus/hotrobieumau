@@ -78,9 +78,29 @@ $(document).ready(function () {
         });
     });
 
+    function ajaxErrorMessage(xhr, fallback) {
+        var response = xhr.responseJSON || {};
+        if (response.errors) {
+            var messages = Object.keys(response.errors).reduce(function (result, field) {
+                return result.concat(response.errors[field] || []);
+            }, []);
+            if (messages.length) return messages.join('\n');
+        }
+
+        return response.message || fallback;
+    }
+
+    function toggleQuickEditDirectionFields(direction) {
+        var incoming = direction === 'incoming';
+        var outgoing = direction === 'outgoing';
+        $('#quickEditDocumentForm .quick-incoming-field').toggle(incoming);
+        $('#quickEditDocumentForm .quick-outgoing-field').toggle(outgoing);
+        $('#quickEditDocumentTitle').text(outgoing ? 'Chỉnh sửa văn bản đi' : (incoming ? 'Chỉnh sửa văn bản đến' : 'Chỉnh sửa văn bản chưa phân loại'));
+        $('#quickRecipientLabel').text(outgoing ? 'Nơi nhận văn bản' : (incoming ? 'Đơn vị hoặc người nhận' : 'Nơi gửi / nơi nhận'));
+    }
+
     function populateQuickEditForm(doc) {
         var form = $('#quickEditDocumentForm');
-        var outgoing = doc.direction === 'outgoing';
         ['title', 'registry_number', 'document_code', 'issuing_agency', 'signer', 'recipient', 'archive_recipient', 'copy_count', 'receipt_signature', 'notes'].forEach(function (field) {
             form.find('[name="' + field + '"]').val(doc[field] || '');
         });
@@ -92,12 +112,14 @@ $(document).ready(function () {
         form.find('[name="priority"]').val(doc.priority || 'normal');
         form.find('[name="security_level"]').val(doc.security_level || 'normal');
         form.find('[name="is_public_level"]').val(doc.visibility === 'system' ? '2' : (doc.visibility === 'branch' ? '1' : '0'));
-        form.find('[name="direction"]').val(doc.direction || 'incoming');
-        form.find('.quick-incoming-field').toggle(!outgoing);
-        form.find('.quick-outgoing-field').toggle(outgoing);
-        $('#quickEditDocumentTitle').text(outgoing ? 'Chỉnh sửa văn bản đi' : 'Chỉnh sửa văn bản đến');
-        $('#quickRecipientLabel').text(outgoing ? 'Nơi nhận văn bản' : 'Đơn vị hoặc người nhận');
+        var direction = doc.direction || 'unclassified';
+        form.find('[name="direction"]').val(direction);
+        toggleQuickEditDirectionFields(direction);
     }
+
+    $('#quickEditDocumentForm [name="direction"]').on('change', function () {
+        toggleQuickEditDirectionFields(this.value);
+    });
 
     $('.document-date-input').on('input', function () {
         var digits = this.value.replace(/\D/g, '').slice(0, 8);
@@ -347,7 +369,7 @@ $(document).ready(function () {
             Swal.fire('Thành công', response.message, 'success');
             table.ajax.reload(null, false);
         }).fail(function (xhr) {
-            Swal.fire('Lỗi', xhr.responseJSON?.message || 'Không thể cập nhật văn bản.', 'error');
+            Swal.fire('Lỗi', ajaxErrorMessage(xhr, 'Không thể cập nhật văn bản.'), 'error');
         }).always(function () {
             button.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Lưu thay đổi');
         });

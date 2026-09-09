@@ -124,6 +124,7 @@ class DocumentController extends Controller
 
         $monthlyIncomingCounts = array_fill(0, 12, 0);
         $monthlyOutgoingCounts = array_fill(0, 12, 0);
+        $monthlyUnclassifiedCounts = array_fill(0, 12, 0);
         $monthlyRows = (clone $documentsQuery)
             ->whereYear('issued_date', $selectedYear)
             ->selectRaw('MONTH(issued_date) as report_month, direction, COUNT(*) as total')
@@ -138,14 +139,17 @@ class DocumentController extends Controller
 
             if ($row->direction === Document::DIRECTION_OUTGOING) {
                 $monthlyOutgoingCounts[$monthIndex] = (int) $row->total;
-            } else {
+            } elseif ($row->direction === Document::DIRECTION_INCOMING) {
                 $monthlyIncomingCounts[$monthIndex] = (int) $row->total;
+            } else {
+                $monthlyUnclassifiedCounts[$monthIndex] += (int) $row->total;
             }
         }
         $monthlyCounts = array_map(
-            fn ($incoming, $outgoing) => $incoming + $outgoing,
+            fn ($incoming, $outgoing, $unclassified) => $incoming + $outgoing + $unclassified,
             $monthlyIncomingCounts,
-            $monthlyOutgoingCounts
+            $monthlyOutgoingCounts,
+            $monthlyUnclassifiedCounts
         );
 
         $visibleQuery = $documentQueryService->getDocumentsForUser($user);
@@ -164,9 +168,11 @@ class DocumentController extends Controller
             'monthlyCounts' => $monthlyCounts,
             'monthlyIncomingCounts' => $monthlyIncomingCounts,
             'monthlyOutgoingCounts' => $monthlyOutgoingCounts,
+            'monthlyUnclassifiedCounts' => $monthlyUnclassifiedCounts,
             'totalSystem' => (clone $documentsQuery)->count(),
             'incomingTotal' => (clone $documentsQuery)->where('direction', Document::DIRECTION_INCOMING)->count(),
             'outgoingTotal' => (clone $documentsQuery)->where('direction', Document::DIRECTION_OUTGOING)->count(),
+            'unclassifiedTotal' => (clone $documentsQuery)->where('direction', Document::DIRECTION_UNCLASSIFIED)->count(),
             'visibleTotal' => $visibleTotal,
             'readTotal' => $readTotal,
             'unreadTotal' => max(0, $readStatusTotal - $readTotal),

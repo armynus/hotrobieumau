@@ -1,67 +1,220 @@
-# Nhập kho văn bản cũ bằng sổ Excel và OCR
+# Quy trình hoàn chỉnh nhập kho văn bản cũ
 
-Luồng xử lý ưu tiên dữ liệu có độ tin cậy cao theo thứ tự:
+Tài liệu này dùng cho kho chung chứa cả văn bản đến và văn bản đi. Luồng nhập ưu tiên dữ liệu theo thứ tự:
 
 1. Tên file -> `document_code` (số, ký hiệu văn bản).
 2. Folder `NGAY dd-mm-yyyy` -> ngày đến của văn bản đến hoặc ngày chuyển của văn bản đi.
-3. Sổ Excel -> các trường nghiệp vụ còn lại.
-4. PDF -> chỉ bù `issued_date` và `title` còn thiếu; công việc này chạy bằng queue.
+3. Hai sổ Excel -> phân loại đến/đi và bổ sung các trường nghiệp vụ.
+4. PDF -> chỉ bù `issued_date` (ngày văn bản) và `title` (trích yếu) còn thiếu bằng `pdftotext` hoặc Tesseract OCR.
 
-## Kho chung đã nhập trước đây
+File không khớp sổ hoặc khớp mơ hồ **vẫn được nhập** với trạng thái `unclassified` (Chưa phân loại). OCR không quyết định văn bản đến hay đi và việc nhập kho cũ không tạo thông báo “văn bản mới”.
 
-Các file đã nhập bằng importer cũ đang mang loại `incoming`. Đối chiếu sổ đi trước để sửa đúng những bản thực tế là văn bản đi:
+## Các đường dẫn dùng trong ví dụ
 
-```powershell
-php artisan documents:enrich-from-ledger "D:\Agribank văn bản\Văn Thư\Sổ vb đi 2026 ( 01-01-2026).xlsx" --direction=outgoing --user=3 --reclassify --dry-run
-```
+- Source Laravel trên server: `D:\hotrobieumau`
+- Kho văn bản: `Z:\KHO VAN BAN CHUNG`
+- Sổ đến: `E:\linh tinh\Văn Thư\Sổ vb đến 2025 (01-01-2026).xlsx`
+- Sổ đi: `E:\linh tinh\Văn Thư\Sổ vb đi 2026 ( 01-01-2026).xlsx`
+- ID văn thư: `3`
 
-Nếu kết quả hợp lý, bỏ `--dry-run` và thêm `--yes`. Sau đó đối chiếu sổ đến cho phần còn lại.
+Nếu source hoặc file trên server nằm ở đường dẫn khác thì thay đường dẫn tương ứng trong các lệnh dưới đây. Nên dùng đúng một cửa sổ PowerShell chạy dưới tài khoản Windows có quyền đọc ổ `Z:` và ghi vào `storage` của Laravel.
 
-Chạy thử trước, không thay đổi dữ liệu:
+## Bước 1: kiểm tra trước khi nhập
 
-```powershell
-php artisan documents:enrich-from-ledger "D:\Agribank văn bản\Văn Thư\Sổ vb đến 2025 (01-01-2026).xlsx" --direction=incoming --user=3 --dry-run
-```
-
-Nếu bảng đối chiếu hợp lý thì cập nhật thật:
+Mở PowerShell trên **máy server** rồi vào source Laravel:
 
 ```powershell
-php artisan documents:enrich-from-ledger "D:\Agribank văn bản\Văn Thư\Sổ vb đến 2025 (01-01-2026).xlsx" --direction=incoming --user=3 --queue-ocr-missing --yes
+Set-Location "D:\hotrobieumau"
 ```
 
-Không dùng `--overwrite` trong lần chạy thông thường. Tùy chọn đó chỉ dành cho trường hợp cần lấy sổ Excel ghi đè dữ liệu đã sửa tay.
-
-## Nhập một kho chung mới kèm hai sổ
-
-Importer quét kho đúng một lần. Mỗi file được dò bằng số, ký hiệu trong cả hai sổ; khớp sổ nào thì nhận loại của sổ đó:
+Kiểm tra đủ ba nguồn dữ liệu. Cả ba lệnh phải trả về `True`:
 
 ```powershell
-php artisan documents:import-archive "Z:\KHO VAN BAN CHUNG" --user=3 --direction=auto --incoming-ledger="E:\linh tinh\Văn Thư\Sổ vb đến 2025 (01-01-2026).xlsx" --outgoing-ledger="E:\linh tinh\Văn Thư\Sổ vb đi 2026 ( 01-01-2026).xlsx" --unmatched=skip --queue-ocr-missing --dry-run
+Test-Path "Z:\KHO VAN BAN CHUNG"
+Test-Path "E:\linh tinh\Văn Thư\Sổ vb đến 2025 (01-01-2026).xlsx"
+Test-Path "E:\linh tinh\Văn Thư\Sổ vb đi 2026 ( 01-01-2026).xlsx"
 ```
 
-Sau khi kiểm tra bảng thống kê, bỏ `--dry-run` và thêm `--yes` để nhập thật. File không có trong sổ hoặc cùng khớp cả hai sổ sẽ được bỏ qua để tránh phân loại sai. `--date-field=auto` là mặc định đúng: folder là ngày đến với văn bản đến, ngày chuyển với văn bản đi.
+Nếu `Z:` là ổ mạng và PowerShell chạy Administrator trả về `False`, hãy dùng đường dẫn UNC dạng `\\ten-may\thu-muc` hoặc map lại ổ trong chính cửa sổ PowerShell đó.
 
-## Cấu hình OCR miễn phí, chạy nội bộ
+Kiểm tra Laravel và database:
 
-Máy chủ cần Poppler và Tesseract OCR có dữ liệu ngôn ngữ Việt. Nếu các chương trình không nằm trong `PATH`, khai báo đường dẫn tuyệt đối trong `.env`:
+```powershell
+php -v
+php artisan about
+php artisan optimize:clear
+php artisan migrate --force
+php artisan storage:link
+```
+
+`storage:link` chỉ cần tạo một lần. Nếu Laravel báo liên kết đã tồn tại thì tiếp tục bình thường.
+
+Nếu lệnh `php` không được nhận, dùng PHP của XAMPP, ví dụ:
+
+```powershell
+& "D:\xampp\php\php.exe" artisan about
+```
+
+### Nếu `--unmatched=unclassified` bị từ chối
+
+Thông báo `--unmatched chỉ nhận skip, incoming hoặc outgoing` nghĩa là máy server vẫn đang chạy phiên bản importer cũ. Không dùng `--unmatched=incoming` hoặc `--unmatched=outgoing` để thay thế vì sẽ phân loại sai các file không khớp sổ.
+
+Đồng bộ source code mới từ máy làm việc sang máy server nhưng **không ghi đè** `.env`, thư mục `storage` hoặc liên kết `public/storage`. Sau đó vào đúng thư mục Laravel trên server rồi chạy:
+
+```powershell
+Get-Location
+Select-String -Path ".\app\Console\Commands\ImportDocumentArchive.php" -Pattern "unmatched=unclassified"
+php artisan optimize:clear
+php artisan help documents:import-archive
+```
+
+Kết quả trợ giúp phải chứa:
+
+```text
+--unmatched ... unclassified, skip, incoming hoặc outgoing [default: "unclassified"]
+```
+
+Nếu copy file thủ công thay vì đồng bộ cả source, tối thiểu phải chép đồng thời các file sau:
+
+```text
+app/Console/Commands/ImportDocumentArchive.php
+app/Models/Document.php
+app/Services/DocumentService.php
+app/Http/Controllers/User/DocumentApiController.php
+app/Http/Controllers/User/DocumentController.php
+public/js/user/document-list.js
+resources/views/user/page/document_detail.blade.php
+resources/views/user/page/document_report.blade.php
+```
+
+Thay đổi `unclassified` không cần chạy migration mới. Sau khi phần trợ giúp hiển thị đúng option mới, tiếp tục bước 2.
+
+## Bước 2: chạy thử toàn bộ kho
+
+Lệnh này chỉ quét, đọc hai sổ và in thống kê; chưa sao chép file, chưa ghi database:
+
+```powershell
+php artisan documents:import-archive "Z:\KHO VAN BAN CHUNG" --user=3 --direction=auto --incoming-ledger="E:\linh tinh\Văn Thư\Sổ vb đến 2025 (01-01-2026).xlsx" --outgoing-ledger="E:\linh tinh\Văn Thư\Sổ vb đi 2026 ( 01-01-2026).xlsx" --unmatched=unclassified --dry-run
+```
+
+Kiểm tra các cột:
+
+- `Có thể nhập`: tổng file hợp lệ sẽ được nhập.
+- `Đến`, `Đi`: số file phân loại được bằng sổ.
+- `Chưa phân loại`: file vẫn được nhập nhưng chưa xác định chắc loại.
+- `Không có ngày`: file không nằm dưới folder `NGAY dd-mm-yyyy`.
+- `Lỗi`: phải xem và xử lý trước khi nhập thật nếu số này khác 0.
+
+## Bước 3: nhập thật
+
+Khi bảng chạy thử hợp lý, chạy:
+
+```powershell
+php artisan documents:import-archive "Z:\KHO VAN BAN CHUNG" --user=3 --direction=auto --incoming-ledger="E:\linh tinh\Văn Thư\Sổ vb đến 2025 (01-01-2026).xlsx" --outgoing-ledger="E:\linh tinh\Văn Thư\Sổ vb đi 2026 ( 01-01-2026).xlsx" --unmatched=unclassified --yes
+```
+
+Có thể chạy lại đúng lệnh nếu PowerShell bị đóng hoặc import bị gián đoạn. Importer nhận diện file đã nhập và ghi vào cột `Trùng`, không tạo thêm bản sao.
+
+## Bước 4: xử lý file không có folder ngày
+
+Nếu thống kê ở bước 2 có `Không có ngày` lớn hơn 0, importer mặc định bỏ qua các file đó để không gán sai ngày. Muốn dùng ngày sửa file làm ngày kho, phải chạy thử lượt hai:
+
+```powershell
+php artisan documents:import-archive "Z:\KHO VAN BAN CHUNG" --user=3 --direction=auto --incoming-ledger="E:\linh tinh\Văn Thư\Sổ vb đến 2025 (01-01-2026).xlsx" --outgoing-ledger="E:\linh tinh\Văn Thư\Sổ vb đi 2026 ( 01-01-2026).xlsx" --unmatched=unclassified --fallback-mtime --dry-run
+```
+
+Chỉ khi ngày xem trước hợp lý mới nhập thật lượt vét:
+
+```powershell
+php artisan documents:import-archive "Z:\KHO VAN BAN CHUNG" --user=3 --direction=auto --incoming-ledger="E:\linh tinh\Văn Thư\Sổ vb đến 2025 (01-01-2026).xlsx" --outgoing-ledger="E:\linh tinh\Văn Thư\Sổ vb đi 2026 ( 01-01-2026).xlsx" --unmatched=unclassified --fallback-mtime --yes
+```
+
+Lượt này quét lại cả kho nhưng tự bỏ qua các file đã nhập. Không dùng `--fallback-mtime` nếu ngày sửa file là ngày vừa copy dữ liệu sang server.
+
+## Bước 5: cấu hình OCR trên server
+
+Không có Poppler/Tesseract thì toàn bộ bước import phía trên vẫn hoàn thành; chỉ chưa tự bù ngày văn bản và trích yếu. Có thể cài OCR sau rồi tiếp tục từ bước này.
+
+Server cần:
+
+- Poppler có `pdftotext.exe` và `pdftoppm.exe`.
+- Tesseract OCR có `eng.traineddata` và `vie.traineddata` trong thư mục `tessdata`.
+
+Khai báo đường dẫn tuyệt đối trong `.env` trên server (đường dẫn có khoảng trắng phải đặt trong dấu nháy):
 
 ```dotenv
-DOCUMENT_PDFTOTEXT_BINARY=C:\poppler\Library\bin\pdftotext.exe
-DOCUMENT_PDFTOPPM_BINARY=C:\poppler\Library\bin\pdftoppm.exe
-DOCUMENT_TESSERACT_BINARY=C:\Program Files\Tesseract-OCR\tesseract.exe
+DOCUMENT_PDFTOTEXT_BINARY=C:/Tools/poppler/Library/bin/pdftotext.exe
+DOCUMENT_PDFTOPPM_BINARY=C:/Tools/poppler/Library/bin/pdftoppm.exe
+DOCUMENT_TESSERACT_BINARY="C:/Program Files/Tesseract-OCR/tesseract.exe"
 DOCUMENT_TESSERACT_LANGUAGES=vie+eng
+DOCUMENT_OCR_MAX_PAGES=2
+DOCUMENT_OCR_DPI=220
+DOCUMENT_OCR_TIMEOUT_SECONDS=150
 ```
 
-Kiểm tra trạng thái và số PDF cần xử lý:
+Nạp lại cấu hình và kiểm tra binary:
 
 ```powershell
-php artisan documents:queue-metadata-extraction --direction=incoming --branch=1 --dry-run
+php artisan optimize:clear
+& "C:\Tools\poppler\Library\bin\pdftotext.exe" -v
+& "C:\Tools\poppler\Library\bin\pdftoppm.exe" -v
+& "C:\Program Files\Tesseract-OCR\tesseract.exe" --version
+& "C:\Program Files\Tesseract-OCR\tesseract.exe" --list-langs
+php artisan documents:queue-metadata-extraction --dry-run
 ```
 
-Chạy worker riêng để OCR không chặn web:
+Kết quả `--list-langs` phải có `eng` và `vie`. Lệnh Laravel phải báo sẵn sàng đọc lớp chữ PDF và OCR ảnh bằng Tesseract.
+
+## Bước 6: chạy OCR cho toàn bộ PDF còn thiếu metadata
+
+Đưa các PDF thuộc kho cũ còn thiếu `issued_date` hoặc `title` vào queue:
 
 ```powershell
-php artisan queue:work --queue=document-ocr --tries=2 --timeout=180 --memory=256
+php artisan documents:queue-metadata-extraction
 ```
 
-Các lần bổ sung metadata không tạo thông báo “văn bản mới”. Log chỉ lưu engine và tên trường đã cập nhật, không lưu toàn bộ nội dung OCR.
+Xử lý hết queue rồi tự dừng:
+
+```powershell
+php artisan queue:work --queue=document-ocr --tries=2 --timeout=180 --memory=256 --stop-when-empty
+```
+
+Kiểm tra job lỗi và số PDF vẫn còn thiếu metadata:
+
+```powershell
+php artisan queue:failed
+php artisan documents:queue-metadata-extraction --dry-run
+```
+
+PDF không nhận dạng được hoặc không có mẫu `Ngày:`/`Nội dung:` phù hợp có thể vẫn còn trong danh sách thiếu metadata; file và bản ghi văn bản của nó không bị xóa. OCR không ghi đè ngày hoặc trích yếu đã có từ sổ Excel.
+
+## Bước 7: hoàn tất
+
+Tạo lại cache production sau khi import và cấu hình OCR xong:
+
+```powershell
+php artisan optimize
+```
+
+Mở trang danh sách văn bản để kiểm tra:
+
+- Số, ký hiệu mở đúng file đính kèm.
+- Văn bản khớp sổ hiển thị đúng Đến/Đi.
+- File không khớp hiển thị Chưa phân loại.
+- Ngày văn bản và trích yếu được bổ sung khi OCR nhận dạng thành công.
+
+## Kho đã nhập bằng phiên bản importer cũ
+
+Nếu dữ liệu cũ từng bị mặc định thành `incoming`, dùng lệnh đối chiếu lại sổ đi trước:
+
+```powershell
+php artisan documents:enrich-from-ledger "E:\linh tinh\Văn Thư\Sổ vb đi 2026 ( 01-01-2026).xlsx" --direction=outgoing --user=3 --reclassify --dry-run
+```
+
+Kết quả đúng thì cập nhật thật:
+
+```powershell
+php artisan documents:enrich-from-ledger "E:\linh tinh\Văn Thư\Sổ vb đi 2026 ( 01-01-2026).xlsx" --direction=outgoing --user=3 --reclassify --yes
+```
+
+Không dùng `--overwrite` trong lần chạy thông thường. Tùy chọn đó chỉ dành cho trường hợp chủ động muốn lấy sổ Excel ghi đè dữ liệu đã sửa tay.

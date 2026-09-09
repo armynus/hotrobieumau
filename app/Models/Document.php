@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * Metadata của một văn bản; thông tin file thật nằm ở document_attachments.
  *
  * @property int $id Khóa chính.
- * @property string $direction Luồng văn bản: incoming (đến) hoặc outgoing (đi).
+ * @property string $direction Luồng văn bản: incoming (đến), outgoing (đi) hoặc unclassified (chưa phân loại).
  * @property string|null $registry_number Số vào sổ, chỉ dùng cho văn bản đến.
  * @property string|null $document_code Số và ký hiệu ghi trên văn bản.
  * @property string|null $title Tên loại và trích yếu; có thể trống với kho cũ chưa cập nhật.
@@ -40,6 +40,7 @@ class Document extends Model
 
     public const DIRECTION_INCOMING = 'incoming';
     public const DIRECTION_OUTGOING = 'outgoing';
+    public const DIRECTION_UNCLASSIFIED = 'unclassified';
 
     public const VISIBILITY_PRIVATE = 'private';
     public const VISIBILITY_BRANCH = 'branch';

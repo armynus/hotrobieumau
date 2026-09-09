@@ -19,9 +19,13 @@ class DocumentService
      */
     public function importArchivedFile(array $data, string $sourcePath, string $relativePath, string $sourceKey, string $checksum, $user): Document
     {
-        $issuedDate = $data['issued_date'] ?? null;
-        $receivedDate = $data['received_date'] ?? null;
-        $archiveDate = $issuedDate ?: $receivedDate ?: now()->toDateString();
+        // Ngày trong đường dẫn kho cũ là mốc lưu trữ đáng tin cậy nhất. Nó cũng
+        // cho phép lưu đúng folder khi văn bản chưa xác định là đến hay đi.
+        $archiveDate = $data['_archive_date']
+            ?? $data['received_date']
+            ?? $data['forwarded_date']
+            ?? $data['issued_date']
+            ?? now()->toDateString();
         $folderPath = DocumentStoragePath::directoryForDate($archiveDate);
         $storedFileName = $this->uniqueStoredFileName($folderPath, basename($sourcePath));
         $storedPath = $folderPath.'/'.$storedFileName;
@@ -42,7 +46,7 @@ class DocumentService
         try {
             return DB::transaction(function () use ($data, $sourcePath, $relativePath, $sourceKey, $checksum, $user, $storedPath, $storedFileName) {
                 $document = Document::create([
-                    'direction' => $data['direction'] ?? Document::DIRECTION_INCOMING,
+                    'direction' => $data['direction'] ?? Document::DIRECTION_UNCLASSIFIED,
                     'registry_number' => $data['registry_number'] ?? null,
                     'document_code' => $data['document_code'],
                     'title' => $data['title'] ?? null,
