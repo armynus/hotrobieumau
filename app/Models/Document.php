@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * Metadata của một văn bản; thông tin file thật nằm ở document_attachments.
  *
  * @property int $id Khóa chính.
- * @property string $direction Luồng văn bản: incoming (đến), outgoing (đi) hoặc unclassified (chưa phân loại).
+ * @property string $direction Phân loại: incoming (đến), outgoing (đi), decision (quyết định), unclassified (chưa phân loại).
  * @property string|null $registry_number Số vào sổ, chỉ dùng cho văn bản đến.
  * @property string|null $document_code Số và ký hiệu ghi trên văn bản.
  * @property string|null $title Tên loại và trích yếu; có thể trống với kho cũ chưa cập nhật.
@@ -29,7 +29,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $notes Ghi chú của văn bản.
  * @property string $priority Mức độ xử lý: normal, urgent hoặc very_urgent.
  * @property string $security_level Độ mật: normal, confidential, secret hoặc top_secret.
- * @property string $visibility Phạm vi xem: private, branch hoặc system.
+ * @property string $visibility Phạm vi xem: private (lãnh đạo), restricted (nơi được chọn), branch hoặc system; văn thư quản lý vẫn được xem.
  * @property int|null $created_by Văn thư đã đăng tải văn bản.
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -40,9 +40,11 @@ class Document extends Model
 
     public const DIRECTION_INCOMING = 'incoming';
     public const DIRECTION_OUTGOING = 'outgoing';
+    public const DIRECTION_DECISION = 'decision';
     public const DIRECTION_UNCLASSIFIED = 'unclassified';
 
     public const VISIBILITY_PRIVATE = 'private';
+    public const VISIBILITY_RESTRICTED = 'restricted';
     public const VISIBILITY_BRANCH = 'branch';
     public const VISIBILITY_SYSTEM = 'system';
 
@@ -88,6 +90,11 @@ class Document extends Model
     public function documentType(): BelongsTo
     {
         return $this->belongsTo(DocumentType::class, 'document_type_id');
+    }
+
+    public function ledgerEntries(): HasMany
+    {
+        return $this->hasMany(DocumentLedgerEntry::class);
     }
 
     public function creator(): BelongsTo
@@ -147,6 +154,9 @@ class Document extends Model
 
     public function canBeDistributedToDepartmentBy(User $user): bool
     {
+        if ($this->canBeEditedBy($user)) {
+            return true;
+        }
         if (!$user->isClerk() || $user->branch?->branch_type !== 'type_2') {
             return false;
         }

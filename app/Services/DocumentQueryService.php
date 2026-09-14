@@ -55,10 +55,13 @@ class DocumentQueryService
 
                         // Rule 2: Automatic Leadership Permission
                         if ($user->isLeadership()) {
-                            $qNormal->orWhere('managing_branch_id', $user->branch_id)
-                                ->orWhereHas('transfers', function ($qt) use ($user) {
-                                    $qt->where('to_branch_id', $user->branch_id);
-                                });
+                            $qNormal->orWhere(function ($leadership) use ($user) {
+                                $leadership->where('visibility', '!=', Document::VISIBILITY_RESTRICTED)
+                                    ->where(function ($scope) use ($user) {
+                                        $scope->where('managing_branch_id', $user->branch_id)
+                                            ->orWhereHas('transfers', fn ($qt) => $qt->where('to_branch_id', $user->branch_id));
+                                    });
+                            });
                         }
                     });
                 }
@@ -81,7 +84,7 @@ class DocumentQueryService
 
         $dateColumn = match ($filters['direction'] ?? null) {
             Document::DIRECTION_INCOMING => 'received_date',
-            Document::DIRECTION_OUTGOING => 'forwarded_date',
+            Document::DIRECTION_OUTGOING, Document::DIRECTION_DECISION => 'forwarded_date',
             default => 'issued_date',
         };
 
@@ -132,8 +135,9 @@ class DocumentQueryService
         // Văn bản nhập từ kho lưu trữ cũ vẫn tra cứu bình thường nhưng không được
         // xem là "văn bản mới" trong khu vực thông báo của người dùng.
         if (! empty($filters['exclude_archive_imports'])) {
-            $query->whereDoesntHave('logs', function ($q) {
-                $q->where('action', 'archive_imported');
+            $query->where(function ($scope) {
+                $scope->whereDoesntHave('logs', fn ($q) => $q->whereIn('action', ['archive_imported', 'ledger_imported', 'ledger_recorded']))
+                    ->orWhereHas('logs', fn ($q) => $q->where('action', 'published'));
             });
         }
 

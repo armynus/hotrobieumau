@@ -92,10 +92,10 @@ $(document).ready(function () {
 
     function toggleQuickEditDirectionFields(direction) {
         var incoming = direction === 'incoming';
-        var outgoing = direction === 'outgoing';
+        var outgoing = direction === 'outgoing' || direction === 'decision';
         $('#quickEditDocumentForm .quick-incoming-field').toggle(incoming);
         $('#quickEditDocumentForm .quick-outgoing-field').toggle(outgoing);
-        $('#quickEditDocumentTitle').text(outgoing ? 'Chỉnh sửa văn bản đi' : (incoming ? 'Chỉnh sửa văn bản đến' : 'Chỉnh sửa văn bản chưa phân loại'));
+        $('#quickEditDocumentTitle').text(direction === 'decision' ? 'Chỉnh sửa quyết định' : (outgoing ? 'Chỉnh sửa văn bản đi' : (incoming ? 'Chỉnh sửa văn bản đến' : 'Chỉnh sửa văn bản chưa phân loại')));
         $('#quickRecipientLabel').text(outgoing ? 'Nơi nhận văn bản' : (incoming ? 'Đơn vị hoặc người nhận' : 'Nơi gửi / nơi nhận'));
     }
 
@@ -111,7 +111,7 @@ $(document).ready(function () {
         form.find('[name="document_type_id"]').val(doc.document_type_id || '');
         form.find('[name="priority"]').val(doc.priority || 'normal');
         form.find('[name="security_level"]').val(doc.security_level || 'normal');
-        form.find('[name="is_public_level"]').val(doc.visibility === 'system' ? '2' : (doc.visibility === 'branch' ? '1' : '0'));
+        form.find('[name="is_public_level"]').val(doc.visibility === 'restricted' ? '3' : (doc.visibility === 'system' ? '2' : (doc.visibility === 'branch' ? '1' : '0')));
         var direction = doc.direction || 'unclassified';
         form.find('[name="direction"]').val(direction);
         toggleQuickEditDirectionFields(direction);
@@ -144,6 +144,8 @@ $(document).ready(function () {
             className: 'document-code-cell',
             render: function (data, type, row) {
                 if (type !== 'display') return data;
+
+                if (data === 'decision') return '<span class="badge badge-warning px-2 py-1"><i class="fas fa-gavel mr-1"></i>Quyết định</span>';
                 var attachment = row.attachments && row.attachments.length ? row.attachments[0] : null;
                 var displayCode = String(data || '').trim() || 'Chưa cập nhật số, ký hiệu';
 
@@ -208,7 +210,7 @@ $(document).ready(function () {
                     actions += '<button type="button" class="btn btn-primary btn-sm shadow-sm mr-1 quick-edit-action" data-document-id="' + data + '" title="Chỉnh sửa văn bản" aria-label="Chỉnh sửa văn bản"><i class="fas fa-edit"></i></button>';
                 }
                 if (capabilities.can_transfer) {
-                    var isDepartmentTransfer = capabilities.transfer_target_type === 'department';
+                    var isDepartmentTransfer = capabilities.transfer_target_type === 'local';
                     var transferClass = isDepartmentTransfer ? 'btn-info' : 'btn-warning';
                     var transferIcon = isDepartmentTransfer ? 'fa-sitemap' : 'fa-share';
                     actions += '<button type="button" class="btn ' + transferClass + ' btn-sm shadow-sm quick-transfer-action" data-document-id="' + data + '" data-target-type="' + capabilities.transfer_target_type + '" title="Chuyển tiếp văn bản" aria-label="Chuyển tiếp văn bản"><i class="fas ' + transferIcon + '"></i></button>';
@@ -299,17 +301,26 @@ $(document).ready(function () {
         });
     });
 
+    function setQuickTransferMode(targetType) {
+        $('#quickTransferTargetType').val(targetType);
+        $('#quickBranchTransferGroup').toggle(targetType === 'branch').find('input').prop('disabled', targetType !== 'branch');
+        $('#quickLocalTransferGroup').toggle(targetType === 'local').find('input').prop('disabled', targetType !== 'local');
+        $('#quickTransferModalTitle').text(targetType === 'branch' ? 'Chuyển đến Chi nhánh loại II' : 'Gửi đến ban giám đốc / phòng ban chi nhánh mình');
+    }
+
+    $('#quickTransferMode').on('change', function () {
+        setQuickTransferMode(this.value);
+    });
+
     $('#dataTable').on('click', '.quick-transfer-action', function () {
         quickDocumentId = $(this).data('document-id');
         var targetType = $(this).data('target-type');
         var form = $('#quickTransferForm');
 
         form[0].reset();
-        $('#quickTransferTargetType').val(targetType);
-        $('#quickBranchTransferGroup').toggle(targetType === 'branch');
-        $('#quickDepartmentTransferGroup').toggle(targetType === 'department');
-        $('#quickToDepartmentId').prop('required', targetType === 'department');
-        $('#quickTransferModalTitle').text(targetType === 'branch' ? 'Chuyển đến Chi nhánh loại II' : 'Phân phối đến phòng ban');
+        $('#quickTransferModeGroup').toggle(targetType === 'branch');
+        $('#quickTransferMode').val(targetType);
+        setQuickTransferMode(targetType);
         $('#quickTransferModal').modal('show');
     });
 
@@ -383,6 +394,10 @@ $(document).ready(function () {
             Swal.fire('Chưa chọn chi nhánh', 'Vui lòng chọn ít nhất một chi nhánh nhận văn bản.', 'warning');
             return;
         }
+        if ($('#quickTransferTargetType').val() === 'local' && $('#quickLocalTransferGroup input[name]:checked').length === 0) {
+            Swal.fire('Chưa chọn nơi nhận', 'Vui lòng chọn ít nhất một người hoặc phòng ban nhận văn bản.', 'warning');
+            return;
+        }
 
         var button = $('#quickTransferSubmit').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang xử lý...');
         $.post('/api/documents/' + quickDocumentId + '/transfer', $(this).serialize()).done(function (response) {
@@ -390,7 +405,7 @@ $(document).ready(function () {
             Swal.fire('Thành công', response.message, 'success');
             table.ajax.reload(null, false);
         }).fail(function (xhr) {
-            Swal.fire('Lỗi', xhr.responseJSON?.message || 'Không thể chuyển văn bản.', 'error');
+            Swal.fire('Lỗi', ajaxErrorMessage(xhr, 'Không thể chuyển văn bản.'), 'error');
         }).always(function () {
             button.prop('disabled', false).text('Xác nhận');
         });

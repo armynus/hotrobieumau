@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Document;
+use App\Support\DocumentLedgerNumber;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Str;
@@ -51,7 +52,7 @@ class DocumentLedgerReader
      *
      * @return array<int, array<string, mixed>>
      */
-    public function read(string $path, string $direction): array
+    public function read(string $path, string $direction, array $sheets = []): array
     {
         if (! is_file($path) || ! is_readable($path)) {
             throw new RuntimeException('Không đọc được file sổ Excel: '.$path);
@@ -66,6 +67,18 @@ class DocumentLedgerReader
             $reader->setReadDataOnly(true);
             $worksheetInfo = collect($reader->listWorksheetInfo($path))
                 ->keyBy('worksheetName');
+            // So sánh tên sau trim để vẫn chọn được sheet Excel có dấu cách cuối tên.
+            $selectedNames = [];
+            foreach ($sheets as $sheet) {
+                $matches = $worksheetInfo->keys()->filter(fn ($name) => trim($name) === trim((string) $sheet))->values();
+                if ($matches->count() !== 1) {
+                    throw new RuntimeException('Không xác định được sheet "'.$sheet.'". Các sheet: '.$worksheetInfo->keys()->implode(', '));
+                }
+                $selectedNames[] = $matches[0];
+            }
+            if ($selectedNames !== []) {
+                $reader->setLoadSheetsOnly(array_values(array_unique($selectedNames)));
+            }
 
             // Lần đọc đầu chỉ nạp 50 dòng/30 cột đầu để tìm đúng các sheet sổ.
             // Điều này tránh kéo theo những sheet phụ có hàng trăm nghìn ô định dạng rỗng.
@@ -82,6 +95,12 @@ class DocumentLedgerReader
                 $header = $this->findHeader($worksheet, $direction);
                 if ($header !== null) {
                     $ledgers[$worksheet->getTitle()] = $header;
+                }
+            }
+
+            foreach ($selectedNames as $selectedName) {
+                if (! isset($ledgers[$selectedName])) {
+                    throw new RuntimeException('Sheet "'.$selectedName.'" không đúng cấu trúc sổ đã chọn.');
                 }
             }
 
@@ -105,7 +124,8 @@ class DocumentLedgerReader
                 // Mỗi lần chỉ nạp một sheet và đúng các cột nghiệp vụ đã nhận diện.
                 // Nhờ vậy bộ nhớ không tăng theo toàn bộ workbook nhiều sheet.
                 $sheetReader = IOFactory::createReaderForFile($path);
-                $sheetReader->setReadDataOnly(true);
+                // Giữ number format để không đánh mất số đến kiểu 01, 02.
+                $sheetReader->setReadDataOnly(false);
                 $sheetReader->setLoadSheetsOnly($worksheetName);
                 $sheetReader->setReadFilter(new DocumentLedgerReadFilter(
                     $worksheetName,
@@ -126,6 +146,8 @@ class DocumentLedgerReader
                 for ($rowNumber = $header['row'] + 1; $rowNumber <= $highestRow; $rowNumber++) {
                     $row = [
                         'direction' => $direction,
+                        '_book' => $direction === Document::DIRECTION_INCOMING ? 'incoming'
+                            : (str_contains($this->normalizeHeader($worksheetName), 'quyet dinh') ? 'decision' : 'outgoing'),
                         '_sheet' => $worksheet->getTitle(),
                         '_row' => $rowNumber,
                     ];
@@ -137,7 +159,13 @@ class DocumentLedgerReader
                             : ($field === 'copy_count' ? $this->integerValue($cell) : $this->textValue($cell));
                     }
 
-                    if (($row['document_code'] ?? null) === null && ($row['title'] ?? null) === null) {
+                    $row['_number'] = $direction === Document::DIRECTION_INCOMING
+                        ? ($row['registry_number'] ?? null)
+                        : DocumentLedgerNumber::fromCode($row['document_code'] ?? null);
+                    $ledgerDate = $row[$direction === Document::DIRECTION_INCOMING ? 'received_date' : 'forwarded_date'] ?? null;
+                    $row['_year'] = $ledgerDate ? (int) substr($ledgerDate, 0, 4) : null;
+
+                    if (($row['document_code'] ?? null) === null && ($row['title'] ?? null) === null && $row['_number'] === null) {
                         continue;
                     }
 
@@ -231,6 +259,10 @@ class DocumentLedgerReader
             return $value->format('d/m/Y');
         }
 
+        if (is_numeric($value) && preg_match('/^0+$/', $cell->getStyle()->getNumberFormat()->getFormatCode())) {
+            $value = str_pad((string) $value, strlen($cell->getStyle()->getNumberFormat()->getFormatCode()), '0', STR_PAD_LEFT);
+        }
+
         $value = str_replace(["\r\n", "\r"], "\n", (string) $value);
         $lines = array_map(
             fn (string $line) => trim(preg_replace('/^[\s_–—•-]+/u', '', $line) ?? ''),
@@ -262,7 +294,7 @@ class DocumentLedgerReader
             return CarbonImmutable::instance($value)->format('Y-m-d');
         }
 
-        if (is_numeric($value) && (float) $value > 0) {
+        if (is_numeric($value) && (float) $value > 0 && (float) $value < 2958466) {
             try {
                 return CarbonImmutable::instance(ExcelDate::excelToDateTimeObject((float) $value))->format('Y-m-d');
             } catch (Throwable) {
@@ -274,7 +306,8 @@ class DocumentLedgerReader
         foreach (['d/m/Y', 'd-m-Y', 'd.m.Y', 'Y-m-d', 'd/m/y', 'd-m-y'] as $format) {
             try {
                 $date = CarbonImmutable::createFromFormat('!'.$format, $value);
-                if ($date !== false) {
+                $errors = CarbonImmutable::getLastErrors();
+                if ($date !== false && ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0))) {
                     return $date->format('Y-m-d');
                 }
             } catch (Throwable) {

@@ -58,10 +58,10 @@
     {{-- ===== HỖ TRỢ BIỂU MẪU ===== --}}
     <x-sidebar-form-types />
     {{-- ===== VĂN THƯ ===== --}}
-    <li class="nav-item {{ request()->routeIs('documents_forward', 'documents_incoming*', 'documents_outgoing*', 'document_register', 'document_detail', 'document_reports') ? 'active' : '' }}">
-        <a class="nav-link {{ request()->routeIs('documents_forward', 'documents_incoming*', 'documents_outgoing*', 'document_register', 'document_detail', 'document_reports') ? '' : 'collapsed' }}"
+    <li class="nav-item {{ request()->routeIs('documents_forward', 'documents_incoming*', 'documents_outgoing*', 'documents_decision*', 'documents_ledger*', 'document_register', 'document_detail', 'document_reports') ? 'active' : '' }}">
+        <a class="nav-link {{ request()->routeIs('documents_forward', 'documents_incoming*', 'documents_outgoing*', 'documents_decision*', 'documents_ledger*', 'document_register', 'document_detail', 'document_reports') ? '' : 'collapsed' }}"
             href="#" data-toggle="collapse" data-target="#collapseDocuments"
-            aria-expanded="{{ request()->routeIs('documents_forward', 'documents_incoming*', 'documents_outgoing*', 'document_register', 'document_detail', 'document_reports') ? 'true' : 'false' }}"
+            aria-expanded="{{ request()->routeIs('documents_forward', 'documents_incoming*', 'documents_outgoing*', 'documents_decision*', 'documents_ledger*', 'document_register', 'document_detail', 'document_reports') ? 'true' : 'false' }}"
             aria-controls="collapseDocuments">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-database-fill" viewBox="0 0 16 16">
                 <path d="M3.904 1.777C4.978 1.289 6.427 1 8 1s3.022.289 4.096.777C13.125 2.245 14 2.993 14 4s-.875 1.755-1.904 2.223C11.022 6.711 9.573 7 8 7s-3.022-.289-4.096-.777C2.875 5.755 2 5.007 2 4s.875-1.755 1.904-2.223" />
@@ -72,7 +72,7 @@
             <span>Tổng hợp văn bản</span>
         </a>
         <div id="collapseDocuments"
-            class="collapse @menuOpen('documents_forward', 'documents_incoming', 'documents_outgoing', 'documents_incoming_register', 'documents_outgoing_register', 'document_register', 'document_detail', 'document_reports')"
+            class="collapse @menuOpen('documents_forward', 'documents_incoming', 'documents_outgoing', 'documents_incoming_register', 'documents_outgoing_register', 'documents_decision_register', 'document_register', 'document_detail', 'document_reports', 'documents_ledger')"
             data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item {{ request()->routeIs('documents_forward', 'documents_incoming', 'documents_outgoing') ? 'active' : '' }}"
@@ -83,6 +83,9 @@
                 @php
                     $user = \App\Models\User::find(Session::get('user_id'));
                 @endphp
+                @if($user && $user->isClerk())
+                    <a class="collapse-item @active('documents_ledger')" href="{{ route('documents_ledger') }}">Sổ văn bản</a>
+                @endif
                 @if($user && $user->canUploadDocument())
                     <div class="collapse-divider"></div>
                     <h6 class="collapse-header">Đăng tải:</h6>
@@ -90,6 +93,7 @@
                         href="{{ route('documents_incoming_register') }}">Đăng văn bản đến</a>
                     <a class="collapse-item @active('documents_outgoing_register')"
                         href="{{ route('documents_outgoing_register') }}">Đăng văn bản đi</a>
+                    <a class="collapse-item @active('documents_decision_register')" href="{{ route('documents_decision_register') }}">Đăng quyết định</a>
                 @endif
             </div>
         </div>

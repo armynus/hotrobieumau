@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Document;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
@@ -43,6 +44,7 @@ class DocumentLedgerExport extends DefaultValueBinder implements
         private readonly Builder $documents,
         private readonly string $direction,
         private readonly string $periodLabel,
+        private readonly ?string $sheetName = null,
     ) {
     }
 
@@ -86,8 +88,8 @@ class DocumentLedgerExport extends DefaultValueBinder implements
     {
         if ($this->isOutgoing()) {
             return [
-                $this->excelDate($document->forwarded_date ?? $document->issued_date),
-                $document->document_code,
+                $this->excelDate($this->entryValue($document, 'entry_date', $document->forwarded_date ?? $document->issued_date)),
+                $document->entry_code ?? $document->document_code,
                 $document->signer,
                 $this->excelDate($document->issued_date),
                 $document->title,
@@ -100,10 +102,10 @@ class DocumentLedgerExport extends DefaultValueBinder implements
         }
 
         return [
-            $this->excelDate($document->received_date ?? $document->issued_date),
-            $document->registry_number,
+            $this->excelDate($this->entryValue($document, 'entry_date', $document->received_date ?? $document->issued_date)),
+            $document->entry_number ?? $document->registry_number,
             $document->issuing_agency,
-            $document->document_code,
+            $document->entry_code ?? $document->document_code,
             $this->excelDate($document->issued_date),
             $document->title,
             $document->recipient,
@@ -136,7 +138,7 @@ class DocumentLedgerExport extends DefaultValueBinder implements
 
     public function title(): string
     {
-        return $this->isOutgoing() ? 'Sổ văn bản đi' : 'Sổ văn bản đến';
+        return $this->sheetName ?? ($this->isOutgoing() ? 'Sổ văn bản đi' : 'Sổ văn bản đến');
     }
 
     public function properties(): array
@@ -203,7 +205,13 @@ class DocumentLedgerExport extends DefaultValueBinder implements
 
     private function excelDate($date): ?float
     {
-        return $date ? Date::dateTimeToExcel($date) : null;
+        return $date ? Date::dateTimeToExcel(is_string($date) ? CarbonImmutable::parse($date) : $date) : null;
+    }
+
+    private function entryValue(Document $document, string $key, mixed $fallback): mixed
+    {
+        // A ledger entry with no registered date must stay blank in an annual export.
+        return array_key_exists($key, $document->getAttributes()) ? $document->getAttribute($key) : $fallback;
     }
 
     private function isOutgoing(): bool

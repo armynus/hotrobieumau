@@ -9,6 +9,7 @@ use App\Services\DocumentLedgerMatcher;
 use App\Services\DocumentLedgerReader;
 use App\Services\DocumentMetadataQueueService;
 use App\Services\DocumentService;
+use App\Support\DocumentStoragePath;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use RecursiveDirectoryIterator;
@@ -25,6 +26,8 @@ class ImportDocumentArchive extends Command
         {--ledger= : File sổ Excel cho chế độ incoming/outgoing cũ}
         {--incoming-ledger= : Sổ văn bản đến dùng khi kho chứa chung hai loại}
         {--outgoing-ledger= : Sổ văn bản đi dùng khi kho chứa chung hai loại}
+        {--incoming-sheet=* : Chỉ đọc các sheet đến này, ví dụ CVĐ}
+        {--outgoing-sheet=* : Chỉ đọc các sheet đi này; truyền nhiều lần cho sổ thường và quyết định}
         {--unmatched=unclassified : Với file không có trong sổ: unclassified, skip, incoming hoặc outgoing}
         {--queue-ocr-missing : Xếp hàng OCR cho PDF không khớp/thiếu metadata sau khi nhập}
         {--visibility=branch : branch, private hoặc system}
@@ -136,7 +139,8 @@ class ImportDocumentArchive extends Command
 
             try {
                 $ledgerPaths[$ledgerDirection] = $path;
-                $ledgerIndexes[$ledgerDirection] = $ledgerMatcher->index($ledgerReader->read($path, $ledgerDirection));
+                $sheets = $this->option($ledgerDirection === Document::DIRECTION_INCOMING ? 'incoming-sheet' : 'outgoing-sheet');
+                $ledgerIndexes[$ledgerDirection] = $ledgerMatcher->index($ledgerReader->read($path, $ledgerDirection, $sheets));
             } catch (Throwable $exception) {
                 $this->error($exception->getMessage());
 
@@ -263,11 +267,13 @@ class ImportDocumentArchive extends Command
                 }
 
                 $stats[$fileDirection]++;
+                $metadata = $this->archiveMetadata($archiveDate->format('Y-m-d'), $fileDirection, $ledgerResult['row'], $dateField);
 
                 if ($dryRun) {
                     if (count($previewRows) < 20) {
                         $previewRows[] = [
                             $archiveDate->format('d/m/Y'),
+                            ! empty($metadata['issued_date']) ? CarbonImmutable::parse($metadata['issued_date'])->format('d/m/Y') : '—',
                             match ($fileDirection) {
                                 Document::DIRECTION_INCOMING => 'Đến',
                                 Document::DIRECTION_OUTGOING => 'Đi',
@@ -287,11 +293,7 @@ class ImportDocumentArchive extends Command
                 try {
                     $date = $archiveDate->format('Y-m-d');
                     $data = array_merge(
-                        $this->ledgerMetadata($ledgerResult['row'] ?? null),
-                        array_filter(
-                            $this->archiveDateFields($date, $fileDirection, $dateField),
-                            fn ($value) => $value !== null
-                        ),
+                        $metadata,
                         [
                             // Tên file vẫn là số/ký hiệu chuẩn của kho; sổ chỉ bổ sung
                             // các trường nghiệp vụ, không đổi tên nhận diện của file.
@@ -302,6 +304,7 @@ class ImportDocumentArchive extends Command
                             '_ledger_source' => isset($ledgerPaths[$fileDirection]) ? basename($ledgerPaths[$fileDirection]) : null,
                             '_ledger_sheet' => $ledgerResult['row']['_sheet'] ?? null,
                             '_ledger_row' => $ledgerResult['row']['_row'] ?? null,
+                            '_ledger_match' => $ledgerResult['row'] ?? null,
                         ]);
 
                     $document = $documentService->importArchivedFile(
@@ -329,7 +332,7 @@ class ImportDocumentArchive extends Command
         }
 
         if ($dryRun && $previewRows !== []) {
-            $this->table(['Ngày kho', 'Loại', 'Số, ký hiệu', 'Trích yếu từ sổ', 'Tên file', 'Đường dẫn tương đối (tối đa 20 dòng)'], $previewRows);
+            $this->table(['Ngày kho', 'Ngày văn bản', 'Loại', 'Số, ký hiệu', 'Trích yếu từ sổ', 'Tên file', 'Đường dẫn tương đối (tối đa 20 dòng)'], $previewRows);
         }
 
         $this->newLine();
@@ -360,19 +363,7 @@ class ImportDocumentArchive extends Command
 
     public function extractArchiveDate(string $path): ?CarbonImmutable
     {
-        $normalized = str_replace('\\', '/', $path);
-        if (! preg_match_all('/(?:NGAY|NGÀY)?\s*(\d{1,2})[-_.\s]+(\d{1,2})[-_.\s]+(\d{4})(?:\/|$)/iu', $normalized.'/', $matches, PREG_SET_ORDER)) {
-            return null;
-        }
-
-        $match = end($matches);
-        try {
-            $date = CarbonImmutable::createSafe((int) $match[3], (int) $match[2], (int) $match[1]);
-
-            return $date?->startOfDay();
-        } catch (Throwable) {
-            return null;
-        }
+        return DocumentStoragePath::dateFromArchivePath($path);
     }
 
     public function documentCodeFromFileName(string $fileName): string
@@ -492,6 +483,18 @@ class ImportDocumentArchive extends Command
     /**
      * @return array<string, mixed>
      */
+    public function archiveMetadata(string $date, string $direction, ?array $row, string $dateField = 'auto'): array
+    {
+        $dates = array_filter($this->archiveDateFields($date, $direction, $dateField), fn ($value) => $value !== null);
+        if ($row === null) {
+            // Không khớp chắc dòng sổ: dùng ngày thư mục làm ngày văn bản theo quy ước kho.
+            return array_merge($dates, ['issued_date' => $date, 'title' => null]);
+        }
+
+        // Ngày và nội dung từ sổ luôn ưu tiên hơn ngày kho, kể cả --date-field=both.
+        return array_merge($dates, $this->ledgerMetadata($row));
+    }
+
     private function ledgerMetadata(?array $row): array
     {
         if ($row === null) {

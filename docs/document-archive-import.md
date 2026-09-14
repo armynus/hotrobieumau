@@ -1,13 +1,23 @@
 # Quy trình hoàn chỉnh nhập kho văn bản cũ
 
+> Với chức năng quản lý sổ theo năm mới, xem [document-ledger.md](document-ledger.md) để chạy đúng các lệnh nhập file, nhập/cập nhật sổ đến và hai sheet sổ đi từ đường dẫn `D:\Agribank văn bản\Văn Thư`. Lệnh `documents:import-ledger` mới vào sổ cả văn bản không có file; `documents:enrich-from-ledger` cũ chỉ bổ sung metadata.
+
 Tài liệu này dùng cho kho chung chứa cả văn bản đến và văn bản đi. Luồng nhập ưu tiên dữ liệu theo thứ tự:
 
 1. Tên file -> `document_code` (số, ký hiệu văn bản).
-2. Folder `NGAY dd-mm-yyyy` -> ngày đến của văn bản đến hoặc ngày chuyển của văn bản đi.
-3. Hai sổ Excel -> phân loại đến/đi và bổ sung các trường nghiệp vụ.
+2. Folder `NGAY dd-mm-yyyy` -> ngày đến của văn bản đến hoặc ngày chuyển của văn bản đi khi sổ không cung cấp ngày đó.
+3. Hai sổ Excel -> phân loại và bổ sung các trường nghiệp vụ; ngày văn bản và trích yếu ưu tiên dữ liệu trong sổ. Nếu đã vào sổ trước khi gắn file, ngày văn bản/trích yếu có nội dung trong Excel được cập nhật vào văn bản đó; ô trống không xóa dữ liệu cũ.
 4. PDF -> chỉ bù `issued_date` (ngày văn bản) và `title` (trích yếu) còn thiếu bằng `pdftotext` hoặc Tesseract OCR.
 
 File không khớp sổ hoặc khớp mơ hồ **vẫn được nhập** với trạng thái `unclassified` (Chưa phân loại). OCR không quyết định văn bản đến hay đi và việc nhập kho cũ không tạo thông báo “văn bản mới”.
+
+**Quy ước ngày khi không khớp sổ:** lấy ngày thư mục làm `issued_date` (ngày văn bản). Ví dụ `NAM 2026\THANG 01-2026\NGAY 05-01-2026` → lưu `2026-01-05`, giao diện hiển thị **05/01/2026**. Áp dụng cả khi không cung cấp Excel hoặc có nhiều dòng khớp không thể chọn chắc chắn; không bịa trích yếu từ tên file. Đây là ngày quy ước của kho, chưa chắc là ngày ban hành thực tế.
+
+Không cần thêm tham số để bật quy tắc này. Bảng `--dry-run` có cả **Ngày kho** và **Ngày văn bản** để kiểm tra trước. Nếu khớp sổ nhưng sổ thiếu ngày văn bản, giữ quy tắc trích xuất/OCR bổ sung như cũ; ngày có trong sổ không bị ngày folder ghi đè, kể cả dùng `--date-field=both`.
+
+**Thư mục ngày thiếu năm cũng được nhận:** `NAM 2022\THANG 12-2022\NGAY 06-12` → **06/12/2022**. Năm lấy từ thư mục cha `THANG mm-yyyy` hoặc `NAM yyyy` gần nhất, hỗ trợ cả tên có dấu `NĂM/THÁNG/NGÀY` và ngày/tháng một chữ số. Nếu thư mục ngày ghi đủ năm thì giữ năm đó. Không có thư mục cha nhận diện được năm hoặc ngày không hợp lệ (ví dụ 29/02/2022) thì vẫn báo không xác định được ngày; không tự gán năm hiện tại. Lệnh import giữ nguyên, không cần thêm tham số.
+
+File đã nhập trước vẫn báo **Trùng** và bị bỏ qua; chạy lại import không tự sửa ngày cho những bản ghi cũ. Không xóa file/database để ép nhập lại. Thư mục không xác định được ngày vẫn bị bỏ qua, trừ khi chủ động dùng `--fallback-mtime` (khi đó ngày dự phòng là ngày sửa file).
 
 ## Các đường dẫn dùng trong ví dụ
 
@@ -218,3 +228,28 @@ php artisan documents:enrich-from-ledger "E:\linh tinh\Văn Thư\Sổ vb đi 202
 ```
 
 Không dùng `--overwrite` trong lần chạy thông thường. Tùy chọn đó chỉ dành cho trường hợp chủ động muốn lấy sổ Excel ghi đè dữ liệu đã sửa tay.
+
+1. Vào source và khai báo đường dẫn
+Set-Location "D:\hotrobieumau"
+
+$kho = 'Z:\KHO VAN BAN CHUNG'
+$soDen = 'D:\Agribank văn bản\Văn Thư\Sổ vb đến 2026 (01-01-2026).xlsx'
+$soDi = 'D:\Agribank văn bản\Văn Thư\Sổ vb đi 2026 ( 01-01-2026).xlsx'
+
+Test-Path -LiteralPath $kho
+Test-Path -LiteralPath $soDen
+Test-Path -LiteralPath $soDi
+
+php artisan optimize:clear
+Đổi $kho thành đường dẫn kho thực tế, ví dụ D:\van ban. Cả ba lệnh Test-Path phải trả về True. Máy server cần có source mới và MySQL đang chạy.
+2. Chạy thử — chưa lưu dữ liệu
+php artisan documents:import-archive "$kho" --user=3 --direction=auto --incoming-ledger="$soDen" --incoming-sheet="CVĐ" --outgoing-ledger="$soDi" --outgoing-sheet="VB đi sau KT" --outgoing-sheet="VB QUYET DINH" --unmatched=unclassified --dry-run
+Đọc bảng thống kê, đặc biệt Ngày văn bản, Không có ngày, Trùng và Lỗi. --user=3 là tài khoản văn thư đứng tên nhập; đổi nếu ID thực tế khác.
+3. Kiểm tra ổn rồi mới nhập thật
+php artisan documents:import-archive "$kho" --user=3 --direction=auto --incoming-ledger="$soDen" --incoming-sheet="CVĐ" --outgoing-ledger="$soDi" --outgoing-sheet="VB đi sau KT" --outgoing-sheet="VB QUYET DINH" --unmatched=unclassified --yes
+Lệnh này sẽ:
+- Khớp sổ → lấy thông tin từ Excel.
+- Không khớp → lưu Chưa phân loại, lấy ngày thư mục làm ngày văn bản.
+- Không cần OCR và không thông báo văn bản mới.
+- File đã nhập báo Trùng → bỏ qua, không tự cập nhật ngày cũ.
+Chưa thêm --fallback-mtime nhé: chỉ dùng khi mày chấp nhận lấy ngày sửa file cho những thư mục không xác định được ngày.

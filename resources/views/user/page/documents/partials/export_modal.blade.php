@@ -75,7 +75,7 @@
                         <i class="fas fa-info-circle text-primary mt-1 mr-2"></i>
                         <div>
                             <div class="font-weight-bold text-gray-800" id="documentExportSummary"></div>
-                            <div class="small text-muted">Dữ liệu được giới hạn theo quyền xem của Văn thư. Mỗi lần xuất tối đa {{ number_format(config('documents.exports.max_rows', 20000)) }} văn bản.</div>
+                            <div class="small text-muted">Chỉ xuất văn bản đã vào sổ của chi nhánh. Sổ đi tách hai sheet thông thường và quyết định. Mỗi lần xuất tối đa {{ number_format(config('documents.exports.max_rows', 20000)) }} văn bản.</div>
                         </div>
                     </div>
                 </div>

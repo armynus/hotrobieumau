@@ -41,7 +41,8 @@ class DocumentLedgerEnrichmentService
         bool $reclassify = false,
     ): array {
         $documents = Document::query()
-            ->when(! $reclassify, fn ($query) => $query->where('direction', $direction))
+            ->when(! $reclassify, fn ($query) => $query->whereIn('direction', $direction === Document::DIRECTION_OUTGOING
+                ? [Document::DIRECTION_OUTGOING, Document::DIRECTION_DECISION] : [$direction]))
             ->where('managing_branch_id', $branchId)
             ->with([
                 'attachments:id,document_id,file_path,archive_relative_path',
@@ -90,7 +91,8 @@ class DocumentLedgerEnrichmentService
             }
 
             $stats['matched']++;
-            $updates = $this->updatesFor($document, $row, $direction, $overwrite, $reclassify);
+            $targetDirection = ($row['_book'] ?? '') === 'decision' ? Document::DIRECTION_DECISION : $direction;
+            $updates = $this->updatesFor($document, $row, $targetDirection, $overwrite, $reclassify);
 
             if ($updates === []) {
                 $stats['unchanged']++;
@@ -146,7 +148,7 @@ class DocumentLedgerEnrichmentService
         if ($reclassify && $document->direction !== $targetDirection) {
             $updates['direction'] = $targetDirection;
 
-            if ($targetDirection === Document::DIRECTION_OUTGOING) {
+            if (in_array($targetDirection, [Document::DIRECTION_OUTGOING, Document::DIRECTION_DECISION], true)) {
                 $updates['forwarded_date'] = $row['forwarded_date']
                     ?? $this->archiveDate($document)
                     ?? $this->comparableValue($document->received_date);
@@ -188,7 +190,7 @@ class DocumentLedgerEnrichmentService
 
     private function documentLedgerDate(Document $document, string $direction): ?string
     {
-        $value = $direction === Document::DIRECTION_OUTGOING
+        $value = in_array($direction, [Document::DIRECTION_OUTGOING, Document::DIRECTION_DECISION], true)
             ? $document->forwarded_date
             : $document->received_date;
 

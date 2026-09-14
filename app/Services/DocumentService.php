@@ -4,9 +4,12 @@ namespace App\Services;
 
 use App\Models\Document;
 use App\Models\DocumentAttachment;
+use App\Models\DocumentLedgerEntry;
 use App\Models\DocumentLog;
 use App\Models\DocumentPermission;
 use App\Models\DocumentTransfer;
+use App\Support\DocumentCode;
+use App\Support\DocumentLedgerNumber;
 use App\Support\DocumentStoragePath;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -45,8 +48,8 @@ class DocumentService
 
         try {
             return DB::transaction(function () use ($data, $sourcePath, $relativePath, $sourceKey, $checksum, $user, $storedPath, $storedFileName) {
-                $document = Document::create([
-                    'direction' => $data['direction'] ?? Document::DIRECTION_UNCLASSIFIED,
+                $document = $this->archivedLedgerDocument($data, $user) ?? Document::create([
+                    'direction' => ($data['_ledger_match']['_book'] ?? '') === 'decision' ? Document::DIRECTION_DECISION : ($data['direction'] ?? Document::DIRECTION_UNCLASSIFIED),
                     'registry_number' => $data['registry_number'] ?? null,
                     'document_code' => $data['document_code'],
                     'title' => $data['title'] ?? null,
@@ -104,86 +107,160 @@ class DocumentService
     }
 
     /**
-     * Upload and create a new document
+     * Tạo văn bản mới hoặc đăng file vào dòng sổ đã chọn, giữ nguyên ID cũ.
      */
-    public function createDocument(array $data, array $files, $user)
+    public function createDocument(array $data, array $files, $user, ?callable $afterSave = null)
     {
-        return DB::transaction(function () use ($data, $files, $user) {
-            $renamedFiles = [];
-
-            $document = Document::create([
-                'direction' => $data['direction'] ?? Document::DIRECTION_INCOMING,
-                'registry_number' => $data['registry_number'] ?? null,
-                'document_code' => $data['document_code'] ?? null,
-                'title' => $data['title'],
-                'document_type_id' => $data['document_type_id'] ?? null,
-                'managing_branch_id' => $data['managing_branch_id'] ?? $user->branch_id,
-                'visibility' => $data['visibility'] ?? Document::VISIBILITY_PRIVATE,
-                'issued_date' => $data['issued_date'] ?? null,
-                'received_date' => $data['received_date'] ?? null,
-                'forwarded_date' => $data['forwarded_date'] ?? null,
-                'issuing_agency' => $data['issuing_agency'] ?? null,
-                'signer' => $data['signer'] ?? null,
-                'recipient' => $data['recipient'] ?? null,
-                'archive_recipient' => $data['archive_recipient'] ?? null,
-                'copy_count' => $data['copy_count'] ?? null,
-                'receipt_signature' => $data['receipt_signature'] ?? null,
-                'notes' => $data['notes'] ?? null,
-                'priority' => $data['priority'] ?? 'normal',
-                'security_level' => $data['security_level'] ?? 'normal',
-                'created_by' => $user->id,
-            ]);
-
-            // Handle file uploads
-            foreach ($files as $file) {
-                if ($file) {
-                    // Lưu theo ngày vào sổ: ngày đến đối với văn bản đến,
-                    // ngày chuyển đối với văn bản đi; ngày văn bản là phương án dự phòng.
-                    $ledgerDate = ($data['direction'] ?? Document::DIRECTION_INCOMING) === Document::DIRECTION_OUTGOING
-                        ? ($data['forwarded_date'] ?? $data['issued_date'] ?? null)
-                        : ($data['received_date'] ?? $data['issued_date'] ?? null);
-                    $folderPath = DocumentStoragePath::directoryForDate($ledgerDate);
-
-                    $originalFileName = $file->getClientOriginalName();
-                    $storedFileName = $this->uniqueStoredFileName($folderPath, $originalFileName);
-                    $path = $file->storeAs($folderPath, $storedFileName, 'public');
-
-                    if ($path === false) {
-                        throw new \RuntimeException('Không thể lưu file văn bản: '.$originalFileName);
-                    }
-
-                    if ($storedFileName !== $this->sanitizeFileName($originalFileName)) {
-                        $renamedFiles[] = [
-                            'original' => $originalFileName,
-                            'stored' => $storedFileName,
-                        ];
-                    }
-
-                    DocumentAttachment::create([
-                        'document_id' => $document->id,
-                        'file_path' => $path,
-                        'file_name' => $storedFileName,
-                        'file_extension' => pathinfo($storedFileName, PATHINFO_EXTENSION) ?: null,
-                        'mime_type' => $file->getMimeType(),
-                        'file_size' => $file->getSize(),
-                        'uploaded_by' => $user->id,
-                    ]);
+        $storedPaths = [];
+        try {
+            return DB::transaction(function () use ($data, $files, $user, $afterSave, &$storedPaths) {
+                $renamedFiles = [];
+                $entry = isset($data['_ledger_entry_id']) ? app(DocumentLedgerUploadService::class)->selected($user, $data) : null;
+                $document = $entry?->document;
+                $metadata = [
+                    'direction' => $data['direction'] ?? Document::DIRECTION_INCOMING,
+                    'registry_number' => $data['registry_number'] ?? null,
+                    'document_code' => $data['document_code'] ?? null,
+                    'title' => $data['title'],
+                    'document_type_id' => $data['document_type_id'] ?? null,
+                    'managing_branch_id' => $data['managing_branch_id'] ?? $user->branch_id,
+                    'visibility' => $data['visibility'] ?? Document::VISIBILITY_PRIVATE,
+                    'issued_date' => $data['issued_date'] ?? null,
+                    'received_date' => $data['received_date'] ?? null,
+                    'forwarded_date' => $data['forwarded_date'] ?? null,
+                    'issuing_agency' => $data['issuing_agency'] ?? null,
+                    'signer' => $data['signer'] ?? null,
+                    'recipient' => $data['recipient'] ?? null,
+                    'archive_recipient' => $data['archive_recipient'] ?? null,
+                    'copy_count' => $data['copy_count'] ?? null,
+                    'receipt_signature' => $data['receipt_signature'] ?? null,
+                    'notes' => $data['notes'] ?? null,
+                    'priority' => $data['priority'] ?? 'normal',
+                    'security_level' => $data['security_level'] ?? 'normal',
+                    'created_by' => $user->id,
+                ];
+                if ($document) {
+                    // Giữ nguyên ID văn bản/file cũ; lần đầu đăng file xác lập người đăng tải.
+                    $document->fill($metadata)->save();
+                    $data['_ledger'] = [
+                        'book' => $entry->book, 'year' => $entry->year, 'number' => $entry->number,
+                        'document_code' => $data['document_code'],
+                        'registered_date' => $data[$entry->book === 'incoming' ? 'received_date' : 'forwarded_date'],
+                    ];
+                } else {
+                    $document = Document::create($metadata);
                 }
+
+                // Kiểm tra/cấp số trước khi ghi file để lỗi dữ liệu sổ không để lại file rác.
+                if (isset($data['_ledger'])) {
+                    app(DocumentLedgerService::class)->register($document, $user, $data['_ledger']);
+                }
+
+                // Handle file uploads
+                foreach ($files as $file) {
+                    if ($file) {
+                        // Lưu theo ngày vào sổ: ngày đến đối với văn bản đến,
+                        // ngày chuyển đối với văn bản đi; ngày văn bản là phương án dự phòng.
+                        $ledgerDate = in_array($data['direction'] ?? '', [Document::DIRECTION_OUTGOING, Document::DIRECTION_DECISION], true)
+                            ? ($data['forwarded_date'] ?? $data['issued_date'] ?? null)
+                            : ($data['received_date'] ?? $data['issued_date'] ?? null);
+                        $folderPath = DocumentStoragePath::directoryForDate($ledgerDate);
+
+                        $originalFileName = $file->getClientOriginalName();
+                        $storedFileName = $this->uniqueStoredFileName($folderPath, $originalFileName);
+                        $path = $file->storeAs($folderPath, $storedFileName, 'public');
+
+                        if ($path === false) {
+                            throw new \RuntimeException('Không thể lưu file văn bản: '.$originalFileName);
+                        }
+                        $storedPaths[] = $path;
+
+                        if ($storedFileName !== $this->sanitizeFileName($originalFileName)) {
+                            $renamedFiles[] = [
+                                'original' => $originalFileName,
+                                'stored' => $storedFileName,
+                            ];
+                        }
+
+                        DocumentAttachment::create([
+                            'document_id' => $document->id,
+                            'file_path' => $path,
+                            'file_name' => $storedFileName,
+                            'file_extension' => pathinfo($storedFileName, PATHINFO_EXTENSION) ?: null,
+                            'mime_type' => $file->getMimeType(),
+                            'file_size' => $file->getSize(),
+                            'uploaded_by' => $user->id,
+                        ]);
+                    }
+                }
+
+                // Log creation
+                DocumentLog::create([
+                    'document_id' => $document->id,
+                    'user_id' => $user->id,
+                    'action' => $entry ? ($files !== [] ? 'published' : 'updated') : 'created',
+                    'details' => ['message' => 'Document created and files uploaded.'],
+                ]);
+                if ($afterSave) {
+                    $afterSave($document);
+                }
+
+                return [
+                    'document' => $document->load('attachments'),
+                    'renamed_files' => $renamedFiles,
+                ];
+            });
+        } catch (\Throwable $exception) {
+            foreach ($storedPaths as $path) {
+                Storage::disk('public')->delete($path);
             }
+            throw $exception;
+        }
+    }
 
-            // Log creation
-            DocumentLog::create([
-                'document_id' => $document->id,
-                'user_id' => $user->id,
-                'action' => 'created',
-                'details' => ['message' => 'Document created and files uploaded.'],
-            ]);
+    /** Nếu đã nhập thông tin từ sổ trước, gắn file vào đúng dòng đó thay vì tạo văn bản thứ hai. */
+    private function archivedLedgerDocument(array $data, $user): ?Document
+    {
+        $row = $data['_ledger_match'] ?? null;
+        if (! $row || empty($row['_year']) || empty($row['_number']) || empty($row['_book'])) {
+            return null;
+        }
+        try {
+            $number = DocumentLedgerNumber::normalize((string) $row['_number']);
+        } catch (\Illuminate\Validation\ValidationException) {
+            return null;
+        }
+        $entries = DocumentLedgerEntry::where('branch_id', $user->branch_id)
+            ->where('year', $row['_year'])->where('book', $row['_book'])->where('number_key', $number)
+            ->where('code_key', DocumentCode::normalize($row['document_code'] ?? null))->get();
+        if ($entries->count() > 1) {
+            $exact = $entries->filter(fn ($entry) => $entry->source_sheet === ($row['_sheet'] ?? null)
+                && (int) $entry->source_row === (int) ($row['_row'] ?? 0));
+            if ($exact->count() !== 1) {
+                throw new \RuntimeException('Có nhiều dòng sổ trùng số; hãy chọn đúng dòng và đăng file trên giao diện.');
+            }
+            $entries = $exact;
+        }
+        $entry = $entries->first();
+        if (! $entry) {
+            return null;
+        }
+        if (DocumentCode::normalize($entry->document_code) !== DocumentCode::normalize($row['document_code'] ?? null)) {
+            throw new \RuntimeException('Số trong sổ đã thuộc văn bản khác. Kiểm tra lại dòng '.$row['_row'].' của sheet '.$row['_sheet'].'.');
+        }
 
-            return [
-                'document' => $document->load('attachments'),
-                'renamed_files' => $renamedFiles,
-            ];
-        });
+        $document = Document::whereKey($entry->document_id)->where('managing_branch_id', $user->branch_id)->lockForUpdate()->firstOrFail();
+        // Khi sổ đã nhập trước file, cập nhật ngày/trích yếu từ dòng Excel đang đối chiếu.
+        // Ô trống không xóa thông tin đã có; không dùng ngày folder đè ngày chính thức.
+        $updates = array_filter(
+            array_intersect_key($row, array_flip(['issued_date', 'title'])),
+            fn ($value) => $value !== null && $value !== ''
+        );
+        if ($updates !== []) {
+            $document->fill($updates)->save();
+        }
+
+        return $document;
     }
 
     /**

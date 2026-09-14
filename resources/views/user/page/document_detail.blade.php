@@ -67,7 +67,7 @@
                     <div class="card-body" id="actionButtons">
                         <button type="button" class="btn btn-primary btn-block mb-2 document-action" id="btnEditDocument" style="display:none;" data-toggle="modal" data-target="#editDocumentModal"><i class="fas fa-edit mr-1"></i> Chỉnh sửa văn bản</button>
                         <button type="button" class="btn btn-warning btn-block mb-2 document-action transfer-action" id="btnTransferBranch" style="display:none;" data-target-type="branch"><i class="fas fa-share mr-1"></i> Chuyển đến Chi nhánh loại II</button>
-                        <button type="button" class="btn btn-info btn-block document-action transfer-action" id="btnDistributeDepartment" style="display:none;" data-target-type="department"><i class="fas fa-sitemap mr-1"></i> Phân phối đến phòng ban</button>
+                        <button type="button" class="btn btn-info btn-block document-action transfer-action" id="btnDistributeDepartment" style="display:none;" data-target-type="local"><i class="fas fa-sitemap mr-1"></i> Gửi đến ban giám đốc / phòng ban</button>
                         <div class="text-center text-muted py-3" id="noDocumentActions"><i class="fas fa-lock mb-2"></i><div>Bạn có quyền xem văn bản này.</div></div>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
 </div>
 
 <div class="modal fade" id="transferModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document"><div class="modal-content">
+    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
         <form id="transferForm">
             @csrf
             <input type="hidden" name="target_type" id="transferTargetType">
@@ -103,11 +103,7 @@
                         @endforeach
                     </div>
                 </div>
-                <div class="form-group" id="departmentTransferGroup">
-                    <label>Phòng ban nhận văn bản <span class="text-danger">*</span></label>
-                    <select class="form-control" name="to_department_id" id="toDepartmentId"><option value="">-- Chọn phòng ban --</option>@foreach($departments as $department)<option value="{{ $department->id }}">{{ $department->department_name }}</option>@endforeach</select>
-                    @if($departments->isEmpty())<small class="form-text text-warning">Chi nhánh của bạn chưa có phòng ban hoạt động.</small>@endif
-                </div>
+                <div id="localTransferGroup">@include('user.page.documents.partials.local_recipients')</div>
                 <div class="form-group mb-0"><label>Ghi chú</label><textarea class="form-control" name="note" rows="3" maxlength="2000"></textarea></div>
             </div>
             <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button><button type="submit" class="btn btn-primary" id="btnTransferSubmit">Xác nhận</button></div>
@@ -126,6 +122,7 @@
                     <select class="form-control" name="direction" required>
                         <option value="incoming">Văn bản đến</option>
                         <option value="outgoing">Văn bản đi</option>
+                        <option value="decision">Quyết định</option>
                         <option value="unclassified">Chưa phân loại</option>
                     </select>
                 </div>
@@ -146,7 +143,7 @@
                 <div class="form-group"><label id="editRecipientLabel">Nơi / Đơn vị nhận văn bản</label><textarea class="form-control" name="recipient" rows="3" maxlength="5000"></textarea></div>
                 <div class="form-group outgoing-edit-field"><label>Đơn vị, người nhận bản lưu</label><textarea class="form-control" name="archive_recipient" rows="2" maxlength="5000"></textarea></div>
                 <div class="form-group"><label>Ký nhận</label><input type="text" class="form-control" name="receipt_signature" maxlength="255"></div>
-                <div class="form-group"><label>Mức độ công khai</label><select class="form-control" name="is_public_level" required><option value="0">Bình thường</option><option value="1">Công khai nội bộ chi nhánh</option><option value="2">Công khai toàn hệ thống</option></select></div>
+                <div class="form-group"><label>Mức độ công khai</label><select class="form-control" name="is_public_level" required><option value="0">Bình thường</option><option value="3">Gửi riêng - Chỉ văn thư và nơi được chọn</option><option value="1">Công khai nội bộ chi nhánh</option><option value="2">Công khai toàn hệ thống</option></select><small class="form-text text-muted">Thêm nơi nhận bằng nút chuyển tiếp văn bản.</small></div>
                 <div class="form-group mb-0"><label>Ghi chú</label><textarea class="form-control" name="notes" rows="3" maxlength="5000"></textarea></div>
             </div>
             <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button><button type="submit" class="btn btn-primary" id="btnEditSubmit"><i class="fas fa-save mr-1"></i> Lưu thay đổi</button></div>
@@ -200,6 +197,7 @@ $(document).ready(function() {
     function visibilityLabel(doc) {
         if (doc.visibility === 'system') return { text: 'Toàn hệ thống', className: 'badge-danger' };
         if (doc.visibility === 'branch') return { text: 'Nội bộ chi nhánh', className: 'badge-primary' };
+        if (doc.visibility === 'restricted') return { text: 'Gửi riêng', className: 'badge-info' };
         return { text: 'Bình thường', className: 'badge-secondary' };
     }
 
@@ -222,7 +220,7 @@ $(document).ready(function() {
         const container = $('#transferList').empty();
         if (!transfers || !transfers.length) return container.append($('<div>', { class: 'text-muted' }).text('Văn bản chưa có lịch sử luân chuyển.'));
         transfers.forEach(function(transfer) {
-            const target = (transfer.to_branch && transfer.to_branch.branch_name) || (transfer.to_department && transfer.to_department.department_name) || 'Nơi nhận';
+            const target = (transfer.to_branch && transfer.to_branch.branch_name) || (transfer.to_department && transfer.to_department.department_name) || (transfer.to_user && transfer.to_user.name) || 'Nơi nhận';
             const item = $('<div>', { class: 'timeline-item' });
             item.append($('<div>', { class: 'font-weight-bold text-gray-800' }).text(target));
             item.append($('<div>', { class: 'small text-muted' }).text(((transfer.transferer && transfer.transferer.name) || 'Người dùng') + ' · ' + formatDate(transfer.transferred_at || transfer.created_at, true)));
@@ -232,7 +230,7 @@ $(document).ready(function() {
     }
 
     function renderLogs(logs) {
-        const labels = { created: 'Đăng tải văn bản', updated: 'Chỉnh sửa văn bản', transferred: 'Chuyển đến chi nhánh', distributed_to_department: 'Phân phối đến phòng ban' };
+        const labels = { created: 'Đăng tải văn bản', published: 'Đăng file cho văn bản đã vào sổ', updated: 'Chỉnh sửa văn bản', ledger_recorded: 'Ghi mới sổ văn bản', ledger_imported: 'Nhập thông tin từ sổ Excel', ledger_registered: 'Cập nhật số trong sổ', archive_imported: 'Nhập kho văn bản cũ', transferred: 'Chuyển đến chi nhánh', distributed_to_department: 'Phân phối đến phòng ban', distributed_to_director: 'Gửi đến ban giám đốc' };
         const container = $('#logList').empty();
         if (!logs || !logs.length) return container.append($('<div>', { class: 'text-muted' }).text('Chưa có nhật ký.'));
         logs.forEach(function(log) {
@@ -257,7 +255,7 @@ $(document).ready(function() {
 
     function toggleEditDirectionFields(direction) {
         const incoming = direction === 'incoming';
-        const outgoing = direction === 'outgoing';
+        const outgoing = direction === 'outgoing' || direction === 'decision';
         $('.incoming-edit-field').toggle(incoming);
         $('.outgoing-edit-field').toggle(outgoing);
         $('#editDocumentModalTitle').text(outgoing ? 'Chỉnh sửa văn bản đi' : (incoming ? 'Chỉnh sửa văn bản đến' : 'Chỉnh sửa văn bản chưa phân loại'));
@@ -276,7 +274,7 @@ $(document).ready(function() {
         });
         form.find('[name="priority"]').val(doc.priority || 'normal');
         form.find('[name="security_level"]').val(doc.security_level || 'normal');
-        form.find('[name="is_public_level"]').val(doc.visibility === 'system' ? '2' : (doc.visibility === 'branch' ? '1' : '0'));
+        form.find('[name="is_public_level"]').val(doc.visibility === 'restricted' ? '3' : (doc.visibility === 'system' ? '2' : (doc.visibility === 'branch' ? '1' : '0')));
         const direction = doc.direction || 'unclassified';
         form.find('[name="direction"]').val(direction);
         toggleEditDirectionFields(direction);
@@ -289,13 +287,13 @@ $(document).ready(function() {
     function bindDocument(doc, capabilities) {
         const visibility = visibilityLabel(doc);
         const isIncoming = doc.direction === 'incoming';
-        const isOutgoing = doc.direction === 'outgoing';
+        const isOutgoing = doc.direction === 'outgoing' || doc.direction === 'decision';
         $('#docTitle').text(doc.document_code || 'Chưa cập nhật số, ký hiệu');
         $('#documentSubTitle').text('Cập nhật lần cuối: ' + formatDate(doc.updated_at, true));
-        $('#docVisibility').removeClass('badge-danger badge-primary badge-secondary').addClass(visibility.className).text(visibility.text);
-        const directionText = isOutgoing ? 'Văn bản đi' : (isIncoming ? 'Văn bản đến' : 'Chưa phân loại');
-        const directionClass = isOutgoing ? 'badge-success' : (isIncoming ? 'badge-primary' : 'badge-secondary');
-        $('#docDirection').removeClass('badge-primary badge-success badge-secondary').addClass(directionClass).text(directionText);
+        $('#docVisibility').removeClass('badge-danger badge-primary badge-secondary badge-info').addClass(visibility.className).text(visibility.text);
+        const directionText = doc.direction === 'decision' ? 'Quyết định' : (isOutgoing ? 'Văn bản đi' : (isIncoming ? 'Văn bản đến' : 'Chưa phân loại'));
+        const directionClass = doc.direction === 'decision' ? 'badge-warning' : (isOutgoing ? 'badge-success' : (isIncoming ? 'badge-primary' : 'badge-secondary'));
+        $('#docDirection').removeClass('badge-primary badge-success badge-secondary badge-warning').addClass(directionClass).text(directionText);
         $('#docDirectionText').text(directionText);
         $('#docDocumentType').text((doc.document_type && doc.document_type.name) || '---');
         $('.incoming-meta').toggle(isIncoming); $('.outgoing-meta').toggle(isOutgoing);
@@ -329,9 +327,9 @@ $(document).ready(function() {
     $('.transfer-action').on('click', function() {
         const targetType = $(this).data('target-type');
         $('#transferForm')[0].reset(); $('#transferTargetType').val(targetType);
-        $('#branchTransferGroup').toggle(targetType === 'branch'); $('#departmentTransferGroup').toggle(targetType === 'department');
-        $('#toDepartmentId').prop('required', targetType === 'department');
-        $('#transferModalTitle').text(targetType === 'branch' ? 'Chuyển đến Chi nhánh loại II' : 'Phân phối đến phòng ban');
+        $('#branchTransferGroup').toggle(targetType === 'branch').find('input').prop('disabled', targetType !== 'branch');
+        $('#localTransferGroup').toggle(targetType === 'local').find('input').prop('disabled', targetType !== 'local');
+        $('#transferModalTitle').text(targetType === 'branch' ? 'Chuyển đến Chi nhánh loại II' : 'Gửi đến ban giám đốc / phòng ban chi nhánh mình');
         $('#transferModal').modal('show');
     });
 
@@ -352,11 +350,15 @@ $(document).ready(function() {
             Swal.fire('Chưa chọn chi nhánh', 'Vui lòng chọn ít nhất một chi nhánh nhận văn bản.', 'warning');
             return;
         }
+        if ($('#transferTargetType').val() === 'local' && $('#localTransferGroup input[name]:checked').length === 0) {
+            Swal.fire('Chưa chọn nơi nhận', 'Vui lòng chọn ít nhất một người hoặc phòng ban nhận văn bản.', 'warning');
+            return;
+        }
 
         const button = $('#btnTransferSubmit').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang xử lý...');
         $.post('/api/documents/' + docId + '/transfer', $(this).serialize()).done(function(response) {
             $('#transferModal').modal('hide'); Swal.fire('Thành công', response.message, 'success'); loadDocument();
-        }).fail(function(xhr) { Swal.fire('Lỗi', (xhr.responseJSON && xhr.responseJSON.message) || 'Không thể chuyển văn bản.', 'error'); })
+        }).fail(function(xhr) { Swal.fire('Lỗi', ajaxErrorMessage(xhr, 'Không thể chuyển văn bản.'), 'error'); })
           .always(function() { button.prop('disabled', false).text('Xác nhận'); });
     });
 

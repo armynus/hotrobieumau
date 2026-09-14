@@ -1,0 +1,19 @@
+#ledgerEntryModal .modal-content { border: 0; border-radius: 14px; overflow: hidden; }
+#ledgerEntryForm { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+#ledgerEntryModal .modal-body { background: #f4f6fb; overflow-y: auto; }
+#ledgerEntryModal .modal-header, #ledgerEntryModal .modal-footer { flex-shrink: 0; }
+.ledger-entry-header { background: #edf2ff; color: #294995; border-bottom: 1px solid #dbe4f7; }
+.ledger-entry-icon { width: 46px; height: 46px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; background: #4e73df; color: white; font-size: 20px; flex-shrink: 0; }
+.ledger-entry-section { background: white; border: 1px solid #e1e7f2; border-radius: 10px; padding: 20px; }
+.ledger-section-title { display: flex; align-items: center; gap: 10px; color: #294995; font-weight: 700; margin-bottom: 18px; }
+.ledger-section-title span { padding: 5px 8px; background: #edf2ff; border-radius: 6px; font-size: 12px; }
+.ledger-entry-context { padding: 12px 16px; background: #eaf2ff; border-left: 3px solid #4e73df; border-radius: 6px; color: #33496f; overflow-wrap: anywhere; }
+#ledgerEntryForm label { color: #44516a; font-size: .9rem; font-weight: 600; }
+#ledgerEntryForm .form-control { border-color: #d6deec; border-radius: 6px; }
+#ledgerCandidates { max-height: 230px; overflow-y: auto; }
+#ledgerMetadataFields:disabled .form-control { background: #f3f4f7; }
+@media (max-width: 575.98px) {
+    #ledgerEntryModal .modal-dialog { margin: .5rem; }
+    #ledgerEntryModal .modal-body, .ledger-entry-section { padding: 12px; }
+    #ledgerEntryModal .modal-footer small { flex-basis: 100%; margin-bottom: 6px; }
+}

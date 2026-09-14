@@ -52,7 +52,8 @@ class DocumentController extends Controller
             ->orderBy('department_name')
             ->get();
 
-        return view('user.page.document_list', compact('documentTypes', 'type2Branches', 'departments'));
+        return view('user.page.document_list', compact('documentTypes', 'type2Branches', 'departments'))
+            ->with('directors', app(\App\Services\DocumentRecipientService::class)->directors((int) $user->branch_id));
     }
 
     public function document_register()
@@ -70,6 +71,11 @@ class DocumentController extends Controller
         return $this->documentRegister(Document::DIRECTION_OUTGOING);
     }
 
+    public function registerDecision()
+    {
+        return $this->documentRegister(Document::DIRECTION_DECISION);
+    }
+
     private function documentRegister(string $direction)
     {
         $userId = Session::get('user_id');
@@ -85,7 +91,9 @@ class DocumentController extends Controller
         $documentTypes = DocumentType::query()->where('status', 'active')->get();
         $type2Branches = Branches::query()->where('branch_type', 'type_2')->where('status', 'active')->get();
 
-        return view('user.page.document_register', compact('documentTypes', 'type2Branches', 'direction'));
+        $departments = Department::where('branch_id', $user->branch_id)->where('status', 'active')->orderBy('department_name')->get();
+        return view('user.page.document_register', compact('documentTypes', 'type2Branches', 'direction', 'departments'))
+            ->with('directors', app(\App\Services\DocumentRecipientService::class)->directors((int) $user->branch_id));
     }
 
     public function document_reports(Request $request, DocumentQueryService $documentQueryService)
@@ -124,6 +132,7 @@ class DocumentController extends Controller
 
         $monthlyIncomingCounts = array_fill(0, 12, 0);
         $monthlyOutgoingCounts = array_fill(0, 12, 0);
+        $monthlyDecisionCounts = array_fill(0, 12, 0);
         $monthlyUnclassifiedCounts = array_fill(0, 12, 0);
         $monthlyRows = (clone $documentsQuery)
             ->whereYear('issued_date', $selectedYear)
@@ -137,7 +146,9 @@ class DocumentController extends Controller
                 continue;
             }
 
-            if ($row->direction === Document::DIRECTION_OUTGOING) {
+            if ($row->direction === Document::DIRECTION_DECISION) {
+                $monthlyDecisionCounts[$monthIndex] = (int) $row->total;
+            } elseif ($row->direction === Document::DIRECTION_OUTGOING) {
                 $monthlyOutgoingCounts[$monthIndex] = (int) $row->total;
             } elseif ($row->direction === Document::DIRECTION_INCOMING) {
                 $monthlyIncomingCounts[$monthIndex] = (int) $row->total;
@@ -146,9 +157,10 @@ class DocumentController extends Controller
             }
         }
         $monthlyCounts = array_map(
-            fn ($incoming, $outgoing, $unclassified) => $incoming + $outgoing + $unclassified,
+            fn ($incoming, $outgoing, $decision, $unclassified) => $incoming + $outgoing + $decision + $unclassified,
             $monthlyIncomingCounts,
             $monthlyOutgoingCounts,
+            $monthlyDecisionCounts,
             $monthlyUnclassifiedCounts
         );
 
@@ -168,10 +180,12 @@ class DocumentController extends Controller
             'monthlyCounts' => $monthlyCounts,
             'monthlyIncomingCounts' => $monthlyIncomingCounts,
             'monthlyOutgoingCounts' => $monthlyOutgoingCounts,
+            'monthlyDecisionCounts' => $monthlyDecisionCounts,
             'monthlyUnclassifiedCounts' => $monthlyUnclassifiedCounts,
             'totalSystem' => (clone $documentsQuery)->count(),
             'incomingTotal' => (clone $documentsQuery)->where('direction', Document::DIRECTION_INCOMING)->count(),
             'outgoingTotal' => (clone $documentsQuery)->where('direction', Document::DIRECTION_OUTGOING)->count(),
+            'decisionTotal' => (clone $documentsQuery)->where('direction', Document::DIRECTION_DECISION)->count(),
             'unclassifiedTotal' => (clone $documentsQuery)->where('direction', Document::DIRECTION_UNCLASSIFIED)->count(),
             'visibleTotal' => $visibleTotal,
             'readTotal' => $readTotal,
@@ -208,6 +222,7 @@ class DocumentController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('user.page.document_detail', compact('id', 'type2Branches', 'departments', 'documentTypes'));
+        return view('user.page.document_detail', compact('id', 'type2Branches', 'departments', 'documentTypes'))
+            ->with('directors', app(\App\Services\DocumentRecipientService::class)->directors((int) $user->branch_id));
     }
 }

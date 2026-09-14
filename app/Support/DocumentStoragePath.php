@@ -50,12 +50,31 @@ class DocumentStoragePath
     public static function dateFromArchivePath(string $path): ?CarbonImmutable
     {
         $path = str_replace('\\', '/', $path);
-        if (! preg_match('#(?:^|/)(?:NGAY|NGÀY)?\s*(\d{1,2})[-_.\s]+(\d{1,2})[-_.\s]+(\d{4})(?:/|$)#iu', $path.'/', $matches)) {
+        $parentYear = null;
+        $dateParts = null;
+        foreach (explode('/', $path) as $segment) {
+            $segment = trim($segment);
+            // Chỉ lấy năm từ thư mục cha nhận diện rõ; không lấy năm hiện tại
+            // hoặc chữ số trong tên file. Thư mục cha gần nhất được ưu tiên.
+            if (preg_match('/^(?:NAM|NĂM)\s*(\d{4})$/iu', $segment, $matches)) {
+                $parentYear = (int) $matches[1];
+            } elseif (preg_match('/^(?:THANG|THÁNG)\s*(\d{1,2})[-_.\s]+(\d{4})$/iu', $segment, $matches)) {
+                $parentYear = (int) $matches[1] >= 1 && (int) $matches[1] <= 12 ? (int) $matches[2] : null;
+            } elseif (preg_match('/^(?:NGAY|NGÀY)?\s*(\d{1,2})[-_.\s]+(\d{1,2})[-_.\s]+(\d{4})$/iu', $segment, $matches)) {
+                $dateParts = [(int) $matches[3], (int) $matches[2], (int) $matches[1]];
+            } elseif (preg_match('/^(?:NGAY|NGÀY)\s*(\d{1,2})[-_.\s]+(\d{1,2})$/iu', $segment, $matches)) {
+                $dateParts = [$parentYear, (int) $matches[2], (int) $matches[1]];
+            }
+        }
+        if ($dateParts === null) {
             return self::dateFromLegacyPath($path);
+        }
+        if ($dateParts[0] === null) {
+            return null;
         }
 
         try {
-            return CarbonImmutable::createSafe((int) $matches[3], (int) $matches[2], (int) $matches[1])?->startOfDay();
+            return CarbonImmutable::createSafe(...$dateParts)?->startOfDay();
         } catch (Throwable) {
             return null;
         }

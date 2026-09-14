@@ -26,6 +26,7 @@ use App\Http\Controllers\User\FormDraftController;
 use App\Http\Controllers\User\DocumentController;
 use App\Http\Controllers\User\DocumentApiController;
 use App\Http\Controllers\User\DocumentExportController;
+use App\Http\Controllers\User\DocumentLedgerController;
 
 
 Route::get('login_admin', [LoginAdminController::class, 'login_admin'])->name('login_admin');
@@ -150,7 +151,15 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::get('documents/register', [DocumentController::class, 'document_register'])->name('document_register');
     Route::get('documents/incoming/register', [DocumentController::class, 'registerIncoming'])->name('documents_incoming_register');
     Route::get('documents/outgoing/register', [DocumentController::class, 'registerOutgoing'])->name('documents_outgoing_register');
+    Route::get('documents/decision/register', [DocumentController::class, 'registerDecision'])->name('documents_decision_register');
+    Route::get('documents/ledger/upload-lookup', [DocumentLedgerController::class, 'uploadLookup'])->middleware('throttle:90,1')->name('documents_ledger_upload_lookup');
     Route::get('documents/reports', [DocumentController::class, 'document_reports'])->name('document_reports');
+    Route::get('documents/ledger', [DocumentLedgerController::class, 'index'])->name('documents_ledger');
+    Route::get('documents/ledger/next-number', [DocumentLedgerController::class, 'nextNumber'])->name('documents_ledger_next_number');
+    Route::get('documents/ledger/candidates', [DocumentLedgerController::class, 'candidates'])->name('documents_ledger_candidates');
+    Route::post('documents/ledger/import', [DocumentLedgerController::class, 'import'])->middleware('throttle:3,1')->name('documents_ledger_import');
+    Route::post('documents/ledger/entries', [DocumentLedgerController::class, 'create'])->middleware('throttle:30,1')->name('documents_ledger_create');
+    Route::post('documents/ledger/{document}/register', [DocumentLedgerController::class, 'register'])->middleware('throttle:30,1')->name('documents_ledger_register');
     Route::post('documents/export', DocumentExportController::class)
         ->middleware('throttle:3,1')
         ->name('documents_export');

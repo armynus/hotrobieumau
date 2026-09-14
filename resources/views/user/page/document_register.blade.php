@@ -1,8 +1,9 @@
 @extends('user.layouts.app')
 @php
-    $isOutgoing = $direction === \App\Models\Document::DIRECTION_OUTGOING;
-    $directionLabel = $isOutgoing ? 'Văn bản đi' : 'Văn bản đến';
-    $listRoute = $isOutgoing ? 'documents_outgoing' : 'documents_incoming';
+    $isDecision = $direction === \App\Models\Document::DIRECTION_DECISION;
+    $isOutgoing = $isDecision || $direction === \App\Models\Document::DIRECTION_OUTGOING;
+    $directionLabel = $isDecision ? 'Quyết định' : ($isOutgoing ? 'Văn bản đi' : 'Văn bản đến');
+    $listRoute = 'documents_forward';
 @endphp
 @section('title', 'Đăng tải ' . mb_strtolower($directionLabel))
 
@@ -18,9 +19,25 @@
         </a>
     </div>
 
-    <form id="documentRegisterForm" enctype="multipart/form-data">
+    <form id="documentRegisterForm" enctype="multipart/form-data" data-ledger-lookup-url="{{ route('documents_ledger_upload_lookup') }}">
         @csrf
         <input type="hidden" name="direction" value="{{ $direction }}">
+        <input type="hidden" name="ledger_book" value="{{ $direction }}">
+        <input type="hidden" name="ledger_entry_id">
+        <input type="hidden" name="ledger_entry_version">
+        <div class="card border-left-primary shadow-sm mb-4">
+            <div class="card-body">
+                <h6 class="font-weight-bold text-primary"><i class="fas fa-book-open mr-1"></i> Lấy thông tin từ sổ {{ mb_strtolower($directionLabel) }}</h6>
+                <div class="form-row align-items-end">
+                    <div class="form-group col-md-2"><label for="uploadLedgerYear">Năm sổ</label><input id="uploadLedgerYear" class="form-control" type="number" min="2000" max="2100" value="{{ now()->year }}"></div>
+                    <div class="form-group col-md-8"><label for="uploadLedgerQuery">Số vào sổ hoặc đầy đủ số, ký hiệu văn bản</label><input id="uploadLedgerQuery" class="form-control" maxlength="255" placeholder="Ví dụ: 123 hoặc 123/NHNo.ĐT-TH" autocomplete="off"></div>
+                    <div class="form-group col-md-2"><button type="button" id="uploadLedgerSearch" class="btn btn-outline-primary btn-block"><i class="fas fa-search mr-1"></i> Tra sổ</button></div>
+                </div>
+                <div id="uploadLedgerStatus" class="small text-muted" role="status">Nhập số để tự điền thông tin. Nếu trùng nhiều dòng, hãy chọn đúng văn bản trước khi tải file.</div>
+                <div id="uploadLedgerChoices" class="d-none mt-2"><label for="uploadLedgerEntry">Chọn dòng trong sổ</label><select id="uploadLedgerEntry" class="form-control"></select></div>
+                <button type="button" id="uploadLedgerReset" class="btn btn-sm btn-link d-none mt-2">Bỏ chọn và nhập văn bản khác</button>
+            </div>
+        </div>
         <div class="row">
             <div class="col-xl-8">
                 <div class="card shadow mb-4">
@@ -29,11 +46,33 @@
                         <span class="badge {{ $isOutgoing ? 'badge-success' : 'badge-primary' }}">{{ $directionLabel }}</span>
                     </div>
                     <div class="card-body">
+                        <div class="bg-light border rounded p-3 mb-3">
+                            <input type="hidden" name="register_in_ledger" value="0">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" name="register_in_ledger" value="1" id="registerInLedger" checked>
+                                <label class="custom-control-label font-weight-bold text-primary" for="registerInLedger">Ghi vào sổ văn bản của chi nhánh</label>
+                            </div>
+                            <small class="form-text text-muted">Năm sổ theo ngày đến/ngày chuyển. Mỗi năm cấp lại số từ 1; chỉ văn bản đã vào sổ mới được xuất Excel.</small>
+                            @if($isOutgoing)
+                            <div class="form-row mt-2 ledger-register-options">
+                                <div class="col-md-6">
+                                    <div class="small font-weight-bold">Sổ riêng: {{ $directionLabel }}</div>
+                                </div>
+                                <div class="col-md-6 d-flex align-items-end pb-2">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" name="ledger_auto_number" value="1" id="ledgerAutoNumber">
+                                        <label class="custom-control-label" for="ledgerAutoNumber">Tự cấp số {{ $isDecision ? 'quyết định' : 'đi' }} trước dấu /</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted ledger-register-options">Giữ số có sẵn trước dấu /. Nếu tự cấp số, nhập ký hiệu như /NHNo.ĐT-TH; hệ thống ghép số khi lưu.</small>
+                            @endif
+                        </div>
                         <div class="form-row">
                             @unless($isOutgoing)
                             <div class="form-group col-md-4">
-                                <label>Số đến <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="registry_number" maxlength="255" required>
+                                <label>Số đến</label>
+                                <input type="text" class="form-control" name="registry_number" maxlength="50" placeholder="Để trống để tự cấp số khi vào sổ">
                             </div>
                             @endunless
                             <div class="form-group {{ $isOutgoing ? 'col-md-12' : 'col-md-8' }}">
@@ -130,10 +169,13 @@
                             <label class="font-weight-bold">Mức độ công khai</label>
                             <select class="form-control" name="is_public_level" id="publicLevel" required>
                                 <option value="0">Bình thường - Ban lãnh đạo và nơi được chuyển tiếp</option>
+                                <option value="3">Gửi riêng - Chỉ văn thư và nơi được chọn</option>
                                 <option value="1">Công khai nội bộ chi nhánh</option>
                                 <option value="2">Công khai toàn hệ thống</option>
                             </select>
                         </div>
+                        @include('user.page.documents.partials.local_recipients')
+                        <small class="d-block text-muted mb-3">Chọn “Gửi riêng” để giới hạn người xem theo những nơi được chọn. Văn thư quản lý vẫn được xem và xử lý văn bản.</small>
                         <label id="branch_selection_label" class="font-weight-bold">Chi nhánh loại II nhận văn bản (nếu có)</label>
                         <div class="border rounded p-2 bg-white" id="branch_selection_area" style="max-height: 220px; overflow-y: auto;">
                             <div class="custom-control custom-checkbox mb-2 border-bottom pb-2">
@@ -220,7 +262,15 @@ $(document).ready(function() {
         $('#selectedFileList').empty();
         document.querySelectorAll('.register-date-picker').forEach(function(input) { if (input._flatpickr) input._flatpickr.clear(); });
         $('#branch_selection_area input[type="checkbox"]').prop('disabled', false).prop('checked', false);
+        $('#registerInLedger').trigger('change');
+        $('#documentRegisterForm').trigger('document-register:reset');
     }
+    $('#documentRegisterForm').on('document-register:reset-request', resetRegisterForm);
+
+    $('#registerInLedger').on('change', function() {
+        $('.ledger-register-options').toggle(this.checked);
+        $('[name="registry_number"]').attr('placeholder', this.checked ? 'Để trống để tự cấp số khi vào sổ' : 'Không ghi vào sổ');
+    });
 
     $('#checkAllBranches').on('change', function() { $('.branch-checkbox').prop('checked', this.checked); });
     $('.branch-checkbox').on('change', function() {
@@ -238,9 +288,10 @@ $(document).ready(function() {
         if (!files || !files.length) return;
         const documentCode = $('[name="document_code"]');
         const codeFromFileName = files[0].name.replace(/\.[^.]+$/, '').trim();
-        if (!documentCode.val().trim() || documentCode.val().trim() === autoFilledDocumentCode) {
+        if (!documentCode.prop('readonly') && (!documentCode.val().trim() || documentCode.val().trim() === autoFilledDocumentCode)) {
             documentCode.val(codeFromFileName);
             autoFilledDocumentCode = codeFromFileName;
+            documentCode.trigger('input');
         }
     });
     $('#documentUploadZone').on('dragenter dragover', function(e) { e.preventDefault(); $(this).addClass('is-dragging'); })
@@ -256,6 +307,10 @@ $(document).ready(function() {
 
     $('#documentRegisterForm').on('submit', function(e) {
         e.preventDefault();
+        if ($(this).data('ledger-lookup-blocked')) {
+            Swal.fire('Chọn dòng sổ', 'Hãy hoàn tất tra sổ và chọn đúng dòng văn bản trước khi đăng tải.', 'info');
+            return;
+        }
         const button = $('#submitBtn');
         const original = button.html();
         button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang tải lên...');
@@ -274,4 +329,5 @@ $(document).ready(function() {
     });
 });
 </script>
+<script src="{{ asset('js/user/document-register-ledger.js') }}"></script>
 @endpush

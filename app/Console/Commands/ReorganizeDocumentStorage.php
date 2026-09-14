@@ -158,7 +158,7 @@ class ReorganizeDocumentStorage extends Command
 
     private function documentDate(object $attachment): ?string
     {
-        if ($attachment->direction === Document::DIRECTION_OUTGOING) {
+        if (in_array($attachment->direction, [Document::DIRECTION_OUTGOING, Document::DIRECTION_DECISION], true)) {
             return $attachment->forwarded_date
                 ?: $attachment->issued_date
                 ?: $attachment->document_created_at;

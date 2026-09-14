@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Exports\DocumentLedgerExport;
+use App\Exports\DocumentLedgerWorkbook;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\User;
-use App\Services\DocumentQueryService;
 use App\Support\DocumentExportPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -16,13 +15,13 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class DocumentExportController extends Controller
 {
-    public function __invoke(Request $request, DocumentQueryService $documentQueryService)
+    public function __invoke(Request $request)
     {
         $userId = Session::get('user_id');
         if (!$userId) return redirect()->route('login');
 
         $user = User::with(['branch', 'position'])->find($userId);
-        abort_unless($user?->isClerk(), 403, 'Chỉ Văn thư mới được xuất sổ văn bản.');
+        abort_unless($user?->isClerk() && $user->branch_id, 403, 'Chỉ Văn thư thuộc chi nhánh mới được xuất sổ văn bản.');
 
         $validated = $request->validate([
             'direction' => 'required|in:incoming,outgoing',
@@ -33,16 +32,19 @@ class DocumentExportController extends Controller
         ]);
         $period = DocumentExportPeriod::from($validated);
         $direction = $validated['direction'];
-        $dateColumn = $direction === Document::DIRECTION_OUTGOING ? 'forwarded_date' : 'received_date';
-
-        $documents = $documentQueryService->getDocumentsForUser($user, [
-            'direction' => $direction,
-            'date_from' => $period->start->toDateString(),
-            'date_to' => $period->end->toDateString(),
-            'sort_by' => $dateColumn,
-            'sort_dir' => 'asc',
-        ]);
-        $documents->setEagerLoads([])->select([
+        // Sổ thuộc chi nhánh, không phải mọi văn bản mà người dùng có quyền xem.
+        $documents = Document::query()
+            ->join('document_ledger_entries as ledger', 'ledger.document_id', '=', 'documents.id')
+            ->where('ledger.branch_id', $user->branch_id)
+            ->where('ledger.year', $validated['year'])
+            ->whereIn('ledger.book', $direction === Document::DIRECTION_INCOMING ? ['incoming'] : ['outgoing', 'decision'])
+            ->when($validated['period_type'] !== 'year', fn ($query) => $query->whereBetween('ledger.registered_date', [
+                $period->start->toDateString(), $period->end->toDateString(),
+            ]))
+            ->orderBy('ledger.sequence_number')
+            ->orderBy('ledger.number_key')
+            ->orderBy('ledger.id');
+        $documents->select([
             'documents.id',
             'documents.direction',
             'documents.registry_number',
@@ -59,6 +61,10 @@ class DocumentExportController extends Controller
             'documents.receipt_signature',
             'documents.notes',
             'documents.created_at',
+            'ledger.number as entry_number',
+            'ledger.document_code as entry_code',
+            'ledger.registered_date as entry_date',
+            'ledger.book as entry_book',
         ]);
 
         $lock = Cache::lock(
@@ -84,7 +90,7 @@ class DocumentExportController extends Controller
 
             $typeName = $direction === Document::DIRECTION_OUTGOING ? 'di' : 'den';
             $fileName = "So-van-ban-{$typeName}_{$period->fileSuffix}.xlsx";
-            $export = new DocumentLedgerExport($documents, $direction, $period->label);
+            $export = new DocumentLedgerWorkbook($documents, $direction, $period->label);
 
             return Excel::download($export, $fileName, ExcelWriter::XLSX, [
                 'Cache-Control' => 'private, no-store, max-age=0',

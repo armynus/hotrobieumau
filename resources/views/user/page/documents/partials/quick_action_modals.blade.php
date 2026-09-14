@@ -1,10 +1,17 @@
 <div class="modal fade" id="quickTransferModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document"><div class="modal-content">
+    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
         <form id="quickTransferForm">
             @csrf
             <input type="hidden" name="target_type" id="quickTransferTargetType">
             <div class="modal-header"><h5 class="modal-title" id="quickTransferModalTitle">Chuyển văn bản</h5><button type="button" class="close" data-dismiss="modal"><span>&times;</span></button></div>
             <div class="modal-body">
+                <div class="form-group" id="quickTransferModeGroup">
+                    <label for="quickTransferMode">Chuyển đến</label>
+                    <select class="form-control" id="quickTransferMode">
+                        <option value="branch">Chi nhánh loại II</option>
+                        <option value="local">Ban giám đốc / phòng ban chi nhánh mình</option>
+                    </select>
+                </div>
                 <div class="form-group" id="quickBranchTransferGroup">
                     <label>Chi nhánh loại II nhận văn bản <span class="text-danger">*</span></label>
                     <div class="border rounded p-2 bg-white" style="max-height: 260px; overflow-y: auto;">
@@ -20,11 +27,7 @@
                         @endforeach
                     </div>
                 </div>
-                <div class="form-group" id="quickDepartmentTransferGroup">
-                    <label>Phòng ban nhận văn bản <span class="text-danger">*</span></label>
-                    <select class="form-control" name="to_department_id" id="quickToDepartmentId"><option value="">-- Chọn phòng ban --</option>@foreach($departments as $department)<option value="{{ $department->id }}">{{ $department->department_name }}</option>@endforeach</select>
-                    @if($departments->isEmpty())<small class="form-text text-warning">Chi nhánh của bạn chưa có phòng ban hoạt động.</small>@endif
-                </div>
+                <div id="quickLocalTransferGroup">@include('user.page.documents.partials.local_recipients')</div>
                 <div class="form-group mb-0"><label>Ghi chú</label><textarea class="form-control" name="note" rows="3" maxlength="2000"></textarea></div>
             </div>
             <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button><button type="submit" class="btn btn-primary" id="quickTransferSubmit">Xác nhận</button></div>
@@ -43,6 +46,7 @@
                     <select class="form-control" name="direction" required>
                         <option value="incoming">Văn bản đến</option>
                         <option value="outgoing">Văn bản đi</option>
+                        <option value="decision">Quyết định</option>
                         <option value="unclassified">Chưa phân loại</option>
                     </select>
                 </div>
@@ -63,7 +67,7 @@
                 <div class="form-group"><label id="quickRecipientLabel">Đơn vị hoặc người nhận</label><textarea class="form-control" name="recipient" rows="3" maxlength="5000"></textarea></div>
                 <div class="form-group quick-outgoing-field"><label>Đơn vị, người nhận bản lưu</label><textarea class="form-control" name="archive_recipient" rows="2" maxlength="5000"></textarea></div>
                 <div class="form-group"><label>Ký nhận</label><input type="text" class="form-control" name="receipt_signature" maxlength="255"></div>
-                <div class="form-group"><label>Mức độ công khai</label><select class="form-control" name="is_public_level" required><option value="0">Bình thường</option><option value="1">Công khai nội bộ chi nhánh</option><option value="2">Công khai toàn hệ thống</option></select></div>
+                <div class="form-group"><label>Mức độ công khai</label><select class="form-control" name="is_public_level" required><option value="0">Bình thường</option><option value="3">Gửi riêng - Chỉ văn thư và nơi được chọn</option><option value="1">Công khai nội bộ chi nhánh</option><option value="2">Công khai toàn hệ thống</option></select><small class="form-text text-muted">Thêm nơi nhận bằng nút chuyển tiếp văn bản.</small></div>
                 <div class="form-group mb-0"><label>Ghi chú</label><textarea class="form-control" name="notes" rows="3" maxlength="5000"></textarea></div>
             </div>
             <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button><button type="submit" class="btn btn-primary" id="quickEditSubmit"><i class="fas fa-save mr-1"></i> Lưu thay đổi</button></div>

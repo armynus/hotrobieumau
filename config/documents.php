@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'ledger' => [
+        'web_import_max_rows' => (int) env('DOCUMENT_LEDGER_WEB_IMPORT_MAX_ROWS', 5000),
+        'web_import_timeout' => (int) env('DOCUMENT_LEDGER_WEB_IMPORT_TIMEOUT', 180),
+    ],
     'exports' => [
         // Giới hạn xuất đồng bộ để một yêu cầu không chiếm hết RAM/CPU của máy chủ.
         'max_rows' => (int) env('DOCUMENT_EXPORT_MAX_ROWS', 20000),
