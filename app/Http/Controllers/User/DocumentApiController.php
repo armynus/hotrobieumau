@@ -40,6 +40,7 @@ class DocumentApiController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
 
+        $request->validate(['direction' => 'nullable|in:incoming,outgoing,decision,unclassified']);
         $filters = $request->only([
             'direction', 'document_type_id', 'keyword', 'date_from', 'date_to',
             'issued_date_from', 'issued_date_to', 'is_read',
@@ -52,7 +53,7 @@ class DocumentApiController extends Controller
         $orderColumn = (int) $request->input('order.0.column', 0);
         $requestedSort = $request->input("columns.{$orderColumn}.name");
         $allowedSorts = [
-            'direction', 'title', 'document_code', 'registry_number', 'issued_date', 'received_date',
+            'id', 'direction', 'title', 'document_code', 'registry_number', 'issued_date', 'received_date',
             'forwarded_date', 'issuing_agency', 'signer', 'recipient', 'created_at',
         ];
         $filters['sort_by'] = in_array($requestedSort, $allowedSorts, true)
@@ -77,7 +78,7 @@ class DocumentApiController extends Controller
         $isTypeTwoClerk = $user->isClerk() && $user->branch?->branch_type === 'type_2';
         if ($isTypeTwoClerk) {
             $query->withExists([
-                'transfers as has_incoming_branch_transfer' => fn ($transferQuery) => $transferQuery
+                'activeTransfers as has_incoming_branch_transfer' => fn ($transferQuery) => $transferQuery
                     ->where('to_branch_id', $user->branch_id),
             ]);
         }
@@ -86,20 +87,20 @@ class DocumentApiController extends Controller
 
         $start = max(0, (int) $request->input('start', 0));
         $requestedLength = (int) $request->input('length', 15);
-        $length = $requestedLength === -1 ? min($recordsFiltered, 1000) : max(1, min($requestedLength, 100));
+        $length = $requestedLength === -1 ? 100 : max(1, min($requestedLength, 100));
         $documents = $query->skip($start)->take($length)->get();
 
         $documents->each(function (Document $document) use ($user, $isTypeTwoClerk) {
             $canEdit = $document->canBeEditedBy($user);
-            $canDistribute = $isTypeTwoClerk && (bool) $document->getAttribute('has_incoming_branch_transfer');
+            $canDistribute = $document->visibility !== Document::VISIBILITY_PRIVATE && $isTypeTwoClerk && (bool) $document->getAttribute('has_incoming_branch_transfer');
 
             $document->setAttribute('capabilities', [
                 'can_edit' => $canEdit,
                 'can_delete' => $document->canBeDeletedBy($user),
                 'can_transfer' => $canEdit || $canDistribute,
                 'can_distribute_local' => $canEdit || $canDistribute,
-                'can_transfer_to_branch' => $canEdit,
-                'transfer_target_type' => $canEdit ? 'branch' : ($canDistribute ? 'local' : null),
+                'can_transfer_to_branch' => $document->canBeTransferredToBranchBy($user),
+                'transfer_target_type' => $document->canBeTransferredToBranchBy($user) ? 'branch' : (($canEdit || $canDistribute) ? 'local' : null),
             ]);
             $document->makeHidden('has_incoming_branch_transfer');
         });
@@ -131,13 +132,8 @@ class DocumentApiController extends Controller
         // Validate
         $validated = $request->validate([
             'direction' => 'required|in:incoming,outgoing,decision',
-            'ledger_entry_id' => 'nullable|integer|min:1',
-            'ledger_entry_version' => 'required_with:ledger_entry_id|nullable|string|size:64',
             'title' => 'required|string|max:5000',
             'registry_number' => 'nullable|string|max:255',
-            'register_in_ledger' => 'nullable|boolean',
-            'ledger_book' => 'nullable|in:incoming,outgoing,decision',
-            'ledger_auto_number' => 'nullable|boolean',
             'document_code' => 'required|string|max:255',
             'document_type_id' => 'nullable|integer|exists:document_types,id',
             'issued_date' => 'required|date',
@@ -154,7 +150,7 @@ class DocumentApiController extends Controller
             'security_level' => 'nullable|in:normal,confidential,secret,top_secret',
             'files' => 'nullable|array',
             'files.*' => 'file|max:51200', // 50MB max per file
-            'is_public_level' => 'required|in:0,1,2,3',
+            'is_public_level' => 'required|in:private,normal,public',
             'to_user_ids' => 'nullable|array',
             'to_user_ids.*' => 'integer|distinct',
             'to_department_ids' => 'nullable|array',
@@ -171,12 +167,8 @@ class DocumentApiController extends Controller
         $recipients->validateBranches($validated['to_branch_ids'] ?? []);
 
         try {
-            $visibility = match ((int) $validated['is_public_level']) {
-                3 => Document::VISIBILITY_RESTRICTED,
-                2 => Document::VISIBILITY_SYSTEM,
-                1 => Document::VISIBILITY_BRANCH,
-                default => Document::VISIBILITY_PRIVATE,
-            };
+            $visibility = $validated['is_public_level'];
+            $recipients->validateVisibility($visibility, $validated['to_department_ids'] ?? [], $validated['to_branch_ids'] ?? []);
 
             $data = $request->only([
                 'direction', 'registry_number', 'document_code', 'title',
@@ -187,36 +179,10 @@ class DocumentApiController extends Controller
             $data['visibility'] = $visibility;
             $data['managing_branch_id'] = $user->branch_id;
 
-            if (! empty($validated['ledger_entry_id'])) {
-                $data['_ledger_entry_id'] = $validated['ledger_entry_id'];
-                $data['_ledger_entry_version'] = $validated['ledger_entry_version'];
-            } elseif ($request->boolean('register_in_ledger')) {
-                $incoming = $validated['direction'] === Document::DIRECTION_INCOMING;
-                $date = $incoming ? $validated['received_date'] : $validated['forwarded_date'];
-                $book = $validated['direction'];
-                if (isset($validated['ledger_book']) && $validated['ledger_book'] !== $book) {
-                    throw \Illuminate\Validation\ValidationException::withMessages(['ledger_book' => 'Sổ không khớp loại văn bản. Vui lòng mở đúng trang đăng tải.']);
-                }
-                $code = $validated['document_code'];
-                $number = $incoming ? ($validated['registry_number'] ?? null) : \App\Support\DocumentLedgerNumber::fromCode($code);
-                if (! $incoming && $request->boolean('ledger_auto_number')) {
-                    if (! preg_match('/^(?:\d+[a-zđ]*\s*)?\/.+/iu', trim($code))) {
-                        throw \Illuminate\Validation\ValidationException::withMessages(['document_code' => 'Để cấp số đi tự động, nhập ký hiệu sau dấu /, ví dụ /NHNo.ĐT-TH.']);
-                    }
-                    $code = substr($code, strpos($code, '/'));
-                    $number = null;
-                } elseif (! $incoming && $number === null) {
-                    throw \Illuminate\Validation\ValidationException::withMessages(['document_code' => 'Khi vào sổ văn bản đi, số đi phải nằm trước dấu /, ví dụ 01/NHNo.ĐT-TH.']);
-                }
-                $data['_ledger'] = [
-                    'book' => $book, 'year' => (int) substr($date, 0, 4),
-                    'registered_date' => $date, 'number' => $number, 'document_code' => $code,
-                ];
-            }
-
+            // Đăng tải chỉ ghi kho; dữ liệu tra sổ đã được điền vào input.
             $createResult = $this->documentService->createDocument($data, $request->file('files') ?? [], $user, function ($document) use ($recipients, $user, $validated, $visibility) {
                 $recipients->distribute($document, $user, $validated['to_user_ids'] ?? [], $validated['to_department_ids'] ?? []);
-                if ($visibility !== Document::VISIBILITY_SYSTEM) {
+                if ($visibility !== Document::VISIBILITY_PRIVATE) {
                     foreach ($validated['to_branch_ids'] ?? [] as $branchId) {
                         $this->documentService->transferDocument($document, $user->branch_id, (int) $branchId, $user);
                     }
@@ -226,7 +192,6 @@ class DocumentApiController extends Controller
             $renamedFiles = $createResult['renamed_files'];
             $typeLabel = match ($data['direction']) { 'decision' => 'Quyết định', 'outgoing' => 'Văn bản đi', default => 'Văn bản đến' };
             $message = $typeLabel.' đã được đăng tải thành công!';
-            if (! empty($validated['ledger_entry_id'])) $message .= ' Đã lưu vào văn bản có sẵn trong sổ, không tạo bản ghi mới.';
             if (! empty($renamedFiles)) {
                 $storedNames = array_column($renamedFiles, 'stored');
                 $message .= ' File trùng tên được lưu thành: '.implode(', ', $storedNames).'.';
@@ -284,6 +249,10 @@ class DocumentApiController extends Controller
         // Mark as read
         $this->documentService->markAsRead($document, $user);
 
+        if ($document->canBeEditedBy($user)) {
+            $document->setAttribute('distribution', app(\App\Services\DocumentRecipientService::class)->selection($document));
+        }
+
         return response()->json([
             'success' => true,
             'data' => $document,
@@ -333,7 +302,7 @@ class DocumentApiController extends Controller
             'notes' => 'nullable|string|max:5000',
             'priority' => 'required|in:normal,urgent,very_urgent',
             'security_level' => 'required|in:normal,confidential,secret,top_secret',
-            'is_public_level' => 'required|in:0,1,2,3',
+            'is_public_level' => 'required|in:private,normal,public',
         ], [
             'direction.required' => 'Vui lòng chọn phân loại văn bản.',
             'direction.in' => 'Phân loại văn bản không hợp lệ.',
@@ -344,16 +313,28 @@ class DocumentApiController extends Controller
             'is_public_level.required' => 'Vui lòng chọn mức độ công khai.',
         ]);
 
-        $level = (int) $validated['is_public_level'];
+        $level = $validated['is_public_level'];
         unset($validated['is_public_level']);
-        $validated['visibility'] = match ($level) {
-            3 => Document::VISIBILITY_RESTRICTED,
-            2 => Document::VISIBILITY_SYSTEM,
-            1 => Document::VISIBILITY_BRANCH,
-            default => Document::VISIBILITY_PRIVATE,
-        };
+        $validated['visibility'] = $level;
 
-        $updatedDocument = $this->documentService->updateDocument($document, $validated, $user);
+        $distribution = $request->validate([
+            'sync_recipients' => 'sometimes|boolean',
+            'to_user_ids' => 'nullable|array', 'to_user_ids.*' => 'integer|distinct',
+            'to_department_ids' => 'nullable|array', 'to_department_ids.*' => 'integer|distinct',
+            'to_branch_ids' => 'nullable|array', 'to_branch_ids.*' => 'integer|distinct',
+        ]);
+        $updatedDocument = DB::transaction(function () use ($document, $validated, $user, $distribution) {
+            $locked = Document::whereKey($document->id)->lockForUpdate()->firstOrFail();
+            abort_unless($locked->canBeEditedBy($user), 403);
+            $updated = $this->documentService->updateDocument($locked, $validated, $user);
+            // Missing marker means an older metadata-only form, not "uncheck everyone".
+            if ($distribution['sync_recipients'] ?? false) {
+                app(\App\Services\DocumentRecipientService::class)->sync($updated, $user,
+                    $distribution['to_user_ids'] ?? [], $distribution['to_department_ids'] ?? [], $distribution['to_branch_ids'] ?? []);
+            }
+
+            return $updated;
+        });
 
         return response()->json([
             'success' => true,

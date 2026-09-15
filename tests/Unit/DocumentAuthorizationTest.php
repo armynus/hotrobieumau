@@ -85,9 +85,9 @@ class DocumentAuthorizationTest extends TestCase
         };
 
         $document = $this->getMockBuilder(Document::class)
-            ->onlyMethods(['transfers'])
+            ->onlyMethods(['activeTransfers'])
             ->getMock();
-        $document->method('transfers')->willReturn($incomingTransfers);
+        $document->method('activeTransfers')->willReturn($incomingTransfers);
 
         $this->assertTrue($document->canBeDistributedToDepartmentBy($clerk));
 

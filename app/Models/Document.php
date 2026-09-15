@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @property int $id Khóa chính.
  * @property string $direction Phân loại: incoming (đến), outgoing (đi), decision (quyết định), unclassified (chưa phân loại).
- * @property string|null $registry_number Số vào sổ, chỉ dùng cho văn bản đến.
+ * @property string|null $registry_number Số đến tham khảo trong kho, không tự ghi hoặc đồng bộ sổ.
  * @property string|null $document_code Số và ký hiệu ghi trên văn bản.
  * @property string|null $title Tên loại và trích yếu; có thể trống với kho cũ chưa cập nhật.
  * @property int|null $document_type_id Loại văn bản trong danh mục document_types.
@@ -29,7 +29,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $notes Ghi chú của văn bản.
  * @property string $priority Mức độ xử lý: normal, urgent hoặc very_urgent.
  * @property string $security_level Độ mật: normal, confidential, secret hoặc top_secret.
- * @property string $visibility Phạm vi xem: private (lãnh đạo), restricted (nơi được chọn), branch hoặc system; văn thư quản lý vẫn được xem.
+ * @property string $visibility Phạm vi người nhận: private (văn thư và BGĐ được chọn), normal (lãnh đạo được chọn), public (thêm nhân viên ở phòng ban được chọn).
  * @property int|null $created_by Văn thư đã đăng tải văn bản.
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -44,6 +44,9 @@ class Document extends Model
     public const DIRECTION_UNCLASSIFIED = 'unclassified';
 
     public const VISIBILITY_PRIVATE = 'private';
+    public const VISIBILITY_NORMAL = 'normal';
+    public const VISIBILITY_PUBLIC = 'public';
+    // Giá trị cũ chỉ để nhận diện dữ liệu trước migration, không còn cấp quyền rộng.
     public const VISIBILITY_RESTRICTED = 'restricted';
     public const VISIBILITY_BRANCH = 'branch';
     public const VISIBILITY_SYSTEM = 'system';
@@ -60,12 +63,12 @@ class Document extends Model
         'managing_branch_id',
         'visibility',
 
-        // Các mốc ngày dùng trong sổ văn bản đến/đi.
+        // Các mốc ngày của kho; sổ lưu dữ liệu độc lập.
         'issued_date',
         'received_date',
         'forwarded_date',
 
-        // Nội dung nghiệp vụ của sổ văn bản.
+        // Nội dung nghiệp vụ của văn bản trong kho.
         'issuing_agency',
         'signer',
         'recipient',
@@ -117,6 +120,11 @@ class Document extends Model
         return $this->hasMany(DocumentTransfer::class, 'document_id');
     }
 
+    public function activeTransfers()
+    {
+        return $this->transfers()->whereIn('status', ['pending', 'received']);
+    }
+
     public function reads(): HasMany
     {
         return $this->hasMany(DocumentRead::class, 'document_id');
@@ -144,7 +152,7 @@ class Document extends Model
 
     public function canBeTransferredToBranchBy(User $user): bool
     {
-        return $this->canBeEditedBy($user);
+        return $this->visibility !== self::VISIBILITY_PRIVATE && $this->canBeEditedBy($user);
     }
 
     public function canBeDeletedBy(User $user): bool
@@ -157,11 +165,11 @@ class Document extends Model
         if ($this->canBeEditedBy($user)) {
             return true;
         }
-        if (!$user->isClerk() || $user->branch?->branch_type !== 'type_2') {
+        if ($this->visibility === self::VISIBILITY_PRIVATE || !$user->isClerk() || $user->branch?->branch_type !== 'type_2') {
             return false;
         }
 
-        return $this->transfers()
+        return $this->activeTransfers()
             ->where('to_branch_id', $user->branch_id)
             ->exists();
     }

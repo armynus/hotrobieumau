@@ -22,9 +22,6 @@
     <form id="documentRegisterForm" enctype="multipart/form-data" data-ledger-lookup-url="{{ route('documents_ledger_upload_lookup') }}">
         @csrf
         <input type="hidden" name="direction" value="{{ $direction }}">
-        <input type="hidden" name="ledger_book" value="{{ $direction }}">
-        <input type="hidden" name="ledger_entry_id">
-        <input type="hidden" name="ledger_entry_version">
         <div class="card border-left-primary shadow-sm mb-4">
             <div class="card-body">
                 <h6 class="font-weight-bold text-primary"><i class="fas fa-book-open mr-1"></i> Lấy thông tin từ sổ {{ mb_strtolower($directionLabel) }}</h6>
@@ -46,33 +43,12 @@
                         <span class="badge {{ $isOutgoing ? 'badge-success' : 'badge-primary' }}">{{ $directionLabel }}</span>
                     </div>
                     <div class="card-body">
-                        <div class="bg-light border rounded p-3 mb-3">
-                            <input type="hidden" name="register_in_ledger" value="0">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" name="register_in_ledger" value="1" id="registerInLedger" checked>
-                                <label class="custom-control-label font-weight-bold text-primary" for="registerInLedger">Ghi vào sổ văn bản của chi nhánh</label>
-                            </div>
-                            <small class="form-text text-muted">Năm sổ theo ngày đến/ngày chuyển. Mỗi năm cấp lại số từ 1; chỉ văn bản đã vào sổ mới được xuất Excel.</small>
-                            @if($isOutgoing)
-                            <div class="form-row mt-2 ledger-register-options">
-                                <div class="col-md-6">
-                                    <div class="small font-weight-bold">Sổ riêng: {{ $directionLabel }}</div>
-                                </div>
-                                <div class="col-md-6 d-flex align-items-end pb-2">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" name="ledger_auto_number" value="1" id="ledgerAutoNumber">
-                                        <label class="custom-control-label" for="ledgerAutoNumber">Tự cấp số {{ $isDecision ? 'quyết định' : 'đi' }} trước dấu /</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <small class="form-text text-muted ledger-register-options">Giữ số có sẵn trước dấu /. Nếu tự cấp số, nhập ký hiệu như /NHNo.ĐT-TH; hệ thống ghép số khi lưu.</small>
-                            @endif
-                        </div>
+                        <div class="alert alert-info">Đăng tải chỉ lưu vào kho văn bản, không tự ghi sổ. Tra sổ chỉ sao chép thông tin để nhập nhanh.</div>
                         <div class="form-row">
                             @unless($isOutgoing)
                             <div class="form-group col-md-4">
                                 <label>Số đến</label>
-                                <input type="text" class="form-control" name="registry_number" maxlength="50" placeholder="Để trống để tự cấp số khi vào sổ">
+                                <input type="text" class="form-control" name="registry_number" maxlength="50" placeholder="Nhập số đến nếu có">
                             </div>
                             @endunless
                             <div class="form-group {{ $isOutgoing ? 'col-md-12' : 'col-md-8' }}">
@@ -166,17 +142,13 @@
                     <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Phân phối và phạm vi xem</h6></div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label class="font-weight-bold">Mức độ công khai</label>
-                            <select class="form-control" name="is_public_level" id="publicLevel" required>
-                                <option value="0">Bình thường - Ban lãnh đạo và nơi được chuyển tiếp</option>
-                                <option value="3">Gửi riêng - Chỉ văn thư và nơi được chọn</option>
-                                <option value="1">Công khai nội bộ chi nhánh</option>
-                                <option value="2">Công khai toàn hệ thống</option>
-                            </select>
+                            <label class="font-weight-bold" for="publicLevel">Mức độ công khai</label>
+                            <select class="form-control" name="is_public_level" id="publicLevel" aria-describedby="publicLevelHelp" required><option value="private">Riêng Tư</option><option value="normal" selected>Bình Thường</option><option value="public">Công Khai</option></select>
+                            <small id="publicLevelHelp" class="form-text text-muted" aria-live="polite">Văn thư cùng chi nhánh, ban giám đốc được chọn và lãnh đạo phòng ban được chọn được xem; nhân viên chưa được xem.</small>
                         </div>
                         @include('user.page.documents.partials.local_recipients')
-                        <small class="d-block text-muted mb-3">Chọn “Gửi riêng” để giới hạn người xem theo những nơi được chọn. Văn thư quản lý vẫn được xem và xử lý văn bản.</small>
                         <label id="branch_selection_label" class="font-weight-bold">Chi nhánh loại II nhận văn bản (nếu có)</label>
+                        <small id="branch_selection_help" class="d-block text-muted mb-2">Chọn chi nhánh để gửi cho văn thư chi nhánh đó; văn thư sẽ chọn tiếp người/phòng ban nhận.</small>
                         <div class="border rounded p-2 bg-white" id="branch_selection_area" style="max-height: 220px; overflow-y: auto;">
                             <div class="custom-control custom-checkbox mb-2 border-bottom pb-2">
                                 <input type="checkbox" class="custom-control-input" id="checkAllBranches">
@@ -262,25 +234,28 @@ $(document).ready(function() {
         $('#selectedFileList').empty();
         document.querySelectorAll('.register-date-picker').forEach(function(input) { if (input._flatpickr) input._flatpickr.clear(); });
         $('#branch_selection_area input[type="checkbox"]').prop('disabled', false).prop('checked', false);
-        $('#registerInLedger').trigger('change');
+        $('#publicLevel').trigger('change');
         $('#documentRegisterForm').trigger('document-register:reset');
     }
     $('#documentRegisterForm').on('document-register:reset-request', resetRegisterForm);
 
-    $('#registerInLedger').on('change', function() {
-        $('.ledger-register-options').toggle(this.checked);
-        $('[name="registry_number"]').attr('placeholder', this.checked ? 'Để trống để tự cấp số khi vào sổ' : 'Không ghi vào sổ');
-    });
 
     $('#checkAllBranches').on('change', function() { $('.branch-checkbox').prop('checked', this.checked); });
     $('.branch-checkbox').on('change', function() {
         $('#checkAllBranches').prop('checked', $('.branch-checkbox').length > 0 && $('.branch-checkbox:checked').length === $('.branch-checkbox').length);
     });
     $('#publicLevel').on('change', function() {
-        const disabled = this.value === '2';
-        $('#branch_selection_area input[type="checkbox"]').prop('disabled', disabled);
-        if (disabled) $('#branch_selection_area input[type="checkbox"]').prop('checked', false);
-    });
+        const descriptions = {
+            private: 'Chỉ văn thư cùng chi nhánh và ban giám đốc được tích chọn được xem. Không gửi xuống phòng ban hoặc chi nhánh cấp dưới.',
+            normal: 'Văn thư cùng chi nhánh, ban giám đốc được chọn và lãnh đạo phòng ban được chọn được xem; nhân viên chưa được xem.',
+            public: 'Như Bình Thường, thêm nhân viên ở phòng ban được chọn được xem. Không công khai cho toàn hệ thống.'
+        };
+        $('#publicLevelHelp').text(descriptions[this.value] || '');
+        const disabled = this.value === 'private';
+        $('#branch_selection_label, #branch_selection_help, #branch_selection_area, #documentRegisterForm .local-recipient-departments').toggle(!disabled);
+        $('#branch_selection_area input, #documentRegisterForm .local-recipient-departments input').prop('disabled', disabled);
+        if (disabled) $('#branch_selection_area input, #documentRegisterForm .local-recipient-departments input').prop('checked', false);
+    }).trigger('change');
 
     $('#documentFiles').on('change', function() {
         const files = this.files;

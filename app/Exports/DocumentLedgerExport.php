@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Document;
+use App\Models\DocumentLedgerEntry;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -86,6 +87,12 @@ class DocumentLedgerExport extends DefaultValueBinder implements
 
     public function map($document): array
     {
+        if ($document instanceof DocumentLedgerEntry) {
+            // Ánh xạ cột Excel trong bộ nhớ, không ghi ngược vào kho.
+            $document->setAttribute('entry_date', $document->registered_date);
+            $document->setAttribute('entry_code', $document->document_code);
+            $document->setAttribute('entry_number', $document->number);
+        }
         if ($this->isOutgoing()) {
             return [
                 $this->excelDate($this->entryValue($document, 'entry_date', $document->forwarded_date ?? $document->issued_date)),
@@ -208,7 +215,7 @@ class DocumentLedgerExport extends DefaultValueBinder implements
         return $date ? Date::dateTimeToExcel(is_string($date) ? CarbonImmutable::parse($date) : $date) : null;
     }
 
-    private function entryValue(Document $document, string $key, mixed $fallback): mixed
+    private function entryValue(Document|DocumentLedgerEntry $document, string $key, mixed $fallback): mixed
     {
         // A ledger entry with no registered date must stay blank in an annual export.
         return array_key_exists($key, $document->getAttributes()) ? $document->getAttribute($key) : $fallback;

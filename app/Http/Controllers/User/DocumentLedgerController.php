@@ -31,23 +31,15 @@ class DocumentLedgerController extends Controller
         $year = (int) ($filters['year'] ?? now()->year);
         $book = $filters['book'] ?? 'incoming';
         $keyword = trim($filters['q'] ?? '');
+        if ($request->has('draw')) {
+            return response()->json(app(\App\Services\DocumentLedgerTableService::class)->data($clerk, $request, $year, $book, $keyword));
+        }
         $base = DocumentLedgerEntry::query()->where('branch_id', $clerk->branch_id)->where('year', $year);
         $counts = (clone $base)->selectRaw('book, count(*) as aggregate')->groupBy('book')->pluck('aggregate', 'book');
-        $entries = (clone $base)->with(['document' => fn ($query) => $query->withCount('attachments')])->where('book', $book)
-            ->when($keyword !== '', function ($query) use ($keyword) {
-                $query->where(function ($query) use ($keyword) {
-                    $query->where('number', 'like', '%'.$keyword.'%')
-                        ->orWhere('document_code', 'like', '%'.$keyword.'%')
-                        ->orWhereHas('document', fn ($document) => $document->where('document_code', 'like', '%'.$keyword.'%')->orWhere('title', 'like', '%'.$keyword.'%'));
-                });
-            })
-            ->orderBy('sequence_number')->orderBy('number_key')->orderBy('id')
-            ->paginate(30)->withQueryString();
         $nextNumber = $ledgerService->nextNumber((int) $clerk->branch_id, $year, $book);
         $bookLabels = self::BOOK_LABELS;
-        $entries->each(fn ($entry) => $entry->setAttribute('form_data', app(DocumentLedgerFormService::class)->formData($entry->document, $clerk, $entry)));
 
-        return view('user.page.document_ledger', compact('clerk', 'year', 'book', 'keyword', 'counts', 'entries', 'nextNumber', 'bookLabels'));
+        return view('user.page.document_ledger', compact('clerk', 'year', 'book', 'keyword', 'counts', 'nextNumber', 'bookLabels'));
     }
 
     public function nextNumber(Request $request, DocumentLedgerService $ledgerService)
@@ -96,9 +88,9 @@ class DocumentLedgerController extends Controller
     public function register(Request $request, int $document, DocumentQueryService $queryService)
     {
         $clerk = $this->clerk();
-        $action = $request->validate(['operation' => 'required|in:register,edit']);
+        $request->validate(['operation' => 'required|in:register']);
         $document = $queryService->getDocumentsForUser($clerk)->findOrFail($document);
-        $entry = app(DocumentLedgerFormService::class)->save($clerk, $document, $request->all(), $action['operation']);
+        $entry = app(DocumentLedgerFormService::class)->save($clerk, $document, $request->all());
 
         return response()->json(['message' => 'Đã lưu thông tin vào sổ văn bản.', 'entry' => $entry]);
     }
@@ -107,7 +99,16 @@ class DocumentLedgerController extends Controller
     {
         $entry = $formService->save($this->clerk(), null, $request->all());
 
-        return response()->json(['message' => 'Đã ghi sổ văn bản. Có thể đăng file sau bằng cách tra số trong sổ.', 'entry' => $entry], 201);
+        return response()->json(['message' => 'Đã ghi sổ văn bản. Không tạo văn bản trong kho.', 'entry' => $entry], 201);
+    }
+
+    public function update(Request $request, int $entry, DocumentLedgerFormService $formService)
+    {
+        $clerk = $this->clerk();
+        $entry = DocumentLedgerEntry::where('branch_id', $clerk->branch_id)->findOrFail($entry);
+        $entry = $formService->save($clerk, null, $request->all(), $entry);
+
+        return response()->json(['message' => 'Đã cập nhật sổ. Thông tin kho văn bản không thay đổi.', 'entry' => $entry]);
     }
 
     public function import(Request $request, DocumentLedgerReader $reader, DocumentLedgerImportService $importer)

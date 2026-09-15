@@ -36,7 +36,7 @@
 </div>
 
 <div class="modal fade" id="quickEditDocumentModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable document-distribution-modal" role="document"><div class="modal-content">
         <form id="quickEditDocumentForm">
             @csrf
             <div class="modal-header"><h5 class="modal-title" id="quickEditDocumentTitle">Chỉnh sửa văn bản</h5><button type="button" class="close" data-dismiss="modal"><span>&times;</span></button></div>
@@ -67,7 +67,7 @@
                 <div class="form-group"><label id="quickRecipientLabel">Đơn vị hoặc người nhận</label><textarea class="form-control" name="recipient" rows="3" maxlength="5000"></textarea></div>
                 <div class="form-group quick-outgoing-field"><label>Đơn vị, người nhận bản lưu</label><textarea class="form-control" name="archive_recipient" rows="2" maxlength="5000"></textarea></div>
                 <div class="form-group"><label>Ký nhận</label><input type="text" class="form-control" name="receipt_signature" maxlength="255"></div>
-                <div class="form-group"><label>Mức độ công khai</label><select class="form-control" name="is_public_level" required><option value="0">Bình thường</option><option value="3">Gửi riêng - Chỉ văn thư và nơi được chọn</option><option value="1">Công khai nội bộ chi nhánh</option><option value="2">Công khai toàn hệ thống</option></select><small class="form-text text-muted">Thêm nơi nhận bằng nút chuyển tiếp văn bản.</small></div>
+                @include('user.page.documents.partials.edit_distribution', ['distributionPrefix' => 'quickEdit'])
                 <div class="form-group mb-0"><label>Ghi chú</label><textarea class="form-control" name="notes" rows="3" maxlength="5000"></textarea></div>
             </div>
             <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button><button type="submit" class="btn btn-primary" id="quickEditSubmit"><i class="fas fa-save mr-1"></i> Lưu thay đổi</button></div>

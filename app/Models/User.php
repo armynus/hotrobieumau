@@ -92,7 +92,7 @@ class User extends Authenticatable
      */
     public function isLeadership(): bool
     {
-        if (!$this->position_id) {
+        if (!$this->position_id || ! $this->position || ! in_array((int) $this->position->level, [1, 2, 3, 4, 5], true)) {
             return false;
         }
         

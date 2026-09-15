@@ -134,7 +134,7 @@ class DocumentRecipientTest extends TestCase
         $this->assertNotContains(4, app(DocumentRecipientService::class)->directors(1)->pluck('id')->all());
     }
 
-    public function test_private_distribution_reaches_selected_director_and_department_without_implicit_leadership_access(): void
+    public function test_public_distribution_reaches_only_selected_director_and_department(): void
     {
         $document = $this->document();
         $recipients = app(DocumentRecipientService::class);
@@ -197,9 +197,279 @@ class DocumentRecipientTest extends TestCase
         app(DocumentRecipientService::class)->distribute($this->document(), User::findOrFail(5), [6], [2]);
     }
 
+    public function test_document_type_filters_keep_permissions_and_issue_date_sorting(): void
+    {
+        Schema::table('documents', function (Blueprint $table) {
+            $table->string('direction')->nullable();
+            $table->date('issued_date')->nullable();
+            $table->date('received_date')->nullable();
+        });
+        $service = app(DocumentQueryService::class);
+        $user = User::findOrFail(1);
+        foreach (['incoming', 'outgoing', 'decision', 'unclassified'] as $type) {
+            $this->document()->update(['direction' => $type, 'issued_date' => '2026-01-02', 'received_date' => '2026-03-01']);
+            Document::create(['created_by' => 5, 'managing_branch_id' => 2, 'visibility' => Document::VISIBILITY_RESTRICTED,
+                'direction' => $type, 'issued_date' => '2026-01-02']);
+            $this->assertSame(1, $service->getDocumentsForUser($user, ['direction' => $type])->count());
+        }
+        $this->assertSame(4, $service->getDocumentsForUser($user)->count());
+        $early = $this->document();
+        $early->update(['direction' => 'incoming', 'issued_date' => '2025-12-31']);
+        $missing = $this->document();
+        $missing->update(['direction' => 'incoming']);
+        $filters = ['direction' => 'incoming', 'sort_by' => 'issued_date', 'sort_dir' => 'asc'];
+        $ids = $service->getDocumentsForUser($user, $filters)->pluck('id')->all();
+        $this->assertSame($early->id, $ids[0]);
+        $this->assertSame($missing->id, end($ids));
+        $ids = $service->getDocumentsForUser($user, array_replace($filters, ['sort_dir' => 'desc']))->pluck('id')->all();
+        $this->assertSame($missing->id, end($ids));
+        $this->assertSame(1, $service->getDocumentsForUser($user, [
+            'direction' => 'incoming', 'issued_date_from' => '2026-01-01', 'issued_date_to' => '2026-01-31',
+        ])->count());
+    }
+
+    public function test_stt_sort_orders_documents_by_id_in_both_directions_across_pages(): void
+    {
+        $first = $this->document();
+        $middle = $this->document();
+        $last = $this->document();
+        Document::create(['created_by' => 5, 'managing_branch_id' => 2, 'visibility' => Document::VISIBILITY_PUBLIC]);
+        $query = app(DocumentQueryService::class);
+        $user = User::findOrFail(1);
+        $this->assertSame([$first->id, $middle->id, $last->id],
+            $query->getDocumentsForUser($user, ['sort_by' => 'id', 'sort_dir' => 'asc'])->pluck('id')->all());
+        $this->assertSame([$last->id, $middle->id, $first->id],
+            $query->getDocumentsForUser($user, ['sort_by' => 'id', 'sort_dir' => 'desc'])->pluck('id')->all());
+        $this->assertSame([$first->id],
+            $query->getDocumentsForUser($user, ['sort_by' => 'id', 'sort_dir' => 'desc'])->offset(2)->limit(2)->pluck('id')->all());
+    }
+
+    public function test_private_is_only_own_clerks_and_selected_directors_even_with_old_grants(): void
+    {
+        $document = $this->document();
+        $document->update(['visibility' => Document::VISIBILITY_PRIVATE]);
+        $service = app(DocumentService::class);
+        $service->assignPermission($document, 'user', 2, User::findOrFail(1));
+        $service->assignPermission($document, 'department', 1, User::findOrFail(1));
+        $service->assignPermission($document, 'user', 6, User::findOrFail(1));
+        $this->assertTrue($this->visibleTo($document, 1));
+        $this->assertTrue($this->visibleTo($document, 2));
+        foreach ([3, 4, 5, 6, 7] as $id) $this->assertFalse($this->visibleTo($document, $id));
+        $this->assertFalse($document->canBeTransferredToBranchBy(User::findOrFail(1)));
+        foreach ([fn () => $service->transferDocument($document, 1, 2, User::findOrFail(1)),
+            fn () => $service->transferDocumentToDepartment($document, 1, User::findOrFail(1)),
+            fn () => app(DocumentRecipientService::class)->distribute($document, User::findOrFail(1), [], [1])] as $attempt) {
+            try {
+                $attempt();
+                $this->fail('Private department/branch transfer accepted');
+            } catch (ValidationException $exception) {
+                $this->assertArrayHasKey('recipients', $exception->errors());
+            }
+        }
+        $this->assertSame(0, DB::table('document_transfers')->count());
+    }
+
+    public function test_normal_selected_departments_include_leaders_but_not_employees_and_public_adds_employees(): void
+    {
+        DB::table('positions')->insert(['id' => 4, 'level' => 3, 'position_name' => 'Trưởng phòng']);
+        DB::table('users')->insert(['id' => 8, 'name' => 'Trưởng phòng I', 'branch_id' => 1, 'department_id' => 1, 'position_id' => 4]);
+        DB::table('users')->insert(['id' => 9, 'name' => 'Trưởng phòng II', 'branch_id' => 2, 'department_id' => 2, 'position_id' => 4]);
+        $document = $this->document();
+        $document->update(['visibility' => Document::VISIBILITY_NORMAL]);
+        $sender = User::findOrFail(1);
+        $recipients = app(DocumentRecipientService::class);
+        $recipients->distribute($document, $sender, [2], [1]);
+        foreach ([1, 2, 8] as $id) $this->assertTrue($this->visibleTo($document, $id));
+        foreach ([3, 4, 5, 6, 7, 9] as $id) $this->assertFalse($this->visibleTo($document, $id));
+        app(DocumentService::class)->transferDocument($document, 1, 2, $sender);
+        $this->assertTrue($this->visibleTo($document, 5));
+        $this->assertFalse($this->visibleTo($document, 6));
+        $this->assertFalse($this->visibleTo($document, 9));
+        $recipients->distribute($document, User::findOrFail(5), [6], [2]);
+        foreach ([6, 9] as $id) $this->assertTrue($this->visibleTo($document, $id));
+        foreach ([4, 7] as $id) $this->assertFalse($this->visibleTo($document, $id));
+        $document->update(['visibility' => Document::VISIBILITY_PUBLIC]);
+        foreach ([4, 7] as $id) $this->assertTrue($this->visibleTo($document, $id));
+        $this->assertFalse($this->visibleTo($document, 3));
+        $document->update(['visibility' => Document::VISIBILITY_PRIVATE]);
+        foreach ([4, 5, 6, 7, 8, 9] as $id) $this->assertFalse($this->visibleTo($document, $id));
+        $this->assertTrue($this->visibleTo($document, 2));
+    }
+
+    public function test_file_download_rechecks_document_permission(): void
+    {
+        Schema::create('document_attachments', function (Blueprint $table) {
+            $table->id();
+            $table->integer('document_id');
+            $table->string('file_path');
+            $table->string('file_name');
+            $table->timestamps();
+        });
+        \Illuminate\Support\Facades\Storage::fake('public');
+        \Illuminate\Support\Facades\Storage::disk('public')->put('documents/test.pdf', "%PDF-1.4\n% test\n");
+        $document = $this->document();
+        $document->update(['visibility' => Document::VISIBILITY_PRIVATE]);
+        $file = \App\Models\DocumentAttachment::create(['document_id' => $document->id, 'file_path' => 'documents/test.pdf', 'file_name' => 'test.pdf']);
+        $controller = app(\App\Http\Controllers\User\DocumentAttachmentController::class);
+        \Illuminate\Support\Facades\Session::put('user_id', 1);
+        $response = $controller($file->id, app(DocumentQueryService::class));
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
+        $this->assertStringContainsString('/documents/attachments/'.$file->id, $file->view_url);
+        foreach ([4, 6] as $userId) {
+            \Illuminate\Support\Facades\Session::put('user_id', $userId);
+            try {
+                $controller($file->id, app(DocumentQueryService::class));
+                $this->fail('Unauthorized file download accepted');
+            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+                $this->assertSame(404, $exception->getStatusCode());
+            }
+        }
+    }
+
+    public function test_private_upload_rejects_forged_department_or_branch_before_saving(): void
+    {
+        \Illuminate\Support\Facades\Session::put('user_id', 1);
+        foreach ([['to_department_ids' => [1]], ['to_branch_ids' => [2]]] as $targets) {
+            $request = \Illuminate\Http\Request::create('/', 'POST', $targets + [
+                'direction' => 'incoming', 'title' => 'Private', 'document_code' => 'PRIVATE',
+                'issued_date' => '2026-01-01', 'received_date' => '2026-01-02',
+                'is_public_level' => 'private', 'to_user_ids' => [2],
+            ]);
+            try {
+                app(\App\Http\Controllers\User\DocumentApiController::class)->store($request);
+                $this->fail('Private upload accepted broad targets');
+            } catch (ValidationException $exception) {
+                $this->assertArrayHasKey('recipients', $exception->errors());
+            }
+        }
+        $this->assertSame(0, Document::count());
+        $this->assertSame(0, DB::table('document_transfers')->count());
+    }
+
+    public function test_legacy_visibility_migration_preserves_rows_and_maps_to_selected_scope(): void
+    {
+        $ids = [];
+        foreach (['private', 'restricted', 'branch', 'system'] as $visibility) {
+            $document = $this->document();
+            $document->update(['visibility' => $visibility]);
+            $ids[] = $document->id;
+        }
+        (require database_path('migrations/main/2026_09_15_000001_document_selected_visibility.php'))->up();
+        $this->assertSame(['normal', 'private', 'public', 'public'], Document::whereIn('id', $ids)->orderBy('id')->pluck('visibility')->all());
+        $this->assertSame(4, Document::count());
+        $this->assertSame(0, DB::table('document_permissions')->count());
+        foreach ($ids as $id) $this->assertFalse($this->visibleTo(Document::findOrFail($id), 4));
+    }
+
+    public function test_edit_distribution_prefills_replaces_and_revokes_downstream_without_deleting_history(): void
+    {
+        $document = $this->document();
+        $service = app(DocumentRecipientService::class);
+        $owner = User::findOrFail(1);
+        $service->sync($document, $owner, [2], [1], [2]);
+        $service->distribute($document, User::findOrFail(5), [6], [2]);
+        $this->assertEquals(['to_user_ids' => [2], 'to_department_ids' => [1], 'to_branch_ids' => [2]], $service->selection($document));
+        foreach ([2, 4, 5, 6, 7] as $userId) $this->assertTrue($this->visibleTo($document, $userId));
+        $transfersBefore = $document->transfers()->count();
+
+        // Keeping a branch does not wipe selections made by its own clerk.
+        $service->sync($document, $owner, [2], [1], [2]);
+        $this->assertTrue($this->visibleTo($document, 7));
+        $this->assertSame($transfersBefore, $document->transfers()->count());
+
+        $service->sync($document, $owner, [3], [], []);
+        foreach ([2, 4, 5, 6, 7] as $userId) $this->assertFalse($this->visibleTo($document, $userId));
+        foreach ([1, 3] as $userId) $this->assertTrue($this->visibleTo($document, $userId));
+        $this->assertFalse($document->canBeDistributedToDepartmentBy(User::findOrFail(5)));
+        $this->assertSame($transfersBefore + 1, $document->transfers()->count());
+        $this->assertSame($transfersBefore, $document->transfers()->where('status', 'revoked')->count());
+        $this->assertSame(1, $document->activeTransfers()->count());
+        $this->assertDatabaseHas('document_logs', ['action' => 'distribution_updated']);
+
+        // Re-adding the branch must not silently restore downstream recipients.
+        $service->sync($document, $owner, [3], [], [2]);
+        $this->assertTrue($this->visibleTo($document, 5));
+        foreach ([6, 7] as $userId) $this->assertFalse($this->visibleTo($document, $userId));
+    }
+
+    public function test_edit_distribution_rejects_foreign_targets_and_non_owner_without_mutation(): void
+    {
+        $document = $this->document();
+        $service = app(DocumentRecipientService::class);
+        $owner = User::findOrFail(1);
+        $service->sync($document, $owner, [2], [1], [2]);
+        $before = $service->selection($document);
+        foreach ([[[6], [], []], [[], [2], []], [[], [], [3]]] as [$users, $departments, $branches]) {
+            try {
+                $service->sync($document, $owner, $users, $departments, $branches);
+                $this->fail('Invalid recipient accepted');
+            } catch (ValidationException $exception) {
+                $this->assertEquals($before, $service->selection($document));
+            }
+        }
+        try {
+            $service->sync($document, User::findOrFail(5), [], [], []);
+            $this->fail('Non-owner changed distribution');
+        } catch (AuthorizationException $exception) {
+            $this->assertEquals($before, $service->selection($document));
+        }
+        $document->update(['visibility' => 'private']);
+        try {
+            $service->sync($document, $owner, [2], [1], []);
+            $this->fail('Private department accepted');
+        } catch (ValidationException $exception) {
+            $this->assertEquals($before, $service->selection($document));
+        }
+        $service->sync($document, $owner, [2], [], []);
+        $document->update(['visibility' => 'public']);
+        foreach ([4, 5, 6, 7] as $userId) $this->assertFalse($this->visibleTo($document, $userId));
+        $this->assertTrue($this->visibleTo($document, 2));
+    }
+
+    public function test_edit_api_saves_metadata_and_recipients_atomically_and_accepts_empty_selection(): void
+    {
+        Schema::table('documents', function (Blueprint $table) {
+            foreach (['title', 'document_code', 'direction', 'priority', 'security_level'] as $column) $table->string($column)->nullable();
+        });
+        Schema::create('document_attachments', function (Blueprint $table) {
+            $table->id();
+            $table->integer('document_id');
+        });
+        $document = $this->document();
+        $service = app(DocumentRecipientService::class);
+        $owner = User::findOrFail(1);
+        $service->sync($document, $owner, [2], [1], [2]);
+        \Illuminate\Support\Facades\Session::put('user_id', 1);
+        $input = ['title' => 'Updated', 'document_code' => '123/TEST', 'direction' => 'incoming',
+            'priority' => 'normal', 'security_level' => 'normal', 'is_public_level' => 'private',
+            'sync_recipients' => '1', 'to_user_ids' => [2], 'to_department_ids' => [1]];
+        $controller = app(\App\Http\Controllers\User\DocumentApiController::class);
+        try {
+            $controller->update(\Illuminate\Http\Request::create('/', 'PUT', $input), $document->id);
+            $this->fail('Private department accepted');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('recipients', $exception->errors());
+        }
+        $this->assertNull($document->fresh()->title);
+        $this->assertSame('public', $document->fresh()->visibility);
+        $this->assertTrue($this->visibleTo($document, 4));
+        unset($input['to_department_ids']);
+        $response = $controller->update(\Illuminate\Http\Request::create('/', 'PUT', $input), $document->id);
+        $this->assertTrue($response->getData(true)['success']);
+        $this->assertSame('Updated', $document->fresh()->title);
+        $this->assertSame('private', $document->fresh()->visibility);
+        $this->assertEquals(['to_user_ids' => [2], 'to_department_ids' => [], 'to_branch_ids' => []], $service->selection($document));
+        unset($input['to_user_ids']);
+        $controller->update(\Illuminate\Http\Request::create('/', 'PUT', $input), $document->id);
+        $this->assertSame(['to_user_ids' => [], 'to_department_ids' => [], 'to_branch_ids' => []], $service->selection($document));
+        $this->assertFalse($this->visibleTo($document, 2));
+        $this->assertTrue($this->visibleTo($document, 1));
+    }
+
     private function document(): Document
     {
-        return Document::create(['created_by' => 1, 'managing_branch_id' => 1, 'visibility' => Document::VISIBILITY_RESTRICTED]);
+        return Document::create(['created_by' => 1, 'managing_branch_id' => 1, 'visibility' => Document::VISIBILITY_PUBLIC]);
     }
 
     private function visibleTo(Document $document, int $userId): bool

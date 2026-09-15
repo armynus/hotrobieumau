@@ -4,12 +4,9 @@ namespace App\Services;
 
 use App\Models\Document;
 use App\Models\DocumentAttachment;
-use App\Models\DocumentLedgerEntry;
 use App\Models\DocumentLog;
 use App\Models\DocumentPermission;
 use App\Models\DocumentTransfer;
-use App\Support\DocumentCode;
-use App\Support\DocumentLedgerNumber;
 use App\Support\DocumentStoragePath;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -48,7 +45,7 @@ class DocumentService
 
         try {
             return DB::transaction(function () use ($data, $sourcePath, $relativePath, $sourceKey, $checksum, $user, $storedPath, $storedFileName) {
-                $document = $this->archivedLedgerDocument($data, $user) ?? Document::create([
+                $document = Document::create([
                     'direction' => ($data['_ledger_match']['_book'] ?? '') === 'decision' ? Document::DIRECTION_DECISION : ($data['direction'] ?? Document::DIRECTION_UNCLASSIFIED),
                     'registry_number' => $data['registry_number'] ?? null,
                     'document_code' => $data['document_code'],
@@ -67,7 +64,7 @@ class DocumentService
                     'receipt_signature' => $data['receipt_signature'] ?? null,
                     'priority' => 'normal',
                     'security_level' => 'normal',
-                    'visibility' => $data['visibility'] ?? Document::VISIBILITY_PRIVATE,
+                    'visibility' => $data['visibility'] ?? Document::VISIBILITY_NORMAL,
                     'created_by' => $user->id,
                 ]);
 
@@ -107,7 +104,7 @@ class DocumentService
     }
 
     /**
-     * Tạo văn bản mới hoặc đăng file vào dòng sổ đã chọn, giữ nguyên ID cũ.
+     * Chỉ lưu kho văn bản; tra sổ là thao tác sao chép thông tin ở giao diện.
      */
     public function createDocument(array $data, array $files, $user, ?callable $afterSave = null)
     {
@@ -115,8 +112,6 @@ class DocumentService
         try {
             return DB::transaction(function () use ($data, $files, $user, $afterSave, &$storedPaths) {
                 $renamedFiles = [];
-                $entry = isset($data['_ledger_entry_id']) ? app(DocumentLedgerUploadService::class)->selected($user, $data) : null;
-                $document = $entry?->document;
                 $metadata = [
                     'direction' => $data['direction'] ?? Document::DIRECTION_INCOMING,
                     'registry_number' => $data['registry_number'] ?? null,
@@ -139,22 +134,7 @@ class DocumentService
                     'security_level' => $data['security_level'] ?? 'normal',
                     'created_by' => $user->id,
                 ];
-                if ($document) {
-                    // Giữ nguyên ID văn bản/file cũ; lần đầu đăng file xác lập người đăng tải.
-                    $document->fill($metadata)->save();
-                    $data['_ledger'] = [
-                        'book' => $entry->book, 'year' => $entry->year, 'number' => $entry->number,
-                        'document_code' => $data['document_code'],
-                        'registered_date' => $data[$entry->book === 'incoming' ? 'received_date' : 'forwarded_date'],
-                    ];
-                } else {
-                    $document = Document::create($metadata);
-                }
-
-                // Kiểm tra/cấp số trước khi ghi file để lỗi dữ liệu sổ không để lại file rác.
-                if (isset($data['_ledger'])) {
-                    app(DocumentLedgerService::class)->register($document, $user, $data['_ledger']);
-                }
+                $document = Document::create($metadata);
 
                 // Handle file uploads
                 foreach ($files as $file) {
@@ -198,7 +178,7 @@ class DocumentService
                 DocumentLog::create([
                     'document_id' => $document->id,
                     'user_id' => $user->id,
-                    'action' => $entry ? ($files !== [] ? 'published' : 'updated') : 'created',
+                    'action' => 'created',
                     'details' => ['message' => 'Document created and files uploaded.'],
                 ]);
                 if ($afterSave) {
@@ -216,51 +196,6 @@ class DocumentService
             }
             throw $exception;
         }
-    }
-
-    /** Nếu đã nhập thông tin từ sổ trước, gắn file vào đúng dòng đó thay vì tạo văn bản thứ hai. */
-    private function archivedLedgerDocument(array $data, $user): ?Document
-    {
-        $row = $data['_ledger_match'] ?? null;
-        if (! $row || empty($row['_year']) || empty($row['_number']) || empty($row['_book'])) {
-            return null;
-        }
-        try {
-            $number = DocumentLedgerNumber::normalize((string) $row['_number']);
-        } catch (\Illuminate\Validation\ValidationException) {
-            return null;
-        }
-        $entries = DocumentLedgerEntry::where('branch_id', $user->branch_id)
-            ->where('year', $row['_year'])->where('book', $row['_book'])->where('number_key', $number)
-            ->where('code_key', DocumentCode::normalize($row['document_code'] ?? null))->get();
-        if ($entries->count() > 1) {
-            $exact = $entries->filter(fn ($entry) => $entry->source_sheet === ($row['_sheet'] ?? null)
-                && (int) $entry->source_row === (int) ($row['_row'] ?? 0));
-            if ($exact->count() !== 1) {
-                throw new \RuntimeException('Có nhiều dòng sổ trùng số; hãy chọn đúng dòng và đăng file trên giao diện.');
-            }
-            $entries = $exact;
-        }
-        $entry = $entries->first();
-        if (! $entry) {
-            return null;
-        }
-        if (DocumentCode::normalize($entry->document_code) !== DocumentCode::normalize($row['document_code'] ?? null)) {
-            throw new \RuntimeException('Số trong sổ đã thuộc văn bản khác. Kiểm tra lại dòng '.$row['_row'].' của sheet '.$row['_sheet'].'.');
-        }
-
-        $document = Document::whereKey($entry->document_id)->where('managing_branch_id', $user->branch_id)->lockForUpdate()->firstOrFail();
-        // Khi sổ đã nhập trước file, cập nhật ngày/trích yếu từ dòng Excel đang đối chiếu.
-        // Ô trống không xóa thông tin đã có; không dùng ngày folder đè ngày chính thức.
-        $updates = array_filter(
-            array_intersect_key($row, array_flip(['issued_date', 'title'])),
-            fn ($value) => $value !== null && $value !== ''
-        );
-        if ($updates !== []) {
-            $document->fill($updates)->save();
-        }
-
-        return $document;
     }
 
     /**
@@ -329,7 +264,10 @@ class DocumentService
      */
     public function transferDocument(Document $document, int $fromBranchId, int $toBranchId, $transferer, ?string $note = null)
     {
+        app(DocumentRecipientService::class)->validateVisibility($document->visibility, [], [$toBranchId]);
         return DB::transaction(function () use ($document, $fromBranchId, $toBranchId, $transferer, $note) {
+            $document = Document::whereKey($document->id)->lockForUpdate()->firstOrFail();
+            app(DocumentRecipientService::class)->validateVisibility($document->visibility, [], [$toBranchId]);
             $transfer = DocumentTransfer::updateOrCreate([
                 'document_id' => $document->id,
                 'from_branch_id' => $fromBranchId,
@@ -359,7 +297,11 @@ class DocumentService
      */
     public function transferDocumentToDepartment(Document $document, int $departmentId, $transferer, ?string $note = null)
     {
+        app(DocumentRecipientService::class)->validateVisibility($document->visibility, [$departmentId]);
         return DB::transaction(function () use ($document, $departmentId, $transferer, $note) {
+            $document = Document::whereKey($document->id)->lockForUpdate()->firstOrFail();
+            abort_unless($document->canBeDistributedToDepartmentBy($transferer), 403);
+            app(DocumentRecipientService::class)->validateVisibility($document->visibility, [$departmentId]);
             $transfer = DocumentTransfer::updateOrCreate([
                 'document_id' => $document->id,
                 'from_branch_id' => $transferer->branch_id,

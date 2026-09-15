@@ -17,7 +17,7 @@ class ImportDocumentLedger extends Command
         {--year= : Năm sổ cần nhập, dựa theo ngày đến/ngày chuyển}
         {--sheet=* : Tên sheet cần nhập; có thể truyền nhiều lần}
         {--overwrite : Cập nhật các trường đã có bằng ô có nội dung trong Excel}
-        {--update-only : Chỉ cập nhật và vào sổ văn bản đã có; không tạo văn bản mới}
+        {--update-only : Chỉ cập nhật dòng sổ đã có; không tạo dòng sổ mới, không ghi kho}
         {--dry-run : Chỉ đối chiếu; không ghi dữ liệu hoặc cấp số}
         {--yes : Xác nhận nhập thật}';
 
@@ -36,7 +36,7 @@ class ImportDocumentLedger extends Command
             $this->error('Cần --year=2000..2100, --direction=incoming|outgoing và ít nhất một --sheet="Tên sheet".');
             return self::FAILURE;
         }
-        if (! Schema::hasTable('document_ledger_entries')) {
+        if (! Schema::hasTable('document_ledger_entries') || ! Schema::hasColumn('document_ledger_entries', 'title')) {
             $this->error('Chưa có bảng sổ. Chạy php artisan migrate --path=database/migrations/main trước.');
             return self::FAILURE;
         }

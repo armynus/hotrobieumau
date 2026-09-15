@@ -5,6 +5,9 @@
 
     RewriteEngine On
 
+    # Văn bản chỉ được mở qua endpoint kiểm tra quyền, kể cả URL file cũ.
+    RewriteRule ^storage/(?:documents|document-deletion-staging)(?:/|$) - [F,L,NC]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

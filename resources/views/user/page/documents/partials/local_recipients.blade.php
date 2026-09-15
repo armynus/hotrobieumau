@@ -14,7 +14,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6 mb-3">
+    <div class="col-md-6 mb-3 local-recipient-departments">
         <div class="border rounded p-3 h-100 bg-light">
             <div class="font-weight-bold text-primary mb-2"><i class="fas fa-sitemap mr-1"></i> Phòng ban chi nhánh mình</div>
             @if($departments->isNotEmpty())

@@ -30,7 +30,7 @@ class ImportDocumentArchive extends Command
         {--outgoing-sheet=* : Chỉ đọc các sheet đi này; truyền nhiều lần cho sổ thường và quyết định}
         {--unmatched=unclassified : Với file không có trong sổ: unclassified, skip, incoming hoặc outgoing}
         {--queue-ocr-missing : Xếp hàng OCR cho PDF không khớp/thiếu metadata sau khi nhập}
-        {--visibility=branch : branch, private hoặc system}
+        {--visibility=private : private, normal hoặc public; chỉ nơi được chọn mới xem}
         {--date-field=auto : auto, issued, received, forwarded hoặc both}
         {--extensions=pdf,doc,docx,xls,xlsx,ppt,pptx : Danh sách phần mở rộng được nhập}
         {--fallback-mtime : Dùng ngày sửa file nếu không tìm thấy folder NGAY dd-mm-yyyy}
@@ -78,8 +78,8 @@ class ImportDocumentArchive extends Command
         }
 
         $visibility = (string) $this->option('visibility');
-        if (! in_array($visibility, ['private', 'branch', 'system'], true)) {
-            $this->error('--visibility chỉ nhận private, branch hoặc system.');
+        if (! in_array($visibility, ['private', 'normal', 'public'], true)) {
+            $this->error('--visibility chỉ nhận private, normal hoặc public. Không có quyền xem toàn chi nhánh/toàn hệ thống.');
 
             return self::FAILURE;
         }

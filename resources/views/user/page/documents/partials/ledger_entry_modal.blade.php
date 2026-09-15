@@ -1,6 +1,6 @@
 <div class="modal fade" id="ledgerEntryModal" tabindex="-1" role="dialog" aria-labelledby="ledgerEntryTitle">
     <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document"><div class="modal-content">
-        <form id="ledgerEntryForm">@csrf<input name="document_id" type="hidden">
+        <form id="ledgerEntryForm">@csrf<input name="document_id" type="hidden"><input name="entry_id" type="hidden">
             <div class="modal-header ledger-entry-header">
                 <div class="d-flex align-items-center">
                     <span class="ledger-entry-icon mr-3"><i class="fas fa-book-open"></i></span>
@@ -52,7 +52,7 @@
                 </fieldset>
             </div>
             <div class="modal-footer bg-white">
-                <small class="text-muted mr-auto">Không đổi tên hoặc xóa file đính kèm.</small>
+                <small class="text-muted mr-auto">Chỉ lưu sổ, không tạo hoặc chỉnh sửa văn bản trong kho.</small>
                 <button class="btn btn-light border" data-dismiss="modal" type="button">Đóng</button>
                 <button class="btn btn-primary" id="ledgerSave" type="submit"><i class="fas fa-save mr-1"></i> Lưu vào sổ</button>
             </div>

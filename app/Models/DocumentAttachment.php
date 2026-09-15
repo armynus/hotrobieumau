@@ -9,6 +9,13 @@ class DocumentAttachment extends Model
 {
     use HasFactory;
 
+    protected $appends = ['view_url'];
+
+    public function getViewUrlAttribute(): string
+    {
+        return route('document_attachment', ['attachment' => $this->id]);
+    }
+
     protected $fillable = [
         'document_id',
         'file_path',

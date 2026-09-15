@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Document;
 use App\Models\DocumentLedgerEntry;
-use App\Models\DocumentLog;
 use App\Models\User;
 use App\Support\DocumentCode;
 use App\Support\DocumentLedgerNumber;
@@ -12,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
+/** Chỉ ghi bảng sổ và dãy số; tuyệt đối không ghi documents, file hay thông báo. */
 class DocumentLedgerService
 {
     public function nextNumber(int $branchId, int $year, string $book): int
@@ -22,70 +22,87 @@ class DocumentLedgerService
         ) + 1;
     }
 
-    /** Cấp số trong transaction, khóa theo chi nhánh/năm/sổ để hai văn thư không nhận trùng số. */
+    /** Sao chép thông tin một lần khi người dùng chủ động đưa văn bản vào sổ. */
     public function register(Document $document, User $user, array $data): DocumentLedgerEntry
     {
         abort_unless($user->isClerk() && $user->branch_id, 403);
-        $data = Validator::make($data, [
-            'book' => 'required|in:incoming,outgoing,decision',
-            'year' => 'required|integer|min:2000|max:2100',
-            'number' => 'nullable|string|max:50',
-            'registered_date' => 'nullable|date_format:Y-m-d',
-            'document_code' => 'nullable|string|max:255',
-            'source_name' => 'nullable|string|max:255',
-            'source_sheet' => 'nullable|string|max:255',
-            'source_row' => 'nullable|integer|min:1',
-            'source_fingerprint' => 'nullable|string|size:64',
-        ])->validate();
+
+        return DB::transaction(function () use ($document, $user, $data) {
+            $document = Document::whereKey($document->id)->lockForUpdate()->firstOrFail();
+            $ownBranch = (int) $document->managing_branch_id === (int) $user->branch_id;
+            abort_unless($ownBranch || ($document->visibility !== Document::VISIBILITY_PRIVATE
+                && $document->activeTransfers()->where('to_branch_id', $user->branch_id)->exists()), 403);
+            if (! $ownBranch && ($data['book'] ?? '') !== 'incoming') {
+                throw ValidationException::withMessages(['book' => 'Văn bản nhận từ chi nhánh khác chỉ được đưa vào sổ đến.']);
+            }
+            if (DocumentLedgerEntry::where('branch_id', $user->branch_id)->where('document_id', $document->id)->exists()) {
+                throw ValidationException::withMessages(['document' => 'Văn bản đã vào sổ chi nhánh mình. Dùng nút bút chì để chỉnh dòng sổ.']);
+            }
+            $snapshot = $document->only(DocumentLedgerEntry::METADATA_FIELDS);
+            foreach (['issued_date', 'forwarded_date'] as $field) {
+                $snapshot[$field] = $document->{$field}?->format('Y-m-d');
+            }
+
+            return $this->save($user, array_merge($snapshot, ['document_code' => $document->document_code], $data), null, $document->id);
+        });
+    }
+
+    public function save(User $user, array $data, ?DocumentLedgerEntry $entry = null, ?int $sourceDocumentId = null): DocumentLedgerEntry
+    {
+        abort_unless($user->isClerk() && $user->branch_id, 403);
+        if ($entry) {
+            abort_unless((int) $entry->branch_id === (int) $user->branch_id, 403);
+        }
+        $rules = [
+            'book' => 'required|in:incoming,outgoing,decision', 'year' => 'required|integer|min:2000|max:2100',
+            'number' => 'nullable|string|max:50', 'registered_date' => 'nullable|date_format:Y-m-d', 'document_code' => 'nullable|string|max:255',
+            'source_name' => 'nullable|string|max:255', 'source_sheet' => 'nullable|string|max:255',
+            'source_row' => 'nullable|integer|min:1', 'source_fingerprint' => 'nullable|string|size:64',
+            'title' => 'nullable|string|max:5000', 'issued_date' => 'nullable|date_format:Y-m-d',
+            'forwarded_date' => 'nullable|date_format:Y-m-d', 'issuing_agency' => 'nullable|string|max:255',
+            'signer' => 'nullable|string|max:255', 'recipient' => 'nullable|string|max:5000',
+            'archive_recipient' => 'nullable|string|max:5000', 'copy_count' => 'nullable|integer|min:1|max:100000',
+            'receipt_signature' => 'nullable|string|max:255', 'notes' => 'nullable|string|max:5000',
+        ];
+        $data = Validator::make($data, $rules)->validate();
         if (! empty($data['registered_date']) && (int) substr($data['registered_date'], 0, 4) !== (int) $data['year']) {
             throw ValidationException::withMessages(['year' => 'Năm sổ phải trùng năm của ngày đến/ngày chuyển.']);
         }
 
-        return DB::transaction(function () use ($document, $user, $data) {
+        return DB::transaction(function () use ($user, $data, $entry, $sourceDocumentId) {
             $scope = ['branch_id' => $user->branch_id, 'year' => $data['year'], 'book' => $data['book']];
             DB::table('document_ledger_sequences')->insertOrIgnore($scope + ['last_number' => 0]);
             $sequence = DB::table('document_ledger_sequences')->where($scope)->lockForUpdate()->first();
-            // Cùng văn bản ở một chi nhánh chỉ có một dòng sổ, kể cả khi đổi năm/nhóm.
-            Document::whereKey($document->id)->lockForUpdate()->firstOrFail();
-            $entry = DocumentLedgerEntry::where('document_id', $document->id)->where('branch_id', $user->branch_id)->first();
+            if ($entry) {
+                $entry = DocumentLedgerEntry::where('branch_id', $user->branch_id)->whereKey($entry->id)->lockForUpdate()->firstOrFail();
+            }
+            $code = $data['document_code'] ?? $entry?->document_code;
             $number = trim((string) ($data['number'] ?? ''));
+            if ($number === '' && $data['book'] !== 'incoming') {
+                $number = (string) DocumentLedgerNumber::fromCode($code);
+            }
             if ($number === '') {
                 $number = (string) max($sequence->last_number + 1, $this->nextNumber((int) $user->branch_id, (int) $data['year'], $data['book']));
             }
             $key = DocumentLedgerNumber::normalize($number);
-            // Số nhập tay được phép trùng để phản ánh nguyên sổ giấy/Excel.
-            // Số tự cấp vẫn tăng dưới khóa sequence, không lấy lại số đã dùng.
-
-            $code = $data['document_code'] ?? $document->document_code;
             if ($data['book'] !== 'incoming') {
                 if (str_starts_with(trim((string) $code), '/')) {
                     $code = $number.trim($code);
-                    if ((int) $document->managing_branch_id === (int) $user->branch_id) {
-                        $document->update(['document_code' => $code]);
-                    }
                 }
                 $codeNumber = DocumentLedgerNumber::fromCode($code);
                 if ($codeNumber === null || DocumentLedgerNumber::normalize($codeNumber) !== $key) {
-                    throw ValidationException::withMessages(['document_code' => 'Số đi phải trùng phần đầu trước dấu / của Số, ký hiệu văn bản. Ví dụ: '.$number.'/NHNo.ĐT-TH.']);
+                    throw ValidationException::withMessages(['document_code' => 'Số sổ phải trùng số ở đầu số, ký hiệu văn bản, ví dụ 201-202 hoặc 1140.']);
+                }
+                if (array_key_exists('registered_date', $data)) {
+                    $data['forwarded_date'] = $data['registered_date'];
                 }
             }
-            $entry ??= new DocumentLedgerEntry(['document_id' => $document->id, 'branch_id' => $user->branch_id]);
-            $entry->fill($data + ['registered_by' => $user->id]);
-            $entry->fill(['number' => $number, 'number_key' => $key, 'sequence_number' => DocumentLedgerNumber::sequence($number), 'document_code' => $code, 'code_key' => DocumentCode::normalize($code)]);
-            $changed = $entry->getDirty();
+            $entry ??= new DocumentLedgerEntry(['branch_id' => $user->branch_id, 'document_id' => $sourceDocumentId]);
+            $entry->fill($data);
+            $entry->fill(['number' => $number, 'number_key' => $key, 'sequence_number' => DocumentLedgerNumber::sequence($number),
+                'document_code' => $code, 'code_key' => DocumentCode::normalize($code), 'registered_by' => $user->id]);
             $entry->save();
-            DB::table('document_ledger_sequences')->where($scope)->update([
-                'last_number' => max($sequence->last_number, $entry->sequence_number),
-            ]);
-            if ($data['book'] === 'incoming' && (int) $document->managing_branch_id === (int) $user->branch_id) {
-                $document->update(['registry_number' => $number]);
-            }
-            if ($changed !== []) {
-                DocumentLog::create([
-                    'document_id' => $document->id, 'user_id' => $user->id, 'action' => 'ledger_registered',
-                    'details' => ['branch_id' => $user->branch_id, 'year' => $entry->year, 'book' => $entry->book, 'number' => $number],
-                ]);
-            }
+            DB::table('document_ledger_sequences')->where($scope)->update(['last_number' => max($sequence->last_number, DocumentLedgerNumber::lastSequence($number))]);
 
             return $entry;
         }, 3);

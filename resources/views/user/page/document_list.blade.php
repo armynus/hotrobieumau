@@ -9,7 +9,7 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <div>
             <h1 class="h3 mb-1 text-gray-800">Quản lý văn bản</h1>
-            <div class="small text-muted">Tra cứu và xử lý tập trung văn bản đến, văn bản đi</div>
+            <div class="small text-muted">Tra cứu và xử lý tập trung văn bản đến, đi và quyết định</div>
         </div>
         <div class="d-flex flex-wrap align-items-center mt-2 mt-sm-0">
             @if($user && $user->isClerk())
@@ -25,6 +25,7 @@
                 <div class="dropdown-menu dropdown-menu-right shadow">
                     <a class="dropdown-item" href="{{ route('documents_incoming_register') }}"><i class="fas fa-inbox text-primary mr-2"></i>Văn bản đến</a>
                     <a class="dropdown-item" href="{{ route('documents_outgoing_register') }}"><i class="fas fa-paper-plane text-success mr-2"></i>Văn bản đi</a>
+                    <a class="dropdown-item" href="{{ route('documents_decision_register') }}"><i class="fas fa-gavel text-primary mr-2"></i>Quyết định</a>
                 </div>
             </div>
             @endif
@@ -32,6 +33,14 @@
     </div>
 
     <x-alert-message />
+
+    <div class="document-kind-tabs mb-3" role="group" aria-label="Chọn phân loại văn bản">
+        @foreach(['' => ['Tất cả', 'fa-layer-group'], 'incoming' => ['Văn bản đến', 'fa-inbox'], 'outgoing' => ['Văn bản đi', 'fa-paper-plane'], 'decision' => ['Quyết định', 'fa-gavel'], 'unclassified' => ['Chưa phân loại', 'fa-folder']] as $key => [$label, $icon])
+        <button type="button" class="document-kind-tab {{ $key === '' ? 'active' : '' }}" data-direction="{{ $key }}" aria-pressed="{{ $key === '' ? 'true' : 'false' }}">
+            <i class="fas {{ $icon }}" aria-hidden="true"></i><span>{{ $label }}</span>
+        </button>
+        @endforeach
+    </div>
 
     <div class="card shadow mb-4">
         <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Bộ lọc tra cứu nâng cao</h6></div>
@@ -77,9 +86,10 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary">Danh sách văn bản</h6>
-            <span class="badge badge-primary">Văn bản đến & đi</span>
+            <span class="badge badge-primary" id="documentKindLabel">Tất cả văn bản</span>
         </div>
         <div class="card-body">
+            <small class="d-block text-muted mb-2">Nhấn tiêu đề cột để sắp xếp tăng/giảm. Ngày văn bản: sớm đến muộn hoặc ngược lại.</small>
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-light"><tr>
@@ -104,6 +114,7 @@
 @endsection
 
 @push('styles')
+<link href="{{ asset('css/user/document-kind-tabs.css') }}" rel="stylesheet">
 <link href="{{ asset('vendor/flatpickr/flatpickr.min.css') }}" rel="stylesheet">
 <style>
     .flatpickr-calendar { border: 0; border-radius: .5rem; box-shadow: 0 .5rem 1.5rem rgba(58, 59, 69, .2); }
@@ -137,5 +148,6 @@
 <script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}"></script>
 <script src="{{ asset('vendor/flatpickr/vn.js') }}"></script>
 <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
+<script src="{{ asset('js/user/document-distribution-editor.js') }}"></script>
 <script src="{{ asset('js/user/document-list.js') }}"></script>
 @endpush

@@ -2,9 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Document;
 use App\Models\DocumentLedgerEntry;
-use App\Models\DocumentLog;
 use App\Models\User;
 use App\Support\DocumentCode;
 use App\Support\DocumentLedgerNumber;
@@ -53,7 +51,6 @@ class DocumentLedgerImportService
             'skipped' => 0, 'skipped_other_year' => 0, 'skipped_missing_code' => 0,
             'conflicts' => 0, 'issues' => [], 'issue_count' => 0,
         ];
-        $wantedCodes = [];
         $sourceFingerprints = [];
         foreach ($rows as $row) {
             $sourceYear = $row['_year'] ?? 'unknown';
@@ -69,27 +66,11 @@ class DocumentLedgerImportService
             } catch (ValidationException) {
                 continue; // Báo lỗi theo dòng ở vòng xử lý bên dưới.
             }
-            $wantedCodes[$code] = true;
             $sourceFingerprints[$key.':'.$code][$this->fingerprint($row)] = true;
         }
         ksort($stats['rows_by_year']);
 
-        // Duyệt theo lô, chỉ giữ ID/ngày của các mã thật sự xuất hiện trong sổ.
-        $documentsByCode = [];
-        Document::query()->where('managing_branch_id', $user->branch_id)
-            ->whereDoesntHave('ledgerEntries', fn ($query) => $query->where('branch_id', $user->branch_id))
-            ->select(['id', 'document_code', 'issued_date', 'received_date', 'forwarded_date'])
-            ->chunkById(1000, function ($documents) use (&$documentsByCode, $wantedCodes): void {
-                foreach ($documents as $document) {
-                    $code = DocumentCode::normalize($document->document_code);
-                    if (isset($wantedCodes[$code])) {
-                        $documentsByCode[$code][] = $document->getAttributes();
-                    }
-                }
-            });
-
         $claimedEntries = [];
-        $claimedDocuments = [];
         foreach ($rows as $row) {
             if (! empty($row['_year']) && (int) $row['_year'] !== $year) {
                 $stats['skipped']++;
@@ -112,7 +93,7 @@ class DocumentLedgerImportService
                 continue;
             }
             if (blank($row['_number'] ?? null)) {
-                $this->issue($stats, $row, 'skipped', 'Thiếu số đến hoặc số đi ở đầu số, ký hiệu trước dấu /.');
+                $this->issue($stats, $row, 'skipped', 'Thiếu số đến hoặc không đọc được số sổ ở đầu số, ký hiệu văn bản.');
 
                 continue;
             }
@@ -126,7 +107,7 @@ class DocumentLedgerImportService
             $fingerprint = $this->fingerprint($row);
 
             try {
-                $result = DB::transaction(function () use ($row, $user, $year, $sourceName, $dryRun, $overwrite, $updateOnly, &$documentsByCode, &$claimedDocuments, &$claimedEntries, $sourceFingerprints, $fingerprint, $key, $dateField): string {
+                $result = DB::transaction(function () use ($row, $user, $year, $sourceName, $dryRun, $overwrite, $updateOnly, &$claimedEntries, $sourceFingerprints, $fingerprint, $key, $dateField): string {
                     $entries = DocumentLedgerEntry::query()->where('branch_id', $user->branch_id)
                         ->where('year', $year)->where('book', $row['_book'])
                         ->where('number_key', DocumentLedgerNumber::normalize((string) $row['_number']))
@@ -152,43 +133,11 @@ class DocumentLedgerImportService
                     if ($entry) {
                         $claimedEntries[$entry->id] = true;
                     }
-                    $sourceCode = DocumentCode::normalize($row['document_code'] ?? null);
-                    if ($entry) {
-                        $storedCode = DocumentCode::normalize($entry->document_code ?: $entry->document?->document_code);
-                        if ($storedCode !== '' && $sourceCode !== '' && $storedCode !== $sourceCode) {
-                            throw ValidationException::withMessages(['ledger' => 'Số này đã thuộc một văn bản có số, ký hiệu khác.']);
-                        }
-                        $document = Document::query()->whereKey($entry->document_id)->where('managing_branch_id', $user->branch_id)
-                            ->when(! $dryRun, fn ($query) => $query->lockForUpdate())->first();
-                        if (! $document) {
-                            throw ValidationException::withMessages(['ledger' => 'Số đã đăng ký cho văn bản ngoài chi nhánh quản lý.']);
-                        }
-                    } else {
-                        $candidates = array_filter($documentsByCode[$sourceCode] ?? [], fn ($candidate) => ! isset($claimedDocuments[$candidate['id']]));
-                        $candidate = $this->candidate($candidates, $row, $year);
-                        $document = $candidate ? Document::query()->whereKey($candidate)
-                            ->when(! $dryRun, fn ($query) => $query->lockForUpdate())->first() : null;
+                    if (! $entry && $updateOnly) {
+                        throw ValidationException::withMessages(['skip' => 'Chưa có dòng sổ khớp; chế độ chỉ cập nhật không tạo mới.']);
                     }
-
-                    if (! $document && $updateOnly) {
-                        throw ValidationException::withMessages(['skip' => 'Không có văn bản khớp trong kho; chế độ chỉ cập nhật không tạo mới.']);
-                    }
-                    if ($document) {
-                        $otherEntry = DocumentLedgerEntry::query()->where('branch_id', $user->branch_id)
-                            ->where('document_id', $document->id)->first();
-                        if (($otherEntry && (! $entry || $otherEntry->id !== $entry->id))
-                            || (isset($claimedDocuments[$document->id]) && $claimedDocuments[$document->id] !== $key)) {
-                            throw ValidationException::withMessages(['ledger' => 'Văn bản khớp đã được đăng ký bằng một số/sổ khác; cần kiểm tra thủ công.']);
-                        }
-                        $claimedDocuments[$document->id] = $key;
-                    }
-                    $created = ! $document;
-                    $document ??= new Document([
-                        'managing_branch_id' => $user->branch_id, 'created_by' => $user->id,
-                        'priority' => 'normal', 'security_level' => 'normal', 'visibility' => Document::VISIBILITY_PRIVATE,
-                    ]);
-                    $changes = $this->metadataChanges($document, $row, $overwrite);
-                    $document->fill($changes);
+                    $created = ! $entry;
+                    $changes = $this->metadataChanges($entry ?? new DocumentLedgerEntry, $row, $overwrite);
                     $entryChanged = ! $entry
                         || (string) $entry->registered_date?->format('Y-m-d') !== (string) $row[$dateField]
                         || $entry->source_fingerprint !== $fingerprint
@@ -200,22 +149,15 @@ class DocumentLedgerImportService
                         return $created ? 'created' : 'updated';
                     }
 
-                    $document->save();
-                    $savedEntry = $this->ledger->register($document, $user, [
+                    $savedEntry = $this->ledger->save($user, array_merge($changes, [
                         'book' => $row['_book'], 'year' => $year, 'number' => (string) $row['_number'],
                         'registered_date' => $row[$dateField],
                         'document_code' => $row['document_code'] ?? $entry?->document_code,
                         'source_name' => $sourceName, 'source_sheet' => $row['_sheet'] ?? null,
                         'source_row' => $row['_row'] ?? null,
                         'source_fingerprint' => $fingerprint,
-                    ]);
+                    ]), $entry);
                     $claimedEntries[$savedEntry->id] = true;
-                    $claimedDocuments[$document->id] = $key;
-                    $details = ['source' => $sourceName, 'sheet' => $row['_sheet'] ?? null, 'row' => $row['_row'] ?? null, 'year' => $year, 'book' => $row['_book'], 'number' => $row['_number'], 'fields' => array_keys($changes)];
-                    if ($created) {
-                        DocumentLog::create(['document_id' => $document->id, 'user_id' => $user->id, 'action' => 'archive_imported', 'details' => $details]);
-                    }
-                    DocumentLog::create(['document_id' => $document->id, 'user_id' => $user->id, 'action' => 'ledger_imported', 'details' => $details]);
 
                     return $created ? 'created' : 'updated';
                 }, 3);
@@ -228,53 +170,15 @@ class DocumentLedgerImportService
         return $stats;
     }
 
-    private function candidate(array $candidates, array $row, int $year): ?int
-    {
-        $dateField = $row['_book'] === 'incoming' ? 'received_date' : 'forwarded_date';
-        $sameYear = array_filter($candidates, function ($candidate) use ($dateField, $year): bool {
-            $date = $candidate[$dateField] ?: ($candidate['issued_date'] ?: ($candidate['received_date'] ?: $candidate['forwarded_date']));
-
-            return $date && (int) substr($date, 0, 4) === $year;
-        });
-        $sameYear = array_column($sameYear, null, 'id');
-        if (count($sameYear) > 1) {
-            $exact = array_filter($sameYear, fn ($candidate) => ($candidate[$dateField] ?? null) === $row[$dateField]);
-            if (count($exact) === 1) {
-                return (int) array_key_first($exact);
-            }
-
-            return null; // Giữ dòng sổ riêng khi kho có nhiều file khớp; đăng file thủ công sẽ chọn đúng dòng.
-        }
-        if ($sameYear !== []) {
-            return (int) array_key_first($sameYear);
-        }
-        foreach ($candidates as $candidate) {
-            if (! $candidate['issued_date'] && ! $candidate['received_date'] && ! $candidate['forwarded_date']) {
-                return null;
-            }
-        }
-
-        return null;
-    }
-
-    private function metadataChanges(Document $document, array $row, bool $overwrite): array
+    private function metadataChanges(DocumentLedgerEntry $entry, array $row, bool $overwrite): array
     {
         $changes = [];
-        $direction = $row['_book'];
-        if (! $document->exists || blank($document->direction) || $document->direction === Document::DIRECTION_UNCLASSIFIED || $overwrite
-            || ($direction === Document::DIRECTION_DECISION && $document->direction === Document::DIRECTION_OUTGOING)) {
-            if ($document->direction !== $direction) {
-                $changes['direction'] = $direction;
-            }
-        } elseif ($document->direction !== $direction) {
-            throw ValidationException::withMessages(['ledger' => 'Phân loại hiện tại khác sổ Excel. Dùng ghi đè nếu đã xác nhận sổ chính xác.']);
-        }
-        foreach (self::FIELDS as $field) {
+        foreach (DocumentLedgerEntry::METADATA_FIELDS as $field) {
             $next = $row[$field] ?? null;
             if ($next === null || $next === '') {
                 continue;
             }
-            $current = $document->{$field};
+            $current = $entry->{$field};
             $current = $current instanceof \DateTimeInterface ? $current->format('Y-m-d') : $current;
             if (($overwrite || $current === null || $current === '') && (string) $current !== (string) $next) {
                 $changes[$field] = $next;

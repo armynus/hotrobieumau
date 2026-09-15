@@ -19,15 +19,11 @@ $(function () {
             if (input[0] && input[0]._flatpickr) input[0]._flatpickr.setDate(value || null, false, 'Y-m-d');
             else input.val(value);
         });
-        form.find('[name="ledger_entry_id"]').val(entry.id);
-        form.find('[name="ledger_entry_version"]').val(entry.version);
-        form.find('[name="document_code"], [name="registry_number"]').prop('readonly', true);
-        $('#registerInLedger').prop('checked', true).prop('disabled', true).trigger('change');
-        $('#ledgerAutoNumber').prop('checked', false).prop('disabled', true);
+        form.find('[name="document_code"], [name="registry_number"]').prop('readonly', false);
         $('#uploadLedgerReset').removeClass('d-none');
         selected = true;
         block(false);
-        status.text('Đã chọn dòng #' + entry.id + ' — số sổ ' + entry.number + ', năm ' + entry.year + '. File sẽ gắn vào văn bản này, không tạo văn bản mới. Bổ sung các ô bắt buộc còn thiếu nếu có.');
+        status.text('Đã chọn dòng #' + entry.id + ' — số sổ ' + entry.number + ', năm ' + entry.year + '. Đã sao chép thông tin; đăng tải chỉ lưu kho, không tạo hoặc sửa dòng sổ. Bổ sung các ô bắt buộc còn thiếu nếu có.');
     }
     function search() {
         clearTimeout(timer);
@@ -43,9 +39,7 @@ $(function () {
                 else input.val(['priority', 'security_level'].includes(name) ? 'normal' : '');
             });
         }
-        form.find('[name="ledger_entry_id"], [name="ledger_entry_version"]').val('');
         form.find('[name="document_code"], [name="registry_number"]').prop('readonly', false);
-        $('#registerInLedger, #ledgerAutoNumber').prop('disabled', false);
         selected = false;
         filledValues = {};
         matches = [];
@@ -74,7 +68,8 @@ $(function () {
             })
             .fail(function (xhr, textStatus) {
                 if (textStatus === 'abort' || requestGeneration !== generation) return;
-                status.text('Không tra được sổ. Bấm “Tra sổ” để thử lại trước khi đăng tải.');
+                block(false);
+                status.text('Không tra được sổ. Có thể thử lại hoặc tự nhập thông tin và đăng tải vào kho.');
             });
     }
     function schedule() {
@@ -87,15 +82,10 @@ $(function () {
     $('#uploadLedgerSearch').on('click', search);
     $('#uploadLedgerQuery, #uploadLedgerYear').on('input change', schedule);
     $('#uploadLedgerQuery').on('keydown', function (event) { if (event.key === 'Enter') { event.preventDefault(); search(); } });
-    form.find('[name="document_code"], [name="registry_number"]').on('input', function () {
-        if (selected) return;
-        $('#uploadLedgerQuery').val(this.value);
-        schedule();
-    });
     select.on('change', function () {
         const entry = matches.find(entry => String(entry.id) === this.value);
         if (entry) apply(entry);
-        else { form.find('[name="ledger_entry_id"], [name="ledger_entry_version"]').val(''); block(true); }
+        else { block(true); }
     });
     $('#uploadLedgerReset').on('click', function () { form.trigger('document-register:reset-request'); });
     form.on('document-register:reset', function () {
@@ -105,9 +95,7 @@ $(function () {
         selected = false;
         matches = [];
         block(false);
-        form.find('[name="ledger_entry_id"], [name="ledger_entry_version"]').val('');
         form.find('[name="document_code"], [name="registry_number"]').prop('readonly', false);
-        $('#registerInLedger, #ledgerAutoNumber').prop('disabled', false);
         $('#uploadLedgerChoices, #uploadLedgerReset').addClass('d-none');
         status.text('Nhập số để lấy thông tin từ sổ.');
     });

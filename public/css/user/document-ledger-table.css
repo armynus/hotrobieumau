@@ -1,0 +1,52 @@
+.ledger-book {
+    border: 1px solid #dfe5f2;
+    border-left: 5px solid #ccd5e8;
+    border-radius: 12px;
+    text-decoration: none !important;
+    transition: background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.ledger-book-label { color: #3659bd; }
+.ledger-book-count { color: #39465d; font-size: 1.4rem; margin-top: 4px !important; }
+.ledger-book .card-body { padding: 14px 18px; }
+.ledger-book-label { font-size: .9rem; }
+.ledger-book-active { font-size: .7rem; }
+.ledger-book-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    margin-left: 16px;
+    border-radius: 10px;
+    font-size: 18px;
+    color: #7890b8;
+    background: #eef2fa;
+}
+.ledger-book:hover, .ledger-book:focus-visible {
+    border-color: #4e73df;
+    box-shadow: 0 5px 18px rgba(45, 80, 178, .18) !important;
+}
+.ledger-book:focus-visible { outline: 3px solid #93b5ff; outline-offset: 3px; }
+.ledger-book.selected {
+    background: linear-gradient(120deg, #2855c5, #426cdb);
+    border-color: #2855c5;
+    box-shadow: 0 6px 18px rgba(40, 85, 197, .26) !important;
+}
+.ledger-book.selected .ledger-book-label,
+.ledger-book.selected .ledger-book-count,
+.ledger-book-active { color: #fff; }
+.ledger-book.selected .ledger-book-icon { color: #2855c5; background: #fff; }
+.ledger-book-active { display: inline-block; margin-top: 3px; font-weight: 600; }
+.ledger-table-container .dataTables_wrapper .dataTables_length { padding-top: 8px; }
+.ledger-table-container .dataTables_info,
+.ledger-table-container .dataTables_paginate { padding-top: 16px !important; }
+.ledger-table th.sorting_asc,
+.ledger-table th.sorting_desc { color: #2855c5; background-color: #eef3ff; }
+.ledger-table td:nth-child(2),
+.ledger-table td:nth-child(5) { white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .ledger-book { transition: none; } }
+@media (max-width: 575.98px) {
+    .ledger-book .card-body { padding: 16px; }
+    .ledger-table-container .dataTables_paginate .pagination { justify-content: center; flex-wrap: wrap; }
+}

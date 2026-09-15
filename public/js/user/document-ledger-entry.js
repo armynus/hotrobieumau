@@ -30,13 +30,13 @@ $(function () {
         $('#entryRecipientLabel').text(incoming ? 'Đơn vị hoặc người nhận' : 'Nơi nhận văn bản');
         $('#entryNumberHint').text(incoming
             ? 'Giữ số theo sổ gốc, cho phép số trùng. Năm sổ theo ngày đến, không theo ngày văn bản.'
-            : 'Số đi/quyết định nằm trước dấu /. Nhập /NHNo.ĐT-TH và để trống số để tự cấp. Mỗi năm, mỗi sổ có dãy số riêng.');
+            : 'Lấy số ở đầu ký hiệu: 201-202/QĐ → 201-202; 1140 KH-/NHNo → 1140. Nhập /NHNo.ĐT-TH và để trống số để tự cấp.');
     }
     function reset(nextMode) {
         searchGeneration++;
         if (pending) pending.abort();
         form[0].reset();
-        form.find('[name="document_id"]').val('');
+        form.find('[name="document_id"], [name="entry_id"]').val('');
         dates.forEach(picker => picker.clear());
         $('#entryBook').val($('#ledgerBook').val()).find('option').prop('disabled', false);
         $('#entryYear').val($('#ledgerYear').val());
@@ -49,7 +49,7 @@ $(function () {
         $('#ledgerFindDocument').toggle(mode === 'existing');
         $('#ledgerEntryTitle').text(mode === 'new' ? 'Ghi mới vào sổ' : 'Đưa văn bản vào sổ');
         $('#ledgerSelectedDocument').text(mode === 'new'
-            ? 'Ghi thông tin trước, chưa cần file. Sau này đăng tải bằng cách tra số trong sổ.'
+            ? 'Chỉ ghi thông tin vào sổ, không tạo văn bản trong kho. Có thể tra sổ để điền nhanh khi đăng tải sau.'
             : 'Chọn văn bản đã có trên hệ thống nhưng chưa vào sổ chi nhánh mình. Không tạo văn bản mới.');
         save.prop('disabled', mode === 'existing').html(saveLabel());
         bookFields();
@@ -63,17 +63,17 @@ $(function () {
         });
         $('#entryBook option').prop('disabled', false);
         if (!entry.own_branch) $('#entryBook').val('incoming').find('option:not([value="incoming"])').prop('disabled', true);
-        $('#ledgerMetadataFields').prop('disabled', !entry.can_edit_metadata);
-        $('#ledgerMetadataNotice').toggleClass('d-none', !!entry.can_edit_metadata);
-        $('#ledgerSelectedDocument').text('#' + entry.document_id + ' · ' + (entry.document_code || 'Chưa có số, ký hiệu') + ' · ' + (entry.title || 'Chưa có trích yếu'));
+        $('#ledgerMetadataFields').prop('disabled', false);
+        $('#ledgerMetadataNotice').addClass('d-none');
+        $('#ledgerSelectedDocument').text('#' + (entry.entry_id || entry.document_id) + ' · ' + (entry.document_code || 'Chưa có số, ký hiệu') + ' · ' + (entry.title || 'Chưa có trích yếu'));
         save.prop('disabled', false);
         bookFields();
     }
     $('#newLedgerEntry').on('click', function () { reset('new'); });
     $('#addLedgerEntry').on('click', function () { reset('existing'); });
-    $('.edit-ledger-entry').on('click', function () {
+    $('#ledgerTable').on('click', '.edit-ledger-entry', function () {
         reset('edit');
-        setEntry($(this).data('entry'));
+        setEntry($('#ledgerTable').DataTable().row($(this).closest('tr')).data().form_data);
         $('#ledgerEntryTitle').text('Chỉnh sửa sổ văn bản');
         modal.modal('show');
     });
@@ -85,7 +85,7 @@ $(function () {
         const generation = ++searchGeneration;
         const button = $(this).prop('disabled', true);
         save.prop('disabled', true);
-        form.find('[name="document_id"]').val('');
+        form.find('[name="document_id"], [name="entry_id"]').val('');
         $('#ledgerCandidates').empty().text('Đang tìm…');
         pending = $.get(page.data('candidates-url'), {q: q}).done(function (documents) {
             if (generation !== searchGeneration) return;
@@ -95,7 +95,7 @@ $(function () {
                     .text('#' + doc.id + ' · ' + (doc.document_code || 'Chưa có số, ký hiệu') + ' — ' + (doc.title || 'Chưa có trích yếu'))
                     .on('click', function () { setEntry(doc.form_data); list.empty(); }).appendTo(list);
             });
-            if (!documents.length) list.text('Không tìm thấy văn bản chưa vào sổ phù hợp. Nếu đã vào sổ, dùng bút chì ở dòng sổ để sửa; chỉ chọn “Ghi mới vào sổ” khi chưa có văn bản trên hệ thống.');
+            if (!documents.length) list.text('Không tìm thấy văn bản chưa vào sổ phù hợp. Nếu đã vào sổ, dùng bút chì ở dòng sổ để sửa; “Ghi mới vào sổ” dùng để nhập thông tin sổ độc lập.');
         }).fail(function (xhr, status) {
             if (status !== 'abort') Swal.fire('Lỗi', errorText(xhr), 'error');
         }).always(function () { if (generation === searchGeneration) button.prop('disabled', false); });
@@ -106,13 +106,13 @@ $(function () {
     form.on('submit', function (e) {
         e.preventDefault();
         if (busy || !form[0].reportValidity()) return;
-        const id = form.find('[name="document_id"]').val();
+        const id = form.find(mode === 'edit' ? '[name="entry_id"]' : '[name="document_id"]').val();
         if (mode !== 'new' && !id) { Swal.fire('Chọn văn bản', 'Hãy tìm và chọn văn bản cần ghi sổ.', 'info'); return; }
-        const url = mode === 'new' ? page.data('create-url') : page.data('register-url') + '/' + encodeURIComponent(id) + '/register';
+        const url = mode === 'new' ? page.data('create-url') : (mode === 'edit' ? page.data('update-url') + '/' + encodeURIComponent(id) : page.data('register-url') + '/' + encodeURIComponent(id) + '/register');
         const data = form.serialize() + '&' + $.param({operation: mode === 'edit' ? 'edit' : 'register'});
         busy = true;
         save.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang lưu…');
-        $.post(url, data).done(function (response) {
+        $.ajax({url: url, type: mode === 'edit' ? 'PUT' : 'POST', data: data}).done(function (response) {
             Swal.fire('Đã lưu', response.message, 'success').then(function () { window.location.reload(); });
         }).fail(function (xhr) { Swal.fire('Lỗi', errorText(xhr), 'error'); }).always(function () {
             busy = false;

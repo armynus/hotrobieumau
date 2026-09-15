@@ -14,57 +14,56 @@ class DocumentQueryService
     public function getDocumentsForUser($user, $filters = [])
     {
         $query = Document::with(['documentType', 'creator']);
+        if (! $user->branch_id) {
+            return $query->whereRaw('1 = 0');
+        }
 
-        // Apply Permission Logic
-        $query->where(function (Builder $q) use ($user) {
-            // Rule 0: Public Documents
-            $q->where('visibility', Document::VISIBILITY_SYSTEM);
-
-            // Rule 0.1: Public within Branch
-            $q->orWhere(function (Builder $qb) use ($user) {
-                $qb->where('visibility', Document::VISIBILITY_BRANCH)
-                    ->where('managing_branch_id', $user->branch_id);
-            });
-
-            $q->orWhere(function (Builder $sub) use ($user) {
-                if ($user->isClerk()) {
-                    // Clerks can see documents in their branch or transferred to their branch
-                    $sub->where('managing_branch_id', $user->branch_id)
-                    // Or documents transferred to their branch
-                        ->orWhereHas('transfers', function ($qt) use ($user) {
-                            $qt->where('to_branch_id', $user->branch_id);
-                        });
-                } else {
-                    // Normal users / Managers: check permissions
-                    $sub->where(function (Builder $qNormal) use ($user) {
-                        // Rule 1: Explicit permissions (Legacy or specific share)
-                        $qNormal->whereHas('permissions', function (Builder $qp) use ($user) {
-                            $qp->where(function ($s) use ($user) {
-                                $s->where('target_type', 'user')->where('target_id', $user->id);
-                            })
-                                ->orWhere(function ($s) use ($user) {
-                                    $s->where('target_type', 'position')->where('target_id', $user->position_id);
-                                })
-                                ->orWhere(function ($s) use ($user) {
-                                    $s->where('target_type', 'department')->where('target_id', $user->department_id);
-                                })
-                                ->orWhere(function ($s) use ($user) {
-                                    $s->where('target_type', 'branch')->where('target_id', $user->branch_id);
-                                });
-                        });
-
-                        // Rule 2: Automatic Leadership Permission
-                        if ($user->isLeadership()) {
-                            $qNormal->orWhere(function ($leadership) use ($user) {
-                                $leadership->where('visibility', '!=', Document::VISIBILITY_RESTRICTED)
-                                    ->where(function ($scope) use ($user) {
-                                        $scope->where('managing_branch_id', $user->branch_id)
-                                            ->orWhereHas('transfers', fn ($qt) => $qt->where('to_branch_id', $user->branch_id));
-                                    });
-                            });
-                        }
+        // Không có quyền xem toàn hệ thống/chi nhánh ngầm theo mức công khai.
+        $query->where(function (Builder $scope) use ($user) {
+            if ($user->isClerk()) {
+                $scope->where('managing_branch_id', $user->branch_id)
+                    ->orWhere(function ($received) use ($user) {
+                        $received->whereIn('visibility', [Document::VISIBILITY_NORMAL, Document::VISIBILITY_PUBLIC])
+                            ->whereHas('activeTransfers', fn ($transfer) => $transfer->where('to_branch_id', $user->branch_id));
                     });
+
+                return;
+            }
+            $scope->where(function ($direct) use ($user) {
+                // Ban giám đốc chỉ được đọc khi chọn đích danh; riêng tư chỉ cùng CN.
+                if (! in_array((int) $user->position?->level, [1, 2], true)) {
+                    $direct->whereRaw('1 = 0');
+
+                    return;
                 }
+                $direct->whereHas('permissions', fn ($permission) => $permission
+                    ->where('target_type', 'user')->where('target_id', $user->id))
+                    ->where(function ($branch) use ($user) {
+                        $branch->where('managing_branch_id', $user->branch_id)
+                            ->orWhere(function ($received) use ($user) {
+                                $received->whereIn('visibility', [Document::VISIBILITY_NORMAL, Document::VISIBILITY_PUBLIC])
+                                    ->whereHas('activeTransfers', fn ($transfer) => $transfer->where('to_branch_id', $user->branch_id));
+                            });
+                    });
+            })->orWhere(function ($department) use ($user) {
+                if (! $user->department_id) {
+                    $department->whereRaw('1 = 0');
+
+                    return;
+                }
+                $department->whereIn('visibility', $user->isLeadership()
+                    ? [Document::VISIBILITY_NORMAL, Document::VISIBILITY_PUBLIC]
+                    : [Document::VISIBILITY_PUBLIC])
+                    ->whereHas('permissions', fn ($permission) => $permission
+                        ->where('target_type', 'department')->where('target_id', $user->department_id))
+                    ->where(function ($branch) use ($user) {
+                        $branch->where('managing_branch_id', $user->branch_id)
+                            ->orWhereHas('activeTransfers', fn ($transfer) => $transfer->where('to_branch_id', $user->branch_id));
+                    })
+                    ->whereExists(function ($assigned) use ($user) {
+                        $assigned->selectRaw('1')->from('departments')
+                            ->where('departments.id', $user->department_id)->where('departments.branch_id', $user->branch_id);
+                    });
             });
         });
 
@@ -144,14 +143,19 @@ class DocumentQueryService
         // Sorting
         $sortBy = $filters['sort_by'] ?? 'created_at';
         $sortDir = $filters['sort_dir'] ?? 'desc';
-        $allowedSorts = ['created_at', 'direction', 'issued_date', 'received_date', 'forwarded_date', 'title', 'document_code', 'registry_number', 'issuing_agency', 'signer', 'recipient'];
+        $allowedSorts = ['id', 'created_at', 'direction', 'issued_date', 'received_date', 'forwarded_date', 'title', 'document_code', 'registry_number', 'issuing_agency', 'signer', 'recipient'];
 
         if (! in_array($sortBy, $allowedSorts, true)) {
             $sortBy = 'created_at';
         }
 
-        $query->orderBy($sortBy, $sortDir === 'asc' ? 'asc' : 'desc')
-            ->orderByDesc('id');
+        if (in_array($sortBy, ['issued_date', 'received_date', 'forwarded_date'], true)) {
+            $query->orderByRaw($sortBy.' IS NULL ASC');
+        }
+        $query->orderBy($sortBy, $sortDir === 'asc' ? 'asc' : 'desc');
+        if ($sortBy !== 'id') {
+            $query->orderByDesc('id');
+        }
 
         return $query;
     }

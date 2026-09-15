@@ -1,7 +1,7 @@
 @extends('user.layouts.app')
 @section('title', 'Sổ văn bản')
 @section('content')
-<div class="container-fluid" id="ledgerPage" data-import-url="{{ route('documents_ledger_import') }}" data-candidates-url="{{ route('documents_ledger_candidates') }}" data-create-url="{{ route('documents_ledger_create') }}" data-next-url="{{ route('documents_ledger_next_number') }}" data-register-url="{{ url('documents/ledger') }}">
+<div class="container-fluid" id="ledgerPage" data-table-url="{{ route('documents_ledger', ['year' => $year, 'book' => $book, 'q' => $keyword]) }}" data-update-url="{{ url('documents/ledger/entries') }}" data-import-url="{{ route('documents_ledger_import') }}" data-candidates-url="{{ route('documents_ledger_candidates') }}" data-create-url="{{ route('documents_ledger_create') }}" data-next-url="{{ route('documents_ledger_next_number') }}" data-register-url="{{ url('documents/ledger') }}">
     <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
         <div><h1 class="h3 text-gray-800 mb-1">Sổ văn bản</h1><div class="text-muted">{{ $clerk->branch->branch_name }} · Năm {{ $year }}</div></div>
         <div class="mt-3 mt-md-0">
@@ -14,8 +14,8 @@
     <div class="row">
         @foreach($bookLabels as $key => $label)
         <div class="col-md-4 mb-3">
-            <a class="card h-100 shadow-sm ledger-book {{ $key === $book ? 'selected' : '' }}" href="{{ route('documents_ledger', ['year' => $year, 'book' => $key]) }}">
-                <div class="card-body d-flex justify-content-between align-items-center"><div><div class="text-primary font-weight-bold">{{ $label }}</div><div class="h3 text-gray-800 mb-0 mt-2">{{ number_format($counts[$key] ?? 0) }}</div></div><i class="fas fa-book fa-2x text-gray-300"></i></div>
+            <a class="card h-100 shadow-sm ledger-book {{ $key === $book ? 'selected' : '' }}" href="{{ route('documents_ledger', ['year' => $year, 'book' => $key, 'q' => $keyword]) }}" @if($key === $book) aria-current="page" @endif>
+                <div class="card-body d-flex justify-content-between align-items-center"><div><div class="ledger-book-label font-weight-bold">{{ $label }}</div><div class="h3 ledger-book-count mb-0 mt-2">{{ number_format($counts[$key] ?? 0) }}</div>@if($key === $book)<small class="ledger-book-active"><i class="fas fa-check-circle mr-1"></i> Đang xem</small>@endif</div><span class="ledger-book-icon"><i class="fas {{ ['incoming' => 'fa-inbox', 'outgoing' => 'fa-paper-plane', 'decision' => 'fa-gavel'][$key] }}" aria-hidden="true"></i></span></div>
             </a>
         </div>
         @endforeach
@@ -30,21 +30,13 @@
             </form>
             <div class="d-flex flex-wrap justify-content-between small text-muted"><span>Số tiếp theo dự kiến: <strong class="text-primary">{{ $nextNumber }}</strong> · Cấp riêng theo năm và loại sổ.</span><span>Chỉ các dòng đã vào sổ được đưa vào file Excel.</span></div>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover mb-0 ledger-table">
-                <thead class="bg-light"><tr><th>Số sổ</th><th>Ngày vào sổ</th><th>Số, ký hiệu văn bản</th><th>Trích yếu</th><th>Ngày văn bản</th><th></th></tr></thead>
-                <tbody>@forelse($entries as $entry)
-                    <tr>
-                        <td class="font-weight-bold">{{ $entry->number }}</td><td>{{ $entry->registered_date?->format('d/m/Y') ?? '—' }}</td>
-                        <td><a href="{{ route('document_detail', $entry->document_id) }}">{{ $entry->document_code ?: $entry->document->document_code ?: 'Chưa có số, ký hiệu' }}</a></td>
-                        <td class="ledger-title">{{ $entry->document->title ?: 'Chưa cập nhật trích yếu' }}@if($entry->source_name)<small class="d-block text-muted">{{ $entry->source_sheet }} · Dòng {{ $entry->source_row }}</small>@endif</td>
-                        <td>{{ $entry->document->issued_date?->format('d/m/Y') ?? '—' }}</td>
-                        <td><button type="button" class="btn btn-sm btn-outline-primary edit-ledger-entry" title="Chỉnh thông tin vào sổ" aria-label="Chỉnh thông tin vào sổ" data-entry="{{ json_encode($entry->form_data, JSON_UNESCAPED_UNICODE) }}"><i class="fas fa-edit"></i></button></td>
-                    </tr>
-                @empty<tr><td colspan="6" class="text-center text-muted py-5">Chưa có văn bản trong sổ này. Nhập Excel hoặc vào sổ văn bản đã có trong hệ thống.</td></tr>@endforelse</tbody>
+        <div class="px-3 pb-3 ledger-table-container">
+            <small class="d-block text-muted mb-2">Nhấn tiêu đề cột để đổi thứ tự tăng/giảm: số sổ, ngày vào sổ hoặc ngày văn bản.</small>
+            <table id="ledgerTable" class="table table-hover ledger-table w-100">
+                <thead class="bg-light"><tr><th>Số sổ</th><th>Ngày vào sổ</th><th>Số, ký hiệu văn bản</th><th>Trích yếu</th><th>Ngày văn bản</th><th>Thao tác</th></tr></thead>
+                <tbody></tbody>
             </table>
         </div>
-        <div class="card-footer bg-white">{{ $entries->links('pagination::bootstrap-4') }}</div>
     </div>
     <div class="card shadow-sm mb-4">
         <div class="card-body">
@@ -69,7 +61,9 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('vendor/flatpickr/flatpickr.min.css') }}">
 <link rel="stylesheet" href="{{ asset('css/user/document-ledger-entry.css') }}">
-<style>.ledger-book{border-left:4px solid #d1d3e2;text-decoration:none!important}.ledger-book.selected{border-left-color:#4e73df;background:#f5f7ff}.ledger-table th,.ledger-table td{vertical-align:middle}.ledger-table th{white-space:nowrap}.ledger-title{min-width:260px;max-width:550px}.ledger-import-issues{max-height:230px;overflow:auto}.ledger-stats{display:flex;gap:12px;flex-wrap:wrap}.ledger-stats>div{padding:8px 12px;background:#f8f9fc;border-radius:6px}</style>
+<link rel="stylesheet" href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user/document-ledger-table.css') }}">
+<style>.ledger-table th,.ledger-table td{vertical-align:middle}.ledger-table th{white-space:nowrap}.ledger-title{min-width:260px;max-width:550px}.ledger-import-issues{max-height:230px;overflow:auto}.ledger-stats{display:flex;gap:12px;flex-wrap:wrap}.ledger-stats>div{padding:8px 12px;background:#f8f9fc;border-radius:6px}</style>
 @endpush
 @push('scripts')
 <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
@@ -78,6 +72,9 @@
 <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
 <script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}"></script>
 <script src="{{ asset('vendor/flatpickr/vn.js') }}"></script>
+<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('js/user/document-ledger-table.js') }}"></script>
 <script src="{{ asset('js/user/document-ledger.js') }}"></script>
 <script src="{{ asset('js/user/document-ledger-entry.js') }}"></script>
 @endpush

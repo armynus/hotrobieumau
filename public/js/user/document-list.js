@@ -17,9 +17,6 @@ $(document).ready(function () {
         return $('<div>').text(value == null ? '' : String(value)).html();
     }
 
-    function storageFileUrl(path) {
-        return '/storage/' + String(path).split('/').map(encodeURIComponent).join('/');
-    }
 
     function toIsoDate(value) {
         var match = String(value || '').trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
@@ -111,7 +108,7 @@ $(document).ready(function () {
         form.find('[name="document_type_id"]').val(doc.document_type_id || '');
         form.find('[name="priority"]').val(doc.priority || 'normal');
         form.find('[name="security_level"]').val(doc.security_level || 'normal');
-        form.find('[name="is_public_level"]').val(doc.visibility === 'restricted' ? '3' : (doc.visibility === 'system' ? '2' : (doc.visibility === 'branch' ? '1' : '0')));
+        DocumentDistributionEditor.populate(form, doc);
         var direction = doc.direction || 'unclassified';
         form.find('[name="direction"]').val(direction);
         toggleQuickEditDirectionFields(direction);
@@ -150,7 +147,7 @@ $(document).ready(function () {
                 var displayCode = String(data || '').trim() || 'Chưa cập nhật số, ký hiệu';
 
                 return attachment
-                    ? '<a class="font-weight-bold text-primary" href="' + storageFileUrl(attachment.file_path) + '" target="_blank" rel="noopener noreferrer" title="Mở file ' + escapeHtml(attachment.file_name) + '">' + escapeHtml(displayCode) + '</a>'
+                    ? '<a class="font-weight-bold text-primary" href="' + escapeHtml(attachment.view_url) + '" target="_blank" rel="noopener noreferrer" title="Mở file ' + escapeHtml(attachment.file_name) + '">' + escapeHtml(displayCode) + '</a>'
                     : '<strong>' + escapeHtml(displayCode) + '</strong>';
             }
         };
@@ -172,6 +169,9 @@ $(document).ready(function () {
                     return '<span class="badge badge-primary px-2 py-1"><i class="fas fa-inbox mr-1"></i>Văn bản đến</span>';
                 }
 
+                if (data === 'decision') {
+                    return '<span class="badge badge-info px-2 py-1"><i class="fas fa-gavel mr-1"></i>Quyết định</span>';
+                }
                 return '<span class="badge badge-secondary px-2 py-1">Chưa phân loại</span>';
             }
         };
@@ -226,10 +226,16 @@ $(document).ready(function () {
 
     var rowNumberColumn = {
         data: null,
-        orderable: false,
+        name: 'id',
+        orderable: true,
         searchable: false,
         render: function (data, type, row, meta) {
-            return meta.settings._iDisplayStart + meta.row + 1;
+            // STT liên tục trong kết quả lọc; ID chỉ dùng làm thứ tự ổn định ở DB.
+            var index = meta.settings._iDisplayStart + meta.row;
+            var order = meta.settings.aaSorting[0] || [];
+            return Number(order[0]) === 0 && order[1] === 'desc'
+                ? meta.settings._iRecordsDisplay - index
+                : index + 1;
         }
     };
 
@@ -242,17 +248,22 @@ $(document).ready(function () {
         actionColumn()
     ];
 
+    var selectedDirection = '';
     var table = $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
+        orderMulti: false,
+        pageLength: 30,
+        lengthMenu: [10, 30, 50, 100],
         ajax: {
             url: '/api/documents',
             type: 'GET',
             data: function (d) {
                 // Thêm tham số bộ lọc vào query string
                 d.keyword = $('input[name="keyword"]').val();
-                d.date_from = $('input[name="date_from"]').val();
-                d.date_to = $('input[name="date_to"]').val();
+                d.direction = selectedDirection;
+                d.issued_date_from = $('input[name="date_from"]').val();
+                d.issued_date_to = $('input[name="date_to"]').val();
                 d.is_read = $('select[name="is_read"]').val();
             }
         },
@@ -279,6 +290,18 @@ $(document).ready(function () {
             }
         },
         order: [[4, 'desc']]
+    });
+
+    $('.document-kind-tab').on('click', function () {
+        selectedDirection = $(this).attr('data-direction');
+        $('.document-kind-tab').removeClass('active').attr('aria-pressed', 'false');
+        $(this).addClass('active').attr('aria-pressed', 'true');
+        $('#documentKindLabel').text(selectedDirection ? $(this).find('span').text() : 'Tất cả văn bản');
+        table.ajax.reload();
+    });
+    $('#filterForm').on('submit', function (event) {
+        event.preventDefault();
+        $('#btnFilter').trigger('click');
     });
 
     $('#dataTable').on('click', '.quick-edit-action', function () {
@@ -321,6 +344,8 @@ $(document).ready(function () {
         $('#quickTransferModeGroup').toggle(targetType === 'branch');
         $('#quickTransferMode').val(targetType);
         setQuickTransferMode(targetType);
+        var documentRow = table.row($(this).closest('tr')).data();
+        $('#quickLocalTransferGroup .local-recipient-departments').toggle(documentRow.visibility !== 'private').find('input').prop('disabled', documentRow.visibility === 'private').prop('checked', false);
         $('#quickTransferModal').modal('show');
     });
 

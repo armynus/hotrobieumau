@@ -79,8 +79,9 @@ class DocumentNotificationQueryTest extends TestCase
 
         $this->assertStringContainsString('visibility', $sql);
         $this->assertStringNotContainsString('is_public', $sql);
-        $this->assertContains('system', $query->getBindings());
-        $this->assertContains('branch', $query->getBindings());
+        $this->assertNotContains('system', $query->getBindings());
+        $this->assertContains('normal', $query->getBindings());
+        $this->assertContains('public', $query->getBindings());
     }
 
     public function test_keyword_filter_searches_only_the_document_code(): void

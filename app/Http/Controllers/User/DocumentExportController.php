@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Exports\DocumentLedgerWorkbook;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
+use App\Models\DocumentLedgerEntry;
 use App\Models\User;
 use App\Support\DocumentExportPeriod;
 use Illuminate\Http\Request;
@@ -33,8 +34,7 @@ class DocumentExportController extends Controller
         $period = DocumentExportPeriod::from($validated);
         $direction = $validated['direction'];
         // Sổ thuộc chi nhánh, không phải mọi văn bản mà người dùng có quyền xem.
-        $documents = Document::query()
-            ->join('document_ledger_entries as ledger', 'ledger.document_id', '=', 'documents.id')
+        $documents = DocumentLedgerEntry::query()->from('document_ledger_entries as ledger')
             ->where('ledger.branch_id', $user->branch_id)
             ->where('ledger.year', $validated['year'])
             ->whereIn('ledger.book', $direction === Document::DIRECTION_INCOMING ? ['incoming'] : ['outgoing', 'decision'])
@@ -44,28 +44,7 @@ class DocumentExportController extends Controller
             ->orderBy('ledger.sequence_number')
             ->orderBy('ledger.number_key')
             ->orderBy('ledger.id');
-        $documents->select([
-            'documents.id',
-            'documents.direction',
-            'documents.registry_number',
-            'documents.document_code',
-            'documents.title',
-            'documents.issued_date',
-            'documents.received_date',
-            'documents.forwarded_date',
-            'documents.issuing_agency',
-            'documents.signer',
-            'documents.recipient',
-            'documents.archive_recipient',
-            'documents.copy_count',
-            'documents.receipt_signature',
-            'documents.notes',
-            'documents.created_at',
-            'ledger.number as entry_number',
-            'ledger.document_code as entry_code',
-            'ledger.registered_date as entry_date',
-            'ledger.book as entry_book',
-        ]);
+        $documents->select('ledger.*');
 
         $lock = Cache::lock(
             'document-ledger-export:user:' . $user->id,
@@ -77,7 +56,7 @@ class DocumentExportController extends Controller
         }
 
         try {
-            $rowCount = (clone $documents)->reorder()->count('documents.id');
+            $rowCount = (clone $documents)->reorder()->count('ledger.id');
             $maxRows = max(1000, (int) config('documents.exports.max_rows', 20000));
 
             if ($rowCount === 0) {

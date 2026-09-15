@@ -1,0 +1,15 @@
+.document-kind-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.document-kind-tab {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 14px; border: 1px solid #dce3f0; border-radius: 10px;
+    background: #fff; color: #526481; font-size: .9rem; font-weight: 600;
+    transition: background .16s ease, box-shadow .16s ease;
+}
+.document-kind-tab i { color: #6b83b1; font-size: 16px; }
+.document-kind-tab:hover { background: #eef3ff; border-color: #4e73df; }
+.document-kind-tab.active { background: #2855c5; border-color: #2855c5; color: #fff; box-shadow: 0 3px 9px rgba(40,85,197,.22); }
+.document-kind-tab.active i { color: #fff; }
+.document-kind-tab:focus-visible { outline: 3px solid #93b5ff; outline-offset: 2px; }
+#dataTable th.sorting_asc, #dataTable th.sorting_desc { color: #2855c5; background-color: #eef3ff; }
+@media (max-width: 575.98px) { .document-kind-tab { padding: 8px 10px; font-size: .8rem; } }
+@media (prefers-reduced-motion: reduce) { .document-kind-tab { transition: none; } }

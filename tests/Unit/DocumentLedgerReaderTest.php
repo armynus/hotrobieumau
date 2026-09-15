@@ -113,6 +113,34 @@ class DocumentLedgerReaderTest extends TestCase
         }
     }
 
+    public function test_reads_decision_range_at_row_206_and_outgoing_number_without_slash(): void
+    {
+        $book = new Spreadsheet;
+        $headers = [['Ngày tháng chuyển', 'Số, ký hiệu Văn bản', 'Người ký văn bản', 'Ngày, tháng VB', 'Tên loại và trích yếu nội dung văn bản']];
+        $decision = $book->getActiveSheet()->setTitle('VB QUYET DINH');
+        $decision->fromArray($headers);
+        $decision->fromArray([['05/01/2026', '201-202/ QĐ NHNo.DT-KTNQ', null, '05/01/2026', 'Quyết định']], null, 'A206');
+        $outgoing = $book->createSheet()->setTitle('VB đi sau KT');
+        $outgoing->fromArray($headers);
+        $outgoing->fromArray([['05/01/2026', '1140 KH-/NHNo-DT-KHDN', null, '05/01/2026', 'Kế hoạch']], null, 'A2');
+        $path = tempnam(sys_get_temp_dir(), 'ledger-number-');
+        try {
+            (new Xlsx($book))->save($path);
+            $rows = app(DocumentLedgerReader::class)->read($path, 'outgoing', ['VB QUYET DINH', 'VB đi sau KT']);
+            $this->assertCount(2, $rows);
+            $decisions = array_values(array_filter($rows, fn ($row) => $row['_book'] === 'decision'));
+            $this->assertSame(206, $decisions[0]['_row']);
+            $this->assertSame('201-202', $decisions[0]['_number']);
+            $this->assertSame('201-202/ QĐ NHNo.DT-KTNQ', $decisions[0]['document_code']);
+            $outgoingRows = array_values(array_filter($rows, fn ($row) => $row['_book'] === 'outgoing'));
+            $this->assertSame('1140', $outgoingRows[0]['_number']);
+            $this->assertSame('1140 KH-/NHNo-DT-KHDN', $outgoingRows[0]['document_code']);
+        } finally {
+            $book->disconnectWorksheets();
+            unlink($path);
+        }
+    }
+
     private function workbook(array $rows): string
     {
         $spreadsheet = new Spreadsheet;

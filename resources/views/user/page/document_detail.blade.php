@@ -112,7 +112,7 @@
 </div>
 
 <div class="modal fade" id="editDocumentModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable document-distribution-modal" role="document"><div class="modal-content">
         <form id="editDocumentForm">
             @csrf
             <div class="modal-header"><h5 class="modal-title" id="editDocumentModalTitle">Chỉnh sửa văn bản</h5><button type="button" class="close" data-dismiss="modal"><span>&times;</span></button></div>
@@ -143,7 +143,7 @@
                 <div class="form-group"><label id="editRecipientLabel">Nơi / Đơn vị nhận văn bản</label><textarea class="form-control" name="recipient" rows="3" maxlength="5000"></textarea></div>
                 <div class="form-group outgoing-edit-field"><label>Đơn vị, người nhận bản lưu</label><textarea class="form-control" name="archive_recipient" rows="2" maxlength="5000"></textarea></div>
                 <div class="form-group"><label>Ký nhận</label><input type="text" class="form-control" name="receipt_signature" maxlength="255"></div>
-                <div class="form-group"><label>Mức độ công khai</label><select class="form-control" name="is_public_level" required><option value="0">Bình thường</option><option value="3">Gửi riêng - Chỉ văn thư và nơi được chọn</option><option value="1">Công khai nội bộ chi nhánh</option><option value="2">Công khai toàn hệ thống</option></select><small class="form-text text-muted">Thêm nơi nhận bằng nút chuyển tiếp văn bản.</small></div>
+                @include('user.page.documents.partials.edit_distribution', ['distributionPrefix' => 'detailEdit'])
                 <div class="form-group mb-0"><label>Ghi chú</label><textarea class="form-control" name="notes" rows="3" maxlength="5000"></textarea></div>
             </div>
             <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button><button type="submit" class="btn btn-primary" id="btnEditSubmit"><i class="fas fa-save mr-1"></i> Lưu thay đổi</button></div>
@@ -166,6 +166,7 @@
 @endpush
 
 @push('scripts')
+<script src="{{ asset('js/user/document-distribution-editor.js') }}"></script>
 <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
@@ -175,6 +176,10 @@
 <script>
 $(document).ready(function() {
     const docId = @json($id);
+    let loadedDocument = null;
+    $('#editDocumentModal').on('show.bs.modal', function() {
+        if (loadedDocument) populateEditForm(loadedDocument);
+    });
 
     flatpickr('.edit-date-picker', {
         locale: flatpickr.l10ns.vn,
@@ -193,12 +198,10 @@ $(document).ready(function() {
         return match[3] + '/' + match[2] + '/' + match[1] + (includeTime && match[4] ? ' ' + match[4] + ':' + match[5] : '');
     }
 
-    function encodedStorageUrl(path) { return '/storage/' + String(path).split('/').map(encodeURIComponent).join('/'); }
     function visibilityLabel(doc) {
-        if (doc.visibility === 'system') return { text: 'Toàn hệ thống', className: 'badge-danger' };
-        if (doc.visibility === 'branch') return { text: 'Nội bộ chi nhánh', className: 'badge-primary' };
-        if (doc.visibility === 'restricted') return { text: 'Gửi riêng', className: 'badge-info' };
-        return { text: 'Bình thường', className: 'badge-secondary' };
+        if (doc.visibility === 'public') return { text: 'Công Khai', className: 'badge-primary' };
+        if (doc.visibility === 'normal') return { text: 'Bình Thường', className: 'badge-info' };
+        return { text: 'Riêng Tư', className: 'badge-secondary' };
     }
 
     function renderAttachments(attachments) {
@@ -206,7 +209,7 @@ $(document).ready(function() {
         if (!attachments || !attachments.length) return container.append($('<div>', { class: 'col-12 text-muted' }).text('Không có file đính kèm.'));
         attachments.forEach(function(file) {
             const size = Number(file.file_size || 0) / 1024;
-            const link = $('<a>', { class: 'attachment-card d-flex align-items-center p-3 text-decoration-none h-100', href: encodedStorageUrl(file.file_path), target: '_blank', rel: 'noopener noreferrer' });
+            const link = $('<a>', { class: 'attachment-card d-flex align-items-center p-3 text-decoration-none h-100', href: file.view_url, target: '_blank', rel: 'noopener noreferrer' });
             link.append($('<i>', { class: 'fas fa-file-alt fa-2x text-primary mr-3' }));
             const info = $('<div>', { class: 'overflow-hidden' });
             info.append($('<div>', { class: 'font-weight-bold text-gray-800 text-truncate' }).text(file.file_name));
@@ -224,13 +227,14 @@ $(document).ready(function() {
             const item = $('<div>', { class: 'timeline-item' });
             item.append($('<div>', { class: 'font-weight-bold text-gray-800' }).text(target));
             item.append($('<div>', { class: 'small text-muted' }).text(((transfer.transferer && transfer.transferer.name) || 'Người dùng') + ' · ' + formatDate(transfer.transferred_at || transfer.created_at, true)));
+            if (transfer.status === 'revoked') item.append($('<span>', { class: 'badge badge-secondary' }).text('Đã thu hồi'));
             if (transfer.note) item.append($('<div>', { class: 'small mt-1' }).text(transfer.note));
             container.append(item);
         });
     }
 
     function renderLogs(logs) {
-        const labels = { created: 'Đăng tải văn bản', published: 'Đăng file cho văn bản đã vào sổ', updated: 'Chỉnh sửa văn bản', ledger_recorded: 'Ghi mới sổ văn bản', ledger_imported: 'Nhập thông tin từ sổ Excel', ledger_registered: 'Cập nhật số trong sổ', archive_imported: 'Nhập kho văn bản cũ', transferred: 'Chuyển đến chi nhánh', distributed_to_department: 'Phân phối đến phòng ban', distributed_to_director: 'Gửi đến ban giám đốc' };
+        const labels = { distribution_updated: 'Cập nhật phân phối và phạm vi xem', created: 'Đăng tải văn bản', published: 'Đăng file cho văn bản đã vào sổ', updated: 'Chỉnh sửa văn bản', ledger_recorded: 'Ghi mới sổ văn bản', ledger_imported: 'Nhập thông tin từ sổ Excel', ledger_registered: 'Cập nhật số trong sổ', archive_imported: 'Nhập kho văn bản cũ', transferred: 'Chuyển đến chi nhánh', distributed_to_department: 'Phân phối đến phòng ban', distributed_to_director: 'Gửi đến ban giám đốc' };
         const container = $('#logList').empty();
         if (!logs || !logs.length) return container.append($('<div>', { class: 'text-muted' }).text('Chưa có nhật ký.'));
         logs.forEach(function(log) {
@@ -274,7 +278,7 @@ $(document).ready(function() {
         });
         form.find('[name="priority"]').val(doc.priority || 'normal');
         form.find('[name="security_level"]').val(doc.security_level || 'normal');
-        form.find('[name="is_public_level"]').val(doc.visibility === 'restricted' ? '3' : (doc.visibility === 'system' ? '2' : (doc.visibility === 'branch' ? '1' : '0')));
+        DocumentDistributionEditor.populate(form, doc);
         const direction = doc.direction || 'unclassified';
         form.find('[name="direction"]').val(direction);
         toggleEditDirectionFields(direction);
@@ -285,7 +289,10 @@ $(document).ready(function() {
     });
 
     function bindDocument(doc, capabilities) {
+        loadedDocument = doc;
         const visibility = visibilityLabel(doc);
+        $('#localTransferGroup').data('private', doc.visibility === 'private');
+        $('#localTransferGroup .local-recipient-departments').toggle(doc.visibility !== 'private').find('input').prop('disabled', doc.visibility === 'private').prop('checked', false);
         const isIncoming = doc.direction === 'incoming';
         const isOutgoing = doc.direction === 'outgoing' || doc.direction === 'decision';
         $('#docTitle').text(doc.document_code || 'Chưa cập nhật số, ký hiệu');
@@ -330,6 +337,7 @@ $(document).ready(function() {
         $('#branchTransferGroup').toggle(targetType === 'branch').find('input').prop('disabled', targetType !== 'branch');
         $('#localTransferGroup').toggle(targetType === 'local').find('input').prop('disabled', targetType !== 'local');
         $('#transferModalTitle').text(targetType === 'branch' ? 'Chuyển đến Chi nhánh loại II' : 'Gửi đến ban giám đốc / phòng ban chi nhánh mình');
+        if ($('#localTransferGroup').data('private')) $('#localTransferGroup .local-recipient-departments input').prop('disabled', true).prop('checked', false);
         $('#transferModal').modal('show');
     });
 

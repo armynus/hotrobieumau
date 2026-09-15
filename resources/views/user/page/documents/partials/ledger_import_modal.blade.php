@@ -7,7 +7,7 @@
                 <button class="close" type="button" data-dismiss="modal" aria-label="Đóng"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
-                <div class="alert alert-light border">Chọn năm và sheet để đối chiếu. Chỉ nhập dòng có số, ký hiệu văn bản; dòng thiếu sẽ bị bỏ qua, dù đã có số đến. Không bắt buộc file đính kèm và không tạo thông báo văn bản mới.</div>
+                <div class="alert alert-light border">Chọn năm và sheet để đối chiếu. Chỉ nhập dòng có số, ký hiệu văn bản; dòng thiếu sẽ bị bỏ qua, dù đã có số đến. Chỉ lưu sổ, không tạo/sửa văn bản trong kho và không gửi thông báo mới.</div>
                 <div class="form-row">
                     <div class="form-group col-md-8"><label for="ledgerImportDirection">Loại sổ</label><select id="ledgerImportDirection" class="form-control" name="direction"><option value="incoming">Sổ văn bản đến</option><option value="outgoing">Sổ văn bản đi</option></select></div>
                     <div class="form-group col-md-4"><label for="ledgerImportYear">Năm cần nhập</label><input id="ledgerImportYear" type="number" class="form-control" name="year" value="{{ $year }}" min="2000" max="2100" required></div>
