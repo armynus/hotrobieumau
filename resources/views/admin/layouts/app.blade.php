@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,5 +59,6 @@
     @include('admin.partials.logout_modal')
 
     @stack('scripts') <!-- Thêm JS riêng -->
+    <script src="{{ asset('js/datatables-enhancements.js') }}?v={{ filemtime(public_path('js/datatables-enhancements.js')) }}"></script>
 </body>
 </html>

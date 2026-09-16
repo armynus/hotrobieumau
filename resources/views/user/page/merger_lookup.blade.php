@@ -152,7 +152,6 @@
 @push('scripts')
      <!-- Bootstrap core JavaScript-->
     <script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{asset('vendor/jquery/jquery.min.js')}}"></script>
 
     <!-- Core plugin JavaScript-->
     <script src="{{asset('vendor/jquery-easing/jquery.easing.min.js')}}"></script>
@@ -166,10 +165,8 @@
     <!-- Page level custom scripts -->
     <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
     <!-- include jQuery validate library -->
-    <script src="{{asset('js/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js')}}" type="text/javascript"></script>
     <!-- Bao gồm jQuery và jQuery UI (nếu chưa có) -->
-    <link href="{{ asset('vendor/jquery/jquery-ui.css') }}" rel="stylesheet">
-    <script src="{{ asset('vendor/jquery/jquery-ui.min.js') }}"></script>
+    @include('shared.jquery-ui')
 
     @include('user.partials.merger_lookup_js')
     

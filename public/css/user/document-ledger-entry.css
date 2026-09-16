@@ -10,8 +10,25 @@
 .ledger-entry-context { padding: 12px 16px; background: #eaf2ff; border-left: 3px solid #4e73df; border-radius: 6px; color: #33496f; overflow-wrap: anywhere; }
 #ledgerEntryForm label { color: #44516a; font-size: .9rem; font-weight: 600; }
 #ledgerEntryForm .form-control { border-color: #d6deec; border-radius: 6px; }
+#ledgerEntryForm .ledger-book-choice {
+    padding: 10px 12px;
+    border: 1px solid #b9c9f4;
+    border-left: 4px solid #4e73df;
+    border-radius: 9px;
+    background: #f1f5ff;
+    box-shadow: 0 3px 10px rgba(78, 115, 223, .1);
+}
+#ledgerEntryForm .ledger-book-choice label { color: #294995; }
+#ledgerEntryForm .ledger-book-choice select { border: 2px solid #6f8ce6; color: #294995; font-weight: 700; background-color: #fff; }
+#entryBookCurrent { display: block; margin-top: 7px; color: #3659bd; font-weight: 700; }
+#ledgerEntryForm .form-control.ledger-field-missing { border-color: #d5a137; background: #fffcf3; }
 #ledgerCandidates { max-height: 230px; overflow-y: auto; }
 #ledgerMetadataFields:disabled .form-control { background: #f3f4f7; }
+#ledgerSlipModal .modal-content { border: 0; border-radius: 14px; overflow: hidden; }
+#ledgerSlipForm { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+#ledgerSlipModal .modal-body { background: #f4f6fb; overflow-y: auto; }
+#ledgerSlipModal .modal-header, #ledgerSlipModal .modal-footer { flex-shrink: 0; }
+#ledgerSlipModal dd { overflow-wrap: anywhere; white-space: pre-line; }
 @media (max-width: 575.98px) {
     #ledgerEntryModal .modal-dialog { margin: .5rem; }
     #ledgerEntryModal .modal-body, .ledger-entry-section { padding: 12px; }

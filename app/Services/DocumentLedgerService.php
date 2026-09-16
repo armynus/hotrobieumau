@@ -49,6 +49,19 @@ class DocumentLedgerService
 
     public function save(User $user, array $data, ?DocumentLedgerEntry $entry = null, ?int $sourceDocumentId = null): DocumentLedgerEntry
     {
+        return $this->persist($user, $data, $entry, $sourceDocumentId, false);
+    }
+
+    /** Chỉ luồng import đã kiểm tra từng dòng mới được giữ ký hiệu thiếu/lỗi. */
+    public function saveImportedRow(User $user, array $data, ?DocumentLedgerEntry $entry = null): DocumentLedgerEntry
+    {
+        Validator::make($data, ['number' => 'required|string', 'source_sheet' => 'required|string', 'source_row' => 'required|integer|min:1'])->validate();
+
+        return $this->persist($user, $data, $entry, null, true);
+    }
+
+    private function persist(User $user, array $data, ?DocumentLedgerEntry $entry, ?int $sourceDocumentId, bool $imported): DocumentLedgerEntry
+    {
         abort_unless($user->isClerk() && $user->branch_id, 403);
         if ($entry) {
             abort_unless((int) $entry->branch_id === (int) $user->branch_id, 403);
@@ -69,7 +82,7 @@ class DocumentLedgerService
             throw ValidationException::withMessages(['year' => 'Năm sổ phải trùng năm của ngày đến/ngày chuyển.']);
         }
 
-        return DB::transaction(function () use ($user, $data, $entry, $sourceDocumentId) {
+        return DB::transaction(function () use ($user, $data, $entry, $sourceDocumentId, $imported) {
             $scope = ['branch_id' => $user->branch_id, 'year' => $data['year'], 'book' => $data['book']];
             DB::table('document_ledger_sequences')->insertOrIgnore($scope + ['last_number' => 0]);
             $sequence = DB::table('document_ledger_sequences')->where($scope)->lockForUpdate()->first();
@@ -86,11 +99,11 @@ class DocumentLedgerService
             }
             $key = DocumentLedgerNumber::normalize($number);
             if ($data['book'] !== 'incoming') {
-                if (str_starts_with(trim((string) $code), '/')) {
+                if (! $imported && str_starts_with(trim((string) $code), '/')) {
                     $code = $number.trim($code);
                 }
                 $codeNumber = DocumentLedgerNumber::fromCode($code);
-                if ($codeNumber === null || DocumentLedgerNumber::normalize($codeNumber) !== $key) {
+                if (($codeNumber === null && ! $imported) || ($codeNumber !== null && DocumentLedgerNumber::normalize($codeNumber) !== $key)) {
                     throw ValidationException::withMessages(['document_code' => 'Số sổ phải trùng số ở đầu số, ký hiệu văn bản, ví dụ 201-202 hoặc 1140.']);
                 }
                 if (array_key_exists('registered_date', $data)) {

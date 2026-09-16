@@ -27,10 +27,12 @@ class DocumentLedgerController extends Controller
             'year' => 'nullable|integer|min:2000|max:2100',
             'book' => 'nullable|in:incoming,outgoing,decision',
             'q' => 'nullable|string|max:255',
+            'check' => 'nullable|boolean',
         ]);
         $year = (int) ($filters['year'] ?? now()->year);
         $book = $filters['book'] ?? 'incoming';
         $keyword = trim($filters['q'] ?? '');
+        $checkOnly = $request->boolean('check');
         if ($request->has('draw')) {
             return response()->json(app(\App\Services\DocumentLedgerTableService::class)->data($clerk, $request, $year, $book, $keyword));
         }
@@ -38,8 +40,9 @@ class DocumentLedgerController extends Controller
         $counts = (clone $base)->selectRaw('book, count(*) as aggregate')->groupBy('book')->pluck('aggregate', 'book');
         $nextNumber = $ledgerService->nextNumber((int) $clerk->branch_id, $year, $book);
         $bookLabels = self::BOOK_LABELS;
+        $clerk->loadMissing(['department', 'branch']);
 
-        return view('user.page.document_ledger', compact('clerk', 'year', 'book', 'keyword', 'counts', 'nextNumber', 'bookLabels'));
+        return view('user.page.document_ledger', compact('clerk', 'year', 'book', 'keyword', 'counts', 'nextNumber', 'bookLabels', 'checkOnly'));
     }
 
     public function nextNumber(Request $request, DocumentLedgerService $ledgerService)
@@ -161,7 +164,7 @@ class DocumentLedgerController extends Controller
                 $token = bin2hex(random_bytes(32));
                 $request->session()->put($sessionKey, ['token' => $token, 'fingerprint' => $fingerprint, 'expires_at' => time() + 1800]);
                 $result['preview_token'] = $token;
-                $result['sample'] = array_slice(array_values(array_filter($rows, fn ($row) => (int) ($row['_year'] ?? 0) === (int) $data['year'])), 0, 20);
+                $result['sample'] = $stats['sample'];
             } else {
                 $request->session()->forget($sessionKey);
             }

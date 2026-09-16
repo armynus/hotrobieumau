@@ -29,11 +29,20 @@ $(function () {
         }
         var skippedReasons = [];
         if (stats.skipped_other_year) skippedReasons.push(stats.skipped_other_year + ' dòng thuộc năm khác');
-        if (stats.skipped_missing_code) skippedReasons.push(stats.skipped_missing_code + ' dòng thiếu số, ký hiệu');
+        if (stats.skipped_missing_code) skippedReasons.push(stats.skipped_missing_code + ' dòng thiếu ký hiệu kèm lỗi khác/không đủ căn cứ khôi phục');
         var skippedOther = stats.skipped - (stats.skipped_other_year || 0) - (stats.skipped_missing_code || 0);
         if (skippedOther > 0) skippedReasons.push(skippedOther + ' dòng vì lý do khác (xem bên dưới)');
         if (skippedReasons.length) {
-            panel.append($('<p>', {class: 'small text-muted'}).text('Bỏ qua: ' + skippedReasons.join('; ') + '. Năm sổ lấy theo ngày đến/ngày chuyển, không theo tên file hay ngày văn bản.'));
+            panel.append($('<p>', {class: 'small text-muted'}).text('Bỏ qua: ' + skippedReasons.join('; ') + '. Năm sổ ưu tiên ngày đến/ngày chuyển; thiếu thì dùng ngày khác có thật trong dòng.'));
+        }
+        if (stats.accepted_with_warnings) {
+            panel.append($('<p>', {class: 'small text-info'}).text((preview ? 'Sẽ nhận ' : 'Đã nhận ') + stats.accepted_with_warnings + ' dòng có thông tin thiếu/cần chú ý; tự điền ' + stats.recovered_numbers + ' số sổ và khôi phục ' + stats.recovered_dates + ' ngày vào sổ; ' + (stats.fallback_years || 0) + ' dòng lấy năm từ ngày khác trong dòng. Không đôn số hoặc lấy nội dung của dòng khác.'));
+            var warnings = $('<ul>', {class: 'small text-info pl-3', style: 'max-height:200px;overflow:auto;'});
+            (stats.warnings || []).forEach(function (item) {
+                warnings.append($('<li>').text(item.sheet + ' · Dòng ' + item.row + ' · Số sổ ' + item.number + ': ' + item.message));
+            });
+            panel.append(warnings);
+            if (stats.warning_count > 100) panel.append($('<p>', {class: 'small text-muted'}).text('Hiển thị tối đa 100 dòng có cảnh báo.'));
         }
         if (preview && response.sample && response.sample.length) {
             var table = $('<table>', {class: 'table table-sm small'}).append('<thead><tr><th>Sheet / dòng</th><th>Số sổ</th><th>Số, ký hiệu</th><th>Trích yếu</th></tr></thead>');

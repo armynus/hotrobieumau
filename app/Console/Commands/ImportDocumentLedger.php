@@ -14,7 +14,7 @@ class ImportDocumentLedger extends Command
         {ledger : Đường dẫn file Excel sổ văn thư}
         {--user= : ID văn thư của chi nhánh sở hữu sổ}
         {--direction=incoming : incoming hoặc outgoing}
-        {--year= : Năm sổ cần nhập, dựa theo ngày đến/ngày chuyển}
+        {--year= : Năm sổ cần nhập; ưu tiên ngày đến/chuyển, thiếu thì dùng ngày khác trong dòng}
         {--sheet=* : Tên sheet cần nhập; có thể truyền nhiều lần}
         {--overwrite : Cập nhật các trường đã có bằng ô có nội dung trong Excel}
         {--update-only : Chỉ cập nhật dòng sổ đã có; không tạo dòng sổ mới, không ghi kho}
@@ -55,8 +55,12 @@ class ImportDocumentLedger extends Command
             foreach ($stats['rows_by_year'] as $sourceYear => $count) {
                 $yearRows[] = [$sourceYear === 'unknown' ? 'Chưa xác định' : $sourceYear, $count];
             }
-            $this->table(['Năm theo ngày đến/ngày chuyển', 'Dòng trong Excel'], $yearRows);
-            $this->line('Bỏ qua do khác năm: '.$stats['skipped_other_year'].'. Thiếu số, ký hiệu trong phạm vi nhập: '.$stats['skipped_missing_code'].'.');
+            $this->table(['Năm theo ngày trong dòng Excel', 'Dòng trong Excel'], $yearRows);
+            $this->line('Bỏ qua do khác năm: '.$stats['skipped_other_year'].'. Thiếu ký hiệu kèm lỗi khác/không khôi phục được: '.$stats['skipped_missing_code'].'.');
+            if ($stats['accepted_with_warnings']) {
+                $this->warn('Nhận '.$stats['accepted_with_warnings'].' dòng có cảnh báo; tự điền '.$stats['recovered_numbers'].' số sổ, khôi phục '.$stats['recovered_dates'].' ngày vào sổ; '.$stats['fallback_years'].' dòng xác định năm từ ngày khác. Hiển thị tối đa 100 dòng.');
+                $this->table(['Sheet', 'Dòng', 'Số sổ', 'Chú ý'], $stats['warnings']);
+            }
             if ($stats['issues']) {
                 $this->warn('Dòng chưa nhập: '.$stats['issue_count'].' (hiển thị tối đa 100). Dòng thuộc năm khác được bỏ qua riêng.');
                 $this->table(['Sheet', 'Dòng', 'Lý do'], $stats['issues']);

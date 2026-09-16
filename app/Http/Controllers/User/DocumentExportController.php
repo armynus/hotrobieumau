@@ -38,7 +38,7 @@ class DocumentExportController extends Controller
             ->where('ledger.branch_id', $user->branch_id)
             ->where('ledger.year', $validated['year'])
             ->whereIn('ledger.book', $direction === Document::DIRECTION_INCOMING ? ['incoming'] : ['outgoing', 'decision'])
-            ->when($validated['period_type'] !== 'year', fn ($query) => $query->whereBetween('ledger.registered_date', [
+            ->when($validated['period_type'] !== 'year', fn ($query) => $query->whereBetween(\Illuminate\Support\Facades\DB::raw('COALESCE(ledger.registered_date, ledger.forwarded_date, ledger.issued_date)'), [
                 $period->start->toDateString(), $period->end->toDateString(),
             ]))
             ->orderBy('ledger.sequence_number')

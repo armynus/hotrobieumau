@@ -122,10 +122,10 @@ class DocumentLedgerTest extends TestCase
         $bad = array_replace($row, ['_number' => '???', '_row' => 3]);
         $conflict = array_replace($row, ['document_code' => 'DIFFERENT', '_row' => 4]);
         $stats = $service->import([$bad, $row, $conflict], $this->clerk(), 2026, 'source.xlsx');
-        $this->assertSame(1, $stats['conflicts']);
+        $this->assertSame(1, $stats['skipped']);
         $this->assertSame(0, Document::count());
         $stats = $service->import([$bad, $row], $this->clerk(), 2026, 'source.xlsx');
-        $this->assertSame(1, $stats['conflicts']);
+        $this->assertSame(1, $stats['skipped']);
         $this->assertSame(1, $stats['unchanged']);
     }
 
@@ -149,7 +149,9 @@ class DocumentLedgerTest extends TestCase
         $this->assertSame(0, $stats['skipped']);
         $this->assertSame('201-202', DocumentLedgerEntry::where('book', 'decision')->first()->number);
         $this->assertSame('1140', DocumentLedgerEntry::where('book', 'outgoing')->first()->number);
-        foreach ($rows as $row) $this->assertDatabaseHas('document_ledger_entries', ['book' => $row['_book'], 'document_code' => $row['document_code']]);
+        foreach ($rows as $row) {
+            $this->assertDatabaseHas('document_ledger_entries', ['book' => $row['_book'], 'document_code' => $row['document_code']]);
+        }
         $this->assertSame(203, app(DocumentLedgerService::class)->nextNumber(1, 2026, 'decision'));
         $this->assertSame(1141, app(DocumentLedgerService::class)->nextNumber(1, 2026, 'outgoing'));
         $again = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
@@ -159,12 +161,12 @@ class DocumentLedgerTest extends TestCase
         $this->assertSame(0, Document::count());
     }
 
-    public function test_missing_codes_are_skipped_before_duplicate_checks_in_preview_and_real_import(): void
+    public function test_numberless_incomplete_rows_are_skipped_without_blocking_valid_rows(): void
     {
         $rows = [];
         foreach ([null, '', '   ', ' / - _ … ', "\t\n"] as $index => $code) {
             // Cùng số với dòng hợp lệ: dòng trống không được gây xung đột giả.
-            $rows[] = array_replace($this->row(), ['document_code' => $code, '_row' => $index + 3]);
+            $rows[] = array_replace($this->row(), ['_number' => null, 'document_code' => $code, 'title' => null, '_row' => $index + 3]);
         }
         $rows[] = $this->row();
         $service = app(DocumentLedgerImportService::class);
@@ -193,11 +195,12 @@ class DocumentLedgerTest extends TestCase
         $before = DocumentLedgerEntry::first()->getAttributes();
         $entryBefore = DocumentLedgerEntry::first()->getAttributes();
         $logCount = DB::table('document_logs')->count();
-        $row = array_replace($this->row(), ['document_code' => null, 'title' => 'Không được ghi đè']);
+        $row = array_replace($this->row(), ['document_code' => null, 'issued_date' => null, 'title' => 'Không được ghi đè']);
 
         foreach ([true, false] as $preview) {
             $stats = $service->import([$row], $this->clerk(), 2026, 'source.xlsx', $preview, true, true);
-            $this->assertSame(1, $stats['skipped_missing_code']);
+            $this->assertSame(1, $stats['skipped']);
+            $this->assertSame(0, $stats['skipped_missing_code']);
             $this->assertSame(0, $stats['updated']);
         }
         $this->assertSame($before, DocumentLedgerEntry::first()->getAttributes());
@@ -230,12 +233,13 @@ class DocumentLedgerTest extends TestCase
             array_replace($this->row(), ['_year' => null, 'received_date' => null]),
         ];
         $stats = app(DocumentLedgerImportService::class)->import($rows, $this->clerk(), 2026, 'source.xlsx', true);
-        $this->assertSame([2025 => 2, 2026 => 2, 'unknown' => 1], $stats['rows_by_year']);
-        $this->assertSame(2, $stats['skipped_other_year']);
-        $this->assertSame(1, $stats['skipped_missing_code']);
-        $this->assertSame(4, $stats['skipped']);
-        $this->assertSame(1, $stats['created']);
-        $this->assertSame(2, $stats['issue_count']);
+        $this->assertSame([2025 => 3, 2026 => 2], $stats['rows_by_year']);
+        $this->assertSame(3, $stats['skipped_other_year']);
+        $this->assertSame(0, $stats['skipped_missing_code']);
+        $this->assertSame(3, $stats['skipped']);
+        $this->assertSame(2, $stats['created']);
+        $this->assertSame(0, $stats['issue_count']);
+        $this->assertSame(1, $stats['accepted_with_warnings']);
         $this->assertSame(5, $stats['created'] + $stats['updated'] + $stats['unchanged'] + $stats['skipped'] + $stats['conflicts']);
         $this->assertSame(0, Document::count());
     }
@@ -342,15 +346,18 @@ class DocumentLedgerTest extends TestCase
         $other->branch_id = 2;
         $service->register($this->document(['managing_branch_id' => 2, 'document_code' => '01/OTHER']), $other, ['book' => 'outgoing', 'year' => 2026, 'number' => '01', 'registered_date' => '2026-01-01']);
         $standalone = $service->save($this->clerk(), ['book' => 'outgoing', 'year' => 2026, 'number' => '03', 'registered_date' => '2026-01-02', 'document_code' => '03/SO', 'title' => 'Standalone export']);
+        $fallback = $service->save($this->clerk(), ['book' => 'outgoing', 'year' => 2026, 'number' => '106', 'document_code' => '106/NHNo.ĐT-KTNQ', 'issued_date' => '2026-01-26']);
         \Maatwebsite\Excel\Facades\Excel::fake();
         $request = \Illuminate\Http\Request::create('/documents/export', 'POST', ['direction' => 'outgoing', 'period_type' => 'month', 'year' => 2026, 'month' => 1]);
         app(\App\Http\Controllers\User\DocumentExportController::class)($request);
-        \Maatwebsite\Excel\Facades\Excel::assertDownloaded('So-van-ban-di_thang-01-2026.xlsx', function ($export) use ($jan, $standalone) {
+        \Maatwebsite\Excel\Facades\Excel::assertDownloaded('So-van-ban-di_thang-01-2026.xlsx', function ($export) use ($jan, $standalone, $fallback) {
             $sheets = $export->sheets();
-            $this->assertSame([$jan->id, $standalone->id], $sheets[0]->query()->pluck('ledger.id')->all());
+            $this->assertSame([$jan->id, $standalone->id, $fallback->id], $sheets[0]->query()->pluck('ledger.id')->all());
             $this->assertSame(0, $sheets[1]->query()->count());
             $record = $sheets[0]->query()->first();
             $this->assertSame('01/TEST', $sheets[0]->map($record)[1]);
+            $this->assertNull($sheets[0]->map($fallback)[0]);
+            $this->assertNotNull($sheets[0]->map($fallback)[3]);
 
             return true;
         });
@@ -794,6 +801,515 @@ class DocumentLedgerTest extends TestCase
         app(\App\Services\DocumentLedgerTableService::class)->data($this->clerk(),
             \Illuminate\Http\Request::create('/', 'GET', ['draw' => 1, 'order' => [['column' => 0, 'dir' => 'desc; DROP TABLE documents']]]),
             2026, 'incoming', '');
+    }
+
+    public function test_ledger_check_identifies_missing_fields_in_all_books_but_ignores_optional_fields(): void
+    {
+        $ledger = app(DocumentLedgerService::class);
+        $table = app(\App\Services\DocumentLedgerTableService::class);
+        foreach (['incoming', 'outgoing', 'decision'] as $book) {
+            $ledger->save($this->clerk(), ['year' => 2026, 'book' => $book, 'number' => '1',
+                'document_code' => '1/TEST', 'title' => 'Đầy đủ thông tin quan trọng',
+                'registered_date' => '2026-01-05', 'issued_date' => '2025-12-31']);
+            $ledger->save($this->clerk(), ['year' => 2026, 'book' => $book, 'number' => '2',
+                'document_code' => '2/TEST', 'title' => ' ', 'issued_date' => null]);
+            $result = $table->data($this->clerk(), \Illuminate\Http\Request::create('/', 'GET', ['draw' => 1, 'check' => 1]), 2026, $book, '');
+            $this->assertSame(2, $result['recordsTotal']);
+            $this->assertSame(1, $result['incompleteCount']);
+            $this->assertSame(1, $result['recordsFiltered']);
+            $this->assertSame('2', $result['data'][0]['number']);
+            $this->assertSame([
+                'title' => 'Trích yếu nội dung',
+                'registered_date' => $book === 'incoming' ? 'Ngày đến' : 'Ngày chuyển',
+                'issued_date' => 'Ngày văn bản',
+            ], $result['data'][0]['missing_fields']);
+        }
+    }
+
+    public function test_ledger_check_is_read_only_scoped_and_supports_search_and_numeric_pagination(): void
+    {
+        $ledger = app(DocumentLedgerService::class);
+        foreach (['01', '2', '10'] as $number) {
+            $ledger->save($this->clerk(), ['year' => 2026, 'book' => 'incoming', 'number' => $number,
+                'document_code' => 'CODE-'.$number, 'title' => 'Needle '.$number]);
+        }
+        $other = $this->clerk();
+        $other->branch_id = 2;
+        $ledger->save($other, ['year' => 2026, 'book' => 'incoming', 'number' => '1', 'title' => 'Needle']);
+        $ledger->save($this->clerk(), ['year' => 2025, 'book' => 'incoming', 'number' => '1', 'title' => 'Needle']);
+        $ledger->save($this->clerk(), ['year' => 2026, 'book' => 'decision', 'number' => '1', 'document_code' => '1/QD', 'title' => 'Needle']);
+        $before = DB::table('document_ledger_entries')->orderBy('id')->get()->toJson();
+        $sequences = DB::table('document_ledger_sequences')->get()->toJson();
+        $table = app(\App\Services\DocumentLedgerTableService::class);
+        $request = \Illuminate\Http\Request::create('/', 'GET', ['draw' => 3, 'check' => 1, 'length' => 2,
+            'order' => [['column' => 0, 'dir' => 'desc']]]);
+        $result = $table->data($this->clerk(), $request, 2026, 'incoming', '');
+        $this->assertSame(3, $result['incompleteCount']);
+        $this->assertSame(['10', '2'], array_column($result['data'], 'number'));
+        $request->query->set('start', 2);
+        $this->assertSame(['01'], array_column($table->data($this->clerk(), $request, 2026, 'incoming', '')['data'], 'number'));
+        $request->query->set('start', 0);
+        $found = $table->data($this->clerk(), $request, 2026, 'incoming', 'Needle 01');
+        $this->assertSame(3, $found['incompleteCount']);
+        $this->assertSame(1, $found['recordsFiltered']);
+        $this->assertSame('01', $found['data'][0]['number']);
+        $this->assertSame($found['data'][0]['id'], $found['data'][0]['form_data']['entry_id']);
+        $this->assertSame($before, DB::table('document_ledger_entries')->orderBy('id')->get()->toJson());
+        $this->assertSame($sequences, DB::table('document_ledger_sequences')->get()->toJson());
+        $this->assertSame(0, Document::count());
+    }
+
+    public function test_ledger_check_handles_blank_excel_text_and_removes_completed_row_after_edit(): void
+    {
+        $entry = app(DocumentLedgerService::class)->saveImportedRow($this->clerk(), ['year' => 2026, 'book' => 'incoming', 'number' => '120',
+            'document_code' => null, 'registered_date' => '2026-01-05', 'source_sheet' => 'CVĐ', 'source_row' => 121]);
+        DB::table('document_ledger_entries')->where('id', $entry->id)->update(['document_code' => " \t\r\n\u{00A0} ", 'title' => "\t\n"]);
+        $table = app(\App\Services\DocumentLedgerTableService::class);
+        $request = \Illuminate\Http\Request::create('/', 'GET', ['draw' => 1, 'check' => 1]);
+        $before = $table->data($this->clerk(), $request, 2026, 'incoming', '');
+        $this->assertSame(1, $before['incompleteCount']);
+        $this->assertSame(['document_code', 'title', 'issued_date'], array_keys($before['data'][0]['missing_fields']));
+        app(\App\Services\DocumentLedgerFormService::class)->save($this->clerk(), null, [
+            'year' => 2026, 'book' => 'incoming', 'number' => '120', 'registered_date' => '2026-01-05',
+            'document_code' => '120/TEST', 'title' => 'Bổ sung thông tin', 'issued_date' => '2026-01-04',
+        ], $entry->fresh());
+        $after = $table->data($this->clerk(), $request, 2026, 'incoming', '');
+        $this->assertSame(0, $after['incompleteCount']);
+        $this->assertSame(0, $after['recordsFiltered']);
+        $this->assertSame([], $after['data']);
+        $request->query->set('check', 0);
+        $this->assertSame($entry->id, $table->data($this->clerk(), $request, 2026, 'incoming', '')['data'][0]['id']);
+        $this->assertSame(1, DocumentLedgerEntry::count());
+        $this->assertSame(0, Document::count());
+    }
+
+    public function test_ledger_check_rejects_non_clerk(): void
+    {
+        $user = $this->clerk();
+        $user->document_role = 'staff';
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        $this->expectExceptionCode(0);
+        app(\App\Services\DocumentLedgerTableService::class)->data($user,
+            \Illuminate\Http\Request::create('/', 'GET', ['draw' => 1, 'check' => 1]), 2026, 'incoming', '');
+    }
+
+    public function test_ledger_check_rejects_invalid_filter(): void
+    {
+        $this->expectException(ValidationException::class);
+        app(\App\Services\DocumentLedgerTableService::class)->data($this->clerk(),
+            \Illuminate\Http\Request::create('/', 'GET', ['draw' => 1, 'check' => 'invalid']), 2026, 'incoming', '');
+    }
+
+    public function test_presentation_slip_fills_ledger_values_and_escapes_word_without_writing_data(): void
+    {
+        $user = $this->clerk();
+        $user->branch->branch_name = 'Đồng Tháp';
+        $entry = app(DocumentLedgerService::class)->save($user, ['year' => 2026, 'book' => 'incoming', 'number' => '01',
+            'document_code' => '123/NHNo&TH', 'title' => "Nội dung <đối chiếu> & kiểm tra\nDòng hai\x01",
+            'issuing_agency' => 'Agribank & đơn vị gửi', 'registered_date' => '2026-01-05', 'issued_date' => '2025-12-31']);
+        $before = $entry->fresh()->getAttributes();
+        $escaping = \PhpOffice\PhpWord\Settings::isOutputEscapingEnabled();
+        $tempDir = \PhpOffice\PhpWord\Settings::getTempDir();
+        \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(true);
+        $path = app(\App\Services\DocumentLedgerSlipService::class)->createFile($user, $entry, $this->slipOptions());
+        try {
+            $zip = new \ZipArchive;
+            $this->assertTrue($zip->open($path));
+            $xml = $zip->getFromName('word/document.xml');
+            $dom = new \DOMDocument;
+            $this->assertTrue($dom->loadXML($xml));
+            $text = $dom->textContent;
+            foreach (['123/NHNo&TH', '31/12/2025', 'Agribank & đơn vị gửi', 'Nội dung <đối chiếu> & kiểm tra', 'Dòng hai', 'CHI NHÁNH ĐỒNG THÁP', 'Nguyễn Văn A'] as $value) {
+                $this->assertStringContainsString($value, $text);
+            }
+            foreach (['15867/', 'DTSoft', 'Nguyễn Thị Thúy Nga', '${', "\x01"] as $value) {
+                $this->assertStringNotContainsString($value, $xml);
+            }
+            $this->assertStringContainsString('AGRIBANK CHI NHÁNH ĐỒNG THÁP', $zip->getFromName('word/header2.xml'));
+            $zip->close();
+            $this->assertSame($before, $entry->fresh()->getAttributes());
+            $this->assertSame(0, Document::count());
+            $this->assertSame(0, DB::table('document_logs')->count());
+            $this->assertTrue(\PhpOffice\PhpWord\Settings::isOutputEscapingEnabled());
+            $this->assertSame($tempDir, \PhpOffice\PhpWord\Settings::getTempDir());
+        } finally {
+            \Illuminate\Support\Facades\File::delete($path);
+            \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled($escaping);
+        }
+    }
+
+    public function test_presentation_slip_keeps_incomplete_imported_row_and_exports_dashes(): void
+    {
+        $entry = app(DocumentLedgerService::class)->saveImportedRow($this->clerk(), ['year' => 2026, 'book' => 'decision',
+            'number' => '373', 'document_code' => '373/QD', 'registered_date' => '2026-08-12', 'source_sheet' => 'VB QUYET DINH', 'source_row' => 379]);
+        $before = $entry->fresh()->getAttributes();
+        $path = app(\App\Services\DocumentLedgerSlipService::class)->createFile($this->clerk(), $entry, $this->slipOptions());
+        try {
+            $zip = new \ZipArchive;
+            $zip->open($path);
+            $dom = new \DOMDocument;
+            $this->assertTrue($dom->loadXML($zip->getFromName('word/document.xml')));
+            $this->assertStringContainsString('373/QD', $dom->textContent);
+            $this->assertGreaterThanOrEqual(3, substr_count($dom->textContent, '—'));
+            $zip->close();
+            $this->assertSame($before, $entry->fresh()->getAttributes());
+            $this->assertNull($entry->fresh()->title);
+            $this->assertNull($entry->fresh()->issued_date);
+        } finally {
+            \Illuminate\Support\Facades\File::delete($path);
+        }
+    }
+
+    public function test_presentation_slip_uses_clerk_workflow_defaults_when_options_are_omitted(): void
+    {
+        $user = $this->clerk();
+        $user->branch->branch_name = 'Đồng Tháp';
+        $user->branch->branch_place = 'TP. Cao Lãnh';
+        $entry = app(DocumentLedgerService::class)->save($user, [
+            'year' => 2026, 'book' => 'incoming', 'number' => '01',
+        ]);
+
+        $values = app(\App\Services\DocumentLedgerSlipService::class)->values($user, $entry, [
+            'print_date' => '2026-09-16', 'submitted_to' => 'Ban Giám đốc',
+        ]);
+
+        $this->assertSame('PHÒNG TỔNG HỢP', $values['department_name']);
+        $this->assertSame('TP. Cao Lãnh', $values['place_name']);
+        $this->assertSame('TP. Cao Lãnh,', $values['place_line']);
+        $this->assertSame('TRƯỞNG PHÒNG TỔNG HỢP', $values['signature_title']);
+    }
+
+    public function test_presentation_slip_rejects_other_branch_and_non_clerk(): void
+    {
+        $entry = app(DocumentLedgerService::class)->save($this->clerk(), ['year' => 2026, 'book' => 'incoming', 'number' => '1']);
+        foreach (['other_branch', 'staff'] as $case) {
+            $user = $this->clerk();
+            if ($case === 'other_branch') {
+                $user->branch_id = 2;
+            } else {
+                $user->document_role = 'staff';
+            }
+            try {
+                app(\App\Services\DocumentLedgerSlipService::class)->createFile($user, $entry, $this->slipOptions());
+                $this->fail('Unauthorized user must not create a slip');
+            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+                $this->assertSame(403, $exception->getStatusCode());
+            }
+        }
+    }
+
+    public function test_presentation_slip_cleans_temporary_files_when_template_has_unknown_macro(): void
+    {
+        \Illuminate\Support\Facades\File::ensureDirectoryExists(storage_path('app/private/document-ledger-slips'));
+        $path = tempnam(storage_path('app/private/document-ledger-slips'), 'invalid-template-');
+        copy(resource_path('documents/ledger-presentation-slip.docx'), $path);
+        $zip = new \ZipArchive;
+        $zip->open($path);
+        $zip->addFromString('word/document.xml', str_replace('${title}', '${unknown_field}', $zip->getFromName('word/document.xml')));
+        $zip->close();
+        config(['documents.ledger.presentation_slip_template' => $path]);
+        $files = glob(storage_path('app/private/document-ledger-slips').'/*');
+        $entry = app(DocumentLedgerService::class)->save($this->clerk(), ['year' => 2026, 'book' => 'incoming', 'number' => '1']);
+        try {
+            app(\App\Services\DocumentLedgerSlipService::class)->createFile($this->clerk(), $entry, $this->slipOptions());
+            $this->fail('Unknown template macro must be rejected');
+        } catch (\RuntimeException $exception) {
+            $this->assertStringContainsString('trường', $exception->getMessage());
+            $this->assertSame($files, glob(storage_path('app/private/document-ledger-slips').'/*'));
+        } finally {
+            \Illuminate\Support\Facades\File::delete($path);
+        }
+    }
+
+    public function test_presentation_slip_cleans_temporary_file_even_when_constructor_cannot_open_template(): void
+    {
+        $directory = storage_path('app/private/document-ledger-slips');
+        \Illuminate\Support\Facades\File::ensureDirectoryExists($directory);
+        $path = tempnam($directory, 'broken-template-');
+        file_put_contents($path, 'Not a DOCX ZIP package');
+        config(['documents.ledger.presentation_slip_template' => $path]);
+        $files = glob($directory.'/*');
+        $entry = app(DocumentLedgerService::class)->save($this->clerk(), ['year' => 2026, 'book' => 'incoming', 'number' => '1']);
+        $error = null;
+        try {
+            app(\App\Services\DocumentLedgerSlipService::class)->createFile($this->clerk(), $entry, $this->slipOptions());
+        } catch (\Throwable $exception) {
+            $error = $exception;
+        } finally {
+            $this->assertNotNull($error);
+            $this->assertSame($files, glob($directory.'/*'));
+            \Illuminate\Support\Facades\File::delete($path);
+        }
+    }
+
+    public function test_presentation_slip_controller_downloads_by_entry_id_and_limits_concurrent_exports(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->integer('branch_id');
+            $table->string('document_role');
+        });
+        Schema::create('branches', function (Blueprint $table) {
+            $table->id();
+            $table->string('branch_type');
+            $table->string('branch_name');
+        });
+        DB::table('users')->insert(['id' => 3, 'branch_id' => 1, 'document_role' => 'clerk']);
+        DB::table('branches')->insert(['id' => 1, 'branch_type' => 'type_1', 'branch_name' => 'Đồng Tháp']);
+        \Illuminate\Support\Facades\Session::put('user_id', 3);
+        $ledger = app(DocumentLedgerService::class);
+        $ledger->save($this->clerk(), ['year' => 2026, 'book' => 'incoming', 'number' => '01', 'document_code' => 'FIRST']);
+        $entry = $ledger->save($this->clerk(), ['year' => 2026, 'book' => 'incoming', 'number' => '01', 'document_code' => 'SECOND']);
+        $request = \Illuminate\Http\Request::create('/', 'POST', $this->slipOptions() + ['document_code' => 'FORGED']);
+        $controller = app(\App\Http\Controllers\User\DocumentLedgerSlipController::class);
+        $service = app(\App\Services\DocumentLedgerSlipService::class);
+        $response = $controller($request, $entry->id, $service);
+        $path = $response->getFile()->getPathname();
+        try {
+            $this->assertSame(200, $response->getStatusCode());
+            $this->assertStringContainsString('dong-'.$entry->id.'.docx', $response->headers->get('Content-Disposition'));
+            $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
+            $zip = new \ZipArchive;
+            $zip->open($path);
+            $xml = $zip->getFromName('word/document.xml');
+            $zip->close();
+            $this->assertStringContainsString('SECOND', $xml);
+            $this->assertStringNotContainsString('FIRST', $xml);
+            $this->assertStringNotContainsString('FORGED', $xml);
+            $reflection = new \ReflectionProperty($response, 'deleteFileAfterSend');
+            $this->assertTrue($reflection->getValue($response));
+        } finally {
+            \Illuminate\Support\Facades\File::delete($path);
+        }
+        $lock = \Illuminate\Support\Facades\Cache::lock('document-ledger-slip:user:3', 60);
+        $this->assertTrue($lock->get());
+        try {
+            $this->assertSame(429, $controller($request, $entry->id, $service)->getStatusCode());
+        } finally {
+            $lock->release();
+        }
+    }
+
+    public function test_presentation_slip_controller_validates_date_and_denies_cross_branch(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->integer('branch_id');
+            $table->string('document_role');
+        });
+        Schema::create('branches', function (Blueprint $table) {
+            $table->id();
+            $table->string('branch_type');
+        });
+        DB::table('users')->insert(['id' => 3, 'branch_id' => 1, 'document_role' => 'clerk']);
+        DB::table('branches')->insert(['id' => 1, 'branch_type' => 'type_1']);
+        \Illuminate\Support\Facades\Session::put('user_id', 3);
+        $entry = app(DocumentLedgerService::class)->save($this->clerk(), ['year' => 2026, 'book' => 'incoming', 'number' => '1']);
+        $controller = app(\App\Http\Controllers\User\DocumentLedgerSlipController::class);
+        $service = app(\App\Services\DocumentLedgerSlipService::class);
+        try {
+            $controller(\Illuminate\Http\Request::create('/', 'POST', array_replace($this->slipOptions(), ['print_date' => '2026-02-31'])), $entry->id, $service);
+            $this->fail('Invalid print date must be rejected');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('print_date', $exception->errors());
+        }
+        DB::table('users')->where('id', 3)->update(['branch_id' => 2]);
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $controller(\Illuminate\Http\Request::create('/', 'POST', $this->slipOptions()), $entry->id, $service);
+    }
+
+    private function slipOptions(): array
+    {
+        return ['print_date' => '2026-09-16', 'submitted_to' => 'Ban Giám đốc', 'department_name' => 'Phòng Tổng hợp',
+            'place_name' => 'P. Cao Lãnh', 'signature_title' => 'P. Trưởng phòng Tổng hợp', 'prepared_by' => 'Nguyễn Văn A'];
+    }
+
+    public function test_recovers_missing_number_400_without_renumbering_or_overwriting_row_401(): void
+    {
+        $rows = [];
+        foreach ([399, 400, 401] as $number) {
+            $rows[] = array_replace($this->row(), ['_row' => $number + 1, '_number' => $number === 400 ? null : (string) $number,
+                'registry_number' => $number === 400 ? null : (string) $number, 'document_code' => 'CODE-'.$number, 'title' => 'Dòng '.$number]);
+        }
+        $service = app(DocumentLedgerImportService::class);
+        $service->import([$rows[0], $rows[2]], $this->clerk(), 2026, 'source.xlsx');
+        $last = DocumentLedgerEntry::where('number', '401')->first()->getAttributes();
+        $preview = $service->import($rows, $this->clerk(), 2026, 'source.xlsx', true);
+        $this->assertSame(1, $preview['created']);
+        $this->assertSame(1, $preview['recovered_numbers']);
+        $this->assertSame('400', $preview['sample'][1]['_number']);
+        $this->assertSame(2, DocumentLedgerEntry::count());
+        $actual = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame($preview, $actual);
+        $this->assertSame($last, DocumentLedgerEntry::where('number', '401')->first()->getAttributes());
+        $this->assertSame(['399', '400', '401'], DocumentLedgerEntry::orderBy('sequence_number')->pluck('number')->all());
+        $again = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame(3, $again['unchanged']);
+        $this->assertSame(3, DocumentLedgerEntry::count());
+        $this->assertSame(0, Document::count());
+    }
+
+    public function test_incoming_accepts_each_single_missing_field_and_later_fills_code_in_same_entry(): void
+    {
+        $rows = [];
+        foreach (['document_code', 'issued_date', 'title'] as $i => $missing) {
+            $rows[] = array_replace($this->row(), ['_row' => 121 + $i, '_number' => (string) (120 + $i),
+                'registry_number' => (string) (120 + $i), 'document_code' => 'CODE-'.$i, $missing => null]);
+        }
+        $service = app(DocumentLedgerImportService::class);
+        $result = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame(3, $result['created']);
+        $this->assertSame(3, $result['accepted_with_warnings']);
+        $this->assertSame(0, $result['skipped']);
+        $entry = DocumentLedgerEntry::where('number', '120')->first();
+        $this->assertNull($entry->document_code);
+        $again = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame(3, $again['unchanged']);
+        $rows[0]['document_code'] = '120/UPDATED';
+        $filled = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame(1, $filled['updated']);
+        $this->assertSame(0, $filled['created']);
+        $this->assertSame('120/UPDATED', $entry->fresh()->document_code);
+        $rows[0]['document_code'] = null;
+        $service->import($rows, $this->clerk(), 2026, 'source.xlsx', false, true);
+        $this->assertSame('120/UPDATED', $entry->fresh()->document_code);
+        $this->assertSame(3, DocumentLedgerEntry::count());
+    }
+
+    public function test_outgoing_and_decision_keep_missing_code_row_and_source_sheet_identity(): void
+    {
+        $rows = [];
+        foreach (['outgoing', 'decision'] as $book) {
+            foreach ([399, 400, 401] as $number) {
+                $rows[] = array_replace($this->row(), ['_book' => $book, '_sheet' => $book, '_row' => $number + 1,
+                    '_number' => $number === 400 ? null : (string) $number, 'document_code' => $number === 400 ? null : $number.'/CODE',
+                    'forwarded_date' => '2026-01-05']);
+            }
+        }
+        $service = app(DocumentLedgerImportService::class);
+        $result = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame(6, $result['created']);
+        $this->assertSame(2, $result['recovered_numbers']);
+        $this->assertSame(2, DocumentLedgerEntry::where('number', '400')->whereNull('document_code')->count());
+        $again = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame(6, $again['unchanged']);
+        foreach ([1, 4] as $index) {
+            $rows[$index]['document_code'] = '400/BO-SUNG';
+        }
+        $fixed = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame(2, $fixed['updated']);
+        $this->assertSame(6, DocumentLedgerEntry::count());
+    }
+
+    public function test_auto_number_collision_in_existing_ledger_does_not_overwrite_different_document(): void
+    {
+        app(DocumentLedgerService::class)->save($this->clerk(), ['book' => 'incoming', 'year' => 2026, 'number' => '400', 'document_code' => 'EXISTING']);
+        $rows = [];
+        foreach ([399, 400, 401] as $n) {
+            $rows[] = array_replace($this->row(), ['_row' => $n + 1, '_number' => $n === 400 ? null : (string) $n, 'document_code' => 'NEW-'.$n]);
+        }
+        $result = app(DocumentLedgerImportService::class)->import($rows, $this->clerk(), 2026, 'source.xlsx', false, true);
+        $this->assertSame(2, $result['created']);
+        $this->assertSame(1, $result['conflicts']);
+        $this->assertSame('EXISTING', DocumentLedgerEntry::where('number', '400')->first()->document_code);
+    }
+
+    public function test_decisions_373_to_376_import_with_blank_content_and_later_fill_same_entries(): void
+    {
+        $rows = [];
+        for ($number = 372; $number <= 377; $number++) {
+            $incomplete = $number > 372 && $number < 377;
+            $rows[] = array_replace($this->row(), ['_book' => 'decision', '_sheet' => 'VB QUYET DINH',
+                '_number' => (string) $number, '_row' => $number + 6, 'document_code' => $number.' /QĐ-NHNo.ĐT-KTNQ',
+                'forwarded_date' => '2026-08-12', 'issued_date' => $incomplete ? null : '2026-08-12',
+                'title' => $incomplete ? null : 'Quyết định '.$number, 'recipient' => null, 'signer' => null]);
+        }
+        $service = app(DocumentLedgerImportService::class);
+        $service->import([$rows[0], $rows[5]], $this->clerk(), 2026, 'source.xlsx');
+        $lastBefore = DocumentLedgerEntry::where('number', '377')->first()->getAttributes();
+        $preview = $service->import($rows, $this->clerk(), 2026, 'source.xlsx', true);
+        $this->assertSame(4, $preview['created']);
+        $this->assertSame(4, $preview['accepted_with_warnings']);
+        $this->assertSame(0, $preview['recovered_numbers']);
+        $this->assertSame(2, DocumentLedgerEntry::count());
+        $actual = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame($preview, $actual);
+        $this->assertSame(['372', '373', '374', '375', '376', '377'], DocumentLedgerEntry::orderBy('sequence_number')->pluck('number')->all());
+        $this->assertSame($lastBefore, DocumentLedgerEntry::where('number', '377')->first()->getAttributes());
+        $this->assertSame(4, DocumentLedgerEntry::whereNull('title')->whereNull('issued_date')->count());
+        $ids = DocumentLedgerEntry::orderBy('sequence_number')->pluck('id')->all();
+        $again = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame(6, $again['unchanged']);
+        foreach ($rows as &$row) {
+            $row['title'] = 'Nội dung bổ sung';
+            $row['issued_date'] = '2026-08-12';
+        }
+        unset($row);
+        $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame($ids, DocumentLedgerEntry::orderBy('sequence_number')->pluck('id')->all());
+        $this->assertSame(0, DocumentLedgerEntry::whereNull('title')->count());
+        $this->assertSame(0, Document::count());
+        $this->assertSame(378, app(DocumentLedgerService::class)->nextNumber(1, 2026, 'decision'));
+        $wrongYear = $service->import($rows, $this->clerk(), 2025, 'source.xlsx', true);
+        $this->assertSame(6, $wrongYear['skipped_other_year']);
+        $this->assertSame(0, $wrongYear['created']);
+    }
+
+    public function test_number_and_any_real_date_accept_screenshot_rows_without_fabricating_metadata(): void
+    {
+        $rows = [];
+        foreach (['incoming', 'outgoing', 'decision'] as $book) {
+            $dateField = $book === 'incoming' ? 'received_date' : 'forwarded_date';
+            $rows[] = ['_book' => $book, '_sheet' => $book, '_row' => 2, '_year' => 2026, '_number' => '01',
+                'document_code' => $book === 'incoming' ? null : '01 /NHNo.ĐT-QLRR', $dateField => '2026-01-05',
+                'issued_date' => null, 'title' => null, 'signer' => null, 'recipient' => null];
+            $rows[] = ['_book' => $book, '_sheet' => $book, '_row' => 107, '_year' => null, '_number' => '106',
+                'document_code' => $book === 'incoming' ? null : '106 /NHNo.ĐT-KTNQ', $dateField => null,
+                'issued_date' => '2026-01-26', 'title' => null, 'signer' => null, 'recipient' => null];
+        }
+        $service = app(DocumentLedgerImportService::class);
+        $preview = $service->import($rows, $this->clerk(), 2026, 'source.xlsx', true);
+        $this->assertSame(6, $preview['created']);
+        $this->assertSame([2026 => 6], $preview['rows_by_year']);
+        $this->assertSame(3, $preview['fallback_years']);
+        $this->assertSame(0, DocumentLedgerEntry::count());
+        $actual = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame($preview, $actual);
+        $this->assertSame(0, $actual['skipped']);
+        $this->assertSame(6, DocumentLedgerEntry::whereNull('title')->count());
+        $this->assertSame(3, DocumentLedgerEntry::where('number', '106')->whereNull('registered_date')->whereDate('issued_date', '2026-01-26')->count());
+        $this->assertSame(3, DocumentLedgerEntry::where('number', '01')->whereDate('registered_date', '2026-01-05')->whereNull('issued_date')->count());
+        $ids = DocumentLedgerEntry::orderBy('id')->pluck('id')->all();
+        $again = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame(6, $again['unchanged']);
+        $this->assertSame($ids, DocumentLedgerEntry::orderBy('id')->pluck('id')->all());
+        $blankIncoming = DocumentLedgerEntry::where('book', 'incoming')->where('number', '01')->first();
+        $rows[0]['document_code'] = 'NEW-CODE';
+        $rows[0]['title'] = 'Bổ sung dòng chỉ có số và ngày';
+        $completed = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame(1, $completed['updated']);
+        $this->assertSame(0, $completed['created']);
+        $this->assertSame('NEW-CODE', $blankIncoming->fresh()->document_code);
+        // Bổ sung ngày chuyển/đến sau đó phải cập nhật chính dòng đang thiếu.
+        foreach ($rows as &$row) {
+            if ($row['_number'] === '106') {
+                $row[$row['_book'] === 'incoming' ? 'received_date' : 'forwarded_date'] = '2026-01-27';
+            }
+        }
+        unset($row);
+        $filled = $service->import($rows, $this->clerk(), 2026, 'source.xlsx');
+        $this->assertSame(3, $filled['updated']);
+        $this->assertSame(0, $filled['created']);
+        $this->assertSame(3, DocumentLedgerEntry::where('number', '106')->whereDate('registered_date', '2026-01-27')->count());
+        foreach ($rows as &$row) {
+            if ($row['_number'] === '106') {
+                $row[$row['_book'] === 'incoming' ? 'received_date' : 'forwarded_date'] = null;
+            }
+        }
+        unset($row);
+        $service->import($rows, $this->clerk(), 2026, 'source.xlsx', false, true);
+        $this->assertSame(3, DocumentLedgerEntry::where('number', '106')->whereDate('registered_date', '2026-01-27')->count());
+        $this->assertSame(0, Document::count());
     }
 
     private function clerk(): User

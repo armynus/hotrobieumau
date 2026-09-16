@@ -2,6 +2,8 @@
 
 return [
     'ledger' => [
+        // Mẫu đi cùng source để server nội bộ không cần Word hay internet khi tạo DOCX.
+        'presentation_slip_template' => env('DOCUMENT_LEDGER_SLIP_TEMPLATE', resource_path('documents/ledger-presentation-slip.docx')),
         'web_import_max_rows' => (int) env('DOCUMENT_LEDGER_WEB_IMPORT_MAX_ROWS', 5000),
         'web_import_timeout' => (int) env('DOCUMENT_LEDGER_WEB_IMPORT_TIMEOUT', 180),
     ],

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html  lang="en-GB">
+<html  lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -64,5 +64,7 @@
  
     @stack('scripts') <!-- Thêm JS riêng -->
     @include('search_topbar')
+    {{-- Nạp cuối cùng để bắt được cả DataTable khởi tạo trực tiếp và qua AJAX. --}}
+    <script src="{{ asset('js/datatables-enhancements.js') }}?v={{ filemtime(public_path('js/datatables-enhancements.js')) }}"></script>
 </body>
 </html>

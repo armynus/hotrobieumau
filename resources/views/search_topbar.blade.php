@@ -1,6 +1,4 @@
-<!-- Bao gồm jQuery và jQuery UI (nếu chưa có) -->
-<link href="{{ asset('vendor/jquery/jquery-ui.css') }}" rel="stylesheet">
-<script src="{{ asset('vendor/jquery/jquery-ui.min.js') }}"></script>
+@include('shared.jquery-ui')
 
 
 <style>
@@ -59,27 +57,6 @@
 </style>
 
 <script>
-$(document).ready(function () {
-    $("#search_topbar").autocomplete({
-    source: function (request, response) {
-        $.ajax({
-            url: "{{ route('support_form.search') }}",
-            dataType: "json",
-            data: { query: request.term },
-            success: function (data) {
-                response(data);
-            }
-        });
-    },
-    minLength: 2,
-    select: function (event, ui) {
-        window.location.href = ui.item.value;
-    }
-}).autocomplete("instance")._renderItem = function (ul, item) {
-    return $("<li>")
-        .append(`<div>${item.icon} ${item.label}</div>`)
-        .appendTo(ul);
-};
-
-});
+window.FormSearchConfig = {url: @json(route('support_form.search'))};
 </script>
+<script src="{{ asset('js/user/form-search.js') }}?v={{ filemtime(public_path('js/user/form-search.js')) }}"></script>

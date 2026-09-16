@@ -160,6 +160,7 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::post('documents/ledger/import', [DocumentLedgerController::class, 'import'])->middleware('throttle:3,1')->name('documents_ledger_import');
     Route::post('documents/ledger/entries', [DocumentLedgerController::class, 'create'])->middleware('throttle:30,1')->name('documents_ledger_create');
     Route::put('documents/ledger/entries/{entry}', [DocumentLedgerController::class, 'update'])->middleware('throttle:30,1')->name('documents_ledger_update');
+    Route::post('documents/ledger/entries/{entry}/presentation-slip', \App\Http\Controllers\User\DocumentLedgerSlipController::class)->middleware('throttle:10,1')->name('documents_ledger_slip');
     Route::post('documents/ledger/{document}/register', [DocumentLedgerController::class, 'register'])->middleware('throttle:30,1')->name('documents_ledger_register');
     Route::post('documents/export', DocumentExportController::class)
         ->middleware('throttle:3,1')

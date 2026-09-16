@@ -34,9 +34,37 @@ Không còn checkbox tự ghi sổ khi đăng tải. Không còn tự gắn file
 - Mỗi chi nhánh/năm có ba dãy số riêng: đến, đi, quyết định. Số đến riêng một cột; số đi/quyết định lấy ở đầu số, ký hiệu. Khi ghi sổ, để trống số để cấp tiếp; với đi/quyết định nhập /NHNo.ĐT-TH để tự ghép số. Đăng tải không cấp số sổ.
 - Import nhận cả `201-202/ QĐ NHNo.DT-KTNQ` → số sổ `201-202` (giữ một dòng) và `1140 KH-/NHNo-DT-KHDN` → `1140` dù thiếu dấu `/` ngay sau số. Giữ nguyên số, ký hiệu gốc. Dải `201-202` sắp xếp theo 201 nhưng số tự cấp tiếp theo tối thiểu là 203. Không tìm số nằm giữa chuỗi nếu đầu ký hiệu không có số.
 - Với các dòng trước đây bị bỏ qua vì hai kiểu số này, chọn lại file Excel và chạy Kiểm tra → Nhập như bình thường (không dùng chế độ chỉ cập nhật). Không cần xóa sổ hoặc sửa file Excel; các dòng khớp đã nhập được đối chiếu theo cơ chế nhập lại hiện có.
-- Cho phép số trùng theo sổ gốc. Mỗi dòng có ID riêng; 01 và 1 được tra cùng số nhưng giữ cách viết gốc. Năm sổ theo ngày đến/ngày chuyển, không theo ngày ban hành.
-- Xuất Excel chỉ đọc sổ, kể cả dòng không có văn bản/file trong kho. Tháng/quý lọc ngày vào sổ; cả năm lọc năm sổ. Sổ đi tách hai sheet VB đi sau KT và VB QUYET DINH.
+- Cho phép số trùng theo sổ gốc. Mỗi dòng có ID riêng; 01 và 1 được tra cùng số nhưng giữ cách viết gốc. Năm sổ ưu tiên ngày đến/ngày chuyển; nếu thiếu thì dùng ngày khác có thật trong dòng (ngày chuyển, ngày văn bản).
+- Xuất Excel chỉ đọc sổ, kể cả dòng không có văn bản/file trong kho. Tháng/quý ưu tiên ngày vào sổ, thiếu thì dùng ngày chuyển/ngày văn bản để lọc; vẫn giữ ô ngày vào sổ trống trong file xuất. Cả năm lọc năm sổ. Sổ đi tách hai sheet VB đi sau KT và VB QUYET DINH.
 - Xóa ô tùy chọn khi sửa thủ công sẽ lưu trống. Import Excel thì ô trống không xóa dữ liệu cũ.
+
+## Tải và in phiếu trình chuyển văn bản
+
+- Khi ghi mới, đưa văn bản vào sổ hoặc chỉnh sổ, bấm **Lưu và tải phiếu trình**: lưu sổ thành công trước, sau đó mở khung tạo phiếu. Nút lưu thông thường vẫn chỉ lưu sổ. Đóng khung phiếu sẽ tải lại bảng sổ.
+- Dòng đã có trong sổ (kể cả dòng import Excel): bấm icon **Word** ở cột Thao tác để tải lại phiếu, không cần ghi mới sổ.
+- Phiếu dùng mẫu `resources/documents/ledger-presentation-slip.docx`, chuyển từ `PHIEU TRINH VAN BAN.docx` của văn thư. Điền **Số** từ số/ký hiệu, **Ngày** từ ngày văn bản, **Nơi gởi** từ tác giả/cơ quan gửi, **Nội dung** từ trích yếu. Ô trống hiển thị —; không tự lấy ngày lập hoặc ngày vào sổ thay ngày văn bản.
+- Khung phiếu cho nhập kính trình, ngày lập, phòng/bộ phận trình, địa danh, chức danh và họ tên người ký phiếu. Họ tên/chức danh ký phiếu mặc định để trống, không giữ tên người ký mẫu cũ; đây không phải người ký văn bản gốc. Các lựa chọn chỉ dùng cho lần tải, không lưu ngược vào sổ. Giữ phần ý kiến, giao việc và ký duyệt của lãnh đạo để ghi sau.
+- File tải là `.docx`: mở bằng Word trên máy trạm để xem/in. Server chỉ cần PHP và thư viện PHPWord đang có; không cần cài Word, LibreOffice, OCR hay internet để xuất phiếu. Không tự gửi tới máy in.
+- Chỉ văn thư cùng chi nhánh được xuất. Dùng ID dòng sổ nên số sổ trùng không bị nhầm. Có giới hạn 10 yêu cầu/phút theo middleware web hiện tại và khóa mỗi người chỉ tạo một phiếu cùng lúc; mỗi yêu cầu tạo một phiếu, file tạm lưu ngoài thư mục public và xóa sau khi gửi.
+- Phiếu chỉ đọc sổ; không tạo, sửa văn bản/file kho, không đổi số sổ và không gửi thông báo. Nếu tải lỗi sau khi lưu, sổ đã lưu vẫn giữ nguyên: dùng icon Word ở dòng đó để thử lại, không ghi sổ mới lần nữa.
+
+### Thay mẫu Word
+
+Mẫu đi cùng source nên cập nhật server phải chép cả file DOCX này. Không cần migration. Nếu cần dùng file riêng, đặt đường dẫn bằng dấu `/` hoặc dấu nháy đơn trong `.env`, ví dụ `DOCUMENT_LEDGER_SLIP_TEMPLATE='D:/mau/Phieu-trinh.docx'`, rồi chạy `php artisan config:clear`.
+
+Mẫu dùng placeholder PHPWord `${document_code}`, `${issued_date}`, `${issuing_agency}`, `${title}` (bốn trường bắt buộc trong mẫu), cùng `${branch_name}`, `${department_name}`, `${place_line}`, `${print_date}`, `${print_month}`, `${print_year}`, `${submitted_to}`, `${signature_title}`, `${prepared_by}`. Có thể thêm `${number}`, `${year}`, `${book}`, `${registered_date}`, `${forwarded_date}`, `${signer}`, `${recipient}`, `${archive_recipient}`, `${copy_count}`, `${receipt_signature}`, `${notes}`. Tên biến phải đúng; không thay bằng `{{...}}`. Giữ dòng có thể mở rộng/ngắt trang để trích yếu dài không bị cắt.
+
+Script bảo trì `scripts/documents/prepare-ledger-presentation-template.py` chuyển bản tham chiếu thành mẫu, chỉ sửa slot dữ liệu và chữ watermark chi nhánh; giữ các phần package khác nguyên byte. Script dùng Python bundled của Codex, không chạy trên server khi xuất phiếu.
+
+## Kiểm tra sổ đã lưu
+
+Trong **Sổ văn bản**, chọn năm/loại sổ rồi bấm **Kiểm tra sổ**. Khung nhắc nhở đếm các dòng thiếu thông tin của cả sổ đang chọn; bảng chỉ hiện các dòng thiếu, có thể tìm theo từ khóa và sắp xếp như bảng sổ thông thường. Chuyển sổ đến/đi/quyết định vẫn giữ chế độ kiểm tra.
+
+- Nhắc ô trống: số sổ, số/ký hiệu văn bản, trích yếu, ngày đến (sổ đến)/ngày chuyển (sổ đi, quyết định), ngày văn bản. Không yêu cầu tác giả, người ký, nơi nhận, ký nhận, ghi chú hay các ô tùy chọn.
+- Số/ký hiệu và trích yếu còn trống hiển thị **—** trên bảng, không ghi dấu gạch vào database. Vẫn giữ nhãn ô thiếu và vị trí dòng Excel để dễ đối chiếu.
+- Bấm bút chì ở kết quả: form nêu rõ và tô màu những ô thiếu. Lưu xong kiểm tra lại danh sách ngay, không chuyển trang; dòng đầy đủ tự rời kết quả. Bấm **Thoát kiểm tra** ở đầu trang hoặc ngay trong khung kiểm tra để trở về bảng thông thường; giữ năm/loại sổ, bỏ lọc thiếu thông tin và từ khóa để xem toàn bộ sổ đang chọn.
+- Chỉ văn thư cùng chi nhánh sử dụng. Kiểm tra không thay đổi dữ liệu, không tự bịa nội dung/ngày, không cấp hoặc đánh lại số, không tác động kho văn bản hay gửi thông báo. Đây không phải quy tắc chặn import Excel: dòng thiếu đã được nhập vẫn giữ nguyên để bổ sung sau.
+- Lọc và đếm tại database theo chi nhánh/năm/loại sổ; phân trang tối đa 100 dòng/yêu cầu, không tải toàn bộ sổ xuống trình duyệt. Không cần migration mới.
 
 ## Nhập Excel
 
@@ -44,7 +72,21 @@ Chọn Nhập Excel → năm, loại sổ, sheet → Kiểm tra trước → đ�
 
 Import chỉ đối chiếu các dòng sổ trong chi nhánh/năm/loại sổ, **không ghép hoặc cập nhật kho**, dù kho có cùng mã. Mặc định bù trường thiếu; --overwrite ưu tiên ô có nội dung trong Excel. --update-only chỉ cập nhật dòng sổ đã có, không tạo dòng mới.
 
-Dòng thiếu ký hiệu, thiếu/sai số, thiếu/sai ngày vào sổ hoặc thuộc năm khác được bỏ qua/báo lỗi. Không có giới hạn ngầm 2.000 dòng. Thống kê tách lý do và số dòng theo năm. Giữ các dòng trùng; nhập lại ưu tiên dấu vân tay nội dung, vị trí sheet/dòng nguồn và ứng viên duy nhất. Đổi chính số hoặc ký hiệu có thể thành dòng mới; import không đồng bộ xóa toàn bộ sổ.
+Không có giới hạn ngầm 2.000 dòng. Thống kê tách lý do và số dòng theo năm. Giữ các dòng trùng; nhập lại ưu tiên dấu vân tay nội dung, vị trí sheet/dòng nguồn và ứng viên duy nhất. Import không đồng bộ xóa toàn bộ sổ và không đôn số của dòng phía sau.
+
+### Nhập linh hoạt theo số sổ và năm — áp dụng chung cả ba sổ
+
+- **Có số sổ hợp lệ và có ngày xác định được năm thì nhập**, không giới hạn số trường mô tả bị thiếu. Sổ đến lấy số đến; sổ đi và quyết định lấy số ở đầu ký hiệu. Không còn điều kiện “thiếu tối đa một trường” hoặc ngoại lệ chỉ dành cho quyết định.
+- Ưu tiên ngày đến của sổ đến/ngày chuyển của sổ đi, quyết định. Nếu thiếu hoặc không đọc được, lấy năm từ ngày khác có thật trong dòng: ngày chuyển, rồi ngày văn bản. Ngày đến/chuyển đã có thì không bị ngày văn bản khác năm thay thế.
+- Ví dụ dòng 01 có ngày chuyển 05/01/2026 nhưng trống ngày văn bản và trích yếu vẫn nhận. Dòng 106 thiếu ngày chuyển, có ngày văn bản 26/01/2026 vẫn vào sổ 2026; ngày chuyển giữ trống. Sổ đến có số 120 và ngày đến nhưng trống ký hiệu/trích yếu cũng vẫn nhận.
+- Chỉ dùng ngày khác để xác định năm/lọc kỳ xuất, không ghi đè vào cột ngày bị thiếu. Nội dung nào Excel để trống thì để trống, không tự bịa ký hiệu, trích yếu hay ngày văn bản.
+- Trường hợp không có ngày hợp lệ nào trong dòng: vẫn có thể khôi phục ngày vào sổ nếu hai hàng kề có cùng ngày vào sổ rõ ràng; không tự lấy năm đang chọn trong form làm năm của mọi dòng.
+- Số bị thiếu vẫn có thể suy ra từ khoảng số chắc chắn của các hàng kề cùng sheet/loại sổ/năm. Ví dụ 399 – trống – 401 thì điền 400. Không dùng số dòng Excel hay MAX(DB) để đánh lại sổ; không đôn số hoặc ghi đè dòng 401. Không tự suy đoán khi vừa thiếu số vừa thiếu nhiều thông tin.
+- Dòng không xác định được số/năm, số tự suy ra xung đột dữ liệu có sẵn, hoặc thuộc năm khác sẽ được báo riêng. Thiếu trích yếu/ngày văn bản/tác giả/người ký/nơi nhận không phải lý do từ chối dòng có số và năm.
+- Preview và CLI tách **dòng được nhận có chú ý** với **dòng chưa nhập**, có số lượng dòng lấy năm từ ngày khác. Hiển thị tối đa 100 chú ý và 100 lỗi; tổng vẫn đếm đầy đủ.
+- Nhập lại cùng file giữ những dòng đã khớp, không nhân bản hoặc làm mất dòng phía sau. Bổ sung thông tin vào dòng có số/file/sheet/vị trí nguồn và dữ liệu khớp sẽ cập nhật dòng cũ. Nếu đổi đồng thời số/ký hiệu/vị trí nguồn thì cần kiểm tra bản xem trước vì có thể chưa đủ căn cứ ghép.
+- Ô Excel trống không xóa dữ liệu đã lưu, kể cả ngày đến/chuyển và khi chọn ghi đè. Không tạo hoặc sửa văn bản trong kho, không gửi thông báo.
+- Bổ sung các dòng bị bỏ qua trước đây: **Kiểm tra trước → Nhập các dòng hợp lệ**, không dùng `--update-only`, không xóa sổ. Không có migration mới.
 
 Giao diện giới hạn 5.000 dòng đọc và 50 MB/file; sổ lớn dùng CLI. Có khóa nhập theo chi nhánh, giao dịch từng dòng; xuất Excel theo lô và có giới hạn số dòng/yêu cầu để giảm tải.
 

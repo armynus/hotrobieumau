@@ -19,6 +19,7 @@ class DocumentLedgerTableService
             'order' => 'nullable|array|max:1',
             'order.0.column' => 'nullable|integer|min:0|max:4',
             'order.0.dir' => 'nullable|in:asc,desc',
+            'check' => 'nullable|boolean',
         ]);
         $length = (int) ($input['length'] ?? 30);
         $length = $length < 1 ? 100 : min($length, 100);
@@ -27,6 +28,12 @@ class DocumentLedgerTableService
         $column = ['sequence_number', 'registered_date', 'document_code', 'title', 'issued_date'][$input['order'][0]['column'] ?? 0];
         $query = DocumentLedgerEntry::where('branch_id', $clerk->branch_id)->where('year', $year)->where('book', $book);
         $total = (clone $query)->count();
+        $checker = app(DocumentLedgerCheckService::class);
+        $incomplete = $checker->onlyIncomplete(clone $query)->count();
+        $checkOnly = $request->boolean('check');
+        if ($checkOnly) {
+            $checker->onlyIncomplete($query);
+        }
         if ($keyword !== '') {
             $query->where(function ($query) use ($keyword) {
                 $query->where('number', 'like', '%'.$keyword.'%')
@@ -34,7 +41,7 @@ class DocumentLedgerTableService
                     ->orWhere('title', 'like', '%'.$keyword.'%');
             });
         }
-        $filtered = $keyword === '' ? $total : (clone $query)->count();
+        $filtered = $keyword === '' ? ($checkOnly ? $incomplete : $total) : (clone $query)->count();
         if (in_array($column, ['registered_date', 'issued_date'], true)) {
             $query->orderByRaw($column.' IS NULL ASC'); // Ngày thiếu luôn nằm cuối.
         }
@@ -48,12 +55,14 @@ class DocumentLedgerTableService
 
         return [
             'draw' => (int) $input['draw'], 'recordsTotal' => $total, 'recordsFiltered' => $filtered,
+            'incompleteCount' => $incomplete,
             'data' => $entries->map(fn ($entry) => [
                 'id' => $entry->id, 'number' => $entry->number,
                 'registered_date' => $entry->registered_date?->format('d/m/Y'),
                 'issued_date' => $entry->issued_date?->format('d/m/Y'),
                 'document_code' => $entry->document_code, 'title' => $entry->title,
                 'source_sheet' => $entry->source_sheet, 'source_row' => $entry->source_row,
+                'missing_fields' => $checker->missingFields($entry),
                 'form_data' => $form->entryData($entry),
             ])->all(),
         ];

@@ -11,10 +11,10 @@
         @csrf
         <div class="input-group">
            
-            <input type="search" class="form-control bg-light border-0 small" placeholder="Tra cứu các biểu mẫu đang được hỗ trợ bằng tên"
-                aria-label="Search" aria-describedby="basic-addon2" name="search_topbar" id="search_topbar" >
+            <input type="search" class="form-control bg-light border-0 small form-search-input" placeholder="Tra cứu biểu mẫu theo tên"
+                aria-label="Tìm biểu mẫu" name="search_topbar" id="search_topbar" >
             <div class="input-group-append">
-                <button class="btn btn-primary" type="submit">
+                <button class="btn btn-primary form-search-button" type="button" aria-label="Tìm biểu mẫu">
                     <i class="fas fa-search fa-sm"></i>
                 </button>
             </div>
@@ -33,13 +33,13 @@
         <!-- Dropdown - Messages -->
         <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
             aria-labelledby="searchDropdown">
-            <form class="form-inline mr-auto w-100 navbar-search">
+            <form class="form-inline mr-auto w-100 navbar-search form-search-mobile">
                 <div class="input-group">
-                    <input type="text" class="form-control bg-light border-0 small"
-                        placeholder="Search for..." aria-label="Search"
-                        aria-describedby="basic-addon2">
+                    <input type="search" class="form-control bg-light border-0 small form-search-input"
+                        placeholder="Tra cứu biểu mẫu theo tên" aria-label="Tìm biểu mẫu"
+                        id="search_topbar_mobile" name="search_topbar_mobile">
                     <div class="input-group-append">
-                        <button class="btn btn-primary" type="button">
+                        <button class="btn btn-primary form-search-button" type="submit" aria-label="Tìm biểu mẫu">
                             <i class="fas fa-search fa-sm"></i>
                         </button>
                     </div>

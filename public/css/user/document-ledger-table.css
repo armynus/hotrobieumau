@@ -45,6 +45,10 @@
 .ledger-table th.sorting_desc { color: #2855c5; background-color: #eef3ff; }
 .ledger-table td:nth-child(2),
 .ledger-table td:nth-child(5) { white-space: nowrap; }
+.ledger-check-summary { padding: 14px 16px; border: 1px solid #cce5d7; border-radius: 10px; background: #f2faf5; color: #256142; }
+.ledger-check-summary.has-missing { border-color: #ead39b; background: #fffaf0; color: #77500d; }
+.ledger-missing-fields { min-width: 200px; max-width: 300px; }
+.ledger-missing-badge { display: inline-block; padding: 4px 8px; margin: 2px 4px 2px 0; border-radius: 6px; background: #fff0c9; color: #77500d; font-size: .78rem; }
 @media (prefers-reduced-motion: reduce) { .ledger-book { transition: none; } }
 @media (max-width: 575.98px) {
     .ledger-book .card-body { padding: 16px; }

@@ -27,8 +27,6 @@ class CustomerController extends Controller
         }
     }
     public function view_data_customer (){
-        $data = CustomerInfo::select('id', 'custno', 'nameloc', 'phone_no', 'identity_no')
-        ->paginate(10); // Hiển thị 10 tài khoản mỗi trang
         $fields = [
             'custno' => 'Mã khách hàng',
             'name' => 'Tên khách hàng in hoa',
@@ -88,7 +86,7 @@ class CustomerController extends Controller
             'add_usridop1' => 'Nhân viên tạo',
         ];
         
-        return view('user.page.view_data_customer', compact ('data', 'fields', 'addFields'));
+        return view('user.page.view_data_customer', compact ('fields', 'addFields'));
     }
     public function uploadfile_customer(Request $request){
         ini_set('max_execution_time', 9000); // = 5 phút

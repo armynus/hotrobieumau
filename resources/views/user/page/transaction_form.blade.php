@@ -237,15 +237,21 @@
        
                        
             
+                    <div id="supportFormDraftStatus" class="small text-muted my-3" role="status" aria-live="polite">
+                        <span id="draftStatusText">Đang kiểm tra bản nháp…</span>
+                        <button id="draftRetry" class="btn btn-sm btn-outline-primary" type="button" hidden>Thử lưu lại</button>
+                        <button id="draftLoadServer" class="btn btn-sm btn-outline-secondary" type="button" hidden>Nạp bản trên máy chủ</button>
+                        <button id="draftKeepLocal" class="btn btn-sm btn-outline-primary" type="button" hidden>Lưu bản đang nhập</button>
+                    </div>
                     <div class="row">
                         <div class="col-md-12 text-right">
-                            <span  class="btn btn-secondary" id="resetFormBtn">
+                            <button type="button" class="btn btn-secondary" id="resetFormBtn">
                                 Làm mới Nháp
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
                                     <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
                                 </svg>
-                            </span>
+                            </button>
                             <span  class="btn btn-success" id="copyClipboardBtn">
                                 Copy Clipboard
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16">
@@ -264,13 +270,13 @@
                                     <path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5zm-2 0h1v1A2.5 2.5 0 0 0 6.5 5h3A2.5 2.5 0 0 0 12 2.5v-1h1a2 2 0 0 1 2 2V14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3.5a2 2 0 0 1 2-2"/>
                                 </svg>
                             </span>
-                            <span  class="btn btn-primary" id="print_form" data-form_id="{{$form->id}}">
+                            <button type="button" class="btn btn-primary" id="print_form" data-form_id="{{$form->id}}">
                                 In biểu mẫu
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
                                     <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1"/>
                                     <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
                                 </svg>
-                            </span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -283,7 +289,6 @@
 @push('scripts')
      <!-- Bootstrap core JavaScript-->
     <script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{asset('vendor/jquery/jquery.min.js')}}"></script>
 
     <!-- Core plugin JavaScript-->
     <script src="{{asset('vendor/jquery-easing/jquery.easing.min.js')}}"></script>
@@ -297,10 +302,8 @@
     <!-- Page level custom scripts -->
     <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
     <!-- include jQuery validate library -->
-    <script src="{{asset('js/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js')}}" type="text/javascript"></script>
       <!-- Bao gồm jQuery và jQuery UI (nếu chưa có) -->
-    <link href="{{ asset('vendor/jquery/jquery-ui.css') }}" rel="stylesheet">
-    <script src="{{ asset('vendor/jquery/jquery-ui.min.js') }}"></script>
+    @include('shared.jquery-ui')
     @include('user.partials.ajax_transaction_form')
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -314,7 +317,7 @@
         };
     </script>
 
-    <script src="{{ asset('js/user/support-form-draft.js') }}"></script>
+    <script type="module" src="{{ asset('js/user/support-form-draft.js') }}?v={{ filemtime(public_path('js/user/support-form-draft.js')) }}"></script>
 
 
 

@@ -1,240 +1,173 @@
-(function($){
-    // ==== Lấy config từ window ====
+import {readFields, restoreFields, DraftSaveQueue} from './support-form-draft-state.js';
+
+const $ = window.jQuery;
+$(function () {
     const cfg = window.SupportFormDraftConfig || {};
-
-    const formKey        = cfg.formKey || 'supportForm';
-    const userId         = cfg.userId || 'guest';
-    const storageKey     = `draft:form:${formKey}:user:${userId}`;
-    const saveUrl        = cfg.saveUrl;
-    const getUrlTemplate = cfg.getUrlTemplate;
-
-    const selectorRoot = $('#supportForm').length ? $('#supportForm') : $('.container').first();
-    const fieldSelector = 'input[type="text"], input[type="tel"], input[type="date"], input[type="email"], textarea, select, input[type="checkbox"], input[type="radio"]';
-
-    const excludeDraftFields = ['NgayGiaoDich', 'NgayThangNam'];
-
-    function debounce(fn, wait = 500) {
-        let timer = null;
-        return function() {
-            const context = this, args = arguments;
-            clearTimeout(timer);
-            timer = setTimeout(function() {
-                fn.apply(context, args);
-            }, wait);
-        };
+    const form = document.getElementById('supportForm');
+    if (!form || !cfg.saveUrl || !cfg.getUrlTemplate) return;
+    const storageKey = `draft:form:${cfg.formKey}:user:${cfg.userId}`;
+    const excluded = ['NgayGiaoDich', 'NgayThangNam', 'keyword'];
+    const fields = () => Array.from(form.querySelectorAll('input[type="text"], input[type="number"], input[type="tel"], input[type="date"], input[type="email"], textarea, select, input[type="checkbox"], input[type="radio"]'))
+        .filter(field => !excluded.includes(field.name || field.id));
+    const initialValues = readFields(fields());
+    const focusedBeforeRestore = fields().includes(document.activeElement) ? document.activeElement : null;
+    let applying = false;
+    let edited = Boolean(focusedBeforeRestore);
+    let timer;
+    let resolving = false;
+    let loaded = false;
+    let local = null;
+    let legacyWarning = false;
+    let localAvailable = true;
+    let state = 'loading';
+    const messages = {
+        loading: 'Đang kiểm tra bản nháp…', saving: 'Đang lưu nháp…', saved: 'Đã lưu nháp',
+        error: 'Chưa đồng bộ được bản nháp.',
+        conflict: 'Có bản nháp khác trên máy chủ. Chọn bản cần dùng.'
+    };
+    function status(next) {
+        state = next;
+        $('#draftStatusText').text(messages[next]
+            + (!localAvailable ? ' Không lưu được trên máy; hãy giữ trang mở tới khi đồng bộ xong.' : (['error', 'conflict'].includes(next) ? ' Nội dung đang nhập vẫn được giữ trên máy.' : ''))
+            + (legacyWarning ? ' Nháp cũ thiếu thông tin lựa chọn: hãy kiểm tra lại các ô checkbox.' : ''));
+        $('#draftRetry').prop('hidden', next !== 'error');
+        $('#draftLoadServer, #draftKeepLocal').prop('hidden', next !== 'conflict');
     }
-
-    function readValues(){
-        const payload = {};
-        selectorRoot.find(fieldSelector).each(function(){
-            const name = this.name || this.id;
-            if (!name) return;
-            if (excludeDraftFields.includes(name)) return;
-
-            if (this.type === 'checkbox' || this.type === 'radio') {
-                payload[name] = $(this).is(':checked');
-            } else {
-                payload[name] = $(this).val();
-            }
-        });
-        return payload;
+    function store(data, dirty, revision) {
+        local = {data, dirty, revision, saved_at: new Date().toISOString()};
+        try { localStorage.setItem(storageKey, JSON.stringify(local)); }
+        catch (_) { localAvailable = false; }
     }
-
-    function writeValues(payload){
-        if (!payload) return;
-        selectorRoot.find(fieldSelector).each(function(){
-            const name = this.name || this.id;
-            if (!name) return;
-            if (excludeDraftFields.includes(name)) return;
-            if (!(name in payload)) return;
-
-            const rawVal = payload[name];
-            if (rawVal === '' || rawVal === null || typeof rawVal === 'undefined') return;
-
-            if (this.type === 'checkbox' || this.type === 'radio') {
-                const v = (typeof rawVal === 'string') ? (rawVal.toLowerCase() === 'true') : Boolean(rawVal);
-                $(this).prop('checked', v);
-            } else {
-                const $el = $(this);
-                if ($el.is('select')) {
-                    const exists = $el.find('option').filter(function(){
-                        return String($(this).attr('value')) === String(rawVal);
-                    }).length > 0;
-                    if (!exists && rawVal !== '') {
-                        $el.prepend($('<option>', { value: rawVal, text: rawVal }));
-                    }
-                }
-                $el.val(rawVal);
-            }
-            $(this).trigger('change');
-        });
-    }
-
-    function saveLocal(){
+    function apply(payload) {
+        applying = true;
         try {
-            const data = readValues();
-            localStorage.setItem(storageKey, JSON.stringify({
-                saved_at: (new Date()).toISOString(),
-                data
-            }));
-        } catch(e){ console.error(e); }
+            legacyWarning = restoreFields(fields(), {...initialValues, ...payload});
+            fields().forEach(field => $(field).trigger('change'));
+        } finally { applying = false; }
     }
-
-    function ajaxSaveDraft(payload){
-        $.ajax({
-            url: saveUrl,
-            method: 'POST',
-            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            data: { form_key: formKey, payload: JSON.stringify(payload) },
-            error: function(xhr){ console.error('Draft save failed', xhr.responseText || xhr.statusText); }
-        });
+    const queue = new DraftSaveQueue(
+        (payload, revision) => $.ajax({
+            url: cfg.saveUrl, method: 'POST', dataType: 'json', timeout: 20000,
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'), Accept: 'application/json'},
+            data: {form_key: cfg.formKey, payload: JSON.stringify(payload), revision}
+        }), status,
+        (payload, pending, revision) => store(pending ?? payload, pending !== null, revision)
+    );
+    function changed() {
+        if (applying) return;
+        edited = true;
+        queue.enqueue(readFields(fields()));
+        store(queue.pending, true, queue.revision ?? local?.revision ?? null);
+        clearTimeout(timer);
+        timer = setTimeout(() => queue.flush(), 800);
+        if (!queue.blocked) status('saving');
     }
-
-    function ajaxGetDraft(){
-        const getUrl = getUrlTemplate.replace('__FORMKEY__', encodeURIComponent(formKey));
-        $.ajax({
-            url: getUrl,
-            method: 'GET',
-            success: function(resp){
-                if (!resp) return;
-                const payload = resp.payload ?? resp;
-                let parsed = payload;
-                if (typeof payload === 'string') {
-                    try { parsed = JSON.parse(payload); } catch(e){ parsed = null; }
-                }
-                if (parsed) writeValues(parsed);
-            }
-        });
+    function getServer() {
+        return $.ajax({url: cfg.getUrlTemplate.replace('__FORMKEY__', encodeURIComponent(cfg.formKey)),
+            dataType: 'json', headers: {Accept: 'application/json'}, timeout: 20000, cache: false});
     }
-
-    const saveLocalDebounced  = debounce(saveLocal, 250);
-    const saveServerDebounced = debounce(function(){ ajaxSaveDraft(readValues()); }, 800);
-
-    $(function(){
-        ajaxGetDraft();
+    async function initialize() {
         try {
-            const rawLocal = localStorage.getItem(storageKey);
-            if (rawLocal) {
-                const obj = JSON.parse(rawLocal);
-                if (obj && obj.data) writeValues(obj.data);
-            }
-        } catch(e){}
-
-        selectorRoot.on('input change', fieldSelector, function(){
-            saveLocalDebounced();
-            saveServerDebounced();
-        });
-
-        $('#resetFormBtn').on('click', function(e){
-            e.preventDefault();
-
-            const excludeNames = [
-                'keyword',
-                'GDichVien',
-                'DiaDanh',
-                '_token',
-                'NgayGiaoDich',
-                'NgayThangNam',
-                'branch'
-            ];
-
-            try {
-                try { localStorage.removeItem(storageKey); } catch(e){}
-
-                $.ajax({
-                    url: saveUrl,
-                    method: 'POST',
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data: { form_key: formKey, payload: JSON.stringify({}) }
-                });
-
-                selectorRoot.find(fieldSelector).each(function(){
-                    const name = this.name || this.id || '';
-                    if (!name) return;
-                    if (excludeNames.includes(name)) return;
-
-                    if (this.type === 'checkbox' || this.type === 'radio') {
-                        $(this).prop('checked', false).trigger('change');
-                        return;
-                    }
-
-                    if (this.tagName && this.tagName.toLowerCase() === 'select') {
-                        const $sel = $(this);
-                        let idxToSelect = 0;
-                        $sel.find('option').each(function(idx){
-                            if (!$(this).prop('disabled')) { idxToSelect = idx; return false; }
-                        });
-                        $sel.prop('selectedIndex', idxToSelect).trigger('change');
-                        return;
-                    }
-
-                    $(this).val('').trigger('change');
-                });
-
-            } catch (err) {
-                console.error('Lỗi khi làm mới biểu mẫu:', err);
-                alert('Không thể làm mới biểu mẫu! Vui lòng thử lại.');
-            }
-        });
-
-        selectorRoot.on('submit', function(){
-            localStorage.removeItem(storageKey);
-            $.ajax({
-                url: saveUrl,
-                method: 'POST',
-                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                data: { form_key: formKey, payload: JSON.stringify({}) }
-            });
-        });
-
-        $('#print_form').on('click', function () {
-            const $btn = $(this);
-            $btn.prop('disabled', true);
-
-            saveDraftNow(function(ok){
-                setTimeout(()=> $btn.prop('disabled', false), 200);
-                if (ok) {
-                    console.log('Draft saved (print click).');
+            const server = await getServer();
+            const previousRevision = local?.revision;
+            queue.revision = server.revision;
+            loaded = true;
+            if (edited || local?.dirty) {
+                queue.enqueue(readFields(fields()));
+                if (local?.dirty && previousRevision !== server.revision && !(previousRevision == null && server.revision === 'missing')) {
+                    queue.blocked = true;
+                    status('conflict');
                 } else {
-                    console.warn('Draft save may have failed before print.');
+                    store(queue.pending, true, queue.revision);
+                    queue.blocked = false;
+                    await queue.flush();
                 }
-            });
-        });
-    });
-
-    function saveDraftNow(callback) {
-        const data = (typeof readValues === 'function') ? readValues() : null;
-
-        try {
-            localStorage.setItem(storageKey, JSON.stringify({
-                saved_at: (new Date()).toISOString(),
-                data
-            }));
-        } catch(e){}
-
-        const csrf = $('meta[name="csrf-token"]').attr('content');
-
-        if (navigator && typeof navigator.sendBeacon === 'function') {
-            try {
-                const fd = new FormData();
-                fd.append('form_key', formKey);
-                fd.append('payload', JSON.stringify(data));
-                if (csrf) fd.append('_token', csrf);
-
-                const ok = navigator.sendBeacon(saveUrl, fd);
-                if (callback) callback(ok);
-                return;
-            } catch(e){}
-        }
-
-        $.ajax({
-            url: saveUrl,
-            method: 'POST',
-            headers: {'X-CSRF-TOKEN': csrf},
-            data: { form_key: formKey, payload: JSON.stringify(data) },
-            success: function(res){ if (callback) callback(true, res); },
-            error: function(xhr){ if (callback) callback(false, xhr); }
-        });
+            } else {
+                apply(server.payload);
+                store(readFields(fields()), false, server.revision);
+                queue.blocked = false;
+                status('saved');
+            }
+        } catch (_) { status('error'); }
     }
-
-})(jQuery);
+    try {
+        const cached = JSON.parse(localStorage.getItem(storageKey));
+        if (cached && cached.data && typeof cached.data === 'object') {
+            local = cached;
+            // Old drafts have no reliable revision; preserve for explicit choice.
+            local.dirty = cached.dirty ?? true;
+            const payload = {...local.data};
+            // The deferred module may start after the user has focused and typed.
+            if (focusedBeforeRestore) {
+                const name = focusedBeforeRestore.name || focusedBeforeRestore.id;
+                payload[name] = initialValues[name];
+                local.dirty = true;
+            }
+            apply(payload);
+        }
+    } catch (_) { /* Bad local data must not prevent opening the form. */ }
+    $(form).on('input change', 'input, textarea, select', function (event) {
+        if (fields().includes(event.target)) changed();
+    });
+    $('#resetFormBtn').on('click', function (event) {
+        event.preventDefault();
+        applying = true;
+        try {
+            const keep = ['GDichVien', 'DiaDanh', 'branch'];
+            fields().filter(field => !keep.includes(field.name)).forEach(field => {
+                if (field.type === 'checkbox' || field.type === 'radio') field.checked = false;
+                else if (field.tagName === 'SELECT') field.selectedIndex = Array.from(field.options).findIndex(option => !option.disabled);
+                else field.value = '';
+                $(field).trigger('change');
+            });
+        } finally { applying = false; }
+        legacyWarning = false;
+        changed();
+        queue.flush();
+    });
+    $('#print_form').on('click', function () {
+        // Printing keeps the draft and uses the same ordered queue.
+        changed();
+        queue.flush();
+    });
+    $('#draftRetry').on('click', async function () {
+        if (resolving || queue.inFlight) return;
+        resolving = true;
+        try {
+            if (!loaded) await initialize();
+            else { queue.blocked = false; await queue.flush(); }
+        } finally { resolving = false; }
+    });
+    $('#draftLoadServer, #draftKeepLocal').on('click', async function () {
+        if (resolving || queue.inFlight) return;
+        const useServer = this.id === 'draftLoadServer';
+        if (useServer && !window.confirm('Thay nội dung đang nhập bằng bản nháp trên máy chủ?')) return;
+        resolving = true;
+        $('#draftLoadServer, #draftKeepLocal').prop('disabled', true);
+        const snapshot = JSON.stringify(readFields(fields()));
+        try {
+            const server = await getServer();
+            if (useServer && snapshot !== JSON.stringify(readFields(fields()))) { status('conflict'); return; }
+            queue.revision = server.revision;
+            queue.blocked = false;
+            if (useServer) {
+                queue.pending = null;
+                apply(server.payload);
+                edited = false;
+                store(readFields(fields()), false, queue.revision);
+                status('saved');
+            } else {
+                queue.enqueue(readFields(fields()));
+                store(queue.pending, true, queue.revision);
+                await queue.flush();
+            }
+        } catch (_) { status('error'); }
+        finally { resolving = false; $('#draftLoadServer, #draftKeepLocal').prop('disabled', false); }
+    });
+    window.addEventListener('online', () => { if (state === 'error') $('#draftRetry').trigger('click'); });
+    window.addEventListener('pagehide', () => {
+        if (queue.pending !== null || queue.inFlight) store(readFields(fields()), true, queue.revision);
+    });
+    status('loading');
+    initialize();
+});

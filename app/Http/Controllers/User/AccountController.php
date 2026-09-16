@@ -30,8 +30,6 @@ class AccountController extends Controller
         }
     }
     public function view_data_account(){
-        $data = AccountInfo::select('id', 'idxacno', 'custseq', 'custnm','stscd') 
-            ->paginate(10); // Hiển thị 10 tài khoản mỗi trang;
         $fields = [
             'idxacno'       => 'Mã tài khoản',
             'custseq'       => 'Mã khách hàng',
@@ -60,7 +58,7 @@ class AccountController extends Controller
             'add_addr3' => 'Địa chỉ cấp 3',
             'add_addrfull' => 'Địa chỉ đầy đủ',
         ];
-        return view('user.page.view_data_account', compact('data', 'fields', 'add_fields'));
+        return view('user.page.view_data_account', compact('fields', 'add_fields'));
     }
     public function uploadfile_account(Request $request){
         ini_set('max_execution_time', 9000); // = 5 phút
@@ -179,4 +177,3 @@ class AccountController extends Controller
         }
     }
 }
-

@@ -14,6 +14,9 @@ class TenantDatabase
 
         // Kiểm tra xem user đã đăng nhập chưa
         if (EMPTY(session()->has('user_id'))) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Phiên đăng nhập đã hết. Vui lòng đăng nhập lại.'], 401);
+            }
             return redirect()->route('login');
         }
 

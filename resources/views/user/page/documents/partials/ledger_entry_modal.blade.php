@@ -16,13 +16,18 @@
                     <div class="list-group mt-2" id="ledgerCandidates" aria-live="polite"></div>
                 </div>
                 <div class="ledger-entry-context mb-3" id="ledgerSelectedDocument" role="status"></div>
+                <div class="alert alert-warning small d-none" id="ledgerCheckNotice" role="status"></div>
                 <div class="alert alert-warning small d-none" id="ledgerMetadataNotice">Văn bản do người khác đăng tải: nội dung bên dưới chỉ để đối chiếu. Bạn vẫn có thể chỉnh số và ngày vào sổ của chi nhánh mình.</div>
                 <section class="ledger-entry-section">
                     <h6 class="ledger-section-title"><span>01</span> Số và ngày vào sổ</h6>
                     <div class="form-row">
-                        <div class="form-group col-md-4"><label for="entryBook">Loại sổ</label><select id="entryBook" name="book" class="form-control">@foreach($bookLabels as $key=>$label)<option value="{{ $key }}" @selected($key === $book)>{{ $label }}</option>@endforeach</select></div>
+                        <div class="form-group col-md-4 ledger-book-choice">
+                            <label for="entryBook"><i class="fas fa-book mr-1" aria-hidden="true"></i> Loại sổ</label>
+                            <select id="entryBook" name="book" class="form-control">@foreach($bookLabels as $key=>$label)<option value="{{ $key }}" @selected($key === $book)>{{ $label }}</option>@endforeach</select>
+                            <small id="entryBookCurrent"><i class="fas fa-check-circle mr-1" aria-hidden="true"></i> Đang chọn: {{ $bookLabels[$book] }}</small>
+                        </div>
                         <div class="form-group col-md-2"><label for="entryYear">Năm sổ <span class="text-danger">*</span></label><input id="entryYear" type="number" class="form-control" name="year" value="{{ $year }}" min="2000" max="2100" required></div>
-                        <div class="form-group col-md-3"><label for="entryNumber" id="entryNumberLabel">Số đến</label><input id="entryNumber" class="form-control" name="number" maxlength="50" placeholder="Trống: tự cấp số"></div>
+                        <div class="form-group col-md-3"><label for="entryNumber" id="entryNumberLabel">Số đến</label><input id="entryNumber" class="form-control" name="number" maxlength="50" value="{{ $book === 'incoming' ? $nextNumber : '' }}" placeholder="Đang lấy số tiếp theo…"></div>
                         <div class="form-group col-md-3"><label for="entryRegisteredDate"><span id="entryRegisteredLabel">Ngày tháng đến</span> <span class="text-danger">*</span></label><input id="entryRegisteredDate" class="form-control ledger-date" name="registered_date" placeholder="dd/mm/yyyy" required></div>
                     </div>
                     <div class="form-group mb-2"><label for="entryCode">Số &amp; ký hiệu văn bản <span class="text-danger">*</span></label><input id="entryCode" class="form-control" name="document_code" maxlength="255" required placeholder="Ví dụ: 123/NHNo.ĐT-TH"></div>
@@ -55,6 +60,7 @@
                 <small class="text-muted mr-auto">Chỉ lưu sổ, không tạo hoặc chỉnh sửa văn bản trong kho.</small>
                 <button class="btn btn-light border" data-dismiss="modal" type="button">Đóng</button>
                 <button class="btn btn-primary" id="ledgerSave" type="submit"><i class="fas fa-save mr-1"></i> Lưu vào sổ</button>
+                <button class="btn btn-outline-primary" id="ledgerSaveAndPrint" type="submit"><i class="fas fa-file-word mr-1" aria-hidden="true"></i> Lưu và tải phiếu trình</button>
             </div>
         </form>
     </div></div>
