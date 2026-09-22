@@ -1,19 +1,18 @@
-<ul class="navbar-nav  sidebar sidebar-dark accordion" id="accordionSidebar" style="background-color: #ae1c3f; 
-    background-size: cover;">
+<ul class="navbar-nav sidebar sidebar-dark accordion user-sidebar" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{route('index')}}">
         <div class="sidebar-brand-icon ">
-            <img src="{{asset('hp-logo.png')}}" alt="" style="height: 50px">
+            <img src="{{asset('hp-logo.png')}}" alt="Agribank" style="height: 50px">
         </div>
-        <div class="sidebar-brand-text mx-3">User Service</div>
+        <div class="sidebar-brand-text mx-3">Hỗ trợ nghiệp vụ</div>
     </a>
 
     <!-- Divider -->
     <hr class="sidebar-divider my-0">
 
     <!-- Nav Item - Dashboard -->
-    <li class="nav-item active">
+    <li class="nav-item {{ request()->routeIs('index', 'user') ? 'active' : '' }}">
         <a class="nav-link" href="{{route('index')}}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Trang Chủ</span></a>

@@ -14,12 +14,11 @@ return new class extends Migration
         Schema::create('form_drafts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('form_key')->nullable();
+            $table->string('form_key', 100);
             $table->json('payload')->nullable();
             $table->timestamps();
 
-            $table->unique(['user_id','form_key']);
-            $table->index('form_key');
+            $table->unique('user_id');
         });
     }
 

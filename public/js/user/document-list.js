@@ -1,6 +1,10 @@
 $(document).ready(function () {
     var quickDocumentId = null;
     var quickEditDatePickers = {};
+    var documentFilterPickers = {};
+    var selectedDirection = '';
+    var filterReloadTimer = null;
+    var dateConstraintTimer = null;
 
     $.ajaxSetup({
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
@@ -8,9 +12,10 @@ $(document).ready(function () {
 
     function formatDocumentDate(value) {
         if (!value) return '-';
-
-        var match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
-        return match ? match[3] + '/' + match[2] + '/' + match[1] : value;
+        var dateOnly = String(value).split('T')[0].split(' ')[0];
+        var parts = dateOnly.split('-');
+        if (parts.length >= 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+        return value;
     }
 
     function escapeHtml(value) {
@@ -41,28 +46,87 @@ $(document).ready(function () {
         return !value || !!isoDate;
     }
 
-    function initFlatpickrDatePicker(displaySelector, hiddenName) {
-        return flatpickr(displaySelector, {
+    function dateFeedback(displaySelector) {
+        var feedbackId = $(displaySelector).attr('aria-describedby');
+        return feedbackId ? $('#' + feedbackId) : $();
+    }
+
+    function clearDateError(displaySelector) {
+        $(displaySelector).removeClass('is-invalid').removeAttr('aria-invalid');
+        dateFeedback(displaySelector).removeClass('d-block');
+    }
+
+    function markDateError(displaySelector) {
+        $(displaySelector).addClass('is-invalid').attr('aria-invalid', 'true');
+        dateFeedback(displaySelector).addClass('d-block');
+    }
+
+    function showDateConstraintStatus(message) {
+        window.clearTimeout(dateConstraintTimer);
+        $('#documentDateConstraintStatus').text(message).removeClass('d-none');
+        dateConstraintTimer = window.setTimeout(function () {
+            $('#documentDateConstraintStatus').addClass('d-none').text('');
+        }, 4000);
+    }
+
+    function syncDatePickerLimits() {
+        if (!documentFilterPickers.to) return;
+        var from = toIsoDate($('#document_date_from_display').val()) || '';
+        var minDate = from ? flatpickr.parseDate(from, 'Y-m-d') : null;
+        documentFilterPickers.to.set('minDate', minDate);
+    }
+
+    function validateDateField(displaySelector, hiddenName) {
+        if (!syncDateFilter(displaySelector, hiddenName)) {
+            markDateError(displaySelector);
+            return false;
+        }
+
+        clearDateError(displaySelector);
+        return true;
+    }
+
+    function normalizeDateRange() {
+        syncDatePickerLimits();
+        var filters = collectFilters();
+        if (!filters.dateFrom || !filters.dateTo || filters.dateFrom <= filters.dateTo) return;
+
+        setDateFilter('to', filters.dateFrom);
+        clearDateError('#document_date_to_display');
+        showDateConstraintStatus('Ngày kết thúc đã được điều chỉnh bằng ngày bắt đầu.');
+    }
+
+    function initFlatpickrDatePicker(displaySelector, hiddenName, pickerSelector, buttonSelector) {
+        return flatpickr(pickerSelector, {
             locale: flatpickr.l10ns.vn,
-            dateFormat: 'd/m/Y',
-            allowInput: true,
+            dateFormat: 'Y-m-d',
+            allowInput: false,
             disableMobile: true,
-            clickOpens: true,
+            clickOpens: false,
+            positionElement: document.querySelector(buttonSelector),
             monthSelectorType: 'dropdown',
-            onChange: function (selectedDates, dateText) {
-                var isoDate = selectedDates.length
-                    ? flatpickr.formatDate(selectedDates[0], 'Y-m-d')
-                    : toIsoDate(dateText);
-                $('input[name="' + hiddenName + '"]').val(isoDate || '');
-            },
-            onClose: function () {
-                syncDateFilter(displaySelector, hiddenName);
+            onChange: function (selectedDates) {
+                var isoDate = selectedDates.length ? flatpickr.formatDate(selectedDates[0], 'Y-m-d') : '';
+                $(displaySelector).val(isoDate ? formatDocumentDate(isoDate) : '');
+                $('input[name="' + hiddenName + '"]').val(isoDate);
+                clearDateError(displaySelector);
+                normalizeDateRange();
             }
         });
     }
 
-    initFlatpickrDatePicker('#document_date_from_display', 'date_from');
-    initFlatpickrDatePicker('#document_date_to_display', 'date_to');
+    documentFilterPickers.from = initFlatpickrDatePicker(
+        '#document_date_from_display',
+        'date_from',
+        '#document_date_from_picker',
+        '[data-picker-target="document_date_from_picker"]'
+    );
+    documentFilterPickers.to = initFlatpickrDatePicker(
+        '#document_date_to_display',
+        'date_to',
+        '#document_date_to_picker',
+        '[data-picker-target="document_date_to_picker"]'
+    );
 
     document.querySelectorAll('.quick-edit-date-picker').forEach(function (input) {
         quickEditDatePickers[input.name] = flatpickr(input, {
@@ -118,7 +182,7 @@ $(document).ready(function () {
         toggleQuickEditDirectionFields(this.value);
     });
 
-    $('.document-date-input').on('input', function () {
+    function handleDocumentDateInput() {
         var digits = this.value.replace(/\D/g, '').slice(0, 8);
         if (digits.length > 4) {
             this.value = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
@@ -127,12 +191,170 @@ $(document).ready(function () {
         } else {
             this.value = digits;
         }
+
+        var displaySelector = '#' + this.id;
+        var isoDate = toIsoDate(this.value);
+        if (this.value.length === 10 && !isoDate) {
+            markDateError(displaySelector);
+            return;
+        }
+
+        clearDateError(displaySelector);
+        if (isoDate) {
+            $('input[name="' + $(this).attr('data-date-filter') + '"]').val(isoDate);
+            normalizeDateRange();
+        }
+    }
+
+    $('.document-date-input').on('input', handleDocumentDateInput);
+
+    $('.document-date-input').on('blur', function () {
+        var displaySelector = '#' + this.id;
+        var hiddenName = $(this).attr('data-date-filter');
+        if (validateDateField(displaySelector, hiddenName)) normalizeDateRange();
     });
 
     $('.flatpickr-date-button').on('click', function () {
-        var input = document.getElementById($(this).data('target'));
+        var input = document.getElementById($(this).attr('data-picker-target'));
+        syncDatePickerLimits();
         if (input && input._flatpickr) input._flatpickr.open();
     });
+
+    function directionLabel(direction) {
+        return {
+            incoming: 'Văn bản đến',
+            outgoing: 'Văn bản đi',
+            decision: 'Quyết định',
+            unclassified: 'Chưa phân loại'
+        }[direction] || 'Tất cả văn bản';
+    }
+
+    function setDirectionFilter(direction) {
+        var allowed = ['', 'incoming', 'outgoing', 'decision', 'unclassified'];
+        selectedDirection = allowed.indexOf(direction) >= 0 ? direction : '';
+        $('.document-kind-tab').removeClass('active').attr('aria-pressed', 'false');
+        $('.document-kind-tab').filter(function () {
+            return $(this).attr('data-direction') === selectedDirection;
+        }).addClass('active').attr('aria-pressed', 'true');
+        $('#documentKindLabel').text(directionLabel(selectedDirection));
+    }
+
+    function setDateFilter(name, value) {
+        var picker = documentFilterPickers[name];
+        var hiddenName = name === 'from' ? 'date_from' : 'date_to';
+        var displaySelector = name === 'from' ? '#document_date_from_display' : '#document_date_to_display';
+        if (!value) {
+            picker.clear(false);
+            $(displaySelector).val('');
+            $('input[name="' + hiddenName + '"]').val('');
+            clearDateError(displaySelector);
+            syncDatePickerLimits();
+            return;
+        }
+        picker.setDate(value, false, 'Y-m-d');
+        $(displaySelector).val(formatDocumentDate(value));
+        $('input[name="' + hiddenName + '"]').val(value);
+        clearDateError(displaySelector);
+        syncDatePickerLimits();
+    }
+
+    function restoreFiltersFromUrl() {
+        var params = new URLSearchParams(window.location.search);
+        var keyword = params.get('keyword') || '';
+        var readStatus = params.get('is_read');
+        var from = params.get('date_from') || '';
+        var to = params.get('date_to') || '';
+
+        $('#documentKeyword').val(keyword);
+        $('#documentReadStatus').val(readStatus === '0' || readStatus === '1' ? readStatus : '');
+        if (/^\d{4}-\d{2}-\d{2}$/.test(from)) setDateFilter('from', from);
+        if (/^\d{4}-\d{2}-\d{2}$/.test(to)) setDateFilter('to', to);
+        normalizeDateRange();
+        setDirectionFilter(params.get('direction') || '');
+    }
+
+    function collectFilters() {
+        return {
+            direction: selectedDirection,
+            keyword: $('#documentKeyword').val().trim(),
+            dateFrom: toIsoDate($('#document_date_from_display').val()) || '',
+            dateTo: toIsoDate($('#document_date_to_display').val()) || '',
+            readStatus: $('#documentReadStatus').val()
+        };
+    }
+
+    function filterChip(key, label) {
+        return '<button type="button" class="document-filter-chip" data-filter="' + key + '" title="Bỏ bộ lọc này">'
+            + escapeHtml(label) + '<i class="fas fa-times" aria-hidden="true"></i></button>';
+    }
+
+    function updateFilterUi() {
+        var filters = collectFilters();
+        var chips = [];
+        if (filters.direction) chips.push(filterChip('direction', directionLabel(filters.direction)));
+        if (filters.keyword) chips.push(filterChip('keyword', 'Số/KH: ' + filters.keyword));
+        if (filters.dateFrom || filters.dateTo) {
+            var fromLabel = formatDocumentDate(filters.dateFrom) || '…';
+            var toLabel = formatDocumentDate(filters.dateTo) || '…';
+            chips.push(filterChip('date', 'Ngày VB: ' + fromLabel + ' – ' + toLabel));
+        }
+        if (filters.readStatus !== '') chips.push(filterChip('read', filters.readStatus === '0' ? 'Chưa đọc' : 'Đã đọc'));
+
+        $('#activeFilterChips').html(chips.join(''));
+        $('#activeFilterBar').toggleClass('d-none', chips.length === 0);
+        $('#btnResetFilter').toggleClass('d-none', chips.length === 0);
+        $('#clearDocumentKeywordWrap').toggleClass('d-none', !filters.keyword);
+    }
+
+    function syncFilterUrl(resetPaging) {
+        var filters = collectFilters();
+        var url = new URL(window.location.href);
+        ['direction', 'keyword', 'date_from', 'date_to', 'is_read'].forEach(function (key) { url.searchParams.delete(key); });
+        if (resetPaging) url.searchParams.delete('page');
+        if (filters.direction) url.searchParams.set('direction', filters.direction);
+        if (filters.keyword) url.searchParams.set('keyword', filters.keyword);
+        if (filters.dateFrom) url.searchParams.set('date_from', filters.dateFrom);
+        if (filters.dateTo) url.searchParams.set('date_to', filters.dateTo);
+        if (filters.readStatus !== '') url.searchParams.set('is_read', filters.readStatus);
+        window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+    }
+
+    restoreFiltersFromUrl();
+
+    function tableStateFromUrl() {
+        var params = new URLSearchParams(window.location.search);
+        var columnsByName = {id: 0, direction: 1, document_code: 2, title: 3, issued_date: 4};
+        var page = Math.max(1, Number.parseInt(params.get('page') || '1', 10) || 1);
+        var requestedLength = Number.parseInt(params.get('length') || '', 10);
+        var length = [10, 30, 50, 100].includes(requestedLength) ? requestedLength : 30;
+        var sortName = params.get('sort');
+        var sortDirection = params.get('dir') === 'asc' ? 'asc' : 'desc';
+        var hasFilterState = ['direction', 'keyword', 'date_from', 'date_to', 'is_read']
+            .some(function (key) { return params.has(key); });
+
+        return {
+            hasPage: params.has('page') || hasFilterState,
+            hasLength: params.has('length'),
+            hasOrder: Object.prototype.hasOwnProperty.call(columnsByName, sortName),
+            start: (page - 1) * length,
+            length: length,
+            order: [[columnsByName[sortName] ?? 4, sortDirection]]
+        };
+    }
+
+    var initialTableState = tableStateFromUrl();
+
+    function syncTableUrl(api) {
+        var info = api.page.info();
+        var order = api.order()[0] || [4, 'desc'];
+        var sortNames = ['id', 'direction', 'document_code', 'title', 'issued_date'];
+        var url = new URL(window.location.href);
+        url.searchParams.set('page', String(info.page + 1));
+        url.searchParams.set('length', String(info.length));
+        url.searchParams.set('sort', sortNames[Number(order[0])] || 'issued_date');
+        url.searchParams.set('dir', order[1] === 'asc' ? 'asc' : 'desc');
+        window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+    }
 
     function documentCodeColumn() {
         return {
@@ -248,23 +470,35 @@ $(document).ready(function () {
         actionColumn()
     ];
 
-    var selectedDirection = '';
     var table = $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
+        searching: false,
+        stateSave: true,
+        stateDuration: -1,
+        deferRender: true,
         orderMulti: false,
-        pageLength: 30,
+        pageLength: initialTableState.length,
+        displayStart: initialTableState.start,
         lengthMenu: [10, 30, 50, 100],
         ajax: {
-            url: '/api/documents',
-            type: 'GET',
-            data: function (d) {
-                // Thêm tham số bộ lọc vào query string
-                d.keyword = $('input[name="keyword"]').val();
-                d.direction = selectedDirection;
-                d.issued_date_from = $('input[name="date_from"]').val();
-                d.issued_date_to = $('input[name="date_to"]').val();
-                d.is_read = $('select[name="is_read"]').val();
+                url: '/api/documents',
+                type: 'GET',
+                data: function (d) {
+                    var filters = collectFilters();
+                    // Thêm tham số bộ lọc vào query string
+                    d.keyword = filters.keyword;
+                    d.direction = selectedDirection;
+                    d.issued_date_from = filters.dateFrom;
+                    d.issued_date_to = filters.dateTo;
+                    d.is_read = filters.readStatus;
+                // Tìm kiếm dùng ô tra cứu riêng; không để từ khóa DataTables cũ
+                // trong localStorage âm thầm tiếp tục lọc kết quả.
+                if (d.search) d.search.value = '';
+            },
+            error: function () {
+                $('#documentResultCount').removeClass('is-loading').html('<i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i> Không tải được');
+                Swal.fire('Không tải được danh sách', 'Hãy kiểm tra kết nối rồi thử lại.', 'error');
             }
         },
         columns: columns,
@@ -289,15 +523,28 @@ $(document).ready(function () {
                 sortDescending: ": sắp xếp giảm dần"
             }
         },
-        order: [[4, 'desc']]
+        order: initialTableState.order,
+        stateSaveParams: function (settings, data) {
+            if (data.search) data.search.search = '';
+            data.documentFilters = collectFilters();
+        },
+        stateLoadParams: function (settings, data) {
+            if (data.search) data.search.search = '';
+            if (initialTableState.hasPage) data.start = initialTableState.start;
+            if (initialTableState.hasLength || initialTableState.hasPage) data.length = initialTableState.length;
+            if (initialTableState.hasOrder) data.order = initialTableState.order;
+        },
+        drawCallback: function () {
+            var info = this.api().page.info();
+            $('#documentResultCount').removeClass('is-loading').text(Number(info.recordsDisplay).toLocaleString('vi-VN') + ' văn bản');
+            updateFilterUi();
+            syncTableUrl(this.api());
+        }
     });
 
     $('.document-kind-tab').on('click', function () {
-        selectedDirection = $(this).attr('data-direction');
-        $('.document-kind-tab').removeClass('active').attr('aria-pressed', 'false');
-        $(this).addClass('active').attr('aria-pressed', 'true');
-        $('#documentKindLabel').text(selectedDirection ? $(this).find('span').text() : 'Tất cả văn bản');
-        table.ajax.reload();
+        setDirectionFilter($(this).attr('data-direction'));
+        applyFilters(true);
     });
     $('#filterForm').on('submit', function (event) {
         event.preventDefault();
@@ -436,26 +683,89 @@ $(document).ready(function () {
         });
     });
 
-    // Bắt sự kiện bấm nút Tra cứu
-    $('#btnFilter').click(function () {
-        var fromDateValid = syncDateFilter('#document_date_from_display', 'date_from');
-        var toDateValid = syncDateFilter('#document_date_to_display', 'date_to');
+    function applyFilters(resetPaging) {
+        window.clearTimeout(filterReloadTimer);
+        var fromDateValid = validateDateField('#document_date_from_display', 'date_from');
+        var toDateValid = validateDateField('#document_date_to_display', 'date_to');
 
         if (!fromDateValid || !toDateValid) {
-            Swal.fire('Ngày không hợp lệ', 'Vui lòng nhập ngày theo định dạng dd/mm/yyyy.', 'warning');
+            $('.document-date-input.is-invalid').first().trigger('focus');
+            return false;
+        }
+
+        normalizeDateRange();
+
+        syncFilterUrl(resetPaging !== false);
+        updateFilterUi();
+        table.ajax.reload(null, resetPaging !== false);
+        return true;
+    }
+
+    function scheduleFilter() {
+        window.clearTimeout(filterReloadTimer);
+        filterReloadTimer = window.setTimeout(function () { applyFilters(true); }, 550);
+    }
+
+    function setPresetRange(range) {
+        if (range === 'clear') {
+            setDateFilter('from', '');
+            setDateFilter('to', '');
+            applyFilters(true);
             return;
         }
 
-        table.ajax.reload();
+        var end = new Date();
+        var start = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+        if (range === '7days') start.setDate(start.getDate() - 6);
+        if (range === 'month') start = new Date(end.getFullYear(), end.getMonth(), 1);
+        setDateFilter('from', flatpickr.formatDate(start, 'Y-m-d'));
+        setDateFilter('to', flatpickr.formatDate(end, 'Y-m-d'));
+        applyFilters(true);
+    }
+
+    $('#btnFilter').on('click', function () { applyFilters(true); });
+
+    $('#documentKeyword').on('input', function () {
+        $('#clearDocumentKeywordWrap').toggleClass('d-none', !this.value.trim());
+        scheduleFilter();
     });
 
-    // Tìm kiếm khi nhấn Enter trong ô keyword
-    $('input[name="keyword"]').keypress(function (e) {
-        if (e.which == 13) {
-            e.preventDefault();
-            table.ajax.reload();
-        }
+    $('#clearDocumentKeyword').on('click', function () {
+        $('#documentKeyword').val('').trigger('focus');
+        applyFilters(true);
     });
+
+    $('#documentReadStatus').on('change', function () { applyFilters(true); });
+
+    $('.document-date-preset').on('click', function () { setPresetRange($(this).data('range')); });
+
+    $('#activeFilterChips').on('click', '.document-filter-chip', function () {
+        var filter = $(this).data('filter');
+        if (filter === 'direction') setDirectionFilter('');
+        if (filter === 'keyword') $('#documentKeyword').val('');
+        if (filter === 'date') { setDateFilter('from', ''); setDateFilter('to', ''); }
+        if (filter === 'read') $('#documentReadStatus').val('');
+        applyFilters(true);
+    });
+
+    $('#btnResetFilter').on('click', function () {
+        window.clearTimeout(filterReloadTimer);
+        setDirectionFilter('');
+        $('#documentKeyword').val('');
+        $('#documentReadStatus').val('');
+        setDateFilter('from', '');
+        setDateFilter('to', '');
+        applyFilters(true);
+    });
+
+    table.on('processing.dt', function (event, settings, processing) {
+        $('#btnFilter').prop('disabled', processing).html(processing
+            ? '<i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i> Đang lọc'
+            : '<i class="fas fa-search mr-1" aria-hidden="true"></i> Tra cứu');
+        if (processing) $('#documentResultCount').addClass('is-loading').html('<i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i> Đang tải');
+    });
+
+    updateFilterUi();
 
     function refreshDocumentExportForm() {
         var periodType = $('.export-period-radio:checked').val() || 'month';
@@ -475,15 +785,4 @@ $(document).ready(function () {
     $('#documentExportModal').on('show.bs.modal', refreshDocumentExportForm);
     refreshDocumentExportForm();
 
-    $('#documentExportForm').on('submit', function () {
-        var button = $('#documentExportSubmit');
-        var original = button.html();
-        button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang tạo file...');
-
-        // Tải file dùng form thường để trình duyệt ghi trực tiếp xuống đĩa,
-        // không gom toàn bộ workbook vào bộ nhớ JavaScript.
-        window.setTimeout(function () {
-            button.prop('disabled', false).html(original);
-        }, 5000);
-    });
 });

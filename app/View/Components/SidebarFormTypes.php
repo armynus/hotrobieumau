@@ -15,7 +15,7 @@ class SidebarFormTypes extends Component
         $this->formTypes = cache()->remember('form_types', 30, function () {
             return FormType::all();
         });
-        $this->isMenuOpen = request()->routeIs('support_forms.index', 'support_forms.show');
+        $this->isMenuOpen = request()->routeIs('support_forms.*');
         
     }
 

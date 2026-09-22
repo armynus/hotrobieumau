@@ -1,5 +1,8 @@
 
 <script>
+    const formFieldGroupLabels = @json($content_groups);
+    const formFieldGroupLabel = key => formFieldGroupLabels[key] || formFieldGroupLabels.transaction;
+
     $(document).ready(function(){
         $('#addFormField').click(function(){
             var _token = $('input[name="_token"]').val();
@@ -8,8 +11,10 @@
             var placeholder = $('#placeholder').val();
             var value = $('#value').val();
             var data_type = $('#data_type').val();
+            var content_group = $('#content_group').val();
+            var display_order = $('#display_order').val();
 
-            if (!field_name || !field_code || !data_type) {
+            if (!field_name || !field_code || !data_type || !content_group || display_order === '') {
                 swal("Vui lòng nhập đầy đủ thông tin!", { icon: "error" });
                 return;
             }
@@ -24,6 +29,8 @@
                     placeholder: placeholder,
                     value: value,
                     data_type: data_type,
+                    content_group: content_group,
+                    display_order: display_order,
                 },
                 success: function (data) {
                     if (data.status) {
@@ -34,6 +41,8 @@
                                 data.form_field.id,
                                 data.form_field.field_name,
                                 data.form_field.field_code,
+                                formFieldGroupLabel(data.form_field.content_group),
+                                data.form_field.display_order,
                                 data.form_field.data_type,
                                 data.form_field.placeholder || '',
                                 data.form_field.value || '',
@@ -65,6 +74,8 @@
                                     <td>${data.form_field.id}</td>
                                     <td>${data.form_field.field_name}</td>
                                     <td>${data.form_field.field_code}</td>
+                                    <td>${formFieldGroupLabel(data.form_field.content_group)}</td>
+                                    <td class="text-center">${data.form_field.display_order}</td>
                                     <td>${data.form_field.data_type}</td>
                                     <td>${data.form_field.placeholder || ''}</td>
                                     <td>${data.form_field.value || ''}</td>
@@ -95,7 +106,9 @@
                         swal("Thành công!", data.message, { icon: "success" });
 
                         // Reset form
-                        $('#field_name, #field_code, #placeholder, #data_type').val('');
+                        $('#field_name, #field_code, #placeholder, #value, #data_type').val('');
+                        $('#content_group').val('transaction');
+                        $('#display_order').val('0');
                         $('#close_button').click();
 
                     }
@@ -126,6 +139,8 @@
                     $('#edit_data_type').val(response.field.data_type);
                     $('#edit_placeholder').val(response.field.placeholder);
                     $('#edit_value').val(response.field.value);
+                    $('#edit_content_group').val(response.field.content_group);
+                    $('#edit_display_order').val(response.field.display_order);
                 },
                 error: function (error) {
                     console.error('Có lỗi xảy ra:', error);
@@ -142,8 +157,10 @@
             var data_type   = $('#edit_data_type').val();
             var placeholder = $('#edit_placeholder').val();
             var value       = $('#edit_value').val();
+            var content_group = $('#edit_content_group').val();
+            var display_order = $('#edit_display_order').val();
             var _token      = $('input[name="_token"]').val();
-            if (!field_name || !field_code || !data_type) {
+            if (!field_name || !field_code || !data_type || !content_group || display_order === '') {
                 swal("Vui lòng nhập đầy đủ thông tin!", { icon: "error" });
                 return;
             }
@@ -159,6 +176,8 @@
                     data_type: data_type,
                     placeholder: placeholder,
                     value: value,
+                    content_group: content_group,
+                    display_order: display_order,
                 },
                 success: function (response) {
                     if (!response.status) {
@@ -181,6 +200,8 @@
                             oldData[0], // Giữ nguyên ID cũ
                             updatedField.field_name,
                             updatedField.field_code,
+                            formFieldGroupLabel(updatedField.content_group),
+                            updatedField.display_order,
                             updatedField.data_type,
                             updatedField.placeholder || '', // Tránh undefined
                             updatedField.value || '', // Tránh undefined

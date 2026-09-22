@@ -153,8 +153,8 @@ class DocumentLedgerController extends Controller
                 || ($confirmation['expires_at'] ?? 0) < time())) {
                 throw ValidationException::withMessages(['file' => 'File hoặc lựa chọn đã thay đổi. Hãy kiểm tra trước khi xác nhận nhập.']);
             }
-            $rows = $reader->read($file->getRealPath(), $data['direction'], $sheets);
             $maxRows = max(100, (int) config('documents.ledger.web_import_max_rows', 5000));
+            $rows = $reader->read($file->getRealPath(), $data['direction'], $sheets, $maxRows);
             if (count($rows) > $maxRows) {
                 throw ValidationException::withMessages(['file' => "Sổ có hơn {$maxRows} dòng. Hãy tách file hoặc dùng lệnh import trên máy chủ."]);
             }

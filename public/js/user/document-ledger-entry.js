@@ -97,6 +97,14 @@ $(function () {
         bookFields();
         if (mode !== 'edit') {
             $('#entryNumber').val($('#entryBook').val() === 'incoming' ? page.data('next-number') : '');
+            if (mode === 'new') {
+                const today = flatpickr.formatDate(new Date(), 'Y-m-d');
+                dates.forEach(picker => {
+                    if (picker.element.name === 'registered_date' || picker.element.name === 'forwarded_date') {
+                        picker.setDate(today);
+                    }
+                });
+            }
             loadNextNumber(false);
         }
     }

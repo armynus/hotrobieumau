@@ -2,10 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\SupportFormUsage;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-
 class SupportFormService
 {
     public function wordSafe($value)
@@ -13,7 +9,7 @@ class SupportFormService
         $value = preg_replace(
             '/[\x00-\x08\x0B\x0C\x0E-\x1F]/u',
             '',
-            (string)$value
+            (string) $value
         );
 
         return htmlspecialchars(
@@ -22,123 +18,99 @@ class SupportFormService
             'UTF-8'
         );
     }
-    // Ham xu ly checkbox
-    public function updateCheckboxContentControl($docxPath, $tag, $isChecked) {
-        $zip = new \ZipArchive();
-        if ($zip->open($docxPath) !== true) {
-            throw new \Exception("Không thể mở file DOCX: " . $zip->getStatusString());
-        }
-    
-        // Đọc nội dung XML từ file DOCX
-        $xmlContent = $zip->getFromName('word/document.xml');
-        if ($xmlContent === false) {
-            $zip->close();
-            throw new \Exception("Không thể đọc file XML");
-        }
-    
-        // Load XML với DOMDocument
-        $dom = new \DOMDocument();
-        libxml_use_internal_errors(true);
-        $dom->loadXML($xmlContent);
-        libxml_clear_errors();
-    
-        // Tạo DOMXPath và đăng ký namespace
-        $xpath = new \DOMXPath($dom);
-        $xpath->registerNamespace('w', 'http://schemas.openxmlformats.org/wordprocessingml/2006/main');
-        $xpath->registerNamespace('w10', 'http://schemas.microsoft.com/office/word/2010/wordml');
-    
-        // Tìm các node <w:sdt> chứa checkbox với tag tương ứng
-        $query = "//w:sdt[.//w:tag[@w:val='{$tag}']]";
-        $sdtNodes = $xpath->query($query);
-        if ($sdtNodes === false || $sdtNodes->length === 0) {
-            $zip->close();
-            return; // Không ném lỗi nữa
-        }
-    
-        // Cập nhật thuộc tính checkbox (w14:checked)
-        foreach ($sdtNodes as $sdtNode) {
-            $checkedNodes = $xpath->query(".//w10:checked", $sdtNode);
-            if ($checkedNodes->length > 0) {
-                foreach ($checkedNodes as $checkedNode) {
-                    if ($checkedNode instanceof \DOMElement) {
-                        $checkedNode->setAttribute('w10:val', $isChecked ? '1' : '0');
-                    }
-                }
-            }
-    
-            // Cập nhật nội dung hiển thị bên trong w:sdtContent
-            $sdtContentNodes = $xpath->query(".//w:sdtContent", $sdtNode);
-            if ($sdtContentNodes->length > 0) {
-                foreach ($sdtContentNodes as $contentNode) {
-                    // Xóa tất cả các node con hiện có
-                    while ($contentNode->hasChildNodes()) {
-                        $contentNode->removeChild($contentNode->firstChild);
-                    }
-    
-                    // Tạo mới một w:r
-                    $w_ns = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
-                    $rNode = $dom->createElementNS($w_ns, 'w:r');
-    
-                    // (Tùy chọn) Tạo w:rPr nếu cần sao chép font, kích thước, vv.
-                    // Ở đây mình tạo một w:rPr cơ bản như ví dụ trong file gốc
-                    $rPrNode = $dom->createElementNS($w_ns, 'w:rPr');
-                    $rFontsNode = $dom->createElementNS($w_ns, 'w:rFonts');
-                    $rFontsNode->setAttribute('w:ascii', 'Times New Roman');
-                    $rFontsNode->setAttribute('w:hAnsi', 'Times New Roman');
-                    $rPrNode->appendChild($rFontsNode);
-                    $szNode = $dom->createElementNS($w_ns, 'w:sz');
-                    $szNode->setAttribute('w:val', '22');
-                    $rPrNode->appendChild($szNode);
-                    $szCsNode = $dom->createElementNS($w_ns, 'w:szCs');
-                    $szCsNode->setAttribute('w:val', '22');
-                    $rPrNode->appendChild($szCsNode);
-                    $rNode->appendChild($rPrNode);
-    
-                    if ($isChecked) {
-                        // Tạo node <w:sym> để hiển thị tick checkbox giống như khi click tay
-                        $symNode = $dom->createElementNS($w_ns, 'w:sym');
-                        $symNode->setAttribute('w:font', 'Wingdings 2');
-                        $symNode->setAttribute('w:char', 'F052');
-                        $rNode->appendChild($symNode);
-                    } else {
-                        // Khi không chọn, hiển thị ô vuông rỗng, có thể dùng <w:t>
-                        $tNode = $dom->createElementNS($w_ns, 'w:t', '☐');
-                        $rNode->appendChild($tNode);
-                    }
-    
-                    // Thêm w:r mới vào w:sdtContent
-                    $contentNode->appendChild($rNode);
-                }
-            }
-        }
-    
-        // Lưu lại nội dung XML đã cập nhật vào file DOCX
-        $updatedXml = $dom->saveXML();
-        $zip->deleteName('word/document.xml');
-        $zip->addFromString('word/document.xml', $updatedXml);
-        $zip->close();
+
+    public function updateCheckboxContentControl($docxPath, $tag, $isChecked)
+    {
+        $this->updateCheckboxContentControls($docxPath, [$tag => $isChecked]);
     }
-    
-    
-    
+
+    /** Update all checkbox controls in one ZIP/XML pass. */
+    public function updateCheckboxContentControls(string $docxPath, array $states): void
+    {
+        if ($states === []) {
+            return;
+        }
+        $zip = new \ZipArchive;
+        if ($zip->open($docxPath) !== true) {
+            throw new \RuntimeException('Không thể mở bản Word.');
+        }
+        $previousErrors = libxml_use_internal_errors(true);
+        try {
+            $xml = $zip->getFromName('word/document.xml');
+            $dom = new \DOMDocument;
+            if ($xml === false || ! $dom->loadXML($xml, LIBXML_NONET)) {
+                throw new \RuntimeException('Nội dung Word không hợp lệ.');
+            }
+            $w = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+            $w14 = 'http://schemas.microsoft.com/office/word/2010/wordml';
+            $xpath = new \DOMXPath($dom);
+            $xpath->registerNamespace('w', $w);
+            $xpath->registerNamespace('w14', $w14);
+            foreach ($xpath->query('//w:sdt') as $control) {
+                $tag = $xpath->query('./w:sdtPr/w:tag', $control)->item(0)?->getAttributeNS($w, 'val');
+                if ($tag === null || ! array_key_exists($tag, $states)) {
+                    continue;
+                }
+                $checked = (bool) $states[$tag];
+                foreach ($xpath->query('./w:sdtPr/w14:checkbox/w14:checked', $control) as $node) {
+                    $node->setAttributeNS($w14, 'w14:val', $checked ? '1' : '0');
+                }
+                foreach ($xpath->query('./w:sdtContent', $control) as $content) {
+                    // Keep the template's text formatting where available.
+                    $existingProperties = $xpath->query('.//w:rPr', $content)->item(0)?->cloneNode(true);
+                    while ($content->hasChildNodes()) {
+                        $content->removeChild($content->firstChild);
+                    }
+                    $run = $dom->createElementNS($w, 'w:r');
+                    if ($existingProperties) {
+                        $run->appendChild($existingProperties);
+                    }
+                    if ($checked) {
+                        $symbol = $dom->createElementNS($w, 'w:sym');
+                        $symbol->setAttributeNS($w, 'w:font', 'Wingdings 2');
+                        $symbol->setAttributeNS($w, 'w:char', 'F052');
+                        $run->appendChild($symbol);
+                    } else {
+                        $run->appendChild($dom->createElementNS($w, 'w:t', '☐'));
+                    }
+                    $content->appendChild($run);
+                }
+            }
+            if (! $zip->addFromString('word/document.xml', $dom->saveXML())) {
+                throw new \RuntimeException('Không ghi được checkbox Word.');
+            }
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousErrors);
+            $zip->close();
+        }
+    }
+
     public function convertDateFormat($date)
     {
         // Nếu date không tồn tại, trả về chuỗi trống
-        if (!$date) return '';
-        
+        if (! $date) {
+            return '';
+        }
+
         try {
             $timestamp = strtotime($date);
-            if ($timestamp === false) return '';
-            
+            if ($timestamp === false) {
+                return '';
+            }
+
             // Đảm bảo format luôn có đủ số 0
             return date('d/m/Y', $timestamp);
         } catch (\Exception $e) {
             return '';
         }
     }
+
     public function convertDateNowFormat($date)
     {
-        if (!$date) return '';
+        if (! $date) {
+            return '';
+        }
 
         $timestamp = strtotime($date);
         $day = date('d', $timestamp);
@@ -147,9 +119,12 @@ class SupportFormService
 
         return "ngày $day tháng $month năm $year";
     }
+
     public function convertDateNowFormatEng($date)
     {
-        if (!$date) return '';
+        if (! $date) {
+            return '';
+        }
 
         $timestamp = strtotime($date);
         $day = date('d', $timestamp);
@@ -158,9 +133,12 @@ class SupportFormService
 
         return "ngày (date) $day tháng (month) $month năm (year) $year";
     }
+
     public function convertDateNowFormatVietEng($date)
     {
-        if (!$date) return '';
+        if (! $date) {
+            return '';
+        }
 
         $timestamp = strtotime($date);
         $day = date('d', $timestamp);
@@ -169,9 +147,10 @@ class SupportFormService
 
         return "date $day month $month year $year";
     }
-    
-    public function convertToUppercaseWithoutAccents($string) {
-        $unwanted_array = array(
+
+    public function convertToUppercaseWithoutAccents($string)
+    {
+        $unwanted_array = [
             'à' => 'a', 'á' => 'a', 'ạ' => 'a', 'ả' => 'a', 'ã' => 'a',
             'â' => 'a', 'ầ' => 'a', 'ấ' => 'a', 'ậ' => 'a', 'ẩ' => 'a', 'ẫ' => 'a',
             'ă' => 'a', 'ằ' => 'a', 'ắ' => 'a', 'ặ' => 'a', 'ẳ' => 'a', 'ẵ' => 'a',
@@ -198,37 +177,48 @@ class SupportFormService
             'Ư' => 'U', 'Ừ' => 'U', 'Ứ' => 'U', 'Ự' => 'U', 'Ử' => 'U', 'Ữ' => 'U',
             'Ỳ' => 'Y', 'Ý' => 'Y', 'Ỵ' => 'Y', 'Ỷ' => 'Y', 'Ỹ' => 'Y',
             'Đ' => 'D',
-        );
+        ];
         $string = strtr($string, $unwanted_array); // Bỏ dấu tiếng Việt
+
         return strtoupper($string); // Chuyển thành chữ IN HOA
     }
-    public function createSquareBoxesString($string, $maxLength = 26) {
+
+    public function createSquareBoxesString($string, $maxLength = 26)
+    {
         // Giới hạn độ dài tối đa của chuỗi
         $string = mb_substr($string, 0, $maxLength);
         // Thêm khoảng trắng nếu chuỗi ngắn hơn 26 ký tự
         $string = str_pad($string, $maxLength);
+
         // Chèn ký tự phân tách giữa các chữ cái (ví dụ: khoảng trắng hoặc '▯')
         return implode(' ', mb_str_split($string));
     }
-    function formatNumber($number) {
+
+    public function formatNumber($number)
+    {
         // Chuyển giá trị về số, nếu không hợp lệ thì mặc định là 0
-        $number = is_numeric($number) ? (float)$number : 0;
-    
+        $number = is_numeric($number) ? (float) $number : 0;
+
         return number_format($number, 0, '', '.');
     }
-    function convertToUppercase($text) {
+
+    public function convertToUppercase($text)
+    {
         return mb_strtoupper($text, 'UTF-8');
     }
 
-    function convertDateToVariablesBirthDay($date) {
-        if (empty($date)) return [];
-    
+    public function convertDateToVariablesBirthDay($date)
+    {
+        if (empty($date)) {
+            return [];
+        }
+
         // Loại bỏ dấu "/"
         $dateStr = str_replace('/', '', $date);
-    
+
         // Đảm bảo đủ 8 ký tự, thiếu thì thêm "0"
         $paddedDate = str_pad($dateStr, 8, '0', STR_PAD_LEFT);
-    
+
         return [
             '1' => $paddedDate[0] === '0' ? '0 ' : $paddedDate[0],
             '2' => $paddedDate[1] === '0' ? '0 ' : $paddedDate[1],
@@ -240,15 +230,19 @@ class SupportFormService
             '8' => $paddedDate[7] === '0' ? '0 ' : $paddedDate[7],
         ];
     }
-    function convertDateToVariablesIdentity($date) {
-        if (empty($date)) return [];
-    
+
+    public function convertDateToVariablesIdentity($date)
+    {
+        if (empty($date)) {
+            return [];
+        }
+
         // Loại bỏ dấu "/" trong chuỗi date
         $dateStr = str_replace('/', '', $date);
-        
+
         // Đảm bảo chuỗi có đủ 8 ký tự, nếu thiếu thì thêm "0" phía trước
         $paddedDate = str_pad($dateStr, 8, '0', STR_PAD_LEFT);
-        
+
         // Gán các ký tự với key từ "9" đến "16"
         return [
             'a' => $paddedDate[0] === '0' ? '0 ' : $paddedDate[0],
@@ -261,15 +255,19 @@ class SupportFormService
             'h' => $paddedDate[7] === '0' ? '0 ' : $paddedDate[7],
         ];
     }
-    function convertOutDateToVariablesIdentity($date) {
-        if (empty($date)) return [];
-    
+
+    public function convertOutDateToVariablesIdentity($date)
+    {
+        if (empty($date)) {
+            return [];
+        }
+
         // Loại bỏ dấu "/" trong chuỗi date
         $dateStr = str_replace('/', '', $date);
-        
+
         // Đảm bảo chuỗi có đủ 8 ký tự, nếu thiếu thì thêm "0" phía trước
         $paddedDate = str_pad($dateStr, 8, '0', STR_PAD_LEFT);
-        
+
         // Gán các ký tự với key từ "9" đến "16"
         return [
             'a1' => $paddedDate[0] === '0' ? '0 ' : $paddedDate[0],
@@ -282,15 +280,19 @@ class SupportFormService
             'a8' => $paddedDate[7] === '0' ? '0 ' : $paddedDate[7],
         ];
     }
-    function convertNgayCapDKKDToVariablesIdentity($date) {
-        if (empty($date)) return [];
-    
+
+    public function convertNgayCapDKKDToVariablesIdentity($date)
+    {
+        if (empty($date)) {
+            return [];
+        }
+
         // Loại bỏ dấu "/" trong chuỗi date
         $dateStr = str_replace('/', '', $date);
-        
+
         // Đảm bảo chuỗi có đủ 8 ký tự, nếu thiếu thì thêm "0" phía trước
         $paddedDate = str_pad($dateStr, 8, '0', STR_PAD_LEFT);
-        
+
         // Gán các ký tự với key từ "9" đến "16"
         return [
             'b1' => $paddedDate[0] === '0' ? '0 ' : $paddedDate[0],
@@ -303,15 +305,19 @@ class SupportFormService
             'b8' => $paddedDate[7] === '0' ? '0 ' : $paddedDate[7],
         ];
     }
-    function convertNgayCapMSTDNToVariablesIdentity($date) {
-        if (empty($date)) return [];
-    
+
+    public function convertNgayCapMSTDNToVariablesIdentity($date)
+    {
+        if (empty($date)) {
+            return [];
+        }
+
         // Loại bỏ dấu "/" trong chuỗi date
         $dateStr = str_replace('/', '', $date);
-        
+
         // Đảm bảo chuỗi có đủ 8 ký tự, nếu thiếu thì thêm "0" phía trước
         $paddedDate = str_pad($dateStr, 8, '0', STR_PAD_LEFT);
-        
+
         // Gán các ký tự với key từ "9" đến "16"
         return [
             'c1' => $paddedDate[0] === '0' ? '0 ' : $paddedDate[0],
@@ -324,52 +330,63 @@ class SupportFormService
             'c8' => $paddedDate[7] === '0' ? '0 ' : $paddedDate[7],
         ];
     }
-    function convertNumberToVariables($number) {
-        if (empty($number)) return [];
-        
+
+    public function convertNumberToVariables($number)
+    {
+        if (empty($number)) {
+            return [];
+        }
+
         // Chuyển số thành mảng ký tự
         $digits = str_split($number);
-        
+
         // Đảm bảo đủ 4 ký tự, nếu thiếu thêm khoảng trắng
         while (count($digits) < 4) {
             $digits[] = ' ';
         }
-    
+
         // Trả về mảng ký tự tương ứng từ s1 -> s16
         $result = [];
         foreach ($digits as $index => $digit) {
-            $result['s' . ($index + 1)] = ($digit === '0') ? '0 ' : $digit;
+            $result['s'.($index + 1)] = ($digit === '0') ? '0 ' : $digit;
         }
-    
+
         return $result;
     }
+
     public function formatDateIfNeeded($date)
     {
         // Nếu null hoặc rỗng thì trả về null
-        if (empty($date)) return null;
+        if (empty($date)) {
+            return null;
+        }
 
         // Nếu đã đúng dạng yyyy-mm-dd rồi thì return luôn
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) return $date;
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            return $date;
+        }
 
         // Nếu dạng ddmmyyyy hoặc yyyymmdd thì xử lý
         if (preg_match('/^\d{8}$/', $date)) {
             // Kiểm tra xem có phải dạng yyyymmdd không
             if (intval(substr($date, 0, 4)) > 1900) {
-                return substr($date, 0, 4) . '-' . substr($date, 4, 2) . '-' . substr($date, 6, 2);
+                return substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
             }
+
             // Ngược lại là dạng ddmmyyyy
-            return substr($date, 4, 4) . '-' . substr($date, 2, 2) . '-' . substr($date, 0, 2);
+            return substr($date, 4, 4).'-'.substr($date, 2, 2).'-'.substr($date, 0, 2);
         }
 
         // Trường hợp khác thì trả về null để tránh lỗi
         return null;
     }
-    
+
     public function ExchangeValue($amount, $rate)
     {
-        if (!is_numeric($amount) || !is_numeric($rate) || $rate == 0) {
+        if (! is_numeric($amount) || ! is_numeric($rate) || $rate == 0) {
             return 0;
         }
+
         return round($amount * $rate);
     }
 }

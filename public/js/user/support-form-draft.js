@@ -5,9 +5,10 @@ $(function () {
     const cfg = window.SupportFormDraftConfig || {};
     const form = document.getElementById('supportForm');
     if (!form || !cfg.saveUrl || !cfg.getUrlTemplate) return;
-    const storageKey = `draft:form:${cfg.formKey}:user:${cfg.userId}`;
+    const storageKey = `draft:shared:user:${cfg.userId}`;
+    const legacyStorageKey = `draft:form:${cfg.formKey}:user:${cfg.userId}`;
     const excluded = ['NgayGiaoDich', 'NgayThangNam', 'keyword'];
-    const fields = () => Array.from(form.querySelectorAll('input[type="text"], input[type="number"], input[type="tel"], input[type="date"], input[type="email"], textarea, select, input[type="checkbox"], input[type="radio"]'))
+    const fields = () => Array.from(form.querySelectorAll('input[type="text"], input[type="number"], input[type="tel"], input[type="date"], input[type="email"], textarea, select, input[type="checkbox"], input[type="radio"], input[data-draft-field]'))
         .filter(field => !excluded.includes(field.name || field.id));
     const initialValues = readFields(fields());
     const focusedBeforeRestore = fields().includes(document.activeElement) ? document.activeElement : null;
@@ -33,10 +34,16 @@ $(function () {
         $('#draftRetry').prop('hidden', next !== 'error');
         $('#draftLoadServer, #draftKeepLocal').prop('hidden', next !== 'conflict');
     }
-    function store(data, dirty, revision) {
-        local = {data, dirty, revision, saved_at: new Date().toISOString()};
-        try { localStorage.setItem(storageKey, JSON.stringify(local)); }
+    function store(data, dirty, revision, mode = 'merge') {
+        local = {data, dirty, revision, mode, saved_at: new Date().toISOString()};
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(local));
+            localStorage.removeItem(legacyStorageKey);
+        }
         catch (_) { localAvailable = false; }
+    }
+    function mergeLocal(data, mode = 'merge') {
+        return mode === 'replace' ? data : {...(local?.data || {}), ...data};
     }
     function apply(payload) {
         applying = true;
@@ -46,18 +53,19 @@ $(function () {
         } finally { applying = false; }
     }
     const queue = new DraftSaveQueue(
-        (payload, revision) => $.ajax({
+        (payload, revision, mode) => $.ajax({
             url: cfg.saveUrl, method: 'POST', dataType: 'json', timeout: 20000,
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'), Accept: 'application/json'},
-            data: {form_key: cfg.formKey, payload: JSON.stringify(payload), revision}
+            data: {form_key: cfg.formKey, payload: JSON.stringify(payload), revision, mode}
         }), status,
-        (payload, pending, revision) => store(pending ?? payload, pending !== null, revision)
+        (payload, pending, revision, mode) => store(payload, pending !== null, revision, pending !== null ? mode : 'merge')
     );
-    function changed() {
+    function changed(mode = 'merge') {
         if (applying) return;
         edited = true;
-        queue.enqueue(readFields(fields()));
-        store(queue.pending, true, queue.revision ?? local?.revision ?? null);
+        const current = readFields(fields());
+        queue.enqueue(current, mode);
+        store(mergeLocal(current, queue.pendingMode), true, queue.revision ?? local?.revision ?? null, queue.pendingMode);
         clearTimeout(timer);
         timer = setTimeout(() => queue.flush(), 800);
         if (!queue.blocked) status('saving');
@@ -73,25 +81,30 @@ $(function () {
             queue.revision = server.revision;
             loaded = true;
             if (edited || local?.dirty) {
-                queue.enqueue(readFields(fields()));
+                const current = readFields(fields());
+                const mode = local?.dirty ? (local.mode || 'merge') : 'merge';
+                queue.enqueue(local?.dirty ? mergeLocal(current, mode) : current, mode);
                 if (local?.dirty && previousRevision !== server.revision && !(previousRevision == null && server.revision === 'missing')) {
                     queue.blocked = true;
                     status('conflict');
                 } else {
-                    store(queue.pending, true, queue.revision);
+                    store(mergeLocal(queue.pending, queue.pendingMode), true, queue.revision, queue.pendingMode);
                     queue.blocked = false;
                     await queue.flush();
                 }
             } else {
-                apply(server.payload);
-                store(readFields(fields()), false, server.revision);
+                const sharedPayload = server.payload && typeof server.payload === 'object'
+                    ? server.payload
+                    : {};
+                apply(sharedPayload);
+                store(sharedPayload, false, server.revision);
                 queue.blocked = false;
                 status('saved');
             }
         } catch (_) { status('error'); }
     }
     try {
-        const cached = JSON.parse(localStorage.getItem(storageKey));
+        const cached = JSON.parse(localStorage.getItem(storageKey) || localStorage.getItem(legacyStorageKey));
         if (cached && cached.data && typeof cached.data === 'object') {
             local = cached;
             // Old drafts have no reliable revision; preserve for explicit choice.
@@ -109,6 +122,7 @@ $(function () {
     $(form).on('input change', 'input, textarea, select', function (event) {
         if (fields().includes(event.target)) changed();
     });
+    $(form).on('supportform:filled', () => changed());
     $('#resetFormBtn').on('click', function (event) {
         event.preventDefault();
         applying = true;
@@ -122,7 +136,7 @@ $(function () {
             });
         } finally { applying = false; }
         legacyWarning = false;
-        changed();
+        changed('replace');
         queue.flush();
     });
     $('#print_form').on('click', function () {
@@ -152,13 +166,17 @@ $(function () {
             queue.blocked = false;
             if (useServer) {
                 queue.pending = null;
-                apply(server.payload);
+                const sharedPayload = server.payload && typeof server.payload === 'object'
+                    ? server.payload
+                    : {};
+                apply(sharedPayload);
                 edited = false;
-                store(readFields(fields()), false, queue.revision);
+                store(sharedPayload, false, queue.revision);
                 status('saved');
             } else {
-                queue.enqueue(readFields(fields()));
-                store(queue.pending, true, queue.revision);
+                const current = mergeLocal(readFields(fields()), local?.mode || 'merge');
+                queue.enqueue(current, local?.mode || 'merge');
+                store(current, true, queue.revision, queue.pendingMode);
                 await queue.flush();
             }
         } catch (_) { status('error'); }
@@ -166,7 +184,12 @@ $(function () {
     });
     window.addEventListener('online', () => { if (state === 'error') $('#draftRetry').trigger('click'); });
     window.addEventListener('pagehide', () => {
-        if (queue.pending !== null || queue.inFlight) store(readFields(fields()), true, queue.revision);
+        if (queue.pending !== null || queue.inFlight) {
+            const mode = queue.pending !== null
+                ? queue.pendingMode
+                : (local?.mode || 'merge');
+            store(mergeLocal(readFields(fields()), mode), true, queue.revision, mode);
+        }
     });
     status('loading');
     initialize();

@@ -13,7 +13,9 @@ class DocumentQueryService
      */
     public function getDocumentsForUser($user, $filters = [])
     {
-        $query = Document::with(['documentType', 'creator']);
+        // Quan hệ chỉ được nạp tại endpoint thật sự cần dùng. Các truy vấn đếm,
+        // thông báo và kiểm tra quyền không phải mang theo documentType/creator.
+        $query = Document::query();
         if (! $user->branch_id) {
             return $query->whereRaw('1 = 0');
         }
@@ -89,11 +91,11 @@ class DocumentQueryService
 
         if (! empty($filters['date_from'])) {
             $query->where(function ($dateQuery) use ($dateColumn, $filters) {
-                $dateQuery->whereDate($dateColumn, '>=', $filters['date_from']);
+                $dateQuery->where($dateColumn, '>=', $filters['date_from']);
                 if ($dateColumn !== 'issued_date') {
                     $dateQuery->orWhere(function ($fallback) use ($dateColumn, $filters) {
                         $fallback->whereNull($dateColumn)
-                            ->whereDate('issued_date', '>=', $filters['date_from']);
+                            ->where('issued_date', '>=', $filters['date_from']);
                     });
                 }
             });
@@ -101,22 +103,22 @@ class DocumentQueryService
 
         if (! empty($filters['date_to'])) {
             $query->where(function ($dateQuery) use ($dateColumn, $filters) {
-                $dateQuery->whereDate($dateColumn, '<=', $filters['date_to']);
+                $dateQuery->where($dateColumn, '<=', $filters['date_to']);
                 if ($dateColumn !== 'issued_date') {
                     $dateQuery->orWhere(function ($fallback) use ($dateColumn, $filters) {
                         $fallback->whereNull($dateColumn)
-                            ->whereDate('issued_date', '<=', $filters['date_to']);
+                            ->where('issued_date', '<=', $filters['date_to']);
                     });
                 }
             });
         }
 
         if (! empty($filters['issued_date_from'])) {
-            $query->whereDate('issued_date', '>=', $filters['issued_date_from']);
+            $query->where('issued_date', '>=', $filters['issued_date_from']);
         }
 
         if (! empty($filters['issued_date_to'])) {
-            $query->whereDate('issued_date', '<=', $filters['issued_date_to']);
+            $query->where('issued_date', '<=', $filters['issued_date_to']);
         }
 
         if (isset($filters['is_read']) && $filters['is_read'] !== '') {
@@ -138,6 +140,10 @@ class DocumentQueryService
                 $scope->whereDoesntHave('logs', fn ($q) => $q->whereIn('action', ['archive_imported', 'ledger_imported', 'ledger_recorded']))
                     ->orWhereHas('logs', fn ($q) => $q->where('action', 'published'));
             });
+        }
+
+        if (! empty($filters['skip_sort'])) {
+            return $query;
         }
 
         // Sorting

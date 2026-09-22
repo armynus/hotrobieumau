@@ -8,7 +8,6 @@ use App\Models\Branches;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\DB;
 
 class LoginUserController extends Controller
 {
@@ -39,6 +38,8 @@ class LoginUserController extends Controller
                 $request->session()->put('user_name', $result->name);
                 $request->session()->put('user_email', $result->email);
                 $request->session()->put('user_role', $result->role_id);
+                $request->session()->put('user_has_avatar', (bool) $result->avatar_path);
+                $request->session()->put('user_avatar_version', optional($result->updated_at)->timestamp ?? time());
                 $request->session()->put('UserBranchId', $result->branch_id);
                 $request->session()->put('UserBranchCode', $branch->branch_code);
                 $request->session()->put('UserBranchName', $branch->branch_name);
@@ -70,6 +71,8 @@ class LoginUserController extends Controller
         Session::forget('user_name');
         Session::forget('user_email');
         Session::forget('user_role');
+        Session::forget('user_has_avatar');
+        Session::forget('user_avatar_version');
         Session::forget('UserBranchId');
         Session::forget('UserBranchCode');
         Session::forget('UserBranchName');
@@ -90,20 +93,26 @@ class LoginUserController extends Controller
         return view('user.auth.change_password_user',compact('user'));
     }
     function reset_password_user(Request $request){
-        $old_password=$request->old_password;
-        $id=$request->user_id;
-        
-        $result= DB::table('users')
-        ->where('id', $id)
-        ->first();
-        
-        if(Hash::check($old_password, $result->password )){
-            $data=array();
-            $data['password']=Hash::make($request->password);
-            Users::where('id',$id)->update($data);
-            return redirect()->back()->with('message','Đổi mật khẩu thành công') ;
-        }else{
-            return redirect()->back()->with('error','Mật khẩu hiện tại không đúng') ;
+        $validated = $request->validate([
+            'old_password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:6', 'max:255'],
+            'repassword' => ['required', 'same:password'],
+        ], [
+            'old_password.required' => 'Vui lòng nhập mật khẩu hiện tại.',
+            'password.required' => 'Vui lòng nhập mật khẩu mới.',
+            'password.min' => 'Mật khẩu mới phải có ít nhất 6 ký tự.',
+            'repassword.same' => 'Mật khẩu nhập lại không khớp.',
+        ]);
+
+        $user = Users::findOrFail((int) Session::get('user_id'));
+
+        if (! Hash::check($validated['old_password'], $user->password)) {
+            return redirect()->back()->with('error', 'Mật khẩu hiện tại không đúng');
         }
+
+        $user->password = Hash::make($validated['password']);
+        $user->save();
+
+        return redirect()->back()->with('message', 'Đổi mật khẩu thành công');
     }
 }

@@ -27,8 +27,8 @@
                             <small id="entryBookCurrent"><i class="fas fa-check-circle mr-1" aria-hidden="true"></i> Đang chọn: {{ $bookLabels[$book] }}</small>
                         </div>
                         <div class="form-group col-md-2"><label for="entryYear">Năm sổ <span class="text-danger">*</span></label><input id="entryYear" type="number" class="form-control" name="year" value="{{ $year }}" min="2000" max="2100" required></div>
-                        <div class="form-group col-md-3"><label for="entryNumber" id="entryNumberLabel">Số đến</label><input id="entryNumber" class="form-control" name="number" maxlength="50" value="{{ $book === 'incoming' ? $nextNumber : '' }}" placeholder="Đang lấy số tiếp theo…"></div>
-                        <div class="form-group col-md-3"><label for="entryRegisteredDate"><span id="entryRegisteredLabel">Ngày tháng đến</span> <span class="text-danger">*</span></label><input id="entryRegisteredDate" class="form-control ledger-date" name="registered_date" placeholder="dd/mm/yyyy" required></div>
+                        <div class="form-group col-md-3"><label for="entryNumber" id="entryNumberLabel">Số đến</label><input id="entryNumber" class="form-control" name="number" maxlength="50" value="{{ $book === 'incoming' ? ($nextNumber ?? '') : '' }}" placeholder="Đang lấy số tiếp theo…"></div>
+                        <div class="form-group col-md-3"><label for="entryRegisteredDate"><span id="entryRegisteredLabel">Ngày tháng đến</span> <span class="text-danger">*</span></label><input id="entryRegisteredDate" class="form-control ledger-date" name="registered_date" placeholder="dd/mm/yyyy" value="{{ now()->format('Y-m-d') }}" required></div>
                     </div>
                     <div class="form-group mb-2"><label for="entryCode">Số &amp; ký hiệu văn bản <span class="text-danger">*</span></label><input id="entryCode" class="form-control" name="document_code" maxlength="255" required placeholder="Ví dụ: 123/NHNo.ĐT-TH"></div>
                     <div class="small text-muted" id="entryNumberHint">Giữ số theo sổ gốc, cho phép số trùng. Năm sổ theo ngày đến, không theo ngày văn bản.</div>
@@ -47,7 +47,7 @@
                         <h6 class="ledger-section-title"><span>03</span> Tiếp nhận và ghi chú</h6>
                         <div class="form-group"><label for="entryRecipient" id="entryRecipientLabel">Đơn vị hoặc người nhận</label><textarea id="entryRecipient" class="form-control" name="recipient" rows="2" maxlength="5000"></textarea></div>
                         <div class="form-row">
-                            <div class="form-group col-md-6 ledger-incoming-field"><label for="entryForwardedDate">Ngày chuyển</label><input id="entryForwardedDate" class="form-control ledger-date" name="forwarded_date" placeholder="dd/mm/yyyy"></div>
+                            <div class="form-group col-md-6 ledger-incoming-field"><label for="entryForwardedDate">Ngày chuyển</label><input id="entryForwardedDate" class="form-control ledger-date" name="forwarded_date" placeholder="dd/mm/yyyy" value="{{ now()->format('Y-m-d') }}"></div>
                             <div class="form-group col-md-6 ledger-outgoing-field"><label for="entryCopies">Số lượng bản</label><input id="entryCopies" type="number" class="form-control" name="copy_count" min="1" max="100000"></div>
                             <div class="form-group col-md-6"><label for="entrySignature">Ký nhận</label><input id="entrySignature" class="form-control" name="receipt_signature" maxlength="255" placeholder="Ví dụ: iOffice"></div>
                         </div>

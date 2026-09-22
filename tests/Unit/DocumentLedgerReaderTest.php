@@ -69,20 +69,25 @@ class DocumentLedgerReaderTest extends TestCase
         $book = new Spreadsheet;
         $sheet = $book->getActiveSheet()->setTitle('VB QUYET DINH ');
         $sheet->fromArray([
-            ['Ngày tháng chuyển','Số, ký hiệu Văn bản','Người ký văn bản','Ngày, tháng VB','Tên loại và trích yếu nội dung văn bản'],
-            ['05/01/2026','01 /QĐ-NHNo.ĐT-TH','Giám đốc','31/02/2026','Quyết định'],
+            ['Ngày tháng chuyển', 'Số, ký hiệu Văn bản', 'Người ký văn bản', 'Ngày, tháng VB', 'Tên loại và trích yếu nội dung văn bản'],
+            ['05/01/2026', '01 /QĐ-NHNo.ĐT-TH', 'Giám đốc', '31/02/2026', 'Quyết định'],
         ]);
-        $book->createSheet()->setTitle('Phụ lục')->setCellValue('A1','Không phải sổ');
-        $path=tempnam(sys_get_temp_dir(),'ledger-reader-');
+        $book->createSheet()->setTitle('Phụ lục')->setCellValue('A1', 'Không phải sổ');
+        $path = tempnam(sys_get_temp_dir(), 'ledger-reader-');
         try {
             (new Xlsx($book))->save($path);
-            $rows=app(DocumentLedgerReader::class)->read($path,'outgoing',['VB QUYET DINH']);
-            $this->assertCount(1,$rows); $this->assertSame('decision',$rows[0]['_book']);
-            $this->assertSame('01',$rows[0]['_number']); $this->assertSame(2026,$rows[0]['_year']);
+            $rows = app(DocumentLedgerReader::class)->read($path, 'outgoing', ['VB QUYET DINH']);
+            $this->assertCount(1, $rows);
+            $this->assertSame('decision', $rows[0]['_book']);
+            $this->assertSame('01', $rows[0]['_number']);
+            $this->assertSame(2026, $rows[0]['_year']);
             $this->assertNull($rows[0]['issued_date']);
             $this->expectException(\RuntimeException::class);
-            app(DocumentLedgerReader::class)->read($path,'outgoing',['VB QUYET DINH','Phụ lục']);
-        } finally { $book->disconnectWorksheets(); unlink($path); }
+            app(DocumentLedgerReader::class)->read($path, 'outgoing', ['VB QUYET DINH', 'Phụ lục']);
+        } finally {
+            $book->disconnectWorksheets();
+            unlink($path);
+        }
     }
 
     public function test_reader_reads_past_2000_rows_and_keeps_source_years_and_missing_codes_for_reporting(): void
@@ -108,6 +113,26 @@ class DocumentLedgerReaderTest extends TestCase
             $this->assertCount(14, array_filter($rows, fn ($row) => $row['document_code'] === null));
             $this->assertSame('2751/TEST', $rows[2750]['document_code']);
             $this->assertSame(2752, $rows[2750]['_row']);
+        } finally {
+            unlink($path);
+        }
+    }
+
+    public function test_limited_read_stops_when_the_web_row_limit_is_exceeded(): void
+    {
+        $data = [[
+            'Ngày tháng đến', 'Số đến', 'Tác giả', 'Số & ký hiệu văn bản',
+            'Ngày, tháng văn bản', 'Tên loại và trích yếu nội dung văn bản',
+        ]];
+        for ($number = 1; $number <= 1205; $number++) {
+            $data[] = ['09/09/2026', (string) $number, null, $number.'/TEST', '08/09/2026', 'Văn bản '.$number];
+        }
+        $path = $this->workbook($data);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('Sổ có hơn 1.000 dòng');
+            app(DocumentLedgerReader::class)->read($path, 'incoming', [], 1000);
         } finally {
             unlink($path);
         }

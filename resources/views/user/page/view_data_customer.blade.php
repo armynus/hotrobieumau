@@ -25,7 +25,7 @@
             modalId="uploadCustomModal" 
             modalLabel="Đăng Tải File Dữ Liệu Khách Hàng" 
             inputName="data_customer" 
-            buttonText="Thêm" 
+            buttonText="Bắt đầu nhập"
         />
         @endif
         <x-customer-form 
@@ -54,6 +54,7 @@
         />
         
         <x-alert-message />
+        @include('user.partials.data_import_status', ['activeImport' => $activeImport])
         <div class="card-body"> 
             <div class="table-responsive">
                 <table class="table table-bordered" id="customerTable" width="100%" cellspacing="0">

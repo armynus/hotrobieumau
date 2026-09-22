@@ -1,291 +1,59 @@
 @extends('user.layouts.app')
-@section('title', 'Biểu mẫu giao dịch')
-   <style>
-    .field-label{
-  min-width: 200px;
-  padding: 0.375rem 0.75rem;
-  background: #c6deff;
-  border-radius: 8px;
-  color: #39404a;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-size: 16px;
-}
-
-/* wrapper chứa input/select + link */
-.field-control{
-  position: relative;
-  padding-top: 0;
-  padding-bottom: 2px; /* chừa chỗ cho link */
-}
-
-/* đồng bộ style form-control (Bootstrap có rồi, đây chỉ tune) */
-.field-control .form-control{
-  border-radius: 8px;
-  border: 1px solid #e6e9ef;
-  padding: 0.375rem 0.75rem;
-}
-
-/* link toggle */
-.field-control a.toggle-manual-input,
-.field-control a.toggle-select-input{
-  position: absolute;
-  right: 4px;
-  bottom: 0;
-  font-size: 12px;
-  color: #2b7cff;
-  text-decoration: none;
-}
-
-/* mobile */
-@media (max-width: 768px){
-  .field-label{ min-width: 120px; font-size: 14px; }
-  .field-control a.toggle-manual-input{ right: 8px; }
-}
-
-    </style>
+@section('title', isset($bundleForms) ? 'Bộ hồ sơ giao dịch' : 'Điền biểu mẫu')
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/user/form-workspace.css') }}?v={{ filemtime(public_path('css/user/form-workspace.css')) }}">
+@endpush
 @section('content')
-<div class="container-fluid">
-    
-   
-
-    <!-- Form biểu mẫu -->
-    <div class="card" >
-        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-4">
-            <h5 class="mb-0"><b>Biểu Mẫu: {{ $form->name }}</b></h5>
-            <x-back-page-button text="Quay lại danh sách biểu mẫu" />
-        </div>
-        <div class="card-body">
-            <form id="supportForm">
-                <input type="hidden" value="" id="custno_hidden" name="custno_hidden" >
-                <input type="hidden" value="" id="MaKHDN_hidden" name="MaKHDN_hidden" >
-                <input type="hidden" value="" id="idxacno_hidden" name="idxacno_hidden" >
+@php($fieldGroups = \App\Services\FormWorkspaceService::groups($fields))
+<main class="container-fluid form-workspace">
+    <div class="fw-heading">
+        <div><p class="fw-eyebrow">{{ isset($bundleForms) ? 'BỘ HỒ SƠ GIAO DỊCH' : 'HỖ TRỢ BIỂU MẪU' }}</p><h1>{{ $form->name }}</h1><p class="text-muted">{{ isset($bundleForms) ? 'Điền một lần. Các mẫu có cùng trường thông tin sẽ dùng chung dữ liệu.' : 'Tìm khách hàng để điền nhanh, kiểm tra thông tin rồi tải bản Word.' }}</p></div>
+        <a class="btn btn-light" href="{{ route('support_forms.catalog') }}">← Danh sách mẫu</a>
+    </div>
+    <div class="fw-layout">
+        <aside class="fw-surface fw-outline"><strong>NỘI DUNG HỒ SƠ</strong><nav aria-label="Nhóm thông tin biểu mẫu">@foreach($fieldGroups as $groupId => $group)<a href="#section-{{ $groupId }}">{{ $group['title'] }}</a>@endforeach</nav>
+        @isset($bundleForms)<hr><strong>{{ count($bundleForms) }} mẫu trong bộ</strong><ol>@foreach($bundleForms as $bundleForm)<li>{{ $bundleForm->name }}</li>@endforeach</ol><p class="fw-hint">Xuất bộ chỉ tạo tệp Word; không cập nhật hồ sơ khách hàng.</p>@endisset
+        </aside>
+        <div class="fw-form-main">
+            <form id="supportForm" novalidate>
                 @csrf
-                <div class="container">
-                     <!-- Thanh tìm kiếm -->
-                    <div class="row mb-4 justify-content-center">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="search" class="form-control bg-light small" id="customer_search" 
-                                placeholder="Tìm theo Họ Tên, CIF hoặc CCCD/CMND của KH để điền FORM" aria-label="Search" aria-describedby="basic-addon2" name="keyword">
-                                <div class="input-group-append" >
-                                    <span class="btn btn-primary" style="font-size: 24px;">
-                                        <i class="fas fa-search fa-sm"></i>
-                                    </span>
-                                </div>
-                            </div>
-                          
-                        </div>
+                <input type="hidden" value="" id="custno_hidden" name="custno_hidden" data-draft-field>
+                <input type="hidden" value="" id="MaKHDN_hidden" name="MaKHDN_hidden" data-draft-field>
+                <input type="hidden" value="" id="idxacno_hidden" name="idxacno_hidden" data-draft-field>
+                <section class="fw-surface fw-customer-search" aria-labelledby="customerSearchLabel">
+                    <label for="customer_search" id="customerSearchLabel">Điền nhanh từ khách hàng</label>
+                    <input type="search" class="form-control" id="customer_search" name="keyword" placeholder="Tìm họ tên, CIF hoặc CCCD/CMND" autocomplete="off" aria-describedby="customerSearchStatus">
+                    <p id="customerSearchStatus" class="fw-hint" role="status" aria-live="polite">Nhập ít nhất 2 ký tự để tìm. Bạn cũng có thể nhập trực tiếp hoặc dán dữ liệu bên dưới.</p>
+                    <div class="fw-secondary-actions fw-tool-actions">
+                        <button type="button" class="btn fw-tool-btn fw-tool-reset" id="requestReset"><i class="fas fa-redo-alt" aria-hidden="true"></i><span>Làm mới nháp</span></button>
+                        <button type="button" class="btn fw-tool-btn fw-tool-personal" id="pasteClipboardBtn"><i class="far fa-id-card" aria-hidden="true"></i><span>Dán dữ liệu cá nhân</span></button>
+                        <button type="button" class="btn fw-tool-btn fw-tool-business" id="pasteClipboardDNBtn"><i class="fas fa-building" aria-hidden="true"></i><span>Dán dữ liệu tổ chức</span></button>
+                        <button type="button" class="btn fw-tool-btn fw-tool-copy" id="copyClipboardBtn"><i class="far fa-copy" aria-hidden="true"></i><span>Sao chép thông tin</span></button>
                     </div>
-                    
-                    @foreach($fields as $key => $info)
-                        @if($loop->first || $loop->iteration % 2 == 1)
-                            <div class="row mb-2">
-                        @endif
-
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-start">
-                                <label class="field-label me-2" for="{{ $key }}">
-                                    {{ $info['field_name'] }}
-                                </label>
-
-                                <div class="field-control flex-grow-1" id="{{ $key }}Wrapper">
-                                    @if($key == 'gender')
-                                        <x-select-input-to-check-box 
-                                            name="gender" 
-                                            :options="$gender" 
-                                            selected="{{ old('gender') }}" 
-                                            {{-- placeholder="Chọn giới tính"  --}}
-                                            :required="true" 
-                                        />
-                                    @elseif($key == 'nguoi')
-                                        <x-select-input-to-check-box 
-                                            name="nguoi" 
-                                            :options="$nguoi" 
-                                            selected="{{ old('nguoi') }}"  
-                                            :required="true" 
-                                        />
-                                    
-                                    @elseif($key == 'identity_type')
-                                        <x-select-input-to-check-box 
-                                            name="identity_type" 
-                                            :options="$identity_type" 
-                                            selected="{{ old('identity_type') }}"  
-                                            :required="true" 
-                                        />
-                                    @elseif($key == 'identity_place')
-                                        <x-select-input-to-check-box 
-                                            name="identity_place" 
-                                            :options="$identity_place" 
-                                            selected="{{ old('identity_place') }}"  
-                                            :required="true" 
-                                        />
-                                    @elseif($key == 'NoiCapCCCDMoi')
-                                        <x-select-input-to-check-box 
-                                            name="NoiCapCCCDMoi" 
-                                            :options="$NoiCapCCCDMoi" 
-                                            selected="{{ old('NoiCapCCCDMoi') }}"  
-                                            :required="true" 
-                                        />
-                                    @elseif($key == 'NgheNghiepKH')
-                                        <x-select-input-to-check-box 
-                                            name="NgheNghiepKH" 
-                                            :options="$NgheNghiepKH" 
-                                            selected="{{ old('NgheNghiepKH') }}"  
-                                            :required="true" 
-                                        />
-                                    @elseif($key == 'ChucVuKH')
-                                        <x-select-input-to-check-box 
-                                            name="ChucVuKH" 
-                                            :options="$ChucVuKH" 
-                                            selected="{{ old('ChucVuKH') }}"  
-                                            :required="true" 
-                                        />
-                                    @elseif($key == 'ccycd')
-                                        <x-select-input-to-check-box 
-                                            name="ccycd" 
-                                            :options="$ccycd" 
-                                            selected="{{'VND' ?? old('ccycd')}}" 
-                                            :required="true" 
-                                        />
-                                    @elseif($key == 'HangThe')
-                                        <x-select-input-to-check-box 
-                                            name="HangThe" 
-                                            :options="$HangThe" 
-                                            selected="{{ old('HangThe') }}" 
-                                            :required="true" 
-                                        />
-                                    @elseif($key == 'LoaiThe')
-                                        <x-select-input-to-check-box 
-                                            name="LoaiThe" 
-                                            :options="$LoaiThe" 
-                                            selected="{{ old('LoaiThe') }}" 
-                                            :required="true" 
-                                        />
-                                    @elseif($key == 'SoTKTT')
-                                        <x-select-input-to-check-box 
-                                            name="SoTKTT" 
-                                            :options="$SoTKTT" 
-                                            selected="{{ old('SoTKTT') }}" 
-                                            :required="true" 
-                                        />
-                                    @elseif($key == 'ThuTuDong')
-                                        <x-check-value-to-check-box
-                                            name="ThuTuDong" 
-                                            :options="$ThuTuDong" 
-                                            selected="{{ old('ThuTuDong') }}" 
-                                            :required="false" 
-                                        />
-                                    @elseif($key == 'MobileBanking')
-                                        <x-check-value-to-check-box
-                                            name="MobileBanking" 
-                                            :options="$MobileBanking" 
-                                            selected="{{ old('MobileBanking') }}" 
-                                            :required="false" 
-                                        />
-                                    @elseif($key == 'RetaileBanking')
-                                        <x-check-value-to-check-box
-                                            name="RetaileBanking" 
-                                            :options="$RetaileBanking" 
-                                            selected="{{ old('RetaileBanking') }}" 
-                                            :required="false" 
-                                        />
-                                    @elseif($key == 'DichVuKhac')
-                                        <x-check-value-to-check-box
-                                            name="DichVuKhac" 
-                                            :options="$DichVuKhac" 
-                                            selected="{{ old('DichVuKhac') }}" 
-                                            :required="false" 
-                                        />
-                                    
-                                    @else
-                                        <input type="{{ $info['data_type'] ?? 'text' }}" 
-                                            class="form-control" 
-                                            id="{{ $key }}" 
-                                            name="{{ $key }}" required
-                                            placeholder="{{ $info['placeholder'] ?? '' }}"
-                                            value="{{ 
-                                                $info['value'] ?? (
-                                                    $key == 'NgayThangNam' || $key == 'NgayGiaoDich' || $key == 'NgayUQ' || $key == 'NgayUQCQ' ? now()->format('Y-m-d') : 
-                                                    ($key == 'QuocTich' ? 'Việt Nam' : 
-                                                    ($key == 'NgayHen' ? now()->addDays(7)->format('Y-m-d') : 
-                                                    ($key == 'branch' ? session('UserBranchName', '') : 
-                                                    ($key == 'DiaChi' ? session('UserBranchAddr', '') : 
-                                                    ($key == 'SoFax' ? session('UserBranchFax', '') : 
-                                                    ($key == 'DienThoai' ? session('UserBranchPhone', '') : 
-                                                    ($key == 'GDichVien' ? session('user_name', '') : 
-                                                    ($key == 'DiaDanh' ? session('UserBranchPlace', '') : 
-                                                    ($key == 'branch_code' ? session('UserBranchCode', '') : '')))))))))) 
-                                            }}"
-                                            {{ $key == 'SoThe' ? 'maxlength=4' : '' }}                                            
-                                        >  
-                                
-                                    @endif
-                                    {{-- Link toggle sẽ được JS tự thêm; nhưng để phòng hờ khi JS chưa load: --}}
-                                    <noscript class="d-block mt-1 text-muted small">JS tắt — không thể toggle</noscript>
-                                </div>
-                            </div>
+                    <div id="resetReview" class="alert alert-warning mt-3" hidden><p>Xóa nội dung nháp và thông tin khách hàng đang chọn để bắt đầu hồ sơ mới?</p><div class="fw-actions"><button type="button" class="btn btn-primary" id="resetFormBtn">Xóa nháp và bắt đầu lại</button><button type="button" class="btn btn-light" id="cancelReset">Giữ nháp</button></div></div>
+                    @unless(isset($bundleForms))<div class="fw-secondary-actions"><button type="button" class="btn fw-save-customer" id="saveCustomerProfile"><i class="fas fa-user-check" aria-hidden="true"></i><span>Lưu thông tin khách hàng</span></button></div><p class="fw-hint">Tải Word chỉ tạo tệp. Dùng “Lưu thông tin khách hàng” khi muốn cập nhật hồ sơ trong hệ thống.</p><div id="customerSaveReview" class="alert alert-info mt-3" hidden><p id="customerSaveReviewText"></p><div class="fw-actions"><button type="button" class="btn btn-primary" id="confirmCustomerSave">Lưu vào hồ sơ</button><button type="button" class="btn btn-light" id="cancelCustomerSave">Hủy</button></div></div><p id="customerSaveStatus" role="status" aria-live="polite" class="fw-hint"></p>@endunless
+                </section>
+                <section id="formValidation" class="fw-surface fw-validation" hidden tabindex="-1" aria-labelledby="validationTitle"><strong id="validationTitle"></strong><p class="fw-hint">Bấm vào thông tin bên dưới để chuyển đến trường cần kiểm tra.</p><ul id="validationErrors"></ul></section>
+                @foreach($fieldGroups as $groupId => $group)
+                    <fieldset class="fw-surface fw-section" id="section-{{ $groupId }}"><legend>{{ $group['title'] }}</legend><div class="fw-field-grid">
+                    @foreach($group['fields'] as $key => $info)
+                        <div class="fw-field" data-field="{{ $key }}">
+                            <label class="field-label" id="label-{{ $key }}" for="{{ $key }}">{{ $info['field_name'] }}@isset($bundleForms)@php($uses = $bundleForms->filter(fn($item) => in_array($key, \App\Services\FormWorkspaceService::fieldCodes($item->fields), true)))@if($uses->count() > 1)<span class="fw-field-badge">Chung {{ $uses->count() }} mẫu</span>@endif @endisset</label>
+                            <div class="field-control" id="{{ $key }}Wrapper">@include('user.partials.support_form_field')</div>
                         </div>
-
-                        @if($loop->iteration % 2 == 0 || $loop->last)
-                            </div>
-                        @endif
                     @endforeach
-       
-                       
-            
-                    <div id="supportFormDraftStatus" class="small text-muted my-3" role="status" aria-live="polite">
-                        <span id="draftStatusText">Đang kiểm tra bản nháp…</span>
-                        <button id="draftRetry" class="btn btn-sm btn-outline-primary" type="button" hidden>Thử lưu lại</button>
-                        <button id="draftLoadServer" class="btn btn-sm btn-outline-secondary" type="button" hidden>Nạp bản trên máy chủ</button>
-                        <button id="draftKeepLocal" class="btn btn-sm btn-outline-primary" type="button" hidden>Lưu bản đang nhập</button>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 text-right">
-                            <button type="button" class="btn btn-secondary" id="resetFormBtn">
-                                Làm mới Nháp
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
-                                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
-                                </svg>
-                            </button>
-                            <span  class="btn btn-success" id="copyClipboardBtn">
-                                Copy Clipboard
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
-                                </svg>
-                            </span>
-                            <span  class="btn btn-primary" id="pasteClipboardBtn">
-                                Dán Clipboard Cá Nhân
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-fill" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5zm-2 0h1v1A2.5 2.5 0 0 0 6.5 5h3A2.5 2.5 0 0 0 12 2.5v-1h1a2 2 0 0 1 2 2V14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3.5a2 2 0 0 1 2-2"/>
-                                </svg>
-                            </span>
-                            <span  class="btn btn-info" id="pasteClipboardDNBtn">
-                                Dán Clipboard Tổ Chức
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-fill" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5zm-2 0h1v1A2.5 2.5 0 0 0 6.5 5h3A2.5 2.5 0 0 0 12 2.5v-1h1a2 2 0 0 1 2 2V14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3.5a2 2 0 0 1 2-2"/>
-                                </svg>
-                            </span>
-                            <button type="button" class="btn btn-primary" id="print_form" data-form_id="{{$form->id}}">
-                                In biểu mẫu
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
-                                    <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1"/>
-                                    <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+                    </div></fieldset>
+                @endforeach
+                <div class="fw-editor-actions">
+                    <div id="supportFormDraftStatus" role="status" aria-live="polite"><span id="draftStatusText">Đang kiểm tra bản nháp…</span> <button id="draftRetry" class="btn btn-sm btn-outline-primary" type="button" hidden>Thử lưu lại</button><button id="draftLoadServer" class="btn btn-sm btn-outline-secondary" type="button" hidden>Nạp bản trên máy chủ</button><button id="draftKeepLocal" class="btn btn-sm btn-outline-primary" type="button" hidden>Lưu bản đang nhập</button></div>
+                    <div class="fw-actions"><span class="fw-progress" id="formProgress" role="status" aria-live="polite"></span><div class="fw-actions"><button type="button" class="btn btn-outline-primary" id="checkForm" aria-controls="formValidation"><i class="fas fa-clipboard-check" aria-hidden="true"></i><span id="checkFormLabel">Kiểm tra thông tin</span></button><button type="button" class="btn fw-download-incomplete" id="downloadIncomplete" aria-describedby="formProgress" hidden><i class="fas fa-exclamation-triangle" aria-hidden="true"></i><span id="downloadIncompleteLabel">Vẫn tải Word</span></button><button type="button" class="btn btn-primary" id="print_form" data-form_id="{{ $form->id }}"><i class="fas fa-file-word" aria-hidden="true"></i>{{ isset($bundleForms) ? 'Tải bộ Word' : 'Tải Word' }}</button></div></div>
+                    <div id="exportStatus" class="fw-export-status" role="status" aria-live="polite"></div>
                 </div>
             </form>
         </div>
     </div>
-</div>
+</main>
 @endsection
-{{-- js --}}
 @push('scripts')
      <!-- Bootstrap core JavaScript-->
     <script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
@@ -296,11 +64,8 @@
     <!-- Custom scripts for all pages-->
     <script src="{{asset('js/sb-admin-2.min.js')}}"></script>
     <!-- Page level plugins -->
-    <script src="{{asset('vendor/datatables/jquery.dataTables.min.js')}}"></script>
-    <script src="{{asset('vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
 
     <!-- Page level custom scripts -->
-    <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
     <!-- include jQuery validate library -->
       <!-- Bao gồm jQuery và jQuery UI (nếu chưa có) -->
     @include('shared.jquery-ui')
@@ -310,7 +75,7 @@
     
     <script>
         window.SupportFormDraftConfig = {
-            formKey: 'supportForm',
+            formKey: "supportForm",
             userId: "{{ auth()->id() ?? Session::get('user_id') ?? 'guest' }}",
             saveUrl: "{{ route('form.draft.save') }}",
             getUrlTemplate: "{{ route('form.draft.get', ['formKey' => '__FORMKEY__']) }}",
@@ -323,8 +88,14 @@
 
 
     
+<script>
+window.FormWorkspaceConfig = {
+    exportUrl: @json(isset($bundleForms) ? route('support_forms.bundle.download') : route('transaction_form_print')),
+    formId: @json($form->id),
+    formIds: @json(isset($bundleForms) ? $bundleForms->pluck('id')->values() : []),
+    signature: @json($bundleSignature ?? null),
+    customerSaveUrl: @json(route('support_forms.customer.save')),
+};
+</script>
+<script type="module" src="{{ asset('js/user/form-workspace.js') }}?v={{ filemtime(public_path('js/user/form-workspace.js')) }}"></script>
 @endpush
-
-
-
-

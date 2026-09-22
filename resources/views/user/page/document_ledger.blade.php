@@ -58,14 +58,16 @@
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <h2 class="h6 font-weight-bold text-success"><i class="fas fa-file-excel mr-1"></i> Xuất sổ văn bản</h2>
-            <form method="POST" action="{{ route('documents_export') }}" class="form-row align-items-end" id="ledgerExportForm">@csrf
+            <form method="POST" action="{{ route('documents_export') }}" class="form-row align-items-end" id="ledgerExportForm" data-document-export-form>@csrf
+                <input type="hidden" name="background" value="1">
                 <div class="form-group col-md-3"><label>Loại sổ</label><select name="direction" class="form-control"><option value="incoming" @selected($book === 'incoming')>Sổ văn bản đến</option><option value="outgoing" @selected($book !== 'incoming')>Sổ văn bản đi (2 sheet)</option></select></div>
                 <div class="form-group col-md-2"><label>Năm</label><input class="form-control" name="year" type="number" min="2000" max="2100" value="{{ $year }}" required></div>
                 <div class="form-group col-md-2"><label>Kỳ xuất</label><select class="form-control" name="period_type"><option value="month">Theo tháng</option><option value="quarter">Theo quý</option><option value="year" selected>Cả năm</option></select></div>
                 <div class="form-group col-md-2 export-month d-none"><label>Tháng</label><select class="form-control" name="month">@for($m=1;$m<=12;$m++)<option value="{{ $m }}" @selected($m === now()->month)>{{ $m }}</option>@endfor</select></div>
                 <div class="form-group col-md-2 export-quarter d-none"><label>Quý</label><select class="form-control" name="quarter">@for($q=1;$q<=4;$q++)<option value="{{ $q }}" @selected($q === now()->quarter)>{{ $q }}</option>@endfor</select></div>
-                <div class="form-group col-md-3"><button class="btn btn-success btn-block"><i class="fas fa-download mr-1"></i> Tải Excel</button></div>
+                <div class="form-group col-md-3"><button class="btn btn-success btn-block" data-document-export-submit><i class="fas fa-download mr-1"></i> Tạo file Excel</button></div>
             </form>
+            @include('user.page.documents.partials.export_status')
             <small class="text-muted">Văn bản đi tách sheet thông thường và quyết định. Ngày lọc là ngày vào sổ, không phải ngày ghi trên văn bản.</small>
         </div>
     </div>
@@ -96,4 +98,5 @@
 <script src="{{ asset('js/user/document-ledger.js') }}"></script>
 <script src="{{ asset('js/user/document-ledger-entry.js') }}?v={{ filemtime(public_path('js/user/document-ledger-entry.js')) }}"></script>
 <script src="{{ asset('js/user/document-ledger-slip.js') }}?v={{ filemtime(public_path('js/user/document-ledger-slip.js')) }}"></script>
+<script src="{{ asset('js/user/document-export.js') }}?v={{ filemtime(public_path('js/user/document-export.js')) }}"></script>
 @endpush

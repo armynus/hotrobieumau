@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\AdminSupFormTypeController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminDepartmentController;
 use App\Http\Controllers\Admin\AdminPositionController;
+use App\Http\Controllers\Admin\AdminTransactionOfficeController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\SupportFormController;
 
@@ -27,6 +28,9 @@ use App\Http\Controllers\User\DocumentController;
 use App\Http\Controllers\User\DocumentApiController;
 use App\Http\Controllers\User\DocumentExportController;
 use App\Http\Controllers\User\DocumentLedgerController;
+use App\Http\Controllers\User\DataImportController;
+use App\Http\Controllers\User\DocumentNotificationController;
+use App\Http\Controllers\User\ProfileController;
 
 
 Route::get('login_admin', [LoginAdminController::class, 'login_admin'])->name('login_admin');
@@ -45,7 +49,14 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('admin_branches_update', [BranchController::class, 'update'])->name('admin_branches_update');
     Route::post('admin_branches_lock', [BranchController::class, 'lock'])->name('admin_branches_lock');
 
+    // Transaction office routes
+    Route::get('admin/transaction-offices', [AdminTransactionOfficeController::class, 'index'])->name('admin_transaction_offices');
+    Route::post('admin/transaction-offices', [AdminTransactionOfficeController::class, 'store'])->name('admin_transaction_offices_store');
+    Route::get('admin/transaction-offices/edit', [AdminTransactionOfficeController::class, 'edit'])->name('admin_transaction_offices_edit');
+    Route::post('admin/transaction-offices/update', [AdminTransactionOfficeController::class, 'update'])->name('admin_transaction_offices_update');
+
     Route::get('admin/list_staff', [AdminUserController::class, 'index'])->name('admin_list_staff');
+    Route::get('admin/list_staff/data', [AdminUserController::class, 'data'])->name('admin_list_staff_data');
     Route::post('admin_user_store', [AdminUserController::class, 'store'])->name('admin_user_store');
     Route::get('admin_user_edit', [AdminUserController::class, 'edit'])->name('admin_user_edit');
     Route::post('admin_user_update', [AdminUserController::class, 'update'])->name('admin_user_update');
@@ -99,6 +110,9 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::get('/', [UserController::class, 'index'])->name('index');
     Route::get('user', [UserController::class, 'index'])->name('user');
     Route::get('getDataReccentForm', [UserController::class, 'getDataReccentForm'])->name('getDataReccentForm');
+    Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('profile', [ProfileController::class, 'update'])->middleware('throttle:10,1')->name('profile.update');
+    Route::get('profile/avatar', [ProfileController::class, 'avatar'])->name('profile.avatar');
     // Dữ liệu khách hàng
     Route::get('view_data_customer', [CustomerController::class, 'view_data_customer'])->name('view_data_customer');
     Route::get('detail_customer', [CustomerController::class, 'detail_customer'])->name('detail_customer');
@@ -112,13 +126,18 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::post('update_account', [AccountController::class, 'update_account'])->name('update_account');
     Route::post('add_account', [AccountController::class, 'add_account'])->name('add_account');
     Route::get('/accounts/data', [AccountController::class, 'getDataAccounts'])->name('accounts.data');
+    Route::get('/data-imports/{dataImport}', [DataImportController::class, 'show'])->name('data-imports.show');
 
     // Sử dụng biểu mẫu
+    Route::get('forms', [UserSupportFormController::class, 'index'])->name('support_forms.catalog');
+    Route::get('form-bundle', [\App\Http\Controllers\User\FormBundleController::class, 'show'])->name('support_forms.bundle');
+    Route::post('form-bundle/download', [\App\Http\Controllers\User\FormBundleController::class, 'download'])->middleware('throttle:10,1')->name('support_forms.bundle.download');
     Route::get('support_forms/{type}', [UserSupportFormController::class, 'index'])->name('support_forms.index'); // Danh sách biểu mẫu
     Route::get('support_forms/{type}/{id}', [UserSupportFormController::class, 'show'])->name('support_forms.show'); // Chi tiết biểu mẫu
     Route::get('/customers/search', [UserSupportFormController::class, 'search'])->name('customer.search');
     Route::get('/support_form/search', [UserSearchController::class, 'search'])->name('support_form.search');
     Route::post('transaction_form_print', [UserSupportFormController::class, 'print'])->name('transaction_form_print');
+    Route::post('support-form/customer', [UserSupportFormController::class, 'saveCustomer'])->middleware('throttle:20,1')->name('support_forms.customer.save');
 
     // Scan QR code with camera
     Route::get('scan_qr_code', [ScanQRCodeController::class, 'index'])->name('scan_qr_code');
@@ -154,6 +173,7 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::get('documents/decision/register', [DocumentController::class, 'registerDecision'])->name('documents_decision_register');
     Route::get('documents/ledger/upload-lookup', [DocumentLedgerController::class, 'uploadLookup'])->middleware('throttle:90,1')->name('documents_ledger_upload_lookup');
     Route::get('documents/reports', [DocumentController::class, 'document_reports'])->name('document_reports');
+    Route::get('api/document-notifications', DocumentNotificationController::class)->name('api.document_notifications');
     Route::get('documents/ledger', [DocumentLedgerController::class, 'index'])->name('documents_ledger');
     Route::get('documents/ledger/next-number', [DocumentLedgerController::class, 'nextNumber'])->name('documents_ledger_next_number');
     Route::get('documents/ledger/candidates', [DocumentLedgerController::class, 'candidates'])->name('documents_ledger_candidates');
@@ -165,6 +185,10 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::post('documents/export', DocumentExportController::class)
         ->middleware('throttle:3,1')
         ->name('documents_export');
+    Route::get('documents/exports/{documentExport}', [\App\Http\Controllers\User\DocumentExportStatusController::class, 'show'])
+        ->name('documents_export_status');
+    Route::get('documents/exports/{documentExport}/download', [\App\Http\Controllers\User\DocumentExportStatusController::class, 'download'])
+        ->name('documents_export_download');
     Route::get('documents/attachments/{attachment}', \App\Http\Controllers\User\DocumentAttachmentController::class)->name('document_attachment');
     Route::get('documents/{id}', [DocumentController::class, 'document_detail'])->name('document_detail');
 
@@ -172,6 +196,7 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::prefix('api/documents')->group(function () {
         Route::get('/', [DocumentApiController::class, 'index'])->name('api.documents.index');
         Route::post('/', [DocumentApiController::class, 'store'])->name('api.documents.store');
+        Route::get('/{id}/history', [DocumentApiController::class, 'history'])->name('api.documents.history');
         Route::get('/{id}', [DocumentApiController::class, 'show'])->name('api.documents.show');
         Route::put('/{id}', [DocumentApiController::class, 'update'])->name('api.documents.update');
         Route::delete('/{id}', [DocumentApiController::class, 'destroy'])->name('api.documents.destroy');

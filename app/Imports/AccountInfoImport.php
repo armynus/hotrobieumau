@@ -3,63 +3,42 @@
 namespace App\Imports;
 
 use App\Models\AccountInfo;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
-use Maatwebsite\Excel\Concerns\ShouldQueue;
-class AccountInfoImport implements ToModel, WithHeadingRow
+
+class AccountInfoImport extends TenantBatchImport
 {
-    public function model(array $row)
+    protected function modelClass(): string
     {
-        $idxacno = $row['idxacno'] ?? null; // Mã tài khoản
+        return AccountInfo::class;
+    }
 
-        if ($idxacno) {
-            $account = AccountInfo::where('idxacno', $idxacno)->first();
+    protected function keyColumn(): string
+    {
+        return 'idxacno';
+    }
 
-            if ($account) {
-                // Cập nhật nếu tài khoản đã tồn tại
-                $account->update([
-                    'custseq'   => $row['custseq'] ?? $account->custseq,
-                    'custnm'    => $row['custnm'] ?? $account->custnm,
-                    'stscd'     => $row['stscd'] ?? $account->stscd,
-                    'ccycd'     => $row['ccycd'] ?? $account->ccycd,
-                    'lmtmtp'    => $row['lmtmtp'] ?? $account->lmtmtp,
-                    'minlmt'    => $row['minlmt'] ?? $account->minlmt,
-                    'addr1'     => $row['addr1'] ?? $account->addr1,
-                    'addr2'     => $row['addr2'] ?? $account->addr2,
-                    'addr3'     => $row['addr3'] ?? $account->addr3,
-                    'addrfull'  => ($row['addr1'] ?? '') . ' ' . ($row['addr2'] ?? '') . ' ' . ($row['addr3'] ?? ''),
-                ]);
+    protected function importedColumns(): array
+    {
+        return ['custseq', 'custnm', 'stscd', 'ccycd', 'lmtmtp', 'minlmt', 'addr1', 'addr2', 'addr3', 'addrfull'];
+    }
 
-                return null; // Không tạo bản ghi mới
+    protected function mergeRow(array $row, array $current, bool $exists): array
+    {
+        foreach (['custseq', 'custnm', 'stscd', 'ccycd', 'lmtmtp', 'minlmt', 'addr1', 'addr2', 'addr3'] as $column) {
+            if ($this->hasValue($row, $column)) {
+                $current[$column] = $this->value($row, $column);
             }
+        }
 
-            // Tạo mới nếu tài khoản chưa tồn tại
-            return new AccountInfo([
-                'idxacno'   => $idxacno,
-                'custseq'   => $row['custseq'] ?? null,
-                'custnm'    => $row['custnm'] ?? null,
-                'stscd'     => $row['stscd'] ?? null,
-                'ccycd'     => $row['ccycd'] ?? null,
-                'lmtmtp'    => $row['lmtmtp'] ?? null,
-                'minlmt'    => $row['minlmt'] ?? null,
-                'addr1'     => $row['addr1'] ?? null,
-                'addr2'     => $row['addr2'] ?? null,
-                'addr3'     => $row['addr3'] ?? null,
-                'addrfull'  => ($row['addr1'] ?? '') . ' ' . ($row['addr2'] ?? '') . ' ' . ($row['addr3'] ?? ''),
+        if ($this->hasValue($row, 'addrfull')) {
+            $current['addrfull'] = $this->value($row, 'addrfull');
+        } elseif ($this->hasValue($row, 'addr1') || $this->hasValue($row, 'addr2') || $this->hasValue($row, 'addr3')) {
+            $current['addrfull'] = $this->fullAddress([
+                $current['addr1'] ?? null,
+                $current['addr2'] ?? null,
+                $current['addr3'] ?? null,
             ]);
         }
 
-        return null; // Bỏ qua nếu `idxacno` không tồn tại trong dòng Excel
-    }
-    public function chunkSize(): int
-    {
-        return 1000;
-    }
-    // 🔹 Giúp nhập dữ liệu nhanh hơn bằng cách chèn theo nhóm
-    public function batchSize(): int
-    {
-        return 500;
+        return $current;
     }
 }

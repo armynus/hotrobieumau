@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Models\FormField;
 use App\Models\SupportForm;
+use App\Services\FormWorkspaceService;
 
 class AdminFormFieldController extends Controller
 {
@@ -32,15 +33,21 @@ class AdminFormFieldController extends Controller
             'placeholder' => 'nullable|string|max:255',
             'value' => 'nullable|string|max:255',
             'data_type' => 'required|string|max:50',
+            'content_group' => ['required', Rule::in(array_keys(FormWorkspaceService::contentGroupOptions()))],
+            'display_order' => 'required|integer|min:0|max:9999',
         ], [
             'field_name.required' => 'Vui lòng nhập tên trường dữ liệu.',
             'field_name.unique' => 'Tên trường dữ liệu đã tồn tại, vui lòng chọn tên khác.',
             'field_code.required' => 'Vui lòng nhập mã dữ liệu.',
             'field_code.unique' => 'Mã dữ liệu đã tồn tại, vui lòng chọn mã khác.',
             'data_type.required' => 'Vui lòng chọn kiểu dữ liệu.',
+            'content_group.required' => 'Vui lòng chọn nhóm nội dung.',
+            'content_group.in' => 'Nhóm nội dung không hợp lệ.',
+            'display_order.required' => 'Vui lòng nhập thứ tự hiển thị.',
+            'display_order.integer' => 'Thứ tự hiển thị phải là số nguyên.',
         ]);
 
-        $formField = FormField::create($request->only(['field_name', 'field_code', 'placeholder', 'data_type','value']));
+        $formField = FormField::create($request->only(['field_name', 'field_code', 'placeholder', 'data_type', 'value', 'content_group', 'display_order']));
 
         return response()->json([
             'status' => true,
@@ -50,7 +57,7 @@ class AdminFormFieldController extends Controller
     }
     
     public function admin_edit_field(Request $request ){
-        $field = FormField::where('id', $request->field_id)->select('id', 'field_name', 'field_code', 'data_type','placeholder','value')->first();
+        $field = FormField::where('id', $request->field_id)->select('id', 'field_name', 'field_code', 'data_type', 'placeholder', 'value', 'content_group', 'display_order')->first();
         return response()->json([
             'field' => $field,
         ]);
@@ -83,19 +90,25 @@ class AdminFormFieldController extends Controller
             'placeholder' => 'nullable|string|max:255',
             'value' => 'nullable|string|max:255',
             'data_type'   => 'required|string|max:50',
+            'content_group' => ['required', Rule::in(array_keys(FormWorkspaceService::contentGroupOptions()))],
+            'display_order' => 'required|integer|min:0|max:9999',
         ], [
             'field_name.required' => 'Vui lòng nhập tên trường dữ liệu.',
             'field_name.unique'   => 'Tên trường dữ liệu đã tồn tại, vui lòng chọn tên khác.',
             'field_code.required' => 'Vui lòng nhập mã dữ liệu.',
             'field_code.unique'   => 'Mã dữ liệu đã tồn tại, vui lòng chọn mã khác.',
             'data_type.required'  => 'Vui lòng chọn kiểu dữ liệu.',
+            'content_group.required' => 'Vui lòng chọn nhóm nội dung.',
+            'content_group.in' => 'Nhóm nội dung không hợp lệ.',
+            'display_order.required' => 'Vui lòng nhập thứ tự hiển thị.',
+            'display_order.integer' => 'Thứ tự hiển thị phải là số nguyên.',
         ]);
 
         // Tìm bản ghi cần cập nhật theo field_id
         $formField = FormField::findOrFail($request->field_id);
         
         // Cập nhật dữ liệu
-        $formField->update($request->only(['field_name', 'field_code', 'placeholder', 'data_type', 'value']));
+        $formField->update($request->only(['field_name', 'field_code', 'placeholder', 'data_type', 'value', 'content_group', 'display_order']));
         
         return response()->json([
             'status'     => true,

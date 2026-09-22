@@ -12,6 +12,10 @@ return [
         'max_rows' => (int) env('DOCUMENT_EXPORT_MAX_ROWS', 20000),
         'chunk_size' => (int) env('DOCUMENT_EXPORT_CHUNK_SIZE', 500),
         'lock_seconds' => (int) env('DOCUMENT_EXPORT_LOCK_SECONDS', 300),
+        'disk' => env('DOCUMENT_EXPORT_DISK', 'local'),
+        'queue' => env('DOCUMENT_EXPORT_QUEUE', 'document-exports'),
+        'job_timeout' => (int) env('DOCUMENT_EXPORT_JOB_TIMEOUT_SECONDS', 240),
+        'ttl_hours' => (int) env('DOCUMENT_EXPORT_TTL_HOURS', 24),
     ],
 
     'metadata_extraction' => [
@@ -23,6 +27,7 @@ return [
         'max_pages' => (int) env('DOCUMENT_OCR_MAX_PAGES', 2),
         'dpi' => (int) env('DOCUMENT_OCR_DPI', 220),
         'timeout_seconds' => (int) env('DOCUMENT_OCR_TIMEOUT_SECONDS', 150),
+        'job_timeout_seconds' => (int) env('DOCUMENT_OCR_JOB_TIMEOUT_SECONDS', 180),
         'minimum_text_characters' => (int) env('DOCUMENT_OCR_MIN_TEXT_CHARACTERS', 80),
         'queue' => env('DOCUMENT_OCR_QUEUE', 'document-ocr'),
     ],

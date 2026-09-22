@@ -164,12 +164,18 @@ DOCUMENT_TESSERACT_LANGUAGES=vie+eng
 DOCUMENT_OCR_MAX_PAGES=2
 DOCUMENT_OCR_DPI=220
 DOCUMENT_OCR_TIMEOUT_SECONDS=150
+DOCUMENT_OCR_JOB_TIMEOUT_SECONDS=180
+DOCUMENT_OCR_QUEUE=document-ocr
+DB_QUEUE_RETRY_AFTER=300
 ```
+
+`DB_QUEUE_RETRY_AFTER` phải luôn lớn hơn `DOCUMENT_OCR_JOB_TIMEOUT_SECONDS`; khoảng chênh 120 giây ở trên dành cho thời gian worker dừng tiến trình và trả trạng thái job. Nếu dùng Redis hoặc Beanstalkd, đặt biến `REDIS_QUEUE_RETRY_AFTER` hoặc `BEANSTALKD_QUEUE_RETRY_AFTER` theo cùng nguyên tắc.
 
 Nạp lại cấu hình và kiểm tra binary:
 
 ```powershell
 php artisan optimize:clear
+php artisan queue:restart
 & "C:\Tools\poppler\Library\bin\pdftotext.exe" -v
 & "C:\Tools\poppler\Library\bin\pdftoppm.exe" -v
 & "C:\Program Files\Tesseract-OCR\tesseract.exe" --version
@@ -192,6 +198,8 @@ Xử lý hết queue rồi tự dừng:
 ```powershell
 php artisan queue:work --queue=document-ocr --tries=2 --timeout=180 --memory=256 --stop-when-empty
 ```
+
+Worker phải nghe đúng queue `document-ocr`. Khi tăng `--timeout` hoặc `DOCUMENT_OCR_JOB_TIMEOUT_SECONDS`, tăng `*_QUEUE_RETRY_AFTER` lên cao hơn rồi chạy `php artisan optimize:clear` và `php artisan queue:restart` trước khi xử lý tiếp.
 
 Kiểm tra job lỗi và số PDF vẫn còn thiếu metadata:
 
@@ -236,7 +244,7 @@ Không dùng `--overwrite` trong lần chạy thông thường. Tùy chọn đó
 1. Vào source và khai báo đường dẫn
 Set-Location "D:\hotrobieumau"
 
-$kho = 'Z:\KHO VAN BAN CHUNG'
+$kho = 'D:\Agribank văn bản\NAM 2026'
 $soDen = 'D:\Agribank văn bản\Văn Thư\Sổ vb đến 2026 (01-01-2026).xlsx'
 $soDi = 'D:\Agribank văn bản\Văn Thư\Sổ vb đi 2026 ( 01-01-2026).xlsx'
 

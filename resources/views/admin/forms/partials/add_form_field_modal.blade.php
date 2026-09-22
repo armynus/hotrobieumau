@@ -1,5 +1,5 @@
 <div class="modal fade" id="addFormFieldModal" tabindex="-1" aria-labelledby="addFormFieldModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content"> 
             <!-- Header -->
             <div class="modal-header ">
@@ -39,6 +39,22 @@
                         <option value="date">date</option>
                         <option value="number">number</option>
                     </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="content_group">Nhóm nội dung</label>
+                        <select class="form-control" id="content_group" name="content_group">
+                            @foreach($content_groups as $groupKey => $groupLabel)
+                                <option value="{{ $groupKey }}" @selected($groupKey === 'transaction')>{{ $groupLabel }}</option>
+                            @endforeach
+                        </select>
+                        <small class="form-text text-muted">Quyết định trường nằm trong mục nào của Nội dung hồ sơ.</small>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="display_order">Thứ tự hiển thị</label>
+                        <input type="number" class="form-control" id="display_order" name="display_order" value="0" min="0" max="9999" step="1">
+                        <small class="form-text text-muted">Số nhỏ hiển thị trước.</small>
+                    </div>
                 </div>
                 
             </div>  

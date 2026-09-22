@@ -1,20 +1,17 @@
 <?php
 
 namespace App\Http\Controllers\User;
-use App\Http\Controllers\Controller;
 
-use \App\Services\FormUsageService;
-use \App\Services\SupportFormService;
-use App\Models\SupportForm;
-use App\Models\FormField;
+use App\Http\Controllers\Controller;
 use App\Models\CustomerInfo;
-use App\Models\AccountInfo;
+use App\Models\FormField;
 use App\Models\FormType;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Support\Facades\DB;
-use PhpOffice\PhpWord\TemplateProcessor;
+use App\Models\SupportForm;
+use App\Services\FormUsageService;
+use App\Services\SupportFormService;
 use Illuminate\Http\Request;
-use Exception;
+use Illuminate\Support\Facades\DB;
+
 class UserSupportFormController extends Controller
 {
     protected SupportFormService $supportformService;
@@ -23,38 +20,43 @@ class UserSupportFormController extends Controller
     {
         $this->supportformService = $supportformService;
     }
-    function index($type){
-        $list_forms = SupportForm::where('form_type', $type)->get(); 
-        $form_type = FormType::where('id', $type)->value('type_name'); 
-        return view('user.page.list_forms', compact('list_forms', 'form_type'));
+
+    public function index($type = null)
+    {
+        $list_forms = SupportForm::with(['formType', 'supFormType'])->orderBy('name')->get();
+        $form_type = $type ? FormType::findOrFail($type)->type_name : 'Tất cả biểu mẫu';
+        $selectedType = $type;
+        $recent = \App\Models\SupportFormUsage::where('user_id', session('user_id'))->pluck('used_at', 'support_form_id');
+
+        return view('user.page.list_forms', compact('list_forms', 'form_type', 'selectedType', 'recent'));
     }
+
     public function show($type, $id)
     {
-        FormUsageService::log($id);
+        $form = SupportForm::where('form_type', $type)->findOrFail($id);
+        FormUsageService::log($form->id);
 
-        // Lấy dữ liệu biểu mẫu theo ID
-        $form = SupportForm::select('id', 'name', 'fields', 'file_template')
-            ->where('form_type', $type) // Lọc theo type
-            ->findOrFail($id);
+        return $this->workspace($form, $type);
+    }
 
-        // Chuyển đổi danh sách trường từ JSON sang mảng
-        $formfields = json_decode($form->fields, true);
+    public function workspace(SupportForm $form, $type, array $extra = [])
+    {
+        $formfields = \App\Services\FormWorkspaceService::fieldCodes($form->fields);
+        $definitions = FormField::whereIn('field_code', $formfields)->get()->keyBy('field_code');
+        $fields = collect($formfields)->mapWithKeys(function ($code) use ($definitions) {
+            $field = $definitions->get($code);
+            if (! $field) {
+                return [];
+            }
 
-        // Lấy danh sách các trường mặc định
-        $default_fields = FormField::all()->mapWithKeys(function ($field) {
-            return [
-                $field->field_code => [
-                    'field_name'  => $field->field_name,
-                    'data_type'   => $field->data_type,
-                    'value'       => $field->value,
-                    'placeholder' => $field->placeholder,
-                ]
-            ];
+            return [$code => [
+                'field_name' => $field->field_name, 'data_type' => $field->data_type,
+                'value' => $field->value, 'placeholder' => $field->placeholder,
+                'content_group' => $field->content_group,
+                'display_order' => (int) $field->display_order,
+            ]];
         })->toArray();
 
-        // Tạo danh sách các trường hợp lệ cho biểu mẫu
-        $fields = array_intersect_key($default_fields, array_flip($formfields));
-       
         $gender = [
             'Nam' => 'Nam',
             'Nữ' => 'Nữ',
@@ -74,7 +76,7 @@ class UserSupportFormController extends Controller
             'Nội trợ' => 'Nội trợ',
             'Khác' => '',
         ];
-        
+
         $ChucVuKH = [
             'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết' => 'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết',
             'Cán bộ nhân viên' => 'Cán bộ nhân viên',
@@ -88,7 +90,7 @@ class UserSupportFormController extends Controller
             'EUR' => 'EUR',
             'Khác' => '',
         ];
-        $SoTKTT= [
+        $SoTKTT = [
             'Số TKTT ngẫu nhiên' => 'LoaiTK_Auto',
             'Số TKTT yêu cầu' => 'LoaiTK_Chon',
             'TKTT chuyên dùng' => 'LoaiTK_ChDung',
@@ -111,7 +113,7 @@ class UserSupportFormController extends Controller
             'Điện' => 'Check_Dien',
             'Viễn Thông' => 'Check_VienT',
             'Học Phí' => 'Check_HocP',
-            'Bảo Hiểm' => 'Check_BH',     
+            'Bảo Hiểm' => 'Check_BH',
         ];
         $MobileBanking = [
             'Agribank Plus' => 'MB_APLUS',
@@ -120,22 +122,22 @@ class UserSupportFormController extends Controller
             'Liên kết Ví điện tử' => 'MB_VDT',
             'Bank plus' => 'MB_BPLUS',
         ];
-        $RetaileBanking=[
-            'Kênh giao dịch'=>[
-                'Mobile'=>'EBANK_Mobile',
-                'Internet'=>'EBANK_Internet',
+        $RetaileBanking = [
+            'Kênh giao dịch' => [
+                'Mobile' => 'EBANK_Mobile',
+                'Internet' => 'EBANK_Internet',
             ],
-            'Gói'=>[
-                'Phi tài chính'=>'Goi_PTC',
-                'Tài chính'=>'Goi_TC',
+            'Gói' => [
+                'Phi tài chính' => 'Goi_PTC',
+                'Tài chính' => 'Goi_TC',
             ],
-            'Phương Thức xác thực'=>[
-                'SMS OTP'=>'Goi_SMS',
-                'Soft OTP'=>'Goi_Soft',
-                'Token OTP'=>'Goi_Token',
+            'Phương Thức xác thực' => [
+                'SMS OTP' => 'Goi_SMS',
+                'Soft OTP' => 'Goi_Soft',
+                'Token OTP' => 'Goi_Token',
             ],
         ];
-        $DichVuKhac=[
+        $DichVuKhac = [
             'Vay vốn' => 'DV_VV',
             'Tiết kiệm' => 'DV_TK',
             'Kiều hối' => 'DV_KH',
@@ -162,504 +164,85 @@ class UserSupportFormController extends Controller
             'Bộ Công An' => 'Bộ Công An',
             'CCS QLHC VỀ TTXH' => 'CCS QLHC VỀ TTXH',
         ];
-        return view('user.page.transaction_form', compact('form', 'fields', 'type', 'gender', 'NgheNghiepKH', 'ChucVuKH', 
-        'ccycd', 'SoTKTT', 'LoaiThe','HangThe', 'ThuTuDong', 'MobileBanking', 'RetaileBanking', 'DichVuKhac','nguoi',
-         'identity_place', 'NoiCapCCCDMoi', 'identity_type',
-        ));
+
+        return view('user.page.transaction_form', compact('form', 'fields', 'type', 'gender', 'NgheNghiepKH', 'ChucVuKH',
+            'ccycd', 'SoTKTT', 'LoaiThe', 'HangThe', 'ThuTuDong', 'MobileBanking', 'RetaileBanking', 'DichVuKhac', 'nguoi',
+            'identity_place', 'NoiCapCCCDMoi', 'identity_type',
+        ))->with($extra);
     }
 
-    
     public function search(Request $request)
     {
-        $query = $request->get('query', '');
-        
+        $request->validate(['query' => 'required|string|min:2|max:100']);
+        $query = trim($request->get('query'));
+        if (mb_strlen($query) < 2) {
+            return response()->json([]);
+        }
+
         // Truy vấn khách hàng theo custno hoặc name (hoặc nameloc)
         $customers = CustomerInfo::with('accounts')
-            ->where('custno', 'like', '%' . $query . '%')
-            ->orWhere('name', 'like', '%' . $query . '%')
-            ->orWhere('nameloc', 'like', '%' . $query . '%')
-            ->orWhere('identity_no', 'like', '%' . $query . '%')
+            ->where('custno', 'like', '%'.$query.'%')
+            ->orWhere('name', 'like', '%'.$query.'%')
+            ->orWhere('nameloc', 'like', '%'.$query.'%')
+            ->orWhere('identity_no', 'like', '%'.$query.'%')
             ->limit(15)
             ->get();
         // Định dạng dữ liệu trả về
-        $results = $customers->map(function($customer) {
+        $results = $customers->map(function ($customer) {
             return [
-                'label'    => 'Mã KH ' . $customer->custno . ' - ' . $customer->nameloc . ' - '  . 'ID ' . $customer->identity_no,
-                'value'    => $customer->custno . ' - ' . $customer->nameloc ,
+                'label' => 'Mã KH '.$customer->custno.' - '.$customer->nameloc.' - '.'ID '.$customer->identity_no,
+                'value' => $customer->custno.' - '.$customer->nameloc,
                 'customer' => $customer,
-                'accounts' => $customer->accounts, // Collection các tài khoản
             ];
         });
 
         return response()->json($results);
     }
+
     public function print(Request $request)
     {
-        // FormUsageService::log($id);
-        DB::beginTransaction(); // Bắt đầu transaction để đảm bảo tính toàn vẹn dữ liệu
+        $request->validate(['form_id' => 'required|integer|min:1']);
+        $form = SupportForm::findOrFail($request->input('form_id'));
+        $workspace = app(\App\Services\FormWorkspaceService::class);
+        $formData = $workspace->validatedPayload($request->except(['_token', 'form_id']));
+        $filePath = $workspace->templatePath($form);
+        $tempFile = null;
         try {
-            // Nhận form_id và dữ liệu từ request
-            $formId = $request->input('form_id');
-            $formData = $request->except(['_token', 'form_id']);
-            FormUsageService::log($formId);
-            // Tìm biểu mẫu trong database
-            $form = SupportForm::find($formId);
-            if (!$form || !$form->file_template) {
-                return response()->json(['error' => 'Biểu mẫu không tồn tại hoặc chưa có file mẫu!'], 404);
-            }
+            $tempFile = app(\App\Services\SupportFormDocumentService::class)->generate($filePath, $workspace->payloadFor($form, $formData));
+            DB::connection('mysql')->transaction(function () use ($form) {
+                $form->timestamps = false;
+                $form->increment('usage_count');
+                FormUsageService::log($form->id);
+            });
 
-            // Kiểm tra file mẫu có tồn tại không
-            $filePath = public_path("storage/" . $form->file_template);
-            if (!file_exists($filePath)) {
-                return response()->json(['error' => 'File mẫu không tồn tại!'], 404);
+            return response()->download($tempFile, pathinfo($filePath, PATHINFO_FILENAME).'_'.date('H-i_d-m-Y').'.docx', [
+                'Cache-Control' => 'private, no-store',
+            ])->deleteFileAfterSend(true);
+        } catch (\Throwable $error) {
+            if ($tempFile && is_file($tempFile)) {
+                unlink($tempFile);
             }
+            report($error);
 
-            // Load template Word
-            $templateProcessor = new TemplateProcessor($filePath);
-            
-            // Lấy giá trị của custno và idxacno từ form; nếu không có thì dùng giá trị ẩn
-            // Xử lý dữ liệu khách hàng
-            $custnoKHCN  = $formData['custno']  ?? $formData['custno_hidden'] ;
-            $custnoKHDN  = $formData['MaKHDN']  ?? $formData['MaKHDN_hidden'] ;
-            $idxacnoIdentifier = $formData['idxacno'] ?? $formData['idxacno_hidden'];
-            // CUSTOMER INFO
-            // =======================
-            // Xử lý Khách hàng Doanh nghiệp
-            // =======================
-            if (!empty($custnoKHDN) ?? $custnoKHDN !== ' ' ?? $custnoKHDN !== null) { 
-                $customerDN = CustomerInfo::where('custno', $custnoKHDN)->first();
-
-                $dataDN = [
-                    'custno'        => $custnoKHDN,
-                    'nameloc'       => $formData['TenDoanhNghiep'] ?? '',
-                    'phone_no'      => $formData['SoDienThoai'] ?? '',
-                    'custtpcd'      => $formData['custtpcd'] ?? 'KHDN',
-                    'branch_code'   => $formData['branch_code'] ?? '',
-                    'addrtpcd'      => $formData['addrtpcd'] ?? '',
-                    'addrfull'      => $formData['DiaChiDoanhNghiep'] ?? '',
-                    'taxno'         => $formData['MaSoThueDN'] ?? '',
-                    'taxno_date'    => $this->supportformService->formatDateIfNeeded($formData['NgayCapMSTDN'] ?? ''),
-                    'taxno_place'   => $formData['NoiCapThueDN'] ?? '',
-                    'busno'         => $formData['GiayDKKD'] ?? '',
-                    'busno_date'    => $this->supportformService->formatDateIfNeeded($formData['NgayCapDKKD'] ?? ''),
-                    'busno_place'   => $formData['NoiCapDKKD'] ?? '',
-                ];
-            
-                if ($customerDN) {
-                    $updateData = [];
-                    foreach ($dataDN as $field => $value) {
-                        if (!is_null($value) && $value !== '') {
-                            $updateData[$field] = $value;
-                        }
-                    }
-                    if (!empty($updateData)) {
-                        $customerDN->update($updateData);
-                    }
-                } else {
-                    $customerDN = CustomerInfo::create($dataDN);
-                }
-
-            }
-
-            // =======================
-            // Xử lý Khách hàng Cá nhân
-            // =======================
-            if (!empty($custnoKHCN) ?? $custnoKHCN !== ' ' ?? $custnoKHCN !== null) {
-                $customerCN = CustomerInfo::where('custno', $custnoKHCN)->first();
-
-                $dataCN = [
-                    'custno'        => $custnoKHCN,
-                    'name'          => $formData['name'] ?? '',
-                    'nameloc'       => $formData['nameloc'] ?? '',
-                    'custtpcd'      => $formData['custtpcd'] ?? 'Cá nhân',
-                    'custdtltpcd'   => $formData['custdtltpcd'] ?? '',
-                    'phone_no'      => $formData['phone_no'] ?? '',
-                    'profnm'        => $formData['NgheNghiepKH'] ?? '',
-                    'gender'        => $formData['gender'] ?? '',
-                    'branch_code'   => $formData['branch_code'] ?? '',
-                    'identity_no'   => $formData['identity_no'] ?? '',
-                    'identity_date' => $formData['identity_date'] ?? '',
-                    'identity_outdate' => $this->supportformService->formatDateIfNeeded($formData['identity_outdate'] ?? ''),
-                    'identity_place'=> $formData['identity_place'] ?? '',
-                    'addrtpcd'      => $formData['addrtpcd'] ?? '',
-                    'addr1'         => $formData['addr1'] ?? '',
-                    'addr2'         => $formData['addr2'] ?? '',
-                    'addr3'         => $formData['addr3'] ?? '',
-                    'addrfull'      => $formData['addrfull'] ?? '',
-                    'birthday'      => $this->supportformService->formatDateIfNeeded($formData['birthday'] ?? ''),
-                    'taxno'         => $formData['MaSoThueCN'] ?? '',
-                    'taxno_place'   => $formData['NoiCapThueCN'] ?? '',
-                ];
-
-                if ($customerCN) {
-                    $updateData = [];
-                    foreach ($dataCN as $field => $value) {
-                        if (!is_null($value) && $value !== '') {
-                            $updateData[$field] = $value;
-                        }
-                    }
-                    if (!empty($updateData)) {
-                        $customerCN->update($updateData);
-                    }
-                } else {
-                    $customerCN = CustomerInfo::create($dataCN);
-                }
-            }
-
-            // -------------------------
-            // ACCOUNT INFO
-            // -------------------------
-            if ($idxacnoIdentifier ?? $idxacnoIdentifier !== ' ' ?? $idxacnoIdentifier !== null) {
-                $account = AccountInfo::where('idxacno', $idxacnoIdentifier)->first();
-
-                // Nếu đã tồn tại → cập nhật
-                if ($account) {
-                    foreach ($account->getFillable() as $field) {
-                        if (isset($formData[$field])) {
-                            $account->$field = $formData[$field];
-                        }
-                    }
-                    $account->save();
-                }
-                // Nếu chưa tồn tại → tạo mới
-                else {
-                    $account = AccountInfo::create([
-                        'idxacno'  => $idxacnoIdentifier,
-                        'custseq'  => isset($customer) ? $customer->custno : null,
-                        'custnm'   => $formData['custnm'] ?? '',
-                        'stscd'    => $formData['stscd'] ?? '',
-                        'ccycd'    => $formData['ccycd'] ?? '',
-                        'lmtmtp'   => $formData['lmtmtp'] ?? '',
-                        'minlmt'   => $formData['minlmt'] ?? '',
-                        'addr1'    => $formData['addr1'] ?? '',
-                        'addr2'    => $formData['addr2'] ?? '',
-                        'addr3'    => $formData['addr3'] ?? '',
-                        'addrfull' => $formData['addrfull'] ?? '',
-                    ]);
-                }
-            }
-
-            // Gắn dữ liệu từ form vào file Word
-            foreach ($formData as $key => $value) {
-                // Nếu không có giá trị thì gán chuỗi rỗng
-                $value = $value ?? ' ';
-                if (is_array($value)) {
-                    $flatArray = [];
-                    array_walk_recursive($value, function($item) use (&$flatArray) {
-                        $flatArray[] = $item;
-                    });
-                    $value = implode(',', $flatArray);
-                }
-                
-                if ($key === 'nameloc') {
-                    // Chuyển tên thành in hoa không dấu
-                    $name = $this->supportformService->convertToUppercaseWithoutAccents($value);
-                    // Tạo mảng ký tự từ tên (giới hạn 26 ký tự)
-                    $nameArray = mb_str_split($name);
-                    $nameArray = array_slice($nameArray, 0, 26); // Giới hạn 26 ký tự
-
-                    // Nếu chưa đủ 26 ký tự thì thêm khoảng trắng
-                    while (count($nameArray) < 26) {
-                        $nameArray[] = ' ';
-                    }
-                    // Gán từng ký tự vào biến tương ứng ($n1, $n2, ..., $n26)
-                    for ($i = 0; $i < 26; $i++) {
-                        $templateProcessor->setValue('n' . ($i + 1), (string)$nameArray[$i]);
-                    }
-                }
-                if ($key === 'SoThe') {
-                    $templateProcessor->setValue('SoThe', (string)$value);
-                    // Chia tách số thành các ký tự riêng lẻ
-                    $stkArray = $this->supportformService->convertNumberToVariables($value);
-                    // Giới hạn mảng chỉ 4 số
-                    $stkArray = array_values(array_slice($stkArray, 0, 4));
-                    $stkArray = array_pad($stkArray, 4, ' ');
-                    // Gán từng ký tự vào biến tương ứng ($s1, $s2, ..., $4)
-                    foreach ($stkArray as $stkKey => $stkValue) {
-                        $templateProcessor->setValue('s' . ($stkKey + 1), (string)$stkValue);
-                    }
-
-                }
-                
-                if (
-                    strpos($key, 'NgayUQCQ') !== false ||
-                    strpos($key, 'NgayThueCQ') !== false ||
-                    strpos($key, 'NgayCapMSTDN') !== false ||
-                    strpos($key, 'NgayUQ') !== false ||
-                    strpos($key, 'NgayHen') !== false ||
-                    strpos($key, 'birthday') !== false ||
-                    strpos($key, 'identity_date') !== false ||
-                    strpos($key, 'identity_outdate') !== false ||
-                    strpos($key, 'NgayGiaoDich') !== false ||
-                    strpos($key, 'NgayCCCDMoi') !== false ||
-                    strpos($key, 'NgayCapDKKD') !== false ||
-                    strpos($key, 'HanCCCDMoi') !== false 
-                ) {
-                    // Chuyển định dạng ngày tháng, nếu không có dữ liệu thì gán khoảng trắng
-                    $value = $this->supportformService->convertDateFormat($value) ?? ' ';
-                    // Nếu là birthday, tách thành các biến phụ
-                    if (strpos($key, 'birthday') !== false) {
-                        $dateVars = $this->supportformService->convertDateToVariablesBirthDay($value ?? ' ');
-                        if (!empty($dateVars) && is_array($dateVars)) {
-                            foreach ($dateVars as $dateKey => $dateValue) {
-                                $templateProcessor->setValue($dateKey, (string)$dateValue);
-                            }
-                        }
-                    }
-                    // Nếu là identity_date, tách thành các biến phụ
-                    if (strpos($key, 'identity_date') !== false) {
-                        $dateVars = $this->supportformService->convertDateToVariablesIdentity($value ?? ' ');
-                        if (!empty($dateVars) && is_array($dateVars)) {
-                            foreach ($dateVars as $dateKey => $dateValue) {
-                                $templateProcessor->setValue($dateKey, (string)$dateValue);
-                            }
-                        }
-                    }
-                    // Nếu là identity_outdate, tách thành các biến phụ
-                    if (strpos($key, 'identity_outdate') !== false) {
-                        $dateVars = $this->supportformService->convertOutDateToVariablesIdentity($value ?? ' ');
-                        if (!empty($dateVars) && is_array($dateVars)) {
-                            foreach ($dateVars as $dateKey => $dateValue) {
-                                $templateProcessor->setValue($dateKey, (string)$dateValue);
-                            }
-                        }
-                    }
-                    // Nếu là NgayCapDKKD, tách thành các biến phụ
-                    if (strpos($key, 'NgayCapDKKD') !== false) {
-                        $dateVars = $this->supportformService->convertNgayCapDKKDToVariablesIdentity($value ?? ' ');
-                        if (!empty($dateVars) && is_array($dateVars)) {
-                            foreach ($dateVars as $dateKey => $dateValue) {
-                                $templateProcessor->setValue($dateKey, (string)$dateValue);
-                            }
-                        }
-                    }
-                    // Nếu là NgayCapDKKD, tách thành các biến phụ
-                    if (strpos($key, 'NgayCapMSTDN') !== false) {
-                        $dateVars = $this->supportformService->convertNgayCapMSTDNToVariablesIdentity($value ?? ' ');
-                        if (!empty($dateVars) && is_array($dateVars)) {
-                            foreach ($dateVars as $dateKey => $dateValue) {
-                                $templateProcessor->setValue($dateKey, (string)$dateValue);
-                            }
-                        }
-                    }
-                } elseif (strpos($key, 'NgayThangNam') !== false) {
-                    $templateProcessor->setValue('DateVietEng', (string)$this->supportformService->convertDateNowFormatEng($value) ?? ' ');
-                    $templateProcessor->setValue('DateEng', (string)$this->supportformService->convertDateNowFormatVietEng($value) ?? ' ');
-
-                    $value = $this->supportformService->convertDateNowFormat($value) ?? ' ';
-                }
-                if (
-                    strpos($key, 'VonSucLD_So') !== false ||
-                    strpos($key, 'SoDuTaiKhoan') !== false ||
-                    strpos($key, 'PhiDichVu') !== false ||
-                    strpos($key, 'HanMucTD_So') !== false
-                ) {
-                    if (strpos($key, 'PhiDichVu') !== false) {
-                        // 👉 Gọi hàm helper đọc số ra chữ
-                        $value_in_words = ucfirst(num_to_vietnamese_words((int)$value)) . ' đồng';
-
-                        // Set luôn vào một biến riêng trong template, ví dụ {{PhiDichVu_Chu}}
-                        $templateProcessor->setValue('PhiDichVu_Chu', $value_in_words);
-                    }
-                    $value = $this->supportformService->formatNumber($value) ?? ' ';
-                }
-                
-                // Gán giá trị cuối cùng cho placeholder có tên trùng với $key
-                // $templateProcessor->setValue($key, (string) ($value ?? ' '));
-                $templateProcessor->setValue(
-                    $key,
-                    $this->supportformService->wordSafe($value)
-                );
-                // Nếu có key branch, tạo thêm biến 'ChiNhanhHOA' với giá trị được chuyển thành in hoa
-                if ($key === 'branch') {
-                    $templateProcessor->setValue('ChiNhanhHOA', (string)$this->supportformService->convertToUppercase($value) ?? ' ');
-                }
-                if ($key === 'SoTienDoi' || isset($formData['TyGia']) || isset($formData['LoaiTienNhan'])) {
-                    $sotiendoi = is_numeric($formData['SoTienDoi']) ? (float)$formData['SoTienDoi'] : 0;
-                    $sotiendoi_chu = ucfirst(num_to_vietnamese_words((int)$sotiendoi)) . ' ' . ($formData['ccycd'] ?? '');
-                    $templateProcessor->setValue('SoTienDoi_Chu', $sotiendoi_chu);
-                    $TyGia = is_numeric($formData['TyGia']) ? (float)$formData['TyGia'] : 0;
-                    $sotiennhan = $this->supportformService->ExchangeValue($sotiendoi, $TyGia);
-                    $templateProcessor->setValue('SoTienNhan', (string)$this->supportformService->formatNumber($sotiennhan) ?? ' ');
-                    // Gọi hàm đọc số thành chữ
-                    $value_in_words = ucfirst(num_to_vietnamese_words((int)$sotiennhan)) . ' ' . ($formData['LoaiTienNhan'] ?? '');
-                    $templateProcessor->setValue('SoTienNhan_Chu', $value_in_words);
-                }
-            }
-            // Lưu file tạm trước khi chỉnh sửa XML
-            $tempFile = tempnam(sys_get_temp_dir(), 'word');
-            $templateProcessor->saveAs($tempFile);
-            // dd($formData['ThuTuDong']);
-            // Xử lý checkbox trong word SAU KHI đã lưu file tạm
-            if (isset($formData['gender'])) {
-                $valueChecked = $formData['gender']; // "Check_NAM" hoặc "Check_NU"
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Check_NAM', $valueChecked === 'Nam');
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Check_NU',  $valueChecked === 'Nữ');
-            }
-            if (isset($formData['NgheNghiepKH'])) {
-                $valueChecked = $formData['NgheNghiepKH'];
-                $NgheNghiepKH = [
-                    'Công chức/viên chức' => 'ccvc',
-                    'Công an/bộ đội' => 'cabd',
-                    'Giáo viên/bác sĩ' => 'gvbs',
-                    'Kỹ sư' => 'ks',
-                    'Công nhân' => 'cn',
-                    'Nông dân' => 'nd',
-                    'Luật sư, nhà chuyên môn về luật/kế toán thuế/tư vấn tài chính và đầu tư' => 'lsncm',
-                    'Kinh doanh tự do' => 'kdtd',
-                    'Hướng dẫn viên du lịch/tiếp viên hàng không' => 'hdvtvhk',
-                    'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết' => 'ctgd',
-                    'Học sinh/sinh viên' => 'hssv',
-                    'Nội trợ' => 'nt',
-                    '' => 'nnkhac',
-                ];
-            
-                // Duyệt toàn bộ danh sách để gán checked/un-checked tương ứng
-                foreach ($NgheNghiepKH as $label => $tagName) {
-                    $isChecked = $valueChecked === $label;
-                    $this->supportformService->updateCheckboxContentControl($tempFile, $tagName, $isChecked);
-                }
-            }
-        
-            if (isset($formData['ChucVuKH'])) {
-                $valueChecked = $formData['ChucVuKH'];
-                $ChucVuKH = [
-                    'Chủ tịch/Giám đốc Công ty TNHH, CP không niêm yết' => 'ChucVu_CTGD',
-                    'Cán bộ nhân viên' => 'ChucVu_CBNV',
-                    'Chủ tịch/Giám đốc/Chức danh tương đương tại TC, DN khác' => 'ChucVu_CTTD',
-                    'Quản lý cấp trung (Trưởng phòng, Phó TP, tương đương)' => 'ChucVu_QLCT',
-                    '' => 'ChucVu_Khac',
-                ];
-                // Duyệt toàn bộ danh sách để gán checked/un-checked tương ứng
-                foreach ($ChucVuKH as $label => $tagName) {
-                    $isChecked = $valueChecked === $label;
-                    $this->supportformService->updateCheckboxContentControl($tempFile, $tagName, $isChecked);
-                }
-            }
-            if (isset($formData['LoaiThe'])) {
-                $valueChecked = $formData['LoaiThe'];
-                $LoaiThe = [
-                    'Thẻ ghi nợ nội địa' => 'Check_TheND',
-                    'Agribank Napas-Mastercard' => 'Check_TheNapas',
-                    'JCB Debit' => 'Check_TheJCB',
-                    'Thẻ liên kết thương hiệu' => 'Check_TheTH',
-                    'Thẻ Visa Debit' => 'Check_TheVS',
-                    'MasterCard Debit' => 'Check_TheMT',
-                    'Thẻ Khác' => 'Check_TheKHAC',
-                ];
-                // Duyệt toàn bộ danh sách để gán checked/un-checked tương ứng
-                foreach ($LoaiThe as $label => $tagName) {
-                    $isChecked = $valueChecked === $label;
-                    $this->supportformService->updateCheckboxContentControl($tempFile, $tagName, $isChecked);
-                }            }
-            if (isset($formData['ccycd'])) {
-                $valueChecked = $formData['ccycd'];
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Check_VND', $valueChecked === 'VND');
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Check_USD',  $valueChecked === 'USD');
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Check_EUR',  $valueChecked === 'EUR');
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Check_TienKhac',  $valueChecked === 'Khác');
-            }
-            if (isset($formData['SoTKTT'])) {
-                $valueChecked = $formData['SoTKTT'];
-                $this->supportformService->updateCheckboxContentControl($tempFile, $valueChecked,  $valueChecked);
-            }
-            if (isset($formData['HangThe'])) {
-                $valueChecked = $formData['HangThe'];
-                $this->supportformService->updateCheckboxContentControl($tempFile, $valueChecked,  $valueChecked);
-            }
-            // dd($formData['MobileBanking']);
-            if (isset($formData['ThuTuDong'])) {
-                // Flatten mảng, lấy tất cả các giá trị thành 1 mảng đơn
-                $selected = [];
-                foreach ($formData['ThuTuDong'] as $item) {
-                    if (is_array($item)) {
-                        $selected = array_merge($selected, $item);
-                    } else {
-                        $selected[] = $item;
-                    }
-                }
-                
-                // Cập nhật checkbox dựa trên việc có trong mảng $selected hay không
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Check_Nuoc', in_array('Check_Nuoc', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Check_Dien', in_array('Check_Dien', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Check_VienT', in_array('Check_VienT', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Check_HocP', in_array('Check_HocP', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Check_BH', in_array('Check_BH', $selected));
-            }
-            if (isset($formData['MobileBanking'])) {
-                // Flatten mảng, lấy tất cả các giá trị thành 1 mảng đơn
-                $selected = [];
-                foreach ($formData['MobileBanking'] as $item) {
-                    if (is_array($item)) {
-                        $selected = array_merge($selected, $item);
-                    } else {
-                        $selected[] = $item;
-                    }
-                }
-                // Cập nhật checkbox dựa trên việc có trong mảng $selected hay không
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'MB_APLUS', in_array('MB_APLUS', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'MB_EC', in_array('MB_EC', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'MB_SMS', in_array('MB_SMS', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'MB_VDT', in_array('MB_VDT', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'MB_BPLUS', in_array('MB_BPLUS', $selected));
-            }
-            if (isset($formData['RetaileBanking'])) {
-                // Flatten mảng, lấy tất cả các giá trị thành 1 mảng đơn
-                $selected = [];
-                foreach ($formData['RetaileBanking'] as $item) {
-                    if (is_array($item)) {
-                        $selected = array_merge($selected, $item);
-                    } else {
-                        $selected[] = $item;
-                    }
-                }
-                // Cập nhật checkbox dựa trên việc có trong mảng $selected hay không
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'EBANK_Mobile', in_array('EBANK_Mobile', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'EBANK_Internet', in_array('EBANK_Internet', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Goi_PTC', in_array('Goi_PTC', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Goi_TC', in_array('Goi_TC', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Goi_SMS', in_array('Goi_SMS', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Goi_Soft', in_array('Goi_Soft', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'Goi_Token', in_array('Goi_Token', $selected));
-            }
-            if (isset($formData['DichVuKhac'])) {
-                // Flatten mảng, lấy tất cả các giá trị thành 1 mảng đơn
-                $selected = [];
-                foreach ($formData['DichVuKhac'] as $item) {
-                    if (is_array($item)) {
-                        $selected = array_merge($selected, $item);
-                    } else {
-                        $selected[] = $item;
-                    }
-                }
-                // Cập nhật checkbox dựa trên việc có trong mảng $selected hay không
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'DV_VV', in_array('DV_VV', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'DV_TK', in_array('DV_TK', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'DV_KH', in_array('DV_KH', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'DV_CTNN', in_array('DV_CTNN', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'DV_MBNT', in_array('DV_MBNT', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'DV_BH', in_array('DV_BH', $selected));
-                $this->supportformService->updateCheckboxContentControl($tempFile, 'DV_KHAC', in_array('DV_KHAC', $selected));
-            }
-            // Tăng usage_count của biểu mẫu mỗi khi in
-            $form->timestamps = false; // Tắt cập nhật timestamp
-            $form->increment('usage_count');
-            DB::commit();
-
-            $originalFileName = pathinfo($filePath, PATHINFO_FILENAME); // 'my_template'
-            // Trả về file Word để tải xuống trực tiếp
-            // return response()->download($tempFile, $form->name .'_' .  date('H-i_d-m-Y') . '.docx')->deleteFileAfterSend(true);
-            return response()->download($tempFile, $originalFileName . '_' . date('H-i_d-m-Y') . '.docx')->deleteFileAfterSend(true);
-
-        } catch (\Exception $e) {
-            DB::rollBack(); // Rollback nếu có lỗi
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Chưa tạo được bản Word. Dữ liệu đang nhập vẫn được giữ; hãy thử lại.'], 500);
         }
     }
 
-    
+    public function saveCustomer(Request $request, \App\Services\SupportFormCustomerService $customers)
+    {
+        $request->validate(['form_id' => 'required|integer|min:1', 'payload' => 'required|array']);
+        $form = SupportForm::findOrFail($request->input('form_id'));
+        $workspace = app(\App\Services\FormWorkspaceService::class);
+        $payload = $workspace->validatedPayload($request->input('payload'));
+        $allowed = array_merge(\App\Services\FormWorkspaceService::fieldCodes($form->fields), ['custno_hidden', 'MaKHDN_hidden', 'idxacno_hidden']);
+        $payload = array_intersect_key($payload, array_flip($allowed));
+        foreach ($payload as $field => $value) {
+            if (is_array($value)) {
+                unset($payload[$field]);
+            }
+        }
+        $customers->save($payload);
 
-    
-    
+        return response()->json(['message' => 'Đã lưu thông tin khách hàng và tài khoản.']);
+    }
 }
-                                     

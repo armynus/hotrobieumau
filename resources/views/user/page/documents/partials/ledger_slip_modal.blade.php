@@ -23,7 +23,13 @@
                         <div class="form-group col-md-6"><label for="slipDate">Ngày lập phiếu <span class="text-danger">*</span></label><input class="form-control" id="slipDate" name="print_date" data-today="{{ now()->format('Y-m-d') }}" placeholder="dd/mm/yyyy" required></div>
                         <div class="form-group col-md-6"><label for="slipDepartment">Phòng / Bộ phận trình</label><input class="form-control" id="slipDepartment" name="department_name" value="Phòng Tổng hợp" maxlength="255"></div>
                         <div class="form-group col-md-6"><label for="slipPlace">Địa danh lập phiếu</label><input class="form-control" id="slipPlace" name="place_name" value="{{ $clerk->branch?->branch_place }}" maxlength="100" placeholder="Chưa cấu hình địa danh chi nhánh"></div>
-                        <div class="form-group col-md-6"><label for="slipSignatureTitle">Chức danh người ký phiếu</label><input class="form-control" id="slipSignatureTitle" name="signature_title" value="Trưởng phòng Tổng hợp" maxlength="255"></div>
+                        <div class="form-group col-md-6">
+                            <label for="slipSignatureTitle">Chức danh người ký phiếu</label>
+                            <select class="form-control" id="slipSignatureTitle" name="signature_title">
+                                <option value="Trưởng phòng Tổng Hợp">Trưởng phòng Tổng Hợp</option>
+                                <option value="P.Trưởng phòng Tổng Hợp">P.Trưởng phòng Tổng Hợp</option>
+                            </select>
+                        </div>
                         <div class="form-group col-md-6"><label for="slipPreparedBy">Họ tên người ký phiếu</label><input class="form-control" id="slipPreparedBy" name="prepared_by" maxlength="255"></div>
                     </div>
                     <p class="small text-muted mb-0">Thông tin phiếu chỉ dùng cho lần tải này, không sửa sổ hay kho văn bản. Giữ phần ý kiến, giao việc và ký duyệt của lãnh đạo để ghi sau; không tự tạo chữ ký.</p>

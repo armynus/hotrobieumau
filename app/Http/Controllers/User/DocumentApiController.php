@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Session;
 
 class DocumentApiController extends Controller
 {
+    private const HISTORY_PAGE_SIZE = 10;
+
     protected $documentService;
 
     protected $documentQueryService;
@@ -40,12 +42,24 @@ class DocumentApiController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
 
-        $request->validate(['direction' => 'nullable|in:incoming,outgoing,decision,unclassified']);
+        $request->validate([
+            'direction' => 'nullable|in:incoming,outgoing,decision,unclassified',
+            'document_type_id' => 'nullable|integer',
+            'keyword' => 'nullable|string|max:255',
+            'date_from' => 'nullable|date_format:Y-m-d',
+            'date_to' => 'nullable|date_format:Y-m-d|after_or_equal:date_from',
+            'issued_date_from' => 'nullable|date_format:Y-m-d',
+            'issued_date_to' => 'nullable|date_format:Y-m-d|after_or_equal:issued_date_from',
+            'is_read' => 'nullable|in:0,1',
+            'start' => 'nullable|integer|min:0|max:10000000',
+            'length' => 'nullable|integer|min:-1|max:100',
+            'search.value' => 'nullable|string|max:255',
+        ]);
         $filters = $request->only([
             'direction', 'document_type_id', 'keyword', 'date_from', 'date_to',
             'issued_date_from', 'issued_date_to', 'is_read',
         ]);
-        $filters['keyword'] = ($filters['keyword'] ?? null) ?: $request->input('search.value');
+        $filters['keyword'] = trim((string) (($filters['keyword'] ?? null) ?: $request->input('search.value')));
         if (($filters['is_read'] ?? '') === '0') {
             $filters['exclude_archive_imports'] = true;
         }
@@ -69,11 +83,27 @@ class DocumentApiController extends Controller
         $totalFilters = array_filter([
             'direction' => $filters['direction'] ?? null,
         ]);
-        $recordsTotal = $this->documentQueryService->getDocumentsForUser($user, $totalFilters)->count();
+        $recordsTotal = $this->documentQueryService
+            ->getDocumentsForUser($user, $totalFilters + ['skip_sort' => true])
+            ->count();
+
+        $hasAdditionalFilters = collect([
+            $filters['document_type_id'] ?? null,
+            $filters['keyword'] ?? null,
+            $filters['date_from'] ?? null,
+            $filters['date_to'] ?? null,
+            $filters['issued_date_from'] ?? null,
+            $filters['issued_date_to'] ?? null,
+            $filters['is_read'] ?? null,
+        ])->contains(fn ($value) => $value !== null && $value !== '');
 
         $query = $this->documentQueryService
             ->getDocumentsForUser($user, $filters)
-            ->with('attachments:id,document_id,file_path,file_name');
+            ->select([
+                'id', 'direction', 'document_code', 'title', 'issued_date',
+                'visibility', 'created_by', 'managing_branch_id',
+            ])
+            ->with('attachments:id,document_id,file_name');
 
         $isTypeTwoClerk = $user->isClerk() && $user->branch?->branch_type === 'type_2';
         if ($isTypeTwoClerk) {
@@ -83,26 +113,39 @@ class DocumentApiController extends Controller
             ]);
         }
 
-        $recordsFiltered = (clone $query)->count();
+        // Khi chỉ đổi tab loại văn bản, recordsTotal đã có cùng phạm vi với
+        // recordsFiltered; tránh chạy lại nguyên truy vấn quyền lần thứ hai.
+        $recordsFiltered = $hasAdditionalFilters ? (clone $query)->count() : $recordsTotal;
 
         $start = max(0, (int) $request->input('start', 0));
         $requestedLength = (int) $request->input('length', 15);
         $length = $requestedLength === -1 ? 100 : max(1, min($requestedLength, 100));
-        $documents = $query->skip($start)->take($length)->get();
-
-        $documents->each(function (Document $document) use ($user, $isTypeTwoClerk) {
+        $documents = $query->skip($start)->take($length)->get()->map(function (Document $document) use ($user, $isTypeTwoClerk) {
             $canEdit = $document->canBeEditedBy($user);
             $canDistribute = $document->visibility !== Document::VISIBILITY_PRIVATE && $isTypeTwoClerk && (bool) $document->getAttribute('has_incoming_branch_transfer');
+            $canTransferToBranch = $document->canBeTransferredToBranchBy($user);
 
-            $document->setAttribute('capabilities', [
-                'can_edit' => $canEdit,
-                'can_delete' => $document->canBeDeletedBy($user),
-                'can_transfer' => $canEdit || $canDistribute,
-                'can_distribute_local' => $canEdit || $canDistribute,
-                'can_transfer_to_branch' => $document->canBeTransferredToBranchBy($user),
-                'transfer_target_type' => $document->canBeTransferredToBranchBy($user) ? 'branch' : (($canEdit || $canDistribute) ? 'local' : null),
-            ]);
-            $document->makeHidden('has_incoming_branch_transfer');
+            return [
+                'id' => (int) $document->id,
+                'direction' => $document->direction,
+                'document_code' => $document->document_code,
+                'title' => $document->title,
+                'issued_date' => $document->issued_date?->format('Y-m-d'),
+                'visibility' => $document->visibility,
+                'attachments' => $document->attachments->map(fn ($attachment) => [
+                    'id' => (int) $attachment->id,
+                    'file_name' => $attachment->file_name,
+                    'view_url' => $attachment->view_url,
+                ])->all(),
+                'capabilities' => [
+                    'can_edit' => $canEdit,
+                    'can_delete' => $document->canBeDeletedBy($user),
+                    'can_transfer' => $canEdit || $canDistribute,
+                    'can_distribute_local' => $canEdit || $canDistribute,
+                    'can_transfer_to_branch' => $canTransferToBranch,
+                    'transfer_target_type' => $canTransferToBranch ? 'branch' : (($canEdit || $canDistribute) ? 'local' : null),
+                ],
+            ];
         });
 
         return response()->json([
@@ -190,7 +233,9 @@ class DocumentApiController extends Controller
             });
             $document = $createResult['document'];
             $renamedFiles = $createResult['renamed_files'];
-            $typeLabel = match ($data['direction']) { 'decision' => 'Quyết định', 'outgoing' => 'Văn bản đi', default => 'Văn bản đến' };
+            $typeLabel = match ($data['direction']) {
+                'decision' => 'Quyết định', 'outgoing' => 'Văn bản đi', default => 'Văn bản đến'
+            };
             $message = $typeLabel.' đã được đăng tải thành công!';
             if (! empty($renamedFiles)) {
                 $storedNames = array_column($renamedFiles, 'stored');
@@ -234,11 +279,23 @@ class DocumentApiController extends Controller
         $document = $this->documentQueryService->getDocumentsForUser($user)
             ->with([
                 'attachments',
+                'documentType:id,name',
                 'creator:id,name',
-                'logs' => fn ($query) => $query->with('user:id,name')->latest(),
+                'logs' => fn ($query) => $query
+                    ->select(['id', 'document_id', 'user_id', 'action', 'created_at'])
+                    ->with('user:id,name')
+                    ->orderByDesc('created_at')
+                    ->orderByDesc('id')
+                    ->limit(self::HISTORY_PAGE_SIZE + 1),
                 'transfers' => fn ($query) => $query
+                    ->select([
+                        'id', 'document_id', 'to_branch_id', 'to_department_id', 'to_user_id',
+                        'transferred_by', 'transferred_at', 'created_at', 'note', 'status',
+                    ])
                     ->with(['toBranch:id,branch_name', 'toDepartment:id,department_name', 'toUser:id,name', 'transferer:id,name'])
-                    ->latest('transferred_at'),
+                    ->orderByDesc('transferred_at')
+                    ->orderByDesc('id')
+                    ->limit(self::HISTORY_PAGE_SIZE + 1),
             ])
             ->find($id);
 
@@ -253,15 +310,87 @@ class DocumentApiController extends Controller
             $document->setAttribute('distribution', app(\App\Services\DocumentRecipientService::class)->selection($document));
         }
 
+        $history = [
+            'logs' => $this->trimInitialHistory($document, 'logs'),
+            'transfers' => $this->trimInitialHistory($document, 'transfers'),
+        ];
+
         return response()->json([
             'success' => true,
             'data' => $document,
+            'history' => $history,
             'capabilities' => [
                 'can_edit' => $document->canBeEditedBy($user),
                 'can_transfer_to_branch' => $document->canBeTransferredToBranchBy($user),
                 'can_distribute_to_department' => $document->canBeDistributedToDepartmentBy($user),
             ],
         ]);
+    }
+
+    /**
+     * Tải thêm từng trang lịch sử, không kéo toàn bộ vòng đời văn bản vào phản hồi chi tiết.
+     */
+    public function history(Request $request, $id)
+    {
+        $data = $request->validate([
+            'kind' => 'required|in:logs,transfers',
+            'page' => 'nullable|integer|min:1|max:10000',
+        ]);
+        $userId = Session::get('user_id');
+        if (! $userId) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $user = User::with('branch')->find($userId);
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $document = $this->documentQueryService->getDocumentsForUser($user)
+            ->select('documents.id')
+            ->find($id);
+        if (! $document) {
+            return response()->json(['success' => false, 'message' => 'Not found or forbidden'], 404);
+        }
+
+        $query = $data['kind'] === 'logs'
+            ? $document->logs()
+                ->select(['id', 'document_id', 'user_id', 'action', 'created_at'])
+                ->with('user:id,name')
+                ->orderByDesc('created_at')
+                ->orderByDesc('id')
+            : $document->transfers()
+                ->select([
+                    'id', 'document_id', 'to_branch_id', 'to_department_id', 'to_user_id',
+                    'transferred_by', 'transferred_at', 'created_at', 'note', 'status',
+                ])
+                ->with(['toBranch:id,branch_name', 'toDepartment:id,department_name', 'toUser:id,name', 'transferer:id,name'])
+                ->orderByDesc('transferred_at')
+                ->orderByDesc('id');
+        $page = $query->simplePaginate(self::HISTORY_PAGE_SIZE);
+
+        return response()->json([
+            'success' => true,
+            'kind' => $data['kind'],
+            'data' => $page->items(),
+            'pagination' => [
+                'current_page' => $page->currentPage(),
+                'has_more' => $page->hasMorePages(),
+                'next_page' => $page->hasMorePages() ? $page->currentPage() + 1 : null,
+            ],
+        ])->header('Cache-Control', 'private, no-store');
+    }
+
+    /**
+     * @return array{has_more: bool, next_page: ?int}
+     */
+    private function trimInitialHistory(Document $document, string $relation): array
+    {
+        $items = $document->getRelation($relation);
+        $hasMore = $items->count() > self::HISTORY_PAGE_SIZE;
+        $document->setRelation($relation, $items->take(self::HISTORY_PAGE_SIZE)->values());
+
+        return ['has_more' => $hasMore, 'next_page' => $hasMore ? 2 : null];
     }
 
     /**

@@ -1,25 +1,29 @@
 <?php
+
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Artisan;
 use App\Models\Branches;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 class MigrateBranchDatabases extends Command
 {
     protected $signature = 'tenants:migrate-branches';
+
     protected $description = 'Run branch-specific migrations for all tenant databases';
 
     public function handle()
     {
         $branches = Branches::all();
-        
+        $failures = 0;
+
         foreach ($branches as $branch) {
             $dbName = $branch->database_name;
 
-            if (!$dbName) {
+            if (! $dbName) {
                 $this->warn("Branch {$branch->id} chưa có database_name");
+
                 continue;
             }
 
@@ -29,19 +33,28 @@ class MigrateBranchDatabases extends Command
             $this->info("🔁 Migrating for: $dbName");
 
             try {
-                Artisan::call('migrate', [
+                DB::purge('tenant');
+                DB::reconnect('tenant');
+                $exitCode = Artisan::call('migrate', [
                     '--path' => 'database/migrations/branch',
                     '--database' => 'tenant',
-                    '--force' => true
+                    '--force' => true,
                 ]);
+                if ($exitCode !== self::SUCCESS) {
+                    throw new \RuntimeException(trim(Artisan::output()) ?: 'Migration trả về mã lỗi '.$exitCode);
+                }
 
                 $this->info("✅ Migration completed for: $dbName");
             } catch (\Exception $e) {
-                $this->error("❌ Lỗi khi migrate database $dbName: " . $e->getMessage());
+                $failures++;
+                $this->error("❌ Lỗi khi migrate database $dbName: ".$e->getMessage());
+            } finally {
+                DB::disconnect('tenant');
             }
         }
 
-        $this->info("🎉 Migrate xong cho tất cả các chi nhánh.");
-        return 0;
+        $this->info('🎉 Migrate xong cho tất cả các chi nhánh.');
+
+        return $failures === 0 ? self::SUCCESS : self::FAILURE;
     }
 }

@@ -55,24 +55,38 @@ export class DraftSaveQueue {
         this.persisted = persisted;
         this.revision = null;
         this.pending = null;
+        this.pendingMode = 'merge';
         this.inFlight = null;
         this.blocked = false;
     }
-    enqueue(payload) { this.pending = JSON.parse(JSON.stringify(payload)); }
+    enqueue(payload, mode = 'merge') {
+        const hadPending = this.pending !== null;
+        this.pending = JSON.parse(JSON.stringify(payload));
+        if (mode === 'replace' || !hadPending || this.pendingMode !== 'replace') this.pendingMode = mode;
+    }
     async flush() {
         if (this.inFlight || this.blocked || this.revision === null || this.pending === null) return;
         const payload = this.pending;
+        const mode = this.pendingMode;
         this.pending = null;
+        this.pendingMode = 'merge';
         this.status('saving');
-        const operation = Promise.resolve().then(() => this.send(payload, this.revision));
+        const operation = Promise.resolve().then(() => this.send(payload, this.revision, mode));
         this.inFlight = operation;
         try {
             const response = await operation;
             this.revision = response.revision;
-            this.persisted(payload, this.pending, this.revision);
+            const serverPayload = response.payload && typeof response.payload === 'object' ? response.payload : payload;
+            const cachedPayload = this.pending === null
+                ? serverPayload
+                : (this.pendingMode === 'replace' ? this.pending : {...serverPayload, ...this.pending});
+            this.persisted(cachedPayload, this.pending, this.revision, this.pendingMode);
             this.status(this.pending === null ? 'saved' : 'saving');
         } catch (error) {
-            if (this.pending === null) this.pending = payload;
+            if (this.pending === null) {
+                this.pending = payload;
+                this.pendingMode = mode;
+            } else if (mode === 'replace') this.pendingMode = 'replace';
             this.blocked = true;
             this.status(error.status === 409 ? 'conflict' : 'error');
         } finally { this.inFlight = null; }

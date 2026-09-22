@@ -1,8 +1,9 @@
 <div class="modal fade" id="documentExportModal" tabindex="-1" role="dialog" aria-labelledby="documentExportModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content border-0 shadow-lg">
-            <form id="documentExportForm" method="POST" action="{{ route('documents_export') }}">
+            <form id="documentExportForm" method="POST" action="{{ route('documents_export') }}" data-document-export-form>
                 @csrf
+                <input type="hidden" name="background" value="1">
                 <div class="modal-header document-export-header text-white">
                     <div class="d-flex align-items-center">
                         <span class="document-export-icon mr-3"><i class="fas fa-file-excel"></i></span>
@@ -78,10 +79,11 @@
                             <div class="small text-muted">Chỉ xuất văn bản đã vào sổ của chi nhánh. Sổ đi tách hai sheet thông thường và quyết định. Mỗi lần xuất tối đa {{ number_format(config('documents.exports.max_rows', 20000)) }} văn bản.</div>
                         </div>
                     </div>
+                    @include('user.page.documents.partials.export_status')
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-success px-4" id="documentExportSubmit">
+                    <button type="submit" class="btn btn-success px-4" id="documentExportSubmit" data-document-export-submit>
                         <i class="fas fa-download mr-1"></i> Tải file Excel
                     </button>
                 </div>

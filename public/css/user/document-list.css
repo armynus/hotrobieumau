@@ -1,0 +1,154 @@
+.document-filter-card,
+.document-list-card {
+    overflow: hidden;
+    border: 1px solid #e1e7f2;
+    border-radius: 12px;
+}
+.document-filter-header { background: linear-gradient(135deg, #f8faff, #f1f5ff); }
+.document-filter-card label { color: #465674; font-size: .84rem; font-weight: 700; }
+.document-filter-card .input-group { flex-direction: row; align-items: stretch; }
+.document-filter-card .input-group-prepend,
+.document-filter-card .input-group-append { width: auto; margin: 0; }
+.document-filter-card .input-group-text { min-width: 0; max-width: none; margin: 0; }
+.document-keyword-group .input-group-text { border-color: #d8e0ef; color: #4e73df; background: #f8faff; }
+.document-keyword-group .form-control,
+.document-keyword-group .btn { border-color: #d8e0ef; }
+.document-keyword-group .form-control { min-width: 0; text-align: left; }
+.document-filter-card .document-keyword-group .input-group-prepend .input-group-text {
+    width: 42px;
+    min-width: 42px;
+    max-width: 42px;
+    justify-content: center;
+}
+.document-filter-footer { padding-top: 12px; border-top: 1px dashed #dfe5f1; }
+.document-date-presets {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 6px 9px;
+    border: 1px solid #dbe4f7;
+    border-radius: 10px;
+    background: #f7f9ff;
+}
+.document-date-presets > .small {
+    margin-right: 3px !important;
+    color: #3f5689 !important;
+    font-size: .86rem;
+}
+.document-date-presets .btn {
+    min-height: 32px;
+    padding: .32rem .72rem;
+    border: 1px solid #d2ddf7;
+    border-radius: 999px;
+    color: #3659ad;
+    background: #fff;
+    font-size: .86rem;
+    font-weight: 600;
+}
+.document-date-presets .btn:hover,
+.document-date-presets .btn:focus {
+    border-color: #4e73df;
+    color: #224abe;
+    background: #edf2ff;
+    box-shadow: 0 3px 9px rgba(78, 115, 223, .14);
+}
+.document-date-presets .btn-link {
+    border-color: transparent;
+    color: #6c78a0;
+    background: transparent;
+}
+.document-filter-hints { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; }
+.document-date-feedback { margin-top: .35rem; font-size: .75rem; }
+.document-date-input { min-width: 0; padding-right: .4rem; padding-left: .6rem; font-size: .86rem; }
+.document-date-input.is-invalid { border-color: #e74a3b; }
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover { color: #c4cad6; background: #f8f9fc; }
+.document-active-filters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 10px 12px;
+    border: 1px solid #d6e1ff;
+    border-radius: 9px;
+    background: #f6f8ff;
+}
+.document-active-filters__label { color: #40527a; font-size: .8rem; font-weight: 700; }
+.document-active-filters__chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.document-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    padding: 4px 9px;
+    border: 1px solid #bed0ff;
+    border-radius: 999px;
+    color: #3158b5;
+    background: #fff;
+    font-size: .78rem;
+    font-weight: 600;
+}
+.document-filter-chip:hover { border-color: #4e73df; color: #224abe; background: #eef3ff; }
+.document-filter-chip i { font-size: .7rem; }
+.document-table-help {
+    padding: 9px 11px;
+    border-radius: 8px;
+    color: #596781;
+    background: #f8f9fc;
+    font-size: .8rem;
+}
+.document-result-count {
+    padding: 5px 10px;
+    border-radius: 999px;
+    color: #3d5dad;
+    background: #edf2ff;
+    font-size: .78rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.document-list-card .dataTables_length label { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.document-list-card .dataTables_length select { min-width: 72px; border-color: #d7def0; border-radius: 7px; }
+.document-list-card .dataTables_info { color: #66738d; font-size: .86rem; }
+.document-list-card .dataTables_processing {
+    top: 110px;
+    min-width: 170px;
+    padding: 13px 18px;
+    border: 1px solid #cfdaef;
+    border-radius: 9px;
+    color: #3158b5;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 8px 24px rgba(54, 78, 139, .15);
+    font-weight: 700;
+}
+.flatpickr-calendar { border: 0; border-radius: .5rem; box-shadow: 0 .5rem 1.5rem rgba(58, 59, 69, .2); }
+.flatpickr-day.selected, .flatpickr-day.selected:hover { background: #4e73df; border-color: #4e73df; }
+.flatpickr-day.today { border-color: #4e73df; }
+.flatpickr-date-button { min-width: 42px; padding-right: .65rem; padding-left: .65rem; color: #fff; background: linear-gradient(135deg, #4e73df, #224abe); border-color: #4e73df; }
+.flatpickr-date-button:hover, .flatpickr-date-button:focus { color: #fff; background: linear-gradient(135deg, #3f65d4, #1d3fa3); border-color: #2653d4; }
+#dataTable td { vertical-align: middle; }
+#dataTable tbody tr { transition: background-color .14s ease; }
+#dataTable tbody tr:hover { background: #f8faff; }
+#dataTable .document-direction-cell { min-width: 132px; white-space: nowrap; }
+#dataTable .document-code-cell { min-width: 190px; }
+#dataTable .document-title-cell { min-width: 320px; line-height: 1.5; }
+#dataTable .document-actions { min-width: 158px; }
+.document-export-header { background: linear-gradient(135deg, #16855b, #0f6847); border: 0; }
+.document-export-icon { display: inline-flex; width: 46px; height: 46px; align-items: center; justify-content: center; border-radius: .75rem; background: rgba(255,255,255,.16); font-size: 1.45rem; }
+.document-period-card { display: flex; min-height: 132px; margin: 0; padding: 1rem; cursor: pointer; border: 2px solid #e3e6f0; border-radius: .75rem; background: #fff; align-items: center; justify-content: center; flex-direction: column; text-align: center; transition: .18s ease; }
+.document-period-card i { margin-bottom: .65rem; color: #858796; font-size: 1.5rem; }
+.document-period-card small { margin-top: .25rem; color: #858796; }
+.export-period-radio:checked + .document-period-card { border-color: #1cc88a; background: #effaf6; box-shadow: 0 .25rem .9rem rgba(28,200,138,.14); transform: translateY(-1px); }
+.export-period-radio:checked + .document-period-card i { color: #1cc88a; }
+.document-export-selection { border: 1px solid #dfe5ec; background: #f8f9fc; }
+@media (max-width: 767.98px) {
+    .document-filter-header { align-items: flex-start !important; }
+    .document-active-filters { align-items: flex-start; }
+    .document-result-count { margin-top: 6px; }
+    .document-list-card .card-header { align-items: flex-start !important; flex-direction: column; }
+    .document-filter-hints { justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #dataTable tbody tr, .document-period-card { transition: none; }
+}

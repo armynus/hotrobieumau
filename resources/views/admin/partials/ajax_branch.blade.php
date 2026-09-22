@@ -1,247 +1,118 @@
-
 <script>
-    $(document).ready(function(){
-        $('#addBranch').click(function(){
-            var _token = $('input[name="_token"]').val();
-            var branch_name = $('#branch_name').val();
-            var branch_code = $('#branch_code').val();
-            var branch_addr = $('#branch_addr').val();
-            var branch_phone = $('#branch_phone').val();
-            var branch_fax = $('#branch_fax').val();
-            var branch_place = $('#branch_place').val();
-            if (branch_name == '') {
-                swal("Vui lòng nhập tên chi nhánh - phòng giao dịch", {
-                    icon: "error",
-                });
-                return;
-            }
-            $.ajax({
-                url: '{{route('admin_branches_store')}}',
-                method: 'POST',
-                data:{
-                    _token: _token,
-                    branch_name: branch_name,
-                    branch_code: branch_code,
-                    branch_addr: branch_addr,
-                    branch_phone: branch_phone,
-                    branch_fax: branch_fax,
-                    branch_place: branch_place,
-                },
-                success: function(data){
-                   if (data.status == true) {
-                    let created_at = new Date(data.branch.created_at); // Chuyển chuỗi thành đối tượng Date
-                    let formatted_created_at = created_at.toLocaleDateString('en-GB'); // Định dạng dd/mm/yyyy
+$(function () {
+    function setParentVisibility(prefix) {
+        var type = $('#' + prefix + 'branch_type').val();
+        var $group = $('#' + prefix + 'branch_parent_group');
+        $group.toggle(type === 'type_2');
+        if (type !== 'type_2') $('#' + prefix + 'branch_parent_id').val('');
+    }
 
-                    let updated_at = new Date(data.branch.updated_at);
-                    let formatted_updated_at = updated_at.toLocaleDateString('en-GB');
+    function branchPayload(prefix) {
+        return {
+            _token: @json(csrf_token()),
+            branch_name: $('#' + prefix + 'branch_name').val(),
+            branch_code: $('#' + prefix + 'branch_code').val(),
+            branch_type: $('#' + prefix + 'branch_type').val(),
+            parent_id: $('#' + prefix + 'branch_parent_id').val(),
+            branch_addr: $('#' + prefix + 'branch_addr').val(),
+            branch_phone: $('#' + prefix + 'branch_phone').val(),
+            branch_fax: $('#' + prefix + 'branch_fax').val(),
+            branch_place: $('#' + prefix + 'branch_place').val(),
+            branch_tax_code: $('#' + prefix + 'branch_tax_code').val(),
+            branch_tax_date: $('#' + prefix + 'branch_tax_date').val(),
+            branch_tax_place: $('#' + prefix + 'branch_tax_place').val(),
+            branch_general: $('#' + prefix + 'branch_general').val()
+        };
+    }
 
-                        let newBranch = `
-                            <tr>
-                                <td>${data.branch.id}</td>
-                                <td>${data.branch.branch_name}</td>
-                                <td>${data.branch.branch_code}</td>
-                                <td>${data.branch.branch_addr}</td>
-                                <td>${data.branch.branch_phone}</td>
-                                <td>${data.branch.branch_fax}</td>
-                                <td>${data.branch.branch_place}</td>
-                                <td>branch_${data.branch.id}</td>
-                                <td>${formatted_updated_at}</td>
-                                <td><span class="badge badge-success">Hoạt động</span></td>
-                                <td style="justify-content: center; align-items: flex-start; text-align: center;">
-                                    <button type="button"  data-toggle="modal" data-target="#editBranchModal" class="btn btn-info btn-icon-split" >
-                                        <span class="text edit_branch" data-branch_id="${data.branch.id}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                                            </svg>
-                                        </span>
-                                    </button>
-                                    <button  class="btn btn-danger btn-icon-split">
-                                        <span class="icon text-white-50  lock_branch"  data-branch_id="${data.branch.id}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ban-fill" viewBox="0 0 16 16">
-                                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M2.71 12.584q.328.378.706.707l9.875-9.875a7 7 0 0 0-.707-.707l-9.875 9.875Z"/>
-                                              </svg>
-                                        </span>
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                        // Chèn dòng dữ liệu mới vào bảng
-                        $('table tbody').append(newBranch);
-                        
-                        // Hiển thị thông báo thành công (tuỳ chọn)
-                        swal("Thành công!", "Chi nhánh mới đã được thêm.", {
-                            icon: "success",
-                        });
-                        // Đóng modal và reset form
-                        var cancel = document.querySelector('#close_button');
-                        $('#branch_name').val('');
-                    } else {
-                        swal(data.message, {
-                            icon: "error",
-                        });
-                        return;
-                    }
-                },
-                error: function(data){
-                    var errors = data.responseJSON;
-                    console.log(errors);
-                }
-            });
+    function showBranchError(xhr, fallback) {
+        var response = xhr.responseJSON || {};
+        var errors = response.errors || {};
+        var firstError = Object.keys(errors).length ? errors[Object.keys(errors)[0]][0] : null;
+        swal(firstError || response.message || fallback, {icon: 'error'});
+    }
+
+    $('#branch_type').on('change', function () { setParentVisibility(''); });
+    $('#edit_branch_type').on('change', function () { setParentVisibility('edit_'); });
+    $('#addBranchModal').on('show.bs.modal', function () { setParentVisibility(''); });
+
+    $('#addBranch').on('click', function () {
+        var $button = $(this).prop('disabled', true);
+        $.ajax({
+            url: @json(route('admin_branches_store')),
+            method: 'POST',
+            data: branchPayload(''),
+            success: function (response) {
+                swal('Thành công!', response.message, {icon: 'success'}).then(function () { location.reload(); });
+            },
+            error: function (xhr) { showBranchError(xhr, 'Không thể tạo chi nhánh.'); },
+            complete: function () { $button.prop('disabled', false); }
         });
-        
     });
-    $(document).ready(function () {
-        // Bắt sự kiện nhấn nút edit_branch
-        $(document).on('click', '.edit_branch', function () {
-            var branchId = $(this).data('branch_id'); // Lấy id của chi nhánh
-            // Gửi AJAX để lấy thông tin chi nhánh
-            $.ajax({
-                url: '{{route('admin_branches_edit')}}',
-                type: 'GET',
-                data: {
-                    branch_id: branchId
-                },
-                success: function (response) {
-                    $('#edit_branch_id').val(response.branch.id);
-                    $('#edit_branch_name').val(response.branch.branch_name);
-                    $('#edit_branch_code').val(response.branch.branch_code);
-                    $('#edit_branch_addr').val(response.branch.branch_addr);
-                    $('#edit_branch_phone').val(response.branch.branch_phone);
-                    $('#edit_branch_fax').val(response.branch.branch_fax);
-                    $('#edit_branch_place').val(response.branch.branch_place);
 
-                   
-                },
-                error: function (error) {
-                    console.error('Có lỗi xảy ra:', error);
-                    alert('Không thể tải thông tin chi nhánh.');
-                }
-            });
+    $(document).on('click', '.edit_branch', function () {
+        $.ajax({
+            url: @json(route('admin_branches_edit')),
+            method: 'GET',
+            data: {branch_id: $(this).data('branch_id')},
+            success: function (response) {
+                var branch = response.branch;
+                $('#edit_branch_id').val(branch.id);
+                $('#edit_branch_name').val(branch.branch_name || '');
+                $('#edit_branch_code').val(branch.branch_code || '');
+                $('#edit_branch_type').val(branch.branch_type || 'type_2');
+                $('#edit_branch_parent_id').val(branch.parent_id || '');
+                $('#edit_branch_addr').val(branch.branch_addr || '');
+                $('#edit_branch_phone').val(branch.branch_phone || '');
+                $('#edit_branch_fax').val(branch.branch_fax || '');
+                $('#edit_branch_place').val(branch.branch_place || '');
+                $('#edit_branch_tax_code').val(branch.branch_tax_code || '');
+                $('#edit_branch_tax_date').val(branch.branch_tax_date || '');
+                $('#edit_branch_tax_place').val(branch.branch_tax_place || '');
+                $('#edit_branch_general').val(branch.branch_general || '');
+                setParentVisibility('edit_');
+            },
+            error: function (xhr) { showBranchError(xhr, 'Không thể tải thông tin chi nhánh.'); }
         });
+    });
 
-        // Cập nhật thông tin chi nhánh
-        $('#updateBranchButton').on('click', function () {
-            var branchId = $('#edit_branch_id').val();
-            var branchName = $('#edit_branch_name').val();
-            var branchCode = $('#edit_branch_code').val();
-            var branch_addr = $('#edit_branch_addr').val();
-            var branch_phone = $('#edit_branch_phone').val();
-            var branch_fax = $('#edit_branch_fax').val();
-            var branch_place = $('#edit_branch_place').val();
-            var _token = $('input[name="_token"]').val();
-            if(branchName == ''){
-                swal("Vui lòng nhập tên chi nhánh!", {
-                    icon: "error",
-                });
-                return;
-            }
-            // Gửi AJAX để cập nhật chi nhánh
+    $('#updateBranchButton').on('click', function () {
+        var payload = branchPayload('edit_');
+        payload.branch_id = $('#edit_branch_id').val();
+        var $button = $(this).prop('disabled', true);
+        $.ajax({
+            url: @json(route('admin_branches_update')),
+            method: 'POST',
+            data: payload,
+            success: function (response) {
+                swal('Thành công!', response.message, {icon: 'success'}).then(function () { location.reload(); });
+            },
+            error: function (xhr) { showBranchError(xhr, 'Không thể cập nhật chi nhánh.'); },
+            complete: function () { $button.prop('disabled', false); }
+        });
+    });
+
+    $(document).on('click', '.lock_branch, .unlock_branch', function () {
+        var branchId = $(this).data('branch_id');
+        var unlocking = $(this).hasClass('unlock_branch');
+        swal({
+            title: unlocking ? 'Mở khóa chi nhánh?' : 'Khóa chi nhánh?',
+            text: unlocking ? 'Nhân viên của chi nhánh sẽ đăng nhập lại được.' : 'Nhân viên của chi nhánh sẽ không thể đăng nhập.',
+            icon: 'warning',
+            buttons: true,
+            dangerMode: !unlocking
+        }).then(function (confirmed) {
+            if (!confirmed) return;
             $.ajax({
-                url: '{{route('admin_branches_update')}}',
+                url: @json(route('admin_branches_lock')),
                 method: 'POST',
-                data: {
-                    _token: _token, // Token CSRF
-                    branch_name: branchName,
-                    branch_code: branchCode,
-                    branch_addr: branch_addr,
-                    branch_phone: branch_phone,
-                    branch_fax: branch_fax,
-                    branch_place: branch_place,
-                    branch_id: branchId
-                },
+                data: {_token: @json(csrf_token()), branch_id: branchId},
                 success: function (response) {
-                    if (response.status == false) {
-                        swal(response.message, {
-                            icon: "warning",
-                        });
-                        return;
-                    }
-                    alert('Cập nhật chi nhánh thành công!');
-                    var cancel = document.querySelector('#close_button');
-                    location.reload(); // Reload lại trang
+                    swal('Thành công!', response.message, {icon: 'success'}).then(function () { location.reload(); });
                 },
-                error: function (error) {
-                    // console.error('Có lỗi xảy ra:', error);
-                    alert('Không thể cập nhật chi nhánh.');
-                }
+                error: function (xhr) { showBranchError(xhr, 'Không thể đổi trạng thái chi nhánh.'); }
             });
         });
     });
-    $(document).ready(function(){
-        $(document).on('click', '.lock_branch', function () {
-            var branchId = $(this).data('branch_id');
-            var _token = $('input[name="_token"]').val();
-            swal({
-                title: "Bạn có chắc chắn muốn khóa chi nhánh này?",
-                text: "Sau khi khóa, nhân viên của chi nhánh này sẽ không thể đăng nhập!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-            .then((willDelete) => {
-                if (willDelete) {
-                    $.ajax({
-                        url: '{{route('admin_branches_lock')}}',
-                        method: 'POST',
-                        data: {
-                            _token: _token,
-                            branch_id: branchId
-                        },
-                        success: function (response) {
-                            if (response.status == false) {
-                                alert(response.message);
-                                return;
-                            }
-                            alert('Khóa chi nhánh thành công!');
-                            location.reload(); // Reload lại trang
-                        },
-                        error: function (error) {
-                            console.error('Có lỗi xảy ra:', error);
-                            alert('Không thể khóa chi nhánh.');
-                        }
-                    });
-                } else {
-                    swal("Chi nhánh chưa được khóa!");
-                }
-            });
-        });
-        $(document).on('click', '.unlock_branch', function () {
-            var branchId = $(this).data('branch_id');
-            var _token = $('input[name="_token"]').val();
-            swal({
-                title: "Bạn có chắc chắn muốn mở khóa chi nhánh này?",
-                text: "Sau khi mở khóa, nhân viên của chi nhánh này sẽ có thể đăng nhập!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-            .then((willDelete) => {
-                if (willDelete) {
-                    $.ajax({
-                        url: '{{route('admin_branches_lock')}}',
-                        method: 'POST',
-                        data: {
-                            _token: _token,
-                            branch_id: branchId
-                        },
-                        success: function (response) {
-                            if (response.status == false) {
-                                alert(response.message);
-                                return;
-                            }
-                            alert('Mở khóa chi nhánh thành công!');
-                            location.reload(); // Reload lại trang
-                        },
-                        error: function (error) {
-                            console.error('Có lỗi xảy ra:', error);
-                            alert('Không thể mở khóa chi nhánh.');
-                        }
-                    });
-                } else {
-                    swal("Chi nhánh chưa được mở khóa!");
-                }
-            });
-        });
-    }); 
+});
 </script>

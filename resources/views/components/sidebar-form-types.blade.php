@@ -15,6 +15,7 @@
          class="collapse {{ $isMenuOpen ? 'show' : '' }}"
          data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item {{ request()->routeIs('support_forms.catalog', 'support_forms.bundle') ? 'active' : '' }}" href="{{ route('support_forms.catalog') }}">Tất cả mẫu & bộ hồ sơ</a>
             @foreach($formTypes as $formType)
                 @php
                     // ✅ Dùng route() thay vì query() vì route là /support_forms/{type}

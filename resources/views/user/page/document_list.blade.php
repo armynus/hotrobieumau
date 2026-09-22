@@ -34,42 +34,63 @@
 
     <x-alert-message />
 
-    <div class="document-kind-tabs mb-3" role="group" aria-label="Chọn phân loại văn bản">
-        @foreach(['' => ['Tất cả', 'fa-layer-group'], 'incoming' => ['Văn bản đến', 'fa-inbox'], 'outgoing' => ['Văn bản đi', 'fa-paper-plane'], 'decision' => ['Quyết định', 'fa-gavel'], 'unclassified' => ['Chưa phân loại', 'fa-folder']] as $key => [$label, $icon])
-        <button type="button" class="document-kind-tab {{ $key === '' ? 'active' : '' }}" data-direction="{{ $key }}" aria-pressed="{{ $key === '' ? 'true' : 'false' }}">
-            <i class="fas {{ $icon }}" aria-hidden="true"></i><span>{{ $label }}</span>
-        </button>
-        @endforeach
+    <div class="document-kind-shell mb-3">
+        <span class="document-kind-caption"><i class="fas fa-filter mr-1" aria-hidden="true"></i> Phân loại nhanh</span>
+        <div class="document-kind-tabs" role="group" aria-label="Chọn phân loại văn bản">
+            @foreach(['' => ['Tất cả', 'fa-layer-group'], 'incoming' => ['Văn bản đến', 'fa-inbox'], 'outgoing' => ['Văn bản đi', 'fa-paper-plane'], 'decision' => ['Quyết định', 'fa-gavel'], 'unclassified' => ['Chưa phân loại', 'fa-folder']] as $key => [$label, $icon])
+            <button type="button" class="document-kind-tab {{ $key === '' ? 'active' : '' }}" data-direction="{{ $key }}" aria-pressed="{{ $key === '' ? 'true' : 'false' }}">
+                <i class="fas {{ $icon }}" aria-hidden="true"></i><span>{{ $label }}</span>
+            </button>
+            @endforeach
+        </div>
     </div>
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Bộ lọc tra cứu nâng cao</h6></div>
+    <div class="card shadow-sm document-filter-card mb-4">
+        <div class="card-header document-filter-header py-3 d-flex flex-wrap align-items-center justify-content-between">
+            <div>
+                <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-sliders-h mr-2" aria-hidden="true"></i>Bộ lọc tra cứu</h6>
+                <small class="text-muted">Lọc nhanh theo số, ký hiệu, ngày văn bản và trạng thái đọc</small>
+            </div>
+            <button type="button" class="btn btn-sm btn-light border d-none mt-2 mt-sm-0" id="btnResetFilter">
+                <i class="fas fa-undo-alt mr-1" aria-hidden="true"></i> Xóa bộ lọc
+            </button>
+        </div>
         <div class="card-body">
             <form id="filterForm" class="row align-items-end">
                 <div class="col-12 col-md-6 col-xl-4 mb-3">
-                    <label>Số, ký hiệu văn bản</label>
-                    <input type="text" class="form-control" name="keyword" placeholder="Nhập số hoặc ký hiệu văn bản...">
+                    <label for="documentKeyword">Số, ký hiệu văn bản</label>
+                    <div class="input-group document-keyword-group">
+                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-search" aria-hidden="true"></i></span></div>
+                        <input type="search" class="form-control" id="documentKeyword" name="keyword" placeholder="Ví dụ: 123/NHNo-ĐT-TH" autocomplete="off">
+                        <div class="input-group-append d-none" id="clearDocumentKeywordWrap">
+                            <button type="button" class="btn btn-light border" id="clearDocumentKeyword" title="Xóa từ khóa" aria-label="Xóa từ khóa"><i class="fas fa-times" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
                 </div>
                 @foreach(['from' => 'Từ', 'to' => 'Đến'] as $key => $label)
                 <div class="col-12 col-md-6 col-xl-2 mb-3">
                     <label>{{ $label }} ngày văn bản</label>
                     <div class="input-group">
                         <input type="text" class="form-control document-date-input" id="document_date_{{ $key }}_display"
-                            inputmode="numeric" autocomplete="off" placeholder="dd/mm/yyyy" maxlength="10">
+                            data-date-filter="date_{{ $key }}" inputmode="numeric" autocomplete="off" placeholder="dd/mm/yyyy" maxlength="10"
+                            aria-describedby="document_date_{{ $key }}_feedback">
+                        <input type="text" class="d-none document-date-picker-anchor" id="document_date_{{ $key }}_picker"
+                            tabindex="-1" aria-hidden="true">
                         <div class="input-group-append">
                             <button type="button" class="btn btn-primary flatpickr-date-button"
-                                data-target="document_date_{{ $key }}_display" aria-label="Chọn ngày">
+                                data-picker-target="document_date_{{ $key }}_picker" aria-label="Chọn ngày">
                                 <i class="fas fa-calendar-alt"></i>
                             </button>
                         </div>
                     </div>
+                    <div class="invalid-feedback document-date-feedback" id="document_date_{{ $key }}_feedback">Nhập ngày hợp lệ theo định dạng dd/mm/yyyy.</div>
                     <input type="hidden" name="date_{{ $key }}">
                 </div>
                 @endforeach
                 <div class="col-12 col-md-6 col-xl-2 mb-3">
                     <label for="documentReadStatus">Tình trạng đọc</label>
                     <select class="form-control" name="is_read" id="documentReadStatus">
-                        <option value="">Tất cả văn bản</option>
+                        <option value="">Tất cả</option>
                         <option value="0">Chưa đọc</option>
                         <option value="1">Đã đọc</option>
                     </select>
@@ -80,16 +101,36 @@
                     </button>
                 </div>
             </form>
+            <div class="document-filter-footer d-flex flex-wrap align-items-center justify-content-between">
+                <div class="document-date-presets" role="group" aria-label="Chọn nhanh khoảng ngày văn bản">
+                    <span class="small font-weight-bold text-muted mr-1">Chọn nhanh:</span>
+                    <button type="button" class="btn btn-sm btn-light document-date-preset" data-range="today">Hôm nay</button>
+                    <button type="button" class="btn btn-sm btn-light document-date-preset" data-range="7days">7 ngày</button>
+                    <button type="button" class="btn btn-sm btn-light document-date-preset" data-range="month">Tháng này</button>
+                    <button type="button" class="btn btn-sm btn-link document-date-preset" data-range="clear">Xóa ngày</button>
+                </div>
+                <div class="document-filter-hints mt-2 mt-lg-0">
+                    <small class="text-primary d-none" id="documentDateConstraintStatus" role="status" aria-live="polite"></small>
+                    <small class="text-muted"><i class="fas fa-keyboard mr-1" aria-hidden="true"></i>Nhấn Enter để lọc ngay</small>
+                </div>
+            </div>
+            <div class="document-active-filters d-none" id="activeFilterBar" role="status" aria-live="polite">
+                <span class="document-active-filters__label">Đang lọc:</span>
+                <div id="activeFilterChips" class="document-active-filters__chips"></div>
+            </div>
         </div>
     </div>
 
-    <div class="card shadow mb-4">
+    <div class="card shadow-sm document-list-card mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">Danh sách văn bản</h6>
-            <span class="badge badge-primary" id="documentKindLabel">Tất cả văn bản</span>
+            <div class="d-flex flex-wrap align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary mr-2">Danh sách văn bản</h6>
+                <span class="badge badge-primary" id="documentKindLabel">Tất cả văn bản</span>
+            </div>
+            <span class="document-result-count" id="documentResultCount" aria-live="polite"><i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i> Đang tải</span>
         </div>
         <div class="card-body">
-            <small class="d-block text-muted mb-2">Nhấn tiêu đề cột để sắp xếp tăng/giảm. Ngày văn bản: sớm đến muộn hoặc ngược lại.</small>
+            <div class="document-table-help mb-3"><i class="fas fa-info-circle mr-1" aria-hidden="true"></i> Nhấn tiêu đề cột để sắp xếp. Bộ lọc và trang đang xem được giữ lại khi quay về từ trang chi tiết.</div>
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-light"><tr>
@@ -114,28 +155,9 @@
 @endsection
 
 @push('styles')
-<link href="{{ asset('css/user/document-kind-tabs.css') }}" rel="stylesheet">
+<link href="{{ asset('css/user/document-kind-tabs.css') }}?v={{ filemtime(public_path('css/user/document-kind-tabs.css')) }}" rel="stylesheet">
+<link href="{{ asset('css/user/document-list.css') }}?v={{ filemtime(public_path('css/user/document-list.css')) }}" rel="stylesheet">
 <link href="{{ asset('vendor/flatpickr/flatpickr.min.css') }}" rel="stylesheet">
-<style>
-    .flatpickr-calendar { border: 0; border-radius: .5rem; box-shadow: 0 .5rem 1.5rem rgba(58, 59, 69, .2); }
-    .flatpickr-day.selected, .flatpickr-day.selected:hover { background: #4e73df; border-color: #4e73df; }
-    .flatpickr-day.today { border-color: #4e73df; }
-    .flatpickr-date-button { min-width: 46px; color: #fff; background: linear-gradient(135deg, #4e73df, #224abe); border-color: #4e73df; }
-    .flatpickr-date-button:hover, .flatpickr-date-button:focus { color: #fff; background: linear-gradient(135deg, #3f65d4, #1d3fa3); border-color: #2653d4; }
-    #dataTable td { vertical-align: middle; }
-    #dataTable .document-direction-cell { min-width: 132px; white-space: nowrap; }
-    #dataTable .document-code-cell { min-width: 190px; }
-    #dataTable .document-title-cell { min-width: 320px; }
-    #dataTable .document-actions { min-width: 158px; }
-    .document-export-header { background: linear-gradient(135deg, #16855b, #0f6847); border: 0; }
-    .document-export-icon { display: inline-flex; width: 46px; height: 46px; align-items: center; justify-content: center; border-radius: .75rem; background: rgba(255,255,255,.16); font-size: 1.45rem; }
-    .document-period-card { display: flex; min-height: 132px; margin: 0; padding: 1rem; cursor: pointer; border: 2px solid #e3e6f0; border-radius: .75rem; background: #fff; align-items: center; justify-content: center; flex-direction: column; text-align: center; transition: .18s ease; }
-    .document-period-card i { margin-bottom: .65rem; color: #858796; font-size: 1.5rem; }
-    .document-period-card small { margin-top: .25rem; color: #858796; }
-    .export-period-radio:checked + .document-period-card { border-color: #1cc88a; background: #effaf6; box-shadow: 0 .25rem .9rem rgba(28,200,138,.14); transform: translateY(-1px); }
-    .export-period-radio:checked + .document-period-card i { color: #1cc88a; }
-    .document-export-selection { border: 1px solid #dfe5ec; background: #f8f9fc; }
-</style>
 @endpush
 
 @push('scripts')
@@ -149,5 +171,6 @@
 <script src="{{ asset('vendor/flatpickr/vn.js') }}"></script>
 <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
 <script src="{{ asset('js/user/document-distribution-editor.js') }}"></script>
-<script src="{{ asset('js/user/document-list.js') }}"></script>
+<script src="{{ asset('js/user/document-list.js') }}?v={{ filemtime(public_path('js/user/document-list.js')) }}"></script>
+<script src="{{ asset('js/user/document-export.js') }}?v={{ filemtime(public_path('js/user/document-export.js')) }}"></script>
 @endpush

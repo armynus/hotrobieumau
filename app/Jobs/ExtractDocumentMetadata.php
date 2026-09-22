@@ -28,6 +28,7 @@ class ExtractDocumentMetadata implements ShouldBeUnique, ShouldQueue
 
     public function __construct(public readonly int $documentId)
     {
+        $this->timeout = max(30, (int) config('documents.metadata_extraction.job_timeout_seconds', 180));
         $this->onQueue((string) config('documents.metadata_extraction.queue', 'document-ocr'));
     }
 

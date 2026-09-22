@@ -61,18 +61,19 @@
                 </div>
             </li>
 
-            <li class="nav-item {{ request()->routeIs('admin_branches', 'admin_branches') ? '' : 'active' }}">
-                <a class="nav-link {{ request()->routeIs('admin_branches', 'admin_branches') ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseBranch"
-                    aria-expanded="true" aria-controls="collapseBranch">
+            <li class="nav-item {{ request()->routeIs('admin_branches', 'admin_transaction_offices') ? 'active' : '' }}">
+                <a class="nav-link {{ request()->routeIs('admin_branches', 'admin_transaction_offices') ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseBranch"
+                    aria-expanded="{{ request()->routeIs('admin_branches', 'admin_transaction_offices') ? 'true' : 'false' }}" aria-controls="collapseBranch">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bank2" viewBox="0 0 16 16">
                         <path d="M8.277.084a.5.5 0 0 0-.554 0l-7.5 5A.5.5 0 0 0 .5 6h1.875v7H1.5a.5.5 0 0 0 0 1h13a.5.5 0 1 0 0-1h-.875V6H15.5a.5.5 0 0 0 .277-.916zM12.375 6v7h-1.25V6zm-2.5 0v7h-1.25V6zm-2.5 0v7h-1.25V6zm-2.5 0v7h-1.25V6zM8 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2M.5 15a.5.5 0 0 0 0 1h15a.5.5 0 1 0 0-1z"/>
                       </svg>
                     <span>QLý Chi Nhánh </span>
                 </a>
-                <div id="collapseBranch" class="collapse @menuOpen('admin_branches', 'admin_branches')" aria-labelledby="headingBranch" data-parent="#accordionSidebar">
+                <div id="collapseBranch" class="collapse {{ request()->routeIs('admin_branches', 'admin_transaction_offices') ? 'show' : '' }}" aria-labelledby="headingBranch" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                    
                         <a class="collapse-item @active('admin_branches')" href="{{route('admin_branches')}}">Danh sách chi nhánh</a>
+                        <a class="collapse-item @active('admin_transaction_offices')" href="{{route('admin_transaction_offices')}}">Phòng giao dịch</a>
                         
                     </div>
                 </div>

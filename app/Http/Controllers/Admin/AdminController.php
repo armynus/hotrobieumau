@@ -9,6 +9,7 @@ use App\Models\SupportForm;
 use App\Models\Users;
 use App\Models\FormField;
 use App\Models\FormType;
+use App\Services\FormWorkspaceService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -22,8 +23,15 @@ class AdminController extends Controller
         return view('admin.dashboard', compact('branch_count','user_count','form_count','field_count'));
     }
     public function branches(){
-        $list_branches = Branches::orderBy('id', 'asc')->get();
-        return view('admin.branches.list_branches', compact('list_branches'));
+        $list_branches = Branches::with('parent:id,branch_name')->orderBy('id', 'asc')->get();
+        $parent_branches = Branches::query()
+            ->select('id', 'branch_name')
+            ->where('branch_type', 'type_1')
+            ->where('status', 'active')
+            ->orderBy('branch_name')
+            ->get();
+
+        return view('admin.branches.list_branches', compact('list_branches', 'parent_branches'));
     }
     public function admin_forms(){
         $list_forms = SupportForm::with(['formType:id,type_name'])
@@ -35,8 +43,9 @@ class AdminController extends Controller
     }
     public function admin_form_fields(){
         $list_fields =  FormField::orderBy('id', 'asc')->get();
+        $content_groups = FormWorkspaceService::contentGroupOptions();
 
-        return view('admin.forms.list_form_field', compact('list_fields'));
+        return view('admin.forms.list_form_field', compact('list_fields', 'content_groups'));
     }
     
 }

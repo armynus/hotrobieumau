@@ -24,7 +24,7 @@
             modalId="uploadAccountModal" 
             modalLabel="Đăng Tải File Dữ Liệu Tài Khoản" 
             inputName="data_account" 
-            buttonText="Thêm" 
+            buttonText="Bắt đầu nhập"
         />
         <x-customer-form 
             modalId="AccountInfoModal"
@@ -50,6 +50,7 @@
             formId="addAccountForm"
         />
         <x-alert-message />
+        @include('user.partials.data_import_status', ['activeImport' => $activeImport])
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="accountTable" width="100%" cellspacing="0">

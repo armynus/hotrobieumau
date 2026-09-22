@@ -35,7 +35,7 @@ test('legacy boolean cannot falsely select a whole group', () => {
 test('saves wait for the initial revision and coalesce edits during a request', async () => {
     const calls = [];
     const acknowledgements = [];
-    const queue = new DraftSaveQueue((payload, revision) => new Promise(resolve => calls.push({payload, revision, resolve})), () => {},
+    const queue = new DraftSaveQueue((payload, revision, mode) => new Promise(resolve => calls.push({payload, revision, mode, resolve})), () => {},
         (...args) => acknowledgements.push(args));
     queue.enqueue({name: 'A'});
     await queue.flush();
@@ -47,13 +47,16 @@ test('saves wait for the initial revision and coalesce edits during a request', 
     queue.enqueue({name: 'C'});
     await queue.flush();
     assert.equal(calls.length, 1);
-    calls[0].resolve({revision: 'r1'});
+    assert.equal(calls[0].mode, 'merge');
+    calls[0].resolve({revision: 'r1', payload: {name: 'A', identity_no: '0123456789'}});
     await new Promise(resolve => setImmediate(resolve));
     assert.equal(calls.length, 2);
     assert.deepEqual(calls[1].payload, {name: 'C'});
     assert.equal(calls[1].revision, 'r1');
+    assert.equal(calls[1].mode, 'merge');
+    assert.deepEqual(acknowledgements[0][0], {name: 'C', identity_no: '0123456789'});
     assert.deepEqual(acknowledgements[0][1], {name: 'C'});
-    calls[1].resolve({revision: 'r2'});
+    calls[1].resolve({revision: 'r2', payload: {name: 'C', identity_no: '0123456789'}});
     await completed;
     assert.equal(queue.pending, null);
     assert.equal(queue.revision, 'r2');
@@ -77,17 +80,19 @@ test('conflicts preserve newest unsaved edits and never retry automatically', as
     assert.deepEqual(queue.pending, {name: 'Newest'});
 });
 
-test('a reset queued during saving is persisted after the old request', async () => {
+test('a reset queued during saving replaces the shared draft after the old request', async () => {
     const calls = [];
-    const queue = new DraftSaveQueue(payload => new Promise(resolve => calls.push({payload, resolve})), () => {}, () => {});
+    const queue = new DraftSaveQueue((payload, revision, mode) => new Promise(resolve => calls.push({payload, revision, mode, resolve})), () => {}, () => {});
     queue.revision = 'r0';
     queue.enqueue({name: 'Old', MobileBanking: ['MB_SMS']});
     const completed = queue.flush();
     await Promise.resolve();
-    queue.enqueue({name: '', MobileBanking: []});
-    calls[0].resolve({revision: 'r1'});
+    queue.enqueue({name: '', MobileBanking: []}, 'replace');
+    queue.enqueue({name: 'Tên vừa nhập lại', MobileBanking: []});
+    calls[0].resolve({revision: 'r1', payload: {name: 'Old', MobileBanking: ['MB_SMS'], old_form_only: 'x'}});
     await new Promise(resolve => setImmediate(resolve));
-    assert.deepEqual(calls[1].payload, {name: '', MobileBanking: []});
-    calls[1].resolve({revision: 'r2'});
+    assert.deepEqual(calls[1].payload, {name: 'Tên vừa nhập lại', MobileBanking: []});
+    assert.equal(calls[1].mode, 'replace');
+    calls[1].resolve({revision: 'r2', payload: {name: 'Tên vừa nhập lại', MobileBanking: []}});
     await completed;
 });

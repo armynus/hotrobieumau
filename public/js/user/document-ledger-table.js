@@ -37,23 +37,34 @@ $(function () {
                 Swal.fire('Không tải được sổ', 'Hãy tải lại trang hoặc kiểm tra kết nối rồi thử lại.', 'error');
             }
         },
-        columns: [
+        columns: (function() {
+            function formatDate(value) {
+                if (!value) return '—';
+                var dateOnly = String(value).split('T')[0].split(' ')[0];
+                var parts = dateOnly.split('-');
+                if (parts.length === 3) return escape(parts[2] + '/' + parts[1] + '/' + parts[0]);
+                return escape(value);
+            }
+
+            return [
             {data: 'number', className: 'font-weight-bold', render: escape},
-            {data: 'registered_date', render: value => escape(value || '—')},
+            {data: 'registered_date', render: formatDate},
             {data: 'document_code', render: displayText},
             {data: 'title', className: 'ledger-title', render: function (value, type, row) {
                 let content = displayText(value);
                 if (row.source_sheet) content += '<small class="d-block text-muted">' + escape(row.source_sheet) + ' · Dòng ' + escape(row.source_row) + '</small>';
                 return content;
             }},
-            {data: 'issued_date', render: value => escape(value || '—')},
+            {data: 'issued_date', render: formatDate},
             {data: 'missing_fields', orderable: false, searchable: false, visible: checkOnly, className: 'ledger-missing-fields', render: function (fields) {
                 return Object.values(fields || {}).map(label => '<span class="ledger-missing-badge">' + escape(label) + '</span>').join('');
             }},
             {data: null, orderable: false, searchable: false, className: 'text-center', render: function () {
                 return '<div class="d-inline-flex"><button type="button" class="btn btn-sm btn-outline-primary edit-ledger-entry mr-1" title="Chỉnh sửa dòng sổ" aria-label="Chỉnh sửa dòng sổ"><i class="fas fa-edit" aria-hidden="true"></i></button><button type="button" class="btn btn-sm btn-outline-info print-ledger-slip" title="Tải phiếu trình Word" aria-label="Tải phiếu trình Word"><i class="fas fa-file-word" aria-hidden="true"></i></button></div>';
             }}
-        ],
+            ];
+        })(),
+        order: [[0, 'desc']],
         language: {
             processing: 'Đang tải sổ…', lengthMenu: 'Xem _MENU_ dòng',
             search: 'Tìm trong sổ:', searchPlaceholder: 'Số sổ, ký hiệu, trích yếu…',

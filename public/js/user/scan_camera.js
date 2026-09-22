@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     let stream = null;
     let isScanning = false;
-    let scanInterval = null;
+    let scanTimer = null;
     let scanAttempts = 0;
     let lastSuccessfulScan = '';
     let zoomLevel = 100;
@@ -147,6 +147,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Canvas và context để xử lý hình ảnh
     const canvas = document.createElement('canvas');
     const canvasContext = canvas.getContext('2d', { willReadFrequently: true });
+    const MAX_ANALYSIS_DIMENSION = 960;
+    const TARGET_SCAN_PERIOD_MS = 180;
+
+    function configureAnalysisCanvas() {
+        const sourceWidth = videoElem.videoWidth || 640;
+        const sourceHeight = videoElem.videoHeight || 480;
+        const scale = Math.min(1, MAX_ANALYSIS_DIMENSION / Math.max(sourceWidth, sourceHeight));
+        canvas.width = Math.max(1, Math.round(sourceWidth * scale));
+        canvas.height = Math.max(1, Math.round(sourceHeight * scale));
+    }
     
     // Zoom event handler
     zoomSlider.addEventListener('input', (e) => {
@@ -242,14 +252,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Xử lý ảnh để tăng khả năng nhận diện QR
     function preprocessImage(imageData) {
-        // Tạo bản sao của dữ liệu ảnh để xử lý
-        const data = new Uint8ClampedArray(imageData.data);
-        const width = imageData.width;
-        const height = imageData.height;
-        
         // Áp dụng độ sáng và tương phản từ slider
         const brightness = parseInt(brightnessSlider.value) / 100;
         const contrast = parseInt(contrastSlider.value) / 100;
+
+        // Cấu hình mặc định dùng trực tiếp buffer gốc, không sao chép hàng triệu byte mỗi lượt quét.
+        if (brightness === 1 && contrast === 1) {
+            return imageData;
+        }
+
+        const data = imageData.data;
         
         for (let i = 0; i < data.length; i += 4) {
             // Áp dụng độ sáng và tương phản cho mỗi pixel
@@ -267,99 +279,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         
-        return new ImageData(data, width, height);
-    }
-    
-    // // Chụp frame hiện tại để phân tích kỹ
-    // captureButton.addEventListener('click', () => {
-    //     if (!stream || !videoElem.srcObject) {
-    //         resultElem.textContent = "⚠️ Hãy bắt đầu quét trước!";
-    //         return;
-    //     }
-        
-    //     // Hiển thị thông báo đang phân tích
-    //     resultElem.textContent = "🔍 Đang phân tích kỹ frame...";
-        
-    //     // Mảng các cài đặt phân tích khác nhau để thử
-    //     const analysisSettings = [
-    //         { inversionAttempts: "dontInvert", brightness: 100, contrast: 100 },
-    //         { inversionAttempts: "onlyInvert", brightness: 110, contrast: 120 },
-    //         { inversionAttempts: "bothInverted", brightness: 90, contrast: 130 },
-    //         { inversionAttempts: "dontInvert", brightness: 120, contrast: 140 },
-    //         { inversionAttempts: "onlyInvert", brightness: 80, contrast: 150 }
-    //     ];
-        
-    //     // Chụp frame hiện tại
-    //     canvas.width = videoElem.videoWidth;
-    //     canvas.height = videoElem.videoHeight;
-    //     canvasContext.drawImage(videoElem, 0, 0, canvas.width, canvas.height);
-    //     const originalImageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
-        
-    //     // Thực hiện phân tích với nhiều cài đặt khác nhau
-    //     let foundCode = null;
-        
-    //     for (const setting of analysisSettings) {
-    //         if (foundCode) break;
-            
-    //         // Lưu cài đặt hiện tại
-    //         const currentBrightness = brightnessSlider.value;
-    //         const currentContrast = contrastSlider.value;
-            
-    //         // Áp dụng cài đặt mới tạm thời
-    //         brightnessSlider.value = setting.brightness;
-    //         contrastSlider.value = setting.contrast;
-            
-    //         // Xử lý ảnh với cài đặt mới
-    //         const processedData = preprocessImage(originalImageData);
-            
-    //         // Thử phát hiện QR code
-    //         foundCode = jsQR(
-    //             processedData.data,
-    //             processedData.width,
-    //             processedData.height,
-    //             { inversionAttempts: setting.inversionAttempts }
-    //         );
-            
-    //         // Khôi phục cài đặt ban đầu
-    //         brightnessSlider.value = currentBrightness;
-    //         contrastSlider.value = currentContrast;
-    //         updateVideoStyles();
-    //     }
-        
-    //     if (foundCode) {
-    //         resultElem.textContent = `✅ Đã phát hiện mã QR: ${foundCode.data}`;
-    //         highlightQRCode(foundCode);
-    //     } else {
-    //         resultElem.textContent = "❌ Không tìm thấy mã QR trong frame này. Hãy điều chỉnh camera và thử lại!";
-    //     }
-    // });
-    
-    // Highlight QR code phát hiện được
-    function highlightQRCode(code) {
-        if (!code) return;
-        
-        // Vẽ viền xung quanh QR code
-        canvasContext.beginPath();
-        canvasContext.moveTo(code.location.topLeftCorner.x, code.location.topLeftCorner.y);
-        canvasContext.lineTo(code.location.topRightCorner.x, code.location.topRightCorner.y);
-        canvasContext.lineTo(code.location.bottomRightCorner.x, code.location.bottomRightCorner.y);
-        canvasContext.lineTo(code.location.bottomLeftCorner.x, code.location.bottomLeftCorner.y);
-        canvasContext.lineTo(code.location.topLeftCorner.x, code.location.topLeftCorner.y);
-        canvasContext.lineWidth = 4;
-        canvasContext.strokeStyle = "#04CA77";
-        canvasContext.stroke();
-        
-        // Thêm hiệu ứng blink để thu hút sự chú ý
-        let blinkCount = 0;
-        const blinkInterval = setInterval(() => {
-            canvasContext.strokeStyle = blinkCount % 2 === 0 ? "#04CA77" : "#FF3B30";
-            canvasContext.stroke();
-            blinkCount++;
-            
-            if (blinkCount > 6) {
-                clearInterval(blinkInterval);
-            }
-        }, 300);
+        return imageData;
     }
     
     // Start scanning với nhiều tối ưu hóa
@@ -400,16 +320,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Đợi thêm để đảm bảo kích thước video đã sẵn sàng
             await new Promise(resolve => {
                 setTimeout(() => {
-                    // Đảm bảo kích thước video hợp lệ trước khi sử dụng
-                    if (videoElem.videoWidth && videoElem.videoHeight) {
-                        canvas.width = videoElem.videoWidth;
-                        canvas.height = videoElem.videoHeight;
-                    } else {
-                        // Sử dụng kích thước mặc định nếu không lấy được kích thước video
-                        canvas.width = 640;
-                        canvas.height = 480;
-                        console.log('Không thể lấy kích thước video, sử dụng kích thước mặc định');
-                    }
+                    configureAnalysisCanvas();
                     resolve();
                 }, 500);
             });
@@ -490,25 +401,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // Quét QR code với thuật toán thích ứng
-    function scanQRCode() {
-        if (!isScanning) return;
-        
-        if (scanInterval) {
-            clearInterval(scanInterval);
+    function scheduleNextScan(delay = TARGET_SCAN_PERIOD_MS) {
+        if (scanTimer) {
+            clearTimeout(scanTimer);
         }
-        
-        scanInterval = setInterval(() => {
-            if (!isScanning || !videoElem.readyState === videoElem.HAVE_ENOUGH_DATA) return;
+
+        scanTimer = isScanning && !document.hidden
+            ? setTimeout(scanQRCode, Math.max(0, delay))
+            : null;
+    }
+
+    function scanQRCode() {
+        if (!isScanning || document.hidden) return;
+
+        scanTimer = null;
+        if (videoElem.readyState < videoElem.HAVE_ENOUGH_DATA) {
+            scheduleNextScan();
+
+            return;
+        }
+
+        const scanStartedAt = performance.now();
             
-            // Kiểm tra video đã sẵn sàng và có kích thước hợp lệ
-            if (videoElem.readyState === videoElem.HAVE_ENOUGH_DATA && 
-                videoElem.videoWidth && videoElem.videoHeight) {
-                // Vẽ frame hiện tại vào canvas
-                canvasContext.drawImage(videoElem, 0, 0, canvas.width, canvas.height);
-            } else {
-                // Bỏ qua frame này nếu video chưa sẵn sàng
-                return;
-            }
+        if (!videoElem.videoWidth || !videoElem.videoHeight) {
+            scheduleNextScan();
+
+            return;
+        }
+
+        canvasContext.drawImage(videoElem, 0, 0, canvas.width, canvas.height);
 
             // Lấy dữ liệu ảnh từ canvas
             let imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
@@ -545,9 +466,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // Hiển thị kết quả
                     resultElem.textContent = `✅ Mã QR: ${qrData}`;
                     
-                    // Highlight QR code
-                    highlightQRCode(code);
-                    
                     // Phát âm thanh thông báo thành công (tùy chọn)
                     const successSound = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAAwAABPAAfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX2ZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZ/////////////////////////////////8AAAAExTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/4zAAAAAAAAAAAAAAAAAAAAAAAFhpbmcAAAAPAAAA5AAyOQMAAgIJDRERFRYaGh0dISUlKCksLDAwMzc3OkBARkdISExSUlZcXGJiZWVpbW1wcHR6en1+goKFiYmNkZGUmJidoaGkqKissbG0t7e6vr7BxcXJzMzP09PX2trb39/i5eXp7Ozv8/P29/f7//8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAqOqwAAAAAAAAAAAAAAAAAAAAAAQMI4yEwAAAAAAAAQYgAAAAAAAADA+AZgAAAA/+NIxAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV/+MoxDsAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV/+MoxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
                     successSound.play();
@@ -559,12 +477,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                     
                     // Tạm dừng quét để tránh lặp lại
-                    clearInterval(scanInterval);
-                    setTimeout(() => {
-                        if (isScanning) {
-                            scanQRCode();
-                        }
-                    }, 1500);
+                    scheduleNextScan(1500);
                     
                     return;
                 }
@@ -601,8 +514,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 updateVideoStyles();
             }
-            
-        }, 50); // Quét mỗi 50ms
+        scheduleNextScan(Math.max(80, TARGET_SCAN_PERIOD_MS - (performance.now() - scanStartedAt)));
     }
     
     // Stop scanning
@@ -612,9 +524,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             stream = null;
         }
         
-        if (scanInterval) {
-            clearInterval(scanInterval);
-            scanInterval = null;
+        if (scanTimer) {
+            clearTimeout(scanTimer);
+            scanTimer = null;
         }
         
         // Xóa scanner area nếu có
@@ -640,6 +552,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     
     stopBtn.addEventListener('click', stopScan);
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            if (scanTimer) {
+                clearTimeout(scanTimer);
+                scanTimer = null;
+            }
+        } else if (isScanning) {
+            scheduleNextScan(0);
+        }
+    });
+
+    window.addEventListener('pagehide', stopScan);
     
     selectElem.addEventListener('change', async (e) => {
         const newDeviceId = e.target.value;

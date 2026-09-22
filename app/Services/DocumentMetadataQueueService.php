@@ -41,10 +41,12 @@ class DocumentMetadataQueueService
             $query->where('managing_branch_id', $branchId);
         }
         if ($year !== null) {
-            $query->where(function ($query) use ($year): void {
-                $query->whereYear('received_date', $year)
-                    ->orWhereYear('forwarded_date', $year)
-                    ->orWhereYear('issued_date', $year);
+            $yearStart = sprintf('%04d-01-01', $year);
+            $nextYear = sprintf('%04d-01-01', $year + 1);
+            $query->where(function ($query) use ($yearStart, $nextYear): void {
+                $query->where(fn ($range) => $range->where('received_date', '>=', $yearStart)->where('received_date', '<', $nextYear))
+                    ->orWhere(fn ($range) => $range->where('forwarded_date', '>=', $yearStart)->where('forwarded_date', '<', $nextYear))
+                    ->orWhere(fn ($range) => $range->where('issued_date', '>=', $yearStart)->where('issued_date', '<', $nextYear));
             });
         }
 

@@ -80,7 +80,7 @@
      <!-- jsQR library - Thư viện quét QR code mạnh mẽ -->
     <script src="{{asset('js/jsQR.min.js')}}"></script>
     
-    <script src="{{asset('js/user/scan_camera.js')}}"></script>
+    <script src="{{ asset('js/user/scan_camera.js') }}?v={{ filemtime(public_path('js/user/scan_camera.js')) }}"></script>
 
     
       

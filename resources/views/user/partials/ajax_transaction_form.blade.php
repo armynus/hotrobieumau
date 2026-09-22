@@ -76,7 +76,9 @@
                     return;
                 }
 
+                window.addrParts = {};
                 const rows = text.trim().split(/\n/);
+                if (rows.length < 2) { alert('Dữ liệu cần có dòng tiêu đề và ít nhất một dòng thông tin.'); return; }
                 const headers = rows[0].split(/\t/).map(h => h.trim().toLowerCase());
                 const values = rows[1].split(/\t/);
         
@@ -103,9 +105,10 @@
                                 .join(' ');
 
                             let addrInput = document.querySelector(`#supportForm input[name='addrfull']`);
-                            if (addrInput) addrInput.value = fullAddress;
+                            if (addrInput) { addrInput.value = fullAddress; $(addrInput).trigger('change'); }
                         } else if (input) {
                             input.value = value;
+                            $(input).trigger('change');
                         }
                         // Gắn dữ liệu vào thẻ input hidden custno
                         if (['custno'].includes(header)) {
@@ -116,6 +119,7 @@
                         }
                     }
                 });
+                $("#supportForm").trigger("supportform:filled");
 
             });
         } catch (error) {
@@ -194,7 +198,9 @@
                     return;
                 }
 
+                window.addrParts = {};
                 const rows = text.trim().split(/\n/);
+                if (rows.length < 2) { alert('Dữ liệu cần có dòng tiêu đề và ít nhất một dòng thông tin.'); return; }
                 const headers = rows[0].split(/\t/).map(h => h.trim().toLowerCase());
                 const values = rows[1].split(/\t/);
                 headers.forEach((header, index) => {
@@ -220,9 +226,10 @@
                                 .join(' ');
 
                             let addrInput = document.querySelector(`#supportForm input[name='DiaChiDoanhNghiep']`);
-                            if (addrInput) addrInput.value = fullAddress;
+                            if (addrInput) { addrInput.value = fullAddress; $(addrInput).trigger('change'); }
                         } else if (input) {
                             input.value = value;
+                            $(input).trigger('change');
                         }
                         // Gắn dữ liệu vào thẻ input hidden custno
                         if (['custno'].includes(header)) {
@@ -233,6 +240,7 @@
                         }
                     }
                 });
+                $("#supportForm").trigger("supportform:filled");
 
             });
         } catch (error) {
@@ -241,13 +249,13 @@
         }
     });
 
-    document.getElementById('copyClipboardBtn').addEventListener('click', function () {
+    document.getElementById('copyClipboardBtn').addEventListener('click', async function () {
         try {
             // Lấy tất cả các input hợp lệ (trừ các input bị loại trừ)
             const inputs = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='_token']):not([disabled]):not([type='hidden']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
 
             // Tạo dữ liệu dưới dạng chuỗi, các giá trị phân cách bằng tab ("\t")
-            const textToCopy = inputs.map(input => input.value.trim()).join("\t");
+            const textToCopy = inputs.filter(input => !['checkbox', 'radio'].includes(input.type) || input.checked).map(input => input.value.trim()).join("\t");
 
             // Phương pháp sao chép tương thích với nhiều trình duyệt hơn
             const copyToClipboard = function(text) {
@@ -277,7 +285,7 @@
             };
 
             // Thực hiện sao chép
-            const result = copyToClipboard(textToCopy);
+            const result = await copyToClipboard(textToCopy);
             if (result) {
                 alert("Đã sao chép dữ liệu vào clipboard!");
             } else {
@@ -290,167 +298,40 @@
         }
     });
 
-    $(document).ready(function () {
-        $('#print_form').click(function () {
-            var formId = $(this).data('form_id');
-            var formDataArray = $('#supportForm').serializeArray();
-            var formData = {};
-            var missingFields = []; // Lưu danh sách trường thiếu
-
-            // Duyệt qua tất cả input trong form để xây dựng formData
-            $.each(formDataArray, function (_, field) {
-                var messageElement = $(`label.field-label[for="${field.name}"]`);
-                var inputElement = $(`[name="${field.name}"]`);
-                var fieldValue = field.value || '';
-                // Các trường hợp không cần kiểm tra: keyword, hidden, disabled
-                if (
-                    field.name === 'keyword' ||
-                    inputElement.attr("type") === "hidden" ||
-                    inputElement.prop("disabled")
-                ) {
-                    formData[field.name] = fieldValue;
-                    return;
-                }
-                
-                // Kiểm tra nếu trường bị trống
-                if (!fieldValue.trim()) {
-                    missingFields.push(messageElement.text() || field.name);
-                }
-
-                // Nếu là checkbox (nhiều lựa chọn), lưu giá trị vào mảng
-                if (inputElement.attr("type") === "checkbox") {
-                    if (!formData[field.name]) {
-                        formData[field.name] = [];
-                    }
-                    formData[field.name].push(fieldValue);
-                } else {
-                    // Nếu không phải checkbox, lưu giá trị trực tiếp
-                    formData[field.name] = fieldValue;
-                }
-            });
-
-            // Hàm submit form ẩn
-            function submitForm() {
-                var $form = $('<form>', {
-                    method: 'POST',
-                    action: "{{ route('transaction_form_print') }}"
-                });
-
-                $form.append($('<input>', {
-                    type: 'hidden',
-                    name: '_token',
-                    value: "{{ csrf_token() }}"
-                }));
-
-                // Duyệt qua formData và thêm input ẩn
-                $.each(formData, function (name, value) {
-                    if (Array.isArray(value)) {
-                        // Nếu value là mảng, thêm từng phần tử với name dạng name[]
-                        $.each(value, function (_, val) {
-                            $form.append($('<input>', {
-                                type: 'hidden',
-                                name: name + '[]',
-                                value: val
-                            }));
-                        });
-                    } else {
-                        $form.append($('<input>', {
-                            type: 'hidden',
-                            name: name,
-                            value: value
-                        }));
-                    }
-                });
-
-                // Thêm form_id
-                $form.append($('<input>', {
-                    type: 'hidden',
-                    name: 'form_id',
-                    value: formId
-                }));
-
-                // Append form vào body và submit
-                $('body').append($form);
-                $form.submit();
-                $form.remove();
-            }
-
-            // Nếu có trường thiếu, hiện cảnh báo, ngược lại submit luôn
-            if (missingFields.length > 0) {
-                swal({
-                    title: "Cảnh báo!",
-                    text: "Bạn điền thiếu các trường thông tin:\n " + missingFields.join(" ") + 
-                        "\n\nBạn muốn tiếp tục in hay điền đầy đủ thông tin?",
-                    icon: "warning",
-                    buttons: {
-                        cancel: {   
-                            text: "Điền đầy đủ",
-                            value: false,
-                            visible: true,
-                            className: "btn btn-success"
-                        },
-                        confirm: {
-                            text: "Tiếp tục in",
-                            value: true,
-                            visible: true,
-                            className: "btn btn-warning"
-                        }
-                    }
-                }).then((willPrint) => {
-                    if (willPrint) {
-                        submitForm();
-                    }
-                });
-            } else {
-                submitForm();
-            }
-        });
-    });
-
-
-
-
-
-    // document.getElementById('resetFormBtn').addEventListener('click', function () {
-    //     try {
-    //         // Lấy tất cả input và select hợp lệ
-    //         const elements = [...document.querySelectorAll("#supportForm input[name]:not([name='keyword']):not([name='GDichVien']):not([name='DiaDanh']):not([name='_token']):not([name='NgayGiaoDich']):not([name='NgayThangNam']):not([name='branch']), #supportForm select[name]:not([name='keyword']):not([name='_token']):not([disabled])")];
-
-    //         // Đặt lại giá trị mặc định
-    //         elements.forEach(el => {
-    //             if (el.tagName === "INPUT") {
-    //                 el.value = ""; // Xóa giá trị input
-    //             } else if (el.tagName === "SELECT") {
-    //                 el.selectedIndex = 0; // Chọn option đầu tiên trong select
-    //             }
-    //         });
-
-    //     } catch (error) {
-    //         console.error("Lỗi khi làm mới:", error);
-    //         alert("Không thể làm mới biểu mẫu!");
-    //     }
-    // });
-
-
     // --- autocomplete + account handling
+    document.getElementById('resetFormBtn').addEventListener('click', function () {
+        window.currentCustomer = null;
+        window._lastAccounts = [];
+        selectOptionsCache = {};
+        $('#custno_hidden, #MaKHDN_hidden, #idxacno_hidden, #customer_search').val('');
+        $('#customerSearchStatus').text('Đã làm mới. Chọn khách hàng tiếp theo hoặc nhập thông tin mới.');
+        $('#customerSaveStatus, #exportStatus').text('');
+    });
     $(document).ready(function () {
         // autocomplete (replace route if needed)
+        let customerRequest;
         $("#customer_search").autocomplete({
             source: function(request, response) {
-                $.ajax({
+                if (customerRequest) customerRequest.abort();
+                $('#customerSearchStatus').text('Đang tìm khách hàng…');
+                customerRequest = $.ajax({
                     url: "{{ route('customer.search') }}",
                     dataType: "json",
                     data: { query: request.term },
-                    success: function(data) { response(data); },
-                    error: function(xhr) { console.error('search error', xhr); }
+                    timeout: 15000,
+                    success: function(data) { $('#customerSearchStatus').text(data.length ? 'Chọn khách hàng để điền thông tin.' : 'Không tìm thấy khách hàng. Bạn có thể nhập trực tiếp.'); response(data); },
+                    error: function(xhr, reason) { if (reason !== 'abort') $('#customerSearchStatus').text(xhr.status === 401 ? 'Phiên đăng nhập đã hết. Vui lòng đăng nhập lại.' : 'Chưa tìm được khách hàng. Hãy thử lại.'); response([]); }
                 });
             },
             minLength: 2,
             select: function(event, ui) {
+                setTimeout(() => $('#supportForm input, #supportForm select').trigger('change'), 0);
                 var customer = ui.item.customer;
                 if (!customer) { console.warn('no customer payload'); return; }
                 window.currentCustomer = customer;
-                console.log('selected customer', customer);
+                $('#custno_hidden, #MaKHDN_hidden, #idxacno_hidden').val('');
+                $('#customerSearchStatus').text('Đã điền thông tin khách hàng. Hãy kiểm tra trước khi tải Word.');
+
 
                 // fill other fields (keeps user's logic)
                 if (customer.custtpcd == 'Cá nhân' || customer.custtpcd == '' || customer.custtpcd == null) {
@@ -465,7 +346,7 @@
                     $("#DiaChiDoanhNghiep").val(customer.addrfull || '');
                     $("#GiayDKKD").val(customer.busno || '');
                     $("#NgayCapDKKD").val(customer.busno_date || '');
-                    $("#NoiCapThueDN").val(customer.busno_place || '');
+                    $("#NoiCapDKKD").val(customer.busno_place || '');
                     $("#MaSoThueDN").val(customer.taxno || '');
                     $("#NgayCapMSTDN").val(customer.taxno_date || '');
                     $("#NoiCapThueDN").val(customer.taxno_place || '');
@@ -474,7 +355,7 @@
 
                 // accounts logic: normalize + build optionsHtml + cache
                 var accounts = normalizeAccounts(customer.accounts);
-                console.log('accounts normalized', accounts);
+
 
                 var optionsHtml = '';
                 accounts.forEach(function(acc){
@@ -486,7 +367,7 @@
                 selectOptionsCache['idxacno'] = optionsHtml;
 
                 // keep lastAccounts cache
-                if (accounts.length) window._lastAccounts = accounts;
+                window._lastAccounts = accounts;
 
                 // decide render mode
                 if (accounts.length > 1) {

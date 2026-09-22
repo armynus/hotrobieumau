@@ -1,5 +1,47 @@
 
 <script>
+    function filterDepartmentOptions(selectSelector, branchId, selectedValue) {
+        var $select = $(selectSelector);
+        $select.find('option[data-branch-id]').each(function () {
+            var visible = String($(this).data('branch-id')) === String(branchId || '');
+            $(this).prop('hidden', !visible).prop('disabled', !visible);
+        });
+        $select.val(selectedValue && $select.find('option[value="' + selectedValue + '"]:not(:disabled)').length ? String(selectedValue) : '');
+    }
+
+    function filterTransactionOfficeOptions(selectSelector, branchId, selectedValue) {
+        var $select = $(selectSelector);
+        $select.find('option[data-branch-id]').each(function () {
+            var sameBranch = String($(this).data('branch-id')) === String(branchId || '');
+            var selectable = $(this).data('status') === 'active' || String($(this).val()) === String(selectedValue || '');
+            var visible = sameBranch && selectable;
+            $(this).prop('hidden', !visible).prop('disabled', !visible);
+        });
+        $select.val(selectedValue && $select.find('option[value="' + selectedValue + '"]:not(:disabled)').length ? String(selectedValue) : '');
+    }
+
+    function showUserRequestError(xhr, fallback) {
+        var response = xhr.responseJSON || {};
+        var errors = response.errors || {};
+        var firstError = Object.keys(errors).length ? errors[Object.keys(errors)[0]][0] : null;
+        swal(firstError || response.message || fallback, { icon: 'error' });
+    }
+
+    $(document).on('change', '#branch', function () {
+        filterDepartmentOptions('#department_id', this.value, '');
+        filterTransactionOfficeOptions('#transaction_office_id', this.value, '');
+    });
+
+    $(document).on('change', '#edit_branch', function () {
+        filterDepartmentOptions('#edit_department_id', this.value, '');
+        filterTransactionOfficeOptions('#edit_transaction_office_id', this.value, '');
+    });
+
+    $('#addUserhModal').on('show.bs.modal', function () {
+        filterDepartmentOptions('#department_id', $('#branch').val(), $('#department_id').val());
+        filterTransactionOfficeOptions('#transaction_office_id', $('#branch').val(), $('#transaction_office_id').val());
+    });
+
     $(document).on('click', '.edit_user', function () {
         var user_id = $(this).data('user_id');
         $.ajax({
@@ -13,10 +55,12 @@
                 $('#edit_user_id').val(data.user.id);
                 $('#edit_name').val(data.user.name);
                 $('#edit_email').val(data.user.email);
+                $('#edit_user_ipcas').val(data.user.user_ipcas || '');
                 $('#edit_branch').val(data.user.branch_id);
                 $('#edit_user_id').val(data.user.id);
                 $('#edit_role_id').val(data.user.role_id);
-                $('#edit_department_id').val(data.user.department_id);
+                filterDepartmentOptions('#edit_department_id', data.user.branch_id, data.user.department_id);
+                filterTransactionOfficeOptions('#edit_transaction_office_id', data.user.branch_id, data.user.transaction_office_id);
                 $('#edit_position_id').val(data.user.position_id);
                 $('#edit_document_role').val(data.user.document_role);
             },
@@ -26,7 +70,7 @@
         });
     });
     $(document).ready(function(){
-        $('.lock_user').click(function(){
+        $(document).on('click', '.lock_user', function(){
             var user_id = $(this).data('user_id');
             var status = $(this).data('status');
             
@@ -109,10 +153,12 @@
             var user_id = $('#edit_user_id').val();
             var name = $('#edit_name').val();
             var email = $('#edit_email').val();
+            var user_ipcas = $('#edit_user_ipcas').val();
             var password = $('#edit_password').val();
             var branch_id = $('#edit_branch').val();
             var role_id = $('#edit_role_id').val();
             var department_id = $('#edit_department_id').val();
+            var transaction_office_id = $('#edit_transaction_office_id').val();
             var position_id = $('#edit_position_id').val();
             var document_role = $('#edit_document_role').val();
             
@@ -121,7 +167,7 @@
                 { condition: !name, message: "Vui lòng nhập tên nhân viên" },
                 { condition: !email, message: "Vui lòng nhập email" },
                 { condition: !branch_id, message: "Vui lòng chọn chi nhánh" },
-                { condition: !role_id, message: "Vui lòng chọn chức vụ" },
+                { condition: !role_id, message: "Vui lòng chọn quyền hệ thống" },
             ];
 
             // Lặp qua các điều kiện và hiển thị lỗi nếu có
@@ -140,10 +186,12 @@
                     user_id: user_id,
                     name: name,
                     email: email,
+                    user_ipcas: user_ipcas,
                     password: password,
                     branch_id: branch_id,
                     role_id: role_id,
                     department_id: department_id,
+                    transaction_office_id: transaction_office_id,
                     position_id: position_id,
                     document_role: document_role,
                 },
@@ -157,49 +205,18 @@
                         return;
                     }
 
-                    // Lấy dữ liệu từ response
-                    let user = data.user || {};
                     let table = $('#dataTable').DataTable();
-
-                    // Xử lý giá trị null thành chuỗi rỗng để tránh lỗi
-                    user.name = user.name || '';
-                    user.email = user.email || '';
-                    data.branch_name = data.branch_name || '';
-                    data.role_name = data.role_name || '';
-
-                    let created_at = new Date(user.created_at).toLocaleDateString('en-GB');
-                    let updated_at = new Date(user.updated_at).toLocaleDateString('en-GB');
-
-                    // Tìm dòng cần cập nhật trong DataTable
-                    let row = $(`span.edit_user[data-user_id="${user_id}"]`).closest('tr');
-                    let dataRow = table.row(row);
-
-                    if (dataRow.data()) {
-                        let rowData = dataRow.data();
-                        // Cập nhật dữ liệu của dòng
-                        rowData[1] = user.name;
-                        rowData[2] = user.email;
-                        rowData[3] = data.branch_name;
-                        rowData[4] = data.role_name;
-                        rowData[5] = created_at;
-                        rowData[6] = updated_at;
-                        
-                        // Cập nhật lại dòng trong DataTable
-                        dataRow.data(rowData).draw(false);
-                    }
+                    table.ajax.reload(null, false);
 
                     swal("Thành công!", "Cập nhật tài khoản thành công.", {
                         icon: "success",
                     }).then(() => {
                         // Đóng modal sau khi cập nhật thành công
-                        $('#close_button').click();
+                        $('#editUserModal').modal('hide');
                     });
                 },
-                error: function(xhr, status, error){
-                    console.error('Có lỗi xảy ra:', error);
-                    swal("Lỗi!", "Không thể cập nhật tài khoản.", {
-                        icon: "error",
-                    });
+                error: function(xhr){
+                    showUserRequestError(xhr, 'Không thể cập nhật tài khoản.');
                 }
             });
         });
@@ -208,10 +225,12 @@
             var _token = $('input[name="_token"]').val();
             var name = $('#name').val();
             var email = $('#email').val();
+            var user_ipcas = $('#user_ipcas').val();
             var password = $('#password').val();
             var branch_id = $('#branch').val();
             var role_id = $('#role_id').val();
             var department_id = $('#department_id').val();
+            var transaction_office_id = $('#transaction_office_id').val();
             var position_id = $('#position_id').val();
             var document_role = $('#document_role').val();
             // Danh sách điều kiện kiểm tra
@@ -221,7 +240,7 @@
                 { condition: !password, message: "Vui lòng nhập mật khẩu" },
                 { condition: password.length < 6, message: "Mật khẩu phải có ít nhất 6 ký tự" },
                 { condition: !branch_id, message: "Vui lòng chọn chi nhánh" },
-                { condition: !role_id, message: "Vui lòng chọn chức vụ" },
+                { condition: !role_id, message: "Vui lòng chọn quyền hệ thống" },
             ];
 
             // Lặp qua các điều kiện và hiển thị lỗi nếu có
@@ -239,10 +258,12 @@
                     _token: _token,
                     name: name,
                     email: email,
+                    user_ipcas: user_ipcas,
                     password: password,
                     branch_id: branch_id,
                     role_id: role_id,
                     department_id: department_id,
+                    transaction_office_id: transaction_office_id,
                     position_id: position_id,
                     document_role: document_role,
                 },
@@ -256,80 +277,26 @@
                         return;
                     }
 
-                    let user = data.user;
                     let table = $('#dataTable').DataTable();
-
-                    // Xử lý giá trị null thành chuỗi rỗng để tránh lỗi
-                    user.name = user.name || '';
-                    user.email = user.email || '';
-                    data.branch_name = data.branch_name || '';
-                    data.role_name = data.role_name || '';
-
-                    let created_at = new Date(user.created_at).toLocaleDateString('en-GB');
-                    let updated_at = new Date(user.updated_at).toLocaleDateString('en-GB');
-
-                    if (data.avaiable === true) {
-                        // CẬP NHẬT thông tin nếu người dùng đã tồn tại
-                        let row = $(`span.edit_user[data-user_id="${user.id}"]`).closest('tr');
-                        let dataRow = table.row(row);
-
-                        if (dataRow.data()) {
-                            let rowData = dataRow.data();
-                            rowData[1] = user.name;
-                            rowData[2] = user.email;
-                            rowData[3] = data.branch_name;
-                            rowData[4] = data.role_name;
-                            rowData[5] = created_at;
-                            rowData[6] = updated_at;
-                            dataRow.data(rowData).draw(false);
-                        }
-                    } else {
-                        // THÊM MỚI người dùng vào bảng
-                        table.row.add([
-                            user.id,
-                            user.name,
-                            user.email,
-                            data.branch_name,
-                            data.role_name,
-                            created_at,
-                            updated_at,
-                            `<td style="justify-content: center; align-items: flex-start; text-align: center;">
-                                <button type="button"  data-toggle="modal" data-target="#editUserModal" class="btn btn-info btn-icon-split" >
-                                        <span class="text edit_user" data-user_id="${user.id}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                                            </svg>
-                                        </span>
-                                    </button>
-                                <button class="btn btn-danger btn-icon-split">
-                                    <span class="icon text-white-50 cancel_order lock_user" data-user_id="${user.id}" data-status="${user.id}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ban-fill" viewBox="0 0 16 16">
-                                            <path d="M16 8A8 8 0 1 1 0 8a 8 8 0 0 1 16 0M2.71 12.584q.328.378.706.707l9.875-9.875a7 7 0 0 0-.707-.707l-9.875 9.875Z"/>
-                                        </svg>
-                                    </span>
-                                </button>
-                            </td>`
-                        ]).draw(false);
-                    }
+                    table.ajax.reload(null, false);
 
                     swal("Thành công!", "Thêm tài khoản thành công.", {
                         icon: "success",
                     }).then(() => {
-                        $('#close_button').click();
+                        $('#addUserhModal').modal('hide');
                         $('#name').val('');
                         $('#email').val('');
+                        $('#user_ipcas').val('');
                         $('#password').val('');
                         $('#branch').val('');
                         $('#department_id').val('');
+                        $('#transaction_office_id').val('');
                         $('#position_id').val('');
                         $('#document_role').val('user');
                     });
                 },
-                error: function(data){
-                    var errors = data.responseJSON;
-                    // alert('Có lỗi xảy ra');
-                    // console.log(errors);
+                error: function(xhr){
+                    showUserRequestError(xhr, 'Không thể thêm tài khoản.');
                 }
             });
         });

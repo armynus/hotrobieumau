@@ -5,13 +5,12 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
-use App\Models\CustomerInfo;
-use App\Imports\AccountInfoImport;
 use App\Models\AccountInfo;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\DataImport;
+use App\Services\DataImportService;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Schema;
 
 class AccountController extends Controller
 {
@@ -58,16 +57,39 @@ class AccountController extends Controller
             'add_addr3' => 'Địa chỉ cấp 3',
             'add_addrfull' => 'Địa chỉ đầy đủ',
         ];
-        return view('user.page.view_data_account', compact('fields', 'add_fields'));
-    }
-    public function uploadfile_account(Request $request){
-        ini_set('max_execution_time', 9000); // = 5 phút
-        // Lưu file Excel tạm thời
-        $file = $request->file('data_account');
-        // Import dữ liệu từ file
-        Excel::import(new AccountInfoImport, $file);
+        $activeImport = $this->latestImport('account');
 
-        return redirect()->back()->with('success', 'Dữ liệu đã được tải lên thành công!');
+        return view('user.page.view_data_account', compact('fields', 'add_fields', 'activeImport'));
+    }
+    public function uploadfile_account(Request $request, DataImportService $imports){
+        $request->validate(['data_account' => ['required', 'file', 'extensions:xls,xlsx,xlsm,csv', 'max:51200']]);
+
+        $import = $imports->queue(
+            $request->file('data_account'),
+            'account',
+            (int) session('user_id'),
+            (int) session('UserBranchId'),
+            (string) config('database.connections.tenant.database')
+        );
+
+        return redirect()->back()->with(
+            'success', 'Đã tiếp nhận file tài khoản. Hệ thống đang nhập dữ liệu ở chế độ nền.'
+        )->with('data_import_id', $import->id);
+    }
+
+    private function latestImport(string $type): ?DataImport
+    {
+        if (! Schema::hasTable('data_imports')) {
+            return null;
+        }
+
+        $query = DataImport::query()
+            ->where('user_id', session('user_id'))
+            ->where('branch_id', session('UserBranchId'))
+            ->where('type', $type);
+
+        return (clone $query)->whereKey(session('data_import_id'))->first()
+            ?? $query->whereIn('status', ['queued', 'running'])->latest()->first();
     }
     public function detail_account(Request $request){
 

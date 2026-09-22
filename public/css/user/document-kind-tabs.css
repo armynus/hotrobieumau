@@ -1,7 +1,17 @@
-.document-kind-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.document-kind-shell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 11px;
+    border: 1px solid #e1e7f2;
+    border-radius: 11px;
+    background: #f8faff;
+}
+.document-kind-caption { flex: 0 0 auto; color: #5c6c88; font-size: .8rem; font-weight: 700; }
+.document-kind-tabs { display: flex; flex-wrap: wrap; gap: 7px; }
 .document-kind-tab {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 14px; border: 1px solid #dce3f0; border-radius: 10px;
+    padding: 7px 11px; border: 1px solid #dce3f0; border-radius: 9px;
     background: #fff; color: #526481; font-size: .9rem; font-weight: 600;
     transition: background .16s ease, box-shadow .16s ease;
 }
@@ -11,5 +21,9 @@
 .document-kind-tab.active i { color: #fff; }
 .document-kind-tab:focus-visible { outline: 3px solid #93b5ff; outline-offset: 2px; }
 #dataTable th.sorting_asc, #dataTable th.sorting_desc { color: #2855c5; background-color: #eef3ff; }
-@media (max-width: 575.98px) { .document-kind-tab { padding: 8px 10px; font-size: .8rem; } }
+@media (max-width: 767.98px) {
+    .document-kind-shell { align-items: flex-start; flex-direction: column; }
+    .document-kind-caption { padding-left: 2px; }
+}
+@media (max-width: 575.98px) { .document-kind-tab { padding: 7px 9px; font-size: .8rem; } }
 @media (prefers-reduced-motion: reduce) { .document-kind-tab { transition: none; } }

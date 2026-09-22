@@ -27,6 +27,8 @@
                             <th>STT</th>
                             <th>Tên dữ liệu</th>
                             <th>Mã dữ liệu</th>
+                            <th>Nhóm nội dung</th>
+                            <th>Thứ tự</th>
                             <th>Kiểu dữ liệu</th>
                             <th>Hướng dẫn nhập</th>
                             <th>Giá trị sẵn</th>
@@ -39,6 +41,8 @@
                             <th>STT</th>
                             <th>Tên dữ liệu</th>
                             <th>Mã dữ liệu</th>
+                            <th>Nhóm nội dung</th>
+                            <th>Thứ tự</th>
                             <th>Kiểu dữ liệu</th>
                             <th>Hướng dẫn nhập</th>
                             <th>Giá trị sẵn</th>
@@ -52,6 +56,8 @@
                             <td>{{$key}}</td>
                             <td>{{$form->field_name}}</td>
                             <td>{{$form->field_code}}</td>
+                            <td><span class="badge badge-light border px-2 py-1">{{ $content_groups[$form->content_group] ?? 'Nội dung giao dịch / yêu cầu' }}</span></td>
+                            <td class="text-center">{{ $form->display_order }}</td>
                             <td>{{$form->data_type}}</td>
                             <td>{{$form->placeholder}}</td>
                             <td>{{$form->value}}</td>

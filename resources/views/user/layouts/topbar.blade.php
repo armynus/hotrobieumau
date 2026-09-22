@@ -49,14 +49,13 @@
     </li>
 
     <!-- Nav Item - Alerts -->
-    <li class="nav-item dropdown no-arrow mx-1 dropdown-notifications" >
-        <a class="nav-link dropdown-toggle view_detail_document_admin"   id="alertsDropdown" role="button" data-toggle="dropdown"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i  class="fas fa-bell fa-fw" ></i>
+    <li class="nav-item dropdown no-arrow mx-1 dropdown-notifications"
+        data-document-notifications data-endpoint="{{ route('api.document_notifications') }}">
+        <a class="nav-link dropdown-toggle view_detail_document_admin" href="#" id="alertsDropdown" role="button"
+            data-toggle="dropdown" data-notification-toggle aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-bell fa-fw" aria-hidden="true"></i><span class="sr-only">Văn bản chưa đọc</span>
             <!-- Counter - Alerts -->
-            @if(isset($unreadCount) && $unreadCount > 0)
-                <span class="badge badge-danger badge-counter">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
-            @endif
+            <span class="badge badge-danger badge-counter" data-notification-count hidden></span>
         </a>
         <!-- Dropdown - Alerts -->
         <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -65,23 +64,9 @@
                 Văn bản chưa đọc
             </h6>
             
-            @if(isset($latestUnreadDocs) && $latestUnreadDocs->count() > 0)
-                @foreach($latestUnreadDocs as $doc)
-                <a class="dropdown-item d-flex align-items-center" href="{{ route('document_detail', $doc->id) }}">
-                    <div class="mr-3">
-                        <div class="icon-circle {{ $doc->visibility === \App\Models\Document::VISIBILITY_SYSTEM ? 'bg-danger' : 'bg-primary' }}">
-                            <i class="fas fa-file-alt text-white"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="small text-gray-500">{{ \Carbon\Carbon::parse($doc->issued_date ?? $doc->created_at)->format('d/m/Y') }}</div>
-                        <span class="font-weight-bold">{{ \Illuminate\Support\Str::limit($doc->document_code ?: 'Chưa cập nhật số, ký hiệu', 40) }}</span>
-                    </div>
-                </a>
-                @endforeach
-            @else
-                <a class="dropdown-item text-center small text-gray-500" href="#">Không có văn bản mới</a>
-            @endif
+            <div data-notification-list>
+                <span class="dropdown-item text-center small text-gray-500">Mở chuông để tải thông báo</span>
+            </div>
             
             <a class="dropdown-item text-center small text-gray-500" href="{{ route('documents_incoming') }}">Xem Tất Cả</a>
         </div>
@@ -99,11 +84,15 @@
                 {{Session::get('user_name')}}
             </span>
             <img class="img-profile rounded-circle"
-                src="{{asset('user_icon.png')}}">
+                src="{{ Session::get('user_has_avatar') ? route('profile.avatar', ['v' => Session::get('user_avatar_version')]) : asset('user_icon.png') }}" alt="Ảnh đại diện của {{ Session::get('user_name') }}">
         </a>
         <!-- Dropdown - User Information -->
         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
             aria-labelledby="userDropdown">
+            <a class="dropdown-item" href="{{ route('profile.show') }}">
+                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                Thông tin cá nhân
+            </a>
             <a class="dropdown-item" href="{{route('change_password_user',Session::get('user_id'))}}">
                 <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                 Đổi mật khẩu

@@ -20,12 +20,16 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'user_ipcas',
+        'avatar_path',
         'password',
         'branch_id',
         'department_id',
+        'transaction_office_id',
         'position_id',
         'role_id',
         'document_role',
+        'status',
     ];
 
     /**
@@ -36,6 +40,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'avatar_path',
     ];
 
     /**
@@ -48,6 +53,11 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'branch_id' => 'integer',
+            'department_id' => 'integer',
+            'transaction_office_id' => 'integer',
+            'position_id' => 'integer',
+            'failed_login_attempts' => 'integer',
         ];
     }
 
@@ -59,6 +69,11 @@ class User extends Authenticatable
     public function department()
     {
         return $this->belongsTo(Department::class, 'department_id');
+    }
+
+    public function transactionOffice()
+    {
+        return $this->belongsTo(TransactionOffice::class, 'transaction_office_id');
     }
 
     public function position()
@@ -92,10 +107,10 @@ class User extends Authenticatable
      */
     public function isLeadership(): bool
     {
-        if (!$this->position_id || ! $this->position || ! in_array((int) $this->position->level, [1, 2, 3, 4, 5], true)) {
+        if (! $this->position_id || ! $this->position || ! in_array((int) $this->position->level, [1, 2, 3, 4, 5], true)) {
             return false;
         }
-        
+
         // Exclude positions named like 'Nhân viên' or 'Cán bộ' if needed
         $posName = mb_strtolower($this->position->position_name ?? '', 'UTF-8');
         if (str_contains($posName, 'nhân viên') || str_contains($posName, 'chuyên viên')) {

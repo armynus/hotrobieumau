@@ -4,15 +4,18 @@
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
-    <h1 class="h3 mb-2 text-gray-800">Danh Sách Tài Khoản</h1>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h1 class="h3 mb-1 text-gray-800">Danh sách tài khoản</h1>
+            <p class="mb-0 text-muted small">Quản lý thông tin tổ chức, quyền hệ thống và vai trò văn thư.</p>
+        </div>
+        <button type="button" class="btn btn-primary mt-3 mt-sm-0" data-toggle="modal" data-target="#addUserhModal">
+            <i class="fas fa-user-plus mr-1"></i> Thêm tài khoản
+        </button>
+    </div>
     
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
-        <div class="mt-3 text-center">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addUserhModal" >
-                Thêm Tài Khoản
-            </button>
-        </div>
        <!-- Modal -->
         @include('admin.partials.adduser_modal')
         @include('admin.partials.edituser_modal')
@@ -20,16 +23,20 @@
         <x-alert-message />
         <div class="card-body"> 
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>STT</th>
                             <th>Tên người dùng</th>
                             <th>Email</th>
                             <th>Chi nhánh</th>
+                            <th>Phòng giao dịch</th>
+                            <th>Phòng ban</th>
                             <th>Chức vụ</th>
-                            <th>Ngày tạo</th>
-                            <th>Ngày cập nhật</th>
+                            <th>Quyền hệ thống</th>
+                            <th>Văn thư</th>
+                            <th>Trạng thái</th>
+                            <th>Cập nhật</th>
                             <th>Chức năng</th>
                         </tr>
                     </thead>
@@ -39,61 +46,20 @@
                             <th>Tên người dùng</th>
                             <th>Email</th>
                             <th>Chi nhánh</th>
+                            <th>Phòng giao dịch</th>
+                            <th>Phòng ban</th>
                             <th>Chức vụ</th>
-                            <th>Ngày tạo</th>
-                            <th>Ngày cập nhật</th>
+                            <th>Quyền hệ thống</th>
+                            <th>Văn thư</th>
+                            <th>Trạng thái</th>
+                            <th>Cập nhật</th>
                             <th>Chức năng</th>
                         </tr>
                     </tfoot>
-                    <tbody>
-                        @foreach($list_user as $key => $user)
-                            <tr>
-                                <td>{{$key}}</td>
-                                <td>{{$user->name}}</td>
-                                <td>{{$user->email}}</td>
-                                <td>{{$user->branch_name}}</td>
-                                @if($user->role_id == 1)
-                                <td>Kiểm soát</td>
-                                @else
-                                <td>Nhân viên</td>
-                                @endif 
-                                <td>{{date('d/m/Y', strtotime($user->created_at)) }}</td>
-                                <td>{{date('d/m/Y', strtotime($user->updated_at)) }}</td>
-                                @if($user->status == 'active' )
-                                <td style="justify-content: center; align-items: flex-start; text-align: center;">
-                                    <button type="button"  data-toggle="modal" data-target="#editUserModal" class="btn btn-info btn-icon-split" >
-                                        <span class="text edit_user" data-user_id="{{$user->id}}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                                            </svg>
-                                        </span>
-                                    </button>
-                                    <button  class="btn btn-danger btn-icon-split">
-                                        <span class="icon text-white-50 cancel_order lock_user"  data-user_id="{{$user->id}}" data-status="{{$user->status}}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ban-fill" viewBox="0 0 16 16">
-                                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M2.71 12.584q.328.378.706.707l9.875-9.875a7 7 0 0 0-.707-.707l-9.875 9.875Z"/>
-                                            </svg>
-                                        </span>
-                                    </button>
-                                </td>
-                                @else
-                                <td style="justify-content: center; align-items: flex-start; text-align: center;">
-                                    <button  class="btn btn-warning btn-icon-split">
-                                        <span class="text lock_user" data-user_id="{{$user->id}}" data-status="{{$user->status}}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-unlock-fill " viewBox="0 0 16 16">
-                                            <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2"/>
-                                            </svg>
-                                        </span>
-                                    </button>
-                                </td>   
-                                @endif
-                            </tr>
-                        @endforeach
-                        @include('admin.partials.ajax_user')
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
+            @include('admin.partials.ajax_user')
         </div>
     </div>
 
@@ -114,7 +80,63 @@
     <script src="{{asset('vendor/datatables/jquery.dataTables.min.js')}}"></script>
     <script src="{{asset('vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
 
-    <!-- Page level custom scripts -->
-    <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
-    <!-- include jQuery validate library -->
+    <script>
+    $(function () {
+        const textRenderer = $.fn.dataTable.render.text();
+        function escapeText(value) {
+            return $('<div>').text(value || '').html();
+        }
+        function formatDate(value, type) {
+            if (type !== 'display' || !value) return value || '';
+            const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
+            return match ? match[3] + '/' + match[2] + '/' + match[1] : value;
+        }
+
+        $('#dataTable').DataTable({
+            processing: true,
+            serverSide: true,
+            pageLength: 10,
+            order: [[1, 'asc']],
+            ajax: @json(route('admin_list_staff_data')),
+            columns: [
+                {data: null, name: 'users.id', searchable: false, orderable: false, render: function (data, type, row, meta) { return meta.settings._iDisplayStart + meta.row + 1; }},
+                {data: 'name', name: 'users.name', render: function (value, type, row) {
+                    if (type !== 'display') return value || '';
+                    const ipcas = row.user_ipcas ? '<small class="d-block text-muted">IPCAS: ' + escapeText(row.user_ipcas) + '</small>' : '';
+                    return '<strong>' + escapeText(value) + '</strong>' + ipcas;
+                }},
+                {data: 'email', name: 'users.email', render: textRenderer},
+                {data: 'branch_name', name: 'branches.branch_name', defaultContent: '—', render: textRenderer},
+                {data: 'transaction_office_name', name: 'transaction_offices.office_name', defaultContent: '—', render: textRenderer},
+                {data: 'department_name', name: 'departments.department_name', defaultContent: '—', render: textRenderer},
+                {data: 'position_name', name: 'positions.position_name', defaultContent: '—', render: textRenderer},
+                {data: 'role_id', name: 'users.role_id', render: function (value) { return Number(value) === 1 ? 'Kiểm soát' : 'Nhân viên'; }},
+                {data: 'document_role', name: 'users.document_role', render: function (value, type) {
+                    if (type !== 'display') return value || '';
+                    return value === 'clerk' ? '<span class="badge badge-info">Văn thư</span>' : '<span class="badge badge-light">Người dùng</span>';
+                }},
+                {data: 'status', name: 'users.status', render: function (value, type) {
+                    if (type !== 'display') return value || '';
+                    return value === 'active' ? '<span class="badge badge-success">Hoạt động</span>' : '<span class="badge badge-secondary">Đã khóa</span>';
+                }},
+                {data: 'updated_at', name: 'users.updated_at', render: formatDate},
+                {data: null, searchable: false, orderable: false, className: 'text-center', render: function (data, type, row) {
+                    if (type !== 'display') return '';
+                    const edit = row.status === 'active'
+                        ? '<button type="button" data-toggle="modal" data-target="#editUserModal" class="btn btn-info btn-sm edit_user" data-user_id="' + Number(row.id) + '" aria-label="Sửa tài khoản"><i class="fas fa-edit"></i></button> '
+                        : '';
+                    const lockClass = row.status === 'active' ? 'btn-danger' : 'btn-warning';
+                    const lockIcon = row.status === 'active' ? 'fa-ban' : 'fa-unlock';
+                    return edit + '<button type="button" class="btn btn-sm ' + lockClass + ' lock_user" data-user_id="' + Number(row.id) + '" data-status="' + (row.status === 'active' ? 'active' : 'inactive') + '" aria-label="Đổi trạng thái tài khoản"><i class="fas ' + lockIcon + '"></i></button>';
+                }}
+            ],
+            language: {
+                processing: 'Đang tải dữ liệu...', search: 'Tìm kiếm:', lengthMenu: 'Hiển thị _MENU_ dòng',
+                info: 'Hiển thị _START_–_END_ trong _TOTAL_ tài khoản', infoEmpty: 'Chưa có tài khoản',
+                zeroRecords: 'Không tìm thấy tài khoản phù hợp',
+                paginate: {first: 'Đầu', last: 'Cuối', next: 'Sau', previous: 'Trước'}
+            }
+        });
+    });
+    </script>
 @endpush

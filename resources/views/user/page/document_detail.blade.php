@@ -57,7 +57,12 @@
 
                 <div class="card shadow mb-4">
                     <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-route mr-1"></i> Lịch sử luân chuyển</h6></div>
-                    <div class="card-body"><div class="timeline-list" id="transferList"></div></div>
+                    <div class="card-body">
+                        <div class="timeline-list" id="transferList"></div>
+                        <button type="button" class="btn btn-light btn-sm mt-3 history-more" id="loadMoreTransfers" data-kind="transfers" style="display:none;">
+                            <i class="fas fa-chevron-down mr-1"></i> Xem thêm luân chuyển
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -74,7 +79,12 @@
 
                 <div class="card shadow mb-4">
                     <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-history mr-1"></i> Nhật ký thao tác</h6></div>
-                    <div class="card-body"><div class="timeline-list" id="logList"></div></div>
+                    <div class="card-body">
+                        <div class="timeline-list" id="logList"></div>
+                        <button type="button" class="btn btn-light btn-sm mt-3 history-more" id="loadMoreLogs" data-kind="logs" style="display:none;">
+                            <i class="fas fa-chevron-down mr-1"></i> Xem thêm nhật ký
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -219,9 +229,13 @@ $(document).ready(function() {
         });
     }
 
-    function renderTransfers(transfers) {
-        const container = $('#transferList').empty();
-        if (!transfers || !transfers.length) return container.append($('<div>', { class: 'text-muted' }).text('Văn bản chưa có lịch sử luân chuyển.'));
+    function renderTransfers(transfers, append) {
+        const container = $('#transferList');
+        if (!append) container.empty();
+        if (!transfers || !transfers.length) {
+            if (!append) container.append($('<div>', { class: 'text-muted' }).text('Văn bản chưa có lịch sử luân chuyển.'));
+            return;
+        }
         transfers.forEach(function(transfer) {
             const target = (transfer.to_branch && transfer.to_branch.branch_name) || (transfer.to_department && transfer.to_department.department_name) || (transfer.to_user && transfer.to_user.name) || 'Nơi nhận';
             const item = $('<div>', { class: 'timeline-item' });
@@ -233,10 +247,14 @@ $(document).ready(function() {
         });
     }
 
-    function renderLogs(logs) {
+    function renderLogs(logs, append) {
         const labels = { distribution_updated: 'Cập nhật phân phối và phạm vi xem', created: 'Đăng tải văn bản', published: 'Đăng file cho văn bản đã vào sổ', updated: 'Chỉnh sửa văn bản', ledger_recorded: 'Ghi mới sổ văn bản', ledger_imported: 'Nhập thông tin từ sổ Excel', ledger_registered: 'Cập nhật số trong sổ', archive_imported: 'Nhập kho văn bản cũ', transferred: 'Chuyển đến chi nhánh', distributed_to_department: 'Phân phối đến phòng ban', distributed_to_director: 'Gửi đến ban giám đốc' };
-        const container = $('#logList').empty();
-        if (!logs || !logs.length) return container.append($('<div>', { class: 'text-muted' }).text('Chưa có nhật ký.'));
+        const container = $('#logList');
+        if (!append) container.empty();
+        if (!logs || !logs.length) {
+            if (!append) container.append($('<div>', { class: 'text-muted' }).text('Chưa có nhật ký.'));
+            return;
+        }
         logs.forEach(function(log) {
             const item = $('<div>', { class: 'timeline-item' });
             item.append($('<div>', { class: 'font-weight-bold text-gray-800' }).text(labels[log.action] || log.action));
@@ -244,6 +262,30 @@ $(document).ready(function() {
             container.append(item);
         });
     }
+
+    function updateHistoryButton(kind, pagination) {
+        const button = kind === 'logs' ? $('#loadMoreLogs') : $('#loadMoreTransfers');
+        const hasMore = Boolean(pagination && pagination.has_more);
+        button.data('next-page', hasMore ? pagination.next_page : null).toggle(hasMore).prop('disabled', false);
+        button.find('i').attr('class', 'fas fa-chevron-down mr-1');
+    }
+
+    $('.history-more').on('click', function() {
+        const button = $(this);
+        const kind = button.data('kind');
+        const page = Number(button.data('next-page') || 0);
+        if (!page || button.prop('disabled')) return;
+
+        button.prop('disabled', true).find('i').attr('class', 'fas fa-spinner fa-spin mr-1');
+        $.get('/api/documents/' + docId + '/history', { kind: kind, page: page }).done(function(response) {
+            if (kind === 'logs') renderLogs(response.data, true);
+            else renderTransfers(response.data, true);
+            updateHistoryButton(kind, response.pagination);
+        }).fail(function(xhr) {
+            button.prop('disabled', false).find('i').attr('class', 'fas fa-chevron-down mr-1');
+            alert(ajaxErrorMessage(xhr, 'Không thể tải thêm lịch sử.'));
+        });
+    });
 
     function ajaxErrorMessage(xhr, fallback) {
         const response = xhr.responseJSON || {};
@@ -288,7 +330,7 @@ $(document).ready(function() {
         toggleEditDirectionFields(this.value);
     });
 
-    function bindDocument(doc, capabilities) {
+    function bindDocument(doc, capabilities, history) {
         loadedDocument = doc;
         const visibility = visibilityLabel(doc);
         $('#localTransferGroup').data('private', doc.visibility === 'private');
@@ -314,6 +356,8 @@ $(document).ready(function() {
         $('#docReceiptSignature').text(doc.receipt_signature || '---'); $('#docCreator').text((doc.creator && doc.creator.name) || '---');
         $('#docNotes').text(doc.notes || '---');
         renderAttachments(doc.attachments); renderTransfers(doc.transfers); renderLogs(doc.logs); populateEditForm(doc);
+        updateHistoryButton('transfers', history && history.transfers);
+        updateHistoryButton('logs', history && history.logs);
         $('.document-action').hide();
         if (capabilities.can_edit) $('#btnEditDocument').show();
         if (capabilities.can_transfer_to_branch) $('#btnTransferBranch').show();
@@ -325,7 +369,7 @@ $(document).ready(function() {
         $('#loadingIndicator').show();
         $.get('/api/documents/' + docId).done(function(response) {
             const capabilities = response.capabilities || {};
-            bindDocument(response.data, capabilities); $('#loadingIndicator').hide(); $('#documentContent').show();
+            bindDocument(response.data, capabilities, response.history || {}); $('#loadingIndicator').hide(); $('#documentContent').show();
         }).fail(function(xhr) {
             $('#loadingIndicator').html($('<p>', { class: 'text-danger' }).text((xhr.responseJSON && xhr.responseJSON.message) || 'Không có quyền xem văn bản này.'));
         });

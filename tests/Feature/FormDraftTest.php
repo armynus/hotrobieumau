@@ -38,6 +38,50 @@ class FormDraftTest extends TestCase
         $this->getJson('/form-draft/supportForm')->assertJsonPath('payload.name', 'Tab A');
     }
 
+    public function test_one_user_has_one_shared_draft_across_different_forms(): void
+    {
+        $revision = $this->saveDraft([
+            'name' => 'Mẫu đơn',
+            'identity_no' => '0123456789',
+        ])->assertOk()->json('revision');
+        $bundleKey = 'bundle:'.str_repeat('a', 64);
+        $response = $this->saveDraft([
+            'name' => 'Bộ hồ sơ',
+            'account_no' => '123456789',
+        ], $revision, $bundleKey)->assertOk();
+
+        $this->assertSame(1, DB::table('form_drafts')->where('user_id', 1)->count());
+        $this->assertSame($bundleKey, DB::table('form_drafts')->where('user_id', 1)->value('form_key'));
+        foreach (['supportForm', $bundleKey] as $formKey) {
+            $this->getJson('/form-draft/'.urlencode($formKey))->assertOk()->assertJson([
+                'payload' => [
+                    'name' => 'Bộ hồ sơ',
+                    'identity_no' => '0123456789',
+                    'account_no' => '123456789',
+                ],
+                'revision' => $response->json('revision'),
+            ]);
+        }
+    }
+
+    public function test_replace_mode_clears_old_shared_fields_when_user_resets_the_draft(): void
+    {
+        $revision = $this->saveDraft([
+            'name' => 'Nội dung cũ',
+            'old_form_only' => 'xóa trường này',
+        ])->assertOk()->json('revision');
+
+        $this->saveDraft([
+            'name' => '',
+            'GDichVien' => 'Giao dịch viên',
+        ], $revision, 'supportForm', 'replace')->assertOk();
+
+        $this->getJson('/form-draft/another-form')->assertOk()
+            ->assertJsonPath('payload.name', '')
+            ->assertJsonPath('payload.GDichVien', 'Giao dịch viên')
+            ->assertJsonMissingPath('payload.old_form_only');
+    }
+
     public function test_stale_update_is_rejected_and_explicit_latest_revision_can_save(): void
     {
         $revision = $this->saveDraft(['name' => 'Initial'])->json('revision');
@@ -96,10 +140,18 @@ class FormDraftTest extends TestCase
         $this->assertStringContainsString('id="draftStatusText"', $html);
     }
 
-    private function saveDraft(array $payload, string $revision = 'missing')
+    private function saveDraft(
+        array $payload,
+        string $revision = 'missing',
+        string $formKey = 'supportForm',
+        string $mode = 'merge'
+    )
     {
         return $this->withSession(['user_id' => 1])->postJson('/form-draft/save', [
-            'form_key' => 'supportForm', 'payload' => json_encode($payload), 'revision' => $revision,
+            'form_key' => $formKey,
+            'payload' => json_encode($payload),
+            'revision' => $revision,
+            'mode' => $mode,
         ]);
     }
 }

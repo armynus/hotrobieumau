@@ -21,6 +21,8 @@ class DocumentLedgerReader
 
     private const MAX_LEDGER_ROWS_PER_SHEET = 100000;
 
+    private const MAX_LIMITED_READ_CHUNK_ROWS = 5001;
+
     private const INCOMING_HEADERS = [
         'received_date' => ['ngay thang den', 'ngay den'],
         'registry_number' => ['so den'],
@@ -52,7 +54,7 @@ class DocumentLedgerReader
      *
      * @return array<int, array<string, mixed>>
      */
-    public function read(string $path, string $direction, array $sheets = []): array
+    public function read(string $path, string $direction, array $sheets = [], ?int $maxRows = null): array
     {
         if (! is_file($path) || ! is_readable($path)) {
             throw new RuntimeException('Không đọc được file sổ Excel: '.$path);
@@ -60,6 +62,10 @@ class DocumentLedgerReader
 
         if (! in_array($direction, [Document::DIRECTION_INCOMING, Document::DIRECTION_OUTGOING], true)) {
             throw new RuntimeException('Loại sổ chỉ nhận incoming hoặc outgoing.');
+        }
+
+        if ($maxRows !== null && $maxRows < 1) {
+            throw new RuntimeException('Giới hạn số dòng phải lớn hơn 0.');
         }
 
         try {
@@ -121,59 +127,72 @@ class DocumentLedgerReader
                     continue;
                 }
 
-                // Mỗi lần chỉ nạp một sheet và đúng các cột nghiệp vụ đã nhận diện.
-                // Nhờ vậy bộ nhớ không tăng theo toàn bộ workbook nhiều sheet.
-                $sheetReader = IOFactory::createReaderForFile($path);
-                // Giữ number format để không đánh mất số đến kiểu 01, 02.
-                $sheetReader->setReadDataOnly(false);
-                $sheetReader->setLoadSheetsOnly($worksheetName);
-                $sheetReader->setReadFilter(new DocumentLedgerReadFilter(
-                    $worksheetName,
-                    $header['row'] + 1,
-                    $highestRow,
-                    array_values($header['columns']),
-                ));
-                $spreadsheet = $sheetReader->load($path);
-                $worksheet = $spreadsheet->getSheetByName($worksheetName);
+                $firstDataRow = $header['row'] + 1;
+                // Trên web, đọc theo cụm để chặn file vượt giới hạn trước khi nạp hết sheet.
+                // Lệnh CLI không truyền giới hạn nên vẫn đọc một lượt để giữ tốc độ nhập kho lớn.
+                $chunkSize = $maxRows === null
+                    ? $highestRow - $firstDataRow + 1
+                    : min(self::MAX_LIMITED_READ_CHUNK_ROWS, $maxRows + 1);
 
-                if ($worksheet === null) {
-                    $spreadsheet->disconnectWorksheets();
-                    unset($spreadsheet);
+                for ($chunkStart = $firstDataRow; $chunkStart <= $highestRow; $chunkStart += $chunkSize) {
+                    $chunkEnd = min($highestRow, $chunkStart + $chunkSize - 1);
+                    $sheetReader = IOFactory::createReaderForFile($path);
+                    // Giữ number format để không đánh mất số đến kiểu 01, 02.
+                    $sheetReader->setReadDataOnly(false);
+                    $sheetReader->setLoadSheetsOnly($worksheetName);
+                    $sheetReader->setReadFilter(new DocumentLedgerReadFilter(
+                        $worksheetName,
+                        $chunkStart,
+                        $chunkEnd,
+                        array_values($header['columns']),
+                    ));
+                    $spreadsheet = $sheetReader->load($path);
 
-                    continue;
-                }
+                    try {
+                        $worksheet = $spreadsheet->getSheetByName($worksheetName);
+                        if ($worksheet === null) {
+                            break;
+                        }
 
-                for ($rowNumber = $header['row'] + 1; $rowNumber <= $highestRow; $rowNumber++) {
-                    $row = [
-                        'direction' => $direction,
-                        '_book' => $direction === Document::DIRECTION_INCOMING ? 'incoming'
-                            : (str_contains($this->normalizeHeader($worksheetName), 'quyet dinh') ? 'decision' : 'outgoing'),
-                        '_sheet' => $worksheet->getTitle(),
-                        '_row' => $rowNumber,
-                    ];
+                        for ($rowNumber = $chunkStart; $rowNumber <= $chunkEnd; $rowNumber++) {
+                            $row = [
+                                'direction' => $direction,
+                                '_book' => $direction === Document::DIRECTION_INCOMING ? 'incoming'
+                                    : (str_contains($this->normalizeHeader($worksheetName), 'quyet dinh') ? 'decision' : 'outgoing'),
+                                '_sheet' => $worksheet->getTitle(),
+                                '_row' => $rowNumber,
+                            ];
 
-                    foreach ($header['columns'] as $field => $column) {
-                        $cell = $worksheet->getCell([$column, $rowNumber]);
-                        $row[$field] = in_array($field, ['received_date', 'issued_date', 'forwarded_date'], true)
-                            ? $this->dateValue($cell)
-                            : ($field === 'copy_count' ? $this->integerValue($cell) : $this->textValue($cell));
+                            foreach ($header['columns'] as $field => $column) {
+                                $cell = $worksheet->getCell([$column, $rowNumber]);
+                                $row[$field] = in_array($field, ['received_date', 'issued_date', 'forwarded_date'], true)
+                                    ? $this->dateValue($cell)
+                                    : ($field === 'copy_count' ? $this->integerValue($cell) : $this->textValue($cell));
+                            }
+
+                            $row['_number'] = $direction === Document::DIRECTION_INCOMING
+                                ? ($row['registry_number'] ?? null)
+                                : DocumentLedgerNumber::fromCode($row['document_code'] ?? null);
+                            $ledgerDate = $row[$direction === Document::DIRECTION_INCOMING ? 'received_date' : 'forwarded_date'] ?? null;
+                            $row['_year'] = $ledgerDate ? (int) substr($ledgerDate, 0, 4) : null;
+
+                            if (($row['document_code'] ?? null) === null && ($row['title'] ?? null) === null && $row['_number'] === null) {
+                                continue;
+                            }
+
+                            $rows[] = $row;
+                            if ($maxRows !== null && count($rows) > $maxRows) {
+                                throw new RuntimeException(
+                                    'Sổ có hơn '.number_format($maxRows, 0, ',', '.').' dòng. '
+                                    .'Hãy tách file hoặc dùng lệnh import trên máy chủ.'
+                                );
+                            }
+                        }
+                    } finally {
+                        $spreadsheet->disconnectWorksheets();
+                        unset($spreadsheet);
                     }
-
-                    $row['_number'] = $direction === Document::DIRECTION_INCOMING
-                        ? ($row['registry_number'] ?? null)
-                        : DocumentLedgerNumber::fromCode($row['document_code'] ?? null);
-                    $ledgerDate = $row[$direction === Document::DIRECTION_INCOMING ? 'received_date' : 'forwarded_date'] ?? null;
-                    $row['_year'] = $ledgerDate ? (int) substr($ledgerDate, 0, 4) : null;
-
-                    if (($row['document_code'] ?? null) === null && ($row['title'] ?? null) === null && $row['_number'] === null) {
-                        continue;
-                    }
-
-                    $rows[] = $row;
                 }
-
-                $spreadsheet->disconnectWorksheets();
-                unset($spreadsheet);
             }
         } catch (RuntimeException $exception) {
             throw $exception;

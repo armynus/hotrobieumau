@@ -62,8 +62,10 @@ class DocumentNotificationQueryTest extends TestCase
         ]);
 
         $this->assertStringContainsString('received_date', $incoming->toSql());
+        $this->assertStringNotContainsString('date(', mb_strtolower($incoming->toSql()));
         $this->assertContains('incoming', $incoming->getBindings());
         $this->assertStringContainsString('forwarded_date', $outgoing->toSql());
+        $this->assertStringNotContainsString('date(', mb_strtolower($outgoing->toSql()));
         $this->assertContains('outgoing', $outgoing->getBindings());
     }
 

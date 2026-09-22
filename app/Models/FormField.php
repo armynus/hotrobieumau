@@ -18,6 +18,12 @@ class FormField extends Model
         'data_type',     // Loại dữ liệu (string, date, number, ...)
         'placeholder',   // Placeholder cho input
         'value',   // value cho input
+        'content_group', // Nhóm nội dung trên giao diện điền mẫu
+        'display_order', // Thứ tự trường trong nhóm
+    ];
+
+    protected $casts = [
+        'display_order' => 'integer',
     ];
     public $timestamps = true;
 

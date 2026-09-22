@@ -6,12 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\CustomerInfo;
-use App\Imports\CustomerInfoImport;
-use App\Models\AccountInfo;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\DataImport;
+use App\Services\DataImportService;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Schema;
 class CustomerController extends Controller
 {
     public function getData(Request $request)
@@ -86,16 +85,39 @@ class CustomerController extends Controller
             'add_usridop1' => 'Nhân viên tạo',
         ];
         
-        return view('user.page.view_data_customer', compact ('fields', 'addFields'));
-    }
-    public function uploadfile_customer(Request $request){
-        ini_set('max_execution_time', 9000); // = 5 phút
-        // Lưu file Excel tạm thời
-        $file = $request->file('data_customer');
-        // Import dữ liệu từ file
-        Excel::import(new CustomerInfoImport, $file);
+        $activeImport = $this->latestImport('customer');
 
-        return redirect()->back()->with('success', 'Dữ liệu đã được tải lên thành công!');
+        return view('user.page.view_data_customer', compact ('fields', 'addFields', 'activeImport'));
+    }
+    public function uploadfile_customer(Request $request, DataImportService $imports){
+        $request->validate(['data_customer' => ['required', 'file', 'extensions:xls,xlsx,xlsm,csv', 'max:51200']]);
+
+        $import = $imports->queue(
+            $request->file('data_customer'),
+            'customer',
+            (int) session('user_id'),
+            (int) session('UserBranchId'),
+            (string) config('database.connections.tenant.database')
+        );
+
+        return redirect()->back()->with(
+            'success', 'Đã tiếp nhận file khách hàng. Hệ thống đang nhập dữ liệu ở chế độ nền.'
+        )->with('data_import_id', $import->id);
+    }
+
+    private function latestImport(string $type): ?DataImport
+    {
+        if (! Schema::hasTable('data_imports')) {
+            return null;
+        }
+
+        $query = DataImport::query()
+            ->where('user_id', session('user_id'))
+            ->where('branch_id', session('UserBranchId'))
+            ->where('type', $type);
+
+        return (clone $query)->whereKey(session('data_import_id'))->first()
+            ?? $query->whereIn('status', ['queued', 'running'])->latest()->first();
     }
     public function detail_customer(Request $request){
 
