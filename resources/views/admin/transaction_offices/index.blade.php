@@ -71,7 +71,7 @@
                         <div class="form-group col-md-5"><label for="edit_office_code">Mã phòng giao dịch</label><input type="text" class="form-control" id="edit_office_code" maxlength="50"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-7"><label for="edit_branch_id">Chi nhánh quản lý <span class="text-danger">*</span></label><select class="form-control" id="edit_branch_id"><option value="">Chọn chi nhánh</option>@foreach($branches as $branch)<option value="{{ $branch->id }}">{{ $branch->branch_name }}{{ $branch->branch_code ? ' · '.$branch->branch_code : '' }}</option>@endforeach</select></div>
+                        <div class="form-group col-md-7"><label for="edit_branch_id">Chi nhánh quản lý <span class="text-danger">*</span></label><select class="form-control" id="edit_branch_id"><option value="">Chọn chi nhánh</option>@foreach($branches as $branch)<option value="{{ $branch->id }}">{{ $branch->branch_name }}{{ $branch->branch_code ? ' · '.$branch->branch_code : '' }}</option>@endforeach</select><small class="form-text text-muted d-none" id="edit_branch_lock_help">PGD đã có nhân viên. Hãy điều chuyển nhân viên trước khi đổi chi nhánh.</small></div>
                         <div class="form-group col-md-5"><label for="edit_office_status">Trạng thái</label><select class="form-control" id="edit_office_status"><option value="active">Hoạt động</option><option value="inactive">Tạm ngưng</option></select></div>
                     </div>
                     <div class="form-group"><label for="edit_office_address">Địa chỉ</label><input type="text" class="form-control" id="edit_office_address" maxlength="255"></div>
@@ -117,9 +117,6 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-<script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
 <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script>
@@ -163,6 +160,8 @@ $(function () {
                 $('#edit_transaction_office_id').val(office.id);
                 fields.forEach(field => $('#edit_' + field).val(office[field] || ''));
                 $('#edit_office_status').val(office.status || 'active');
+                $('#edit_branch_id').prop('disabled', !!response.has_assigned_users);
+                $('#edit_branch_lock_help').toggleClass('d-none', !response.has_assigned_users);
             })
             .fail(xhr => showError(xhr, 'Không thể tải thông tin phòng giao dịch.'));
     });

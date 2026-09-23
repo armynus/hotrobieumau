@@ -41,8 +41,15 @@ class DocumentLedgerController extends Controller
         $nextNumber = $ledgerService->nextNumber((int) $clerk->branch_id, $year, $book);
         $bookLabels = self::BOOK_LABELS;
         $clerk->loadMissing(['department', 'branch']);
+        $signers = User::query()
+            ->where('branch_id', $clerk->branch_id)
+            ->where('status', 'active')
+            ->whereHas('position', fn ($q) => $q->whereIn('level', [1, 2]))
+            ->with('position')
+            ->get()
+            ->sortBy(fn($user) => $user->position->level ?? 999);
 
-        return view('user.page.document_ledger', compact('clerk', 'year', 'book', 'keyword', 'counts', 'nextNumber', 'bookLabels', 'checkOnly'));
+        return view('user.page.document_ledger', compact('clerk', 'year', 'book', 'keyword', 'counts', 'nextNumber', 'bookLabels', 'checkOnly', 'signers'));
     }
 
     public function nextNumber(Request $request, DocumentLedgerService $ledgerService)

@@ -125,6 +125,28 @@
 
            
 
+            <li class="nav-item {{ request()->routeIs('admin.it_support.*') ? 'active' : '' }}">
+                <a class="nav-link {{ request()->routeIs('admin.it_support.*') ? '' : 'collapsed' }}"
+                    href="#" data-toggle="collapse" data-target="#collapseAdminItSupport"
+                    aria-expanded="{{ request()->routeIs('admin.it_support.*') ? 'true' : 'false' }}"
+                    aria-controls="collapseAdminItSupport">
+                    <i class="fas fa-fw fa-headset"></i>
+                    <span>QLý Yêu Cầu IT</span>
+                </a>
+                <div id="collapseAdminItSupport"
+                    class="collapse {{ request()->routeIs('admin.it_support.*') ? 'show' : '' }}"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item {{ request()->routeIs('admin.it_support.manage') && !request()->has('status') ? 'active' : '' }}"
+                            href="{{ route('admin.it_support.manage') }}">Tất cả yêu cầu</a>
+                        <a class="collapse-item {{ request()->routeIs('admin.it_support.manage') && request()->has('status') && in_array('pending', (array)request()->query('status')) ? 'active' : '' }}"
+                            href="{{ route('admin.it_support.manage', ['status' => ['pending', 'processing']]) }}">Yêu cầu đang mở</a>
+                        <a class="collapse-item {{ request()->routeIs('admin.it_support.manage') && request()->has('status') && in_array('resolved', (array)request()->query('status')) ? 'active' : '' }}"
+                            href="{{ route('admin.it_support.manage', ['status' => ['resolved', 'closed']]) }}">Yêu cầu đã xử lý</a>
+                    </div>
+                </div>
+            </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 

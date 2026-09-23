@@ -17,11 +17,11 @@
                 <div class="modal-body p-4">
                     <label class="font-weight-bold text-gray-800 mb-2">Chọn loại sổ</label>
                     <div class="btn-group btn-group-toggle d-flex mb-4" data-toggle="buttons">
-                        <label class="btn btn-outline-primary active flex-fill">
-                            <input type="radio" name="direction" value="incoming" autocomplete="off" checked> Sổ văn bản đến
+                        <label class="btn btn-outline-primary {{ ($exportDefaultDirection ?? 'incoming') === 'incoming' ? 'active' : '' }} flex-fill">
+                            <input type="radio" name="direction" value="incoming" autocomplete="off" @checked(($exportDefaultDirection ?? 'incoming') === 'incoming')> Sổ văn bản đến
                         </label>
-                        <label class="btn btn-outline-success flex-fill">
-                            <input type="radio" name="direction" value="outgoing" autocomplete="off"> Sổ văn bản đi
+                        <label class="btn btn-outline-success {{ ($exportDefaultDirection ?? 'incoming') === 'outgoing' ? 'active' : '' }} flex-fill">
+                            <input type="radio" name="direction" value="outgoing" autocomplete="off" @checked(($exportDefaultDirection ?? 'incoming') === 'outgoing')> Sổ văn bản đi
                         </label>
                     </div>
                     <label class="font-weight-bold text-gray-800 mb-3">Chọn kỳ báo cáo</label>
@@ -33,7 +33,7 @@
                         ] as $value => $option)
                         <div class="col-md-4 mb-2 mb-md-0">
                             <input type="radio" class="d-none export-period-radio" name="period_type"
-                                id="export_period_{{ $value }}" value="{{ $value }}" @checked($value === 'month')>
+                                id="export_period_{{ $value }}" value="{{ $value }}" @checked($value === ($exportDefaultPeriod ?? 'month'))>
                             <label class="document-period-card" for="export_period_{{ $value }}">
                                 <i class="fas fa-{{ $option[0] }}"></i>
                                 <span class="font-weight-bold">{{ $option[1] }}</span>
@@ -48,8 +48,8 @@
                             <div class="form-group col-md-5 mb-md-0">
                                 <label for="exportYear">Năm</label>
                                 <select class="form-control" name="year" id="exportYear" required>
-                                    @for($year = now()->year + 1; $year >= 2000; $year--)
-                                        <option value="{{ $year }}" @selected($year === now()->year)>{{ $year }}</option>
+                                    @for($exportYearOption = max(now()->year + 1, $exportDefaultYear ?? now()->year); $exportYearOption >= 2000; $exportYearOption--)
+                                        <option value="{{ $exportYearOption }}" @selected($exportYearOption === ($exportDefaultYear ?? now()->year))>{{ $exportYearOption }}</option>
                                     @endfor
                                 </select>
                             </div>

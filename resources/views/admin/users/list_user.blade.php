@@ -68,20 +68,15 @@
 {{-- js --}}
 @push('scripts')
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
 
-    <!-- Core plugin JavaScript-->
-    <script src="{{asset('vendor/jquery-easing/jquery.easing.min.js')}}"></script>
 
-    <!-- Custom scripts for all pages-->
-    <script src="{{asset('js/sb-admin-2.min.js')}}"></script>
     <!-- Page level plugins -->
     <script src="{{asset('vendor/datatables/jquery.dataTables.min.js')}}"></script>
     <script src="{{asset('vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
 
     <script>
     $(function () {
+        const currentAdminId = {{ Session::get('admin_id') ?? 'null' }};
         const textRenderer = $.fn.dataTable.render.text();
         function escapeText(value) {
             return $('<div>').text(value || '').html();
@@ -110,7 +105,10 @@
                 {data: 'transaction_office_name', name: 'transaction_offices.office_name', defaultContent: '—', render: textRenderer},
                 {data: 'department_name', name: 'departments.department_name', defaultContent: '—', render: textRenderer},
                 {data: 'position_name', name: 'positions.position_name', defaultContent: '—', render: textRenderer},
-                {data: 'role_id', name: 'users.role_id', render: function (value) { return Number(value) === 1 ? 'Kiểm soát' : 'Nhân viên'; }},
+                {data: 'role_id', name: 'users.role_id', render: function (value) { 
+                    if (Number(value) === 0) return '<span class="badge badge-primary">Quản trị viên</span>';
+                    return Number(value) === 1 ? 'Kiểm soát' : 'Nhân viên'; 
+                }},
                 {data: 'document_role', name: 'users.document_role', render: function (value, type) {
                     if (type !== 'display') return value || '';
                     return value === 'clerk' ? '<span class="badge badge-info">Văn thư</span>' : '<span class="badge badge-light">Người dùng</span>';
@@ -122,6 +120,7 @@
                 {data: 'updated_at', name: 'users.updated_at', render: formatDate},
                 {data: null, searchable: false, orderable: false, className: 'text-center', render: function (data, type, row) {
                     if (type !== 'display') return '';
+                    if (Number(row.role_id) === 0 && Number(row.id) !== currentAdminId) return '';
                     const edit = row.status === 'active'
                         ? '<button type="button" data-toggle="modal" data-target="#editUserModal" class="btn btn-info btn-sm edit_user" data-user_id="' + Number(row.id) + '" aria-label="Sửa tài khoản"><i class="fas fa-edit"></i></button> '
                         : '';

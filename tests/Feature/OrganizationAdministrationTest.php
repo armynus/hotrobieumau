@@ -94,7 +94,7 @@ class OrganizationAdministrationTest extends TestCase
         $this->assertDatabaseHas('departments', [
             'branch_id' => 2,
             'department_code' => 'KTNQ',
-            'department_name' => 'Phòng Kế toán và Ngân quỹ',
+            'department_name' => 'Phòng Kế toán Ngân quỹ',
         ]);
 
         $this->artisan('organization:seed-type2-departments', ['--branch' => [2]])->assertSuccessful();
@@ -203,5 +203,19 @@ class OrganizationAdministrationTest extends TestCase
         app(AdminUserController::class)->store($valid);
 
         $this->assertSame(21, Users::where('email', 'c@example.test')->value('transaction_office_id'));
+
+        $move = Request::create('/admin/transaction-offices/update', 'POST', [
+            'transaction_office_id' => 21,
+            'branch_id' => 3,
+            'office_name' => 'PGD đúng chi nhánh',
+            'status' => 'active',
+        ]);
+        try {
+            app(AdminTransactionOfficeController::class)->update($move);
+            $this->fail('PGD đã gán nhân viên không được chuyển sang chi nhánh khác.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('branch_id', $exception->errors());
+        }
+        $this->assertSame(2, TransactionOffice::findOrFail(21)->branch_id);
     }
 }

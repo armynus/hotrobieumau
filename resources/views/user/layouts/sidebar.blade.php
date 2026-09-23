@@ -117,6 +117,31 @@
         </a>
     </li>
     @endif
+
+    {{-- ===== HỖ TRỢ ĐIỆN TOÁN ===== --}}
+    <li class="nav-item {{ request()->routeIs('user.it_support.*') ? 'active' : '' }}">
+        <a class="nav-link {{ request()->routeIs('user.it_support.*') ? '' : 'collapsed' }}"
+            href="#" data-toggle="collapse" data-target="#collapseItSupport"
+            aria-expanded="{{ request()->routeIs('user.it_support.*') ? 'true' : 'false' }}"
+            aria-controls="collapseItSupport">
+            <i class="fas fa-fw fa-headset" style="color:white;"></i>
+            <span>Hỗ trợ IT</span>
+        </a>
+        <div id="collapseItSupport"
+            class="collapse {{ request()->routeIs('user.it_support.*') ? 'show' : '' }}"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ request()->routeIs('user.it_support.create') ? 'active' : '' }}"
+                    href="{{ route('user.it_support.create') }}">Tạo yêu cầu mới</a>
+                <a class="collapse-item {{ request()->routeIs('user.it_support.index') && !request()->has('status') ? 'active' : '' }}"
+                    href="{{ route('user.it_support.index') }}">Tất cả yêu cầu</a>
+                <a class="collapse-item {{ request()->routeIs('user.it_support.index') && request()->has('status') && in_array('pending', (array)request()->query('status')) ? 'active' : '' }}"
+                    href="{{ route('user.it_support.index', ['status' => ['pending', 'processing']]) }}">Yêu cầu đang mở</a>
+                <a class="collapse-item {{ request()->routeIs('user.it_support.index') && request()->has('status') && in_array('resolved', (array)request()->query('status')) ? 'active' : '' }}"
+                    href="{{ route('user.it_support.index', ['status' => ['resolved', 'closed']]) }}">Yêu cầu đã xử lý</a>
+            </div>
+        </div>
+    </li>
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 

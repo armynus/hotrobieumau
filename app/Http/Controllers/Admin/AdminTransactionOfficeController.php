@@ -39,8 +39,11 @@ class AdminTransactionOfficeController extends Controller
 
     public function edit(Request $request)
     {
+        $office = TransactionOffice::findOrFail($request->integer('transaction_office_id'));
+
         return response()->json([
-            'office' => TransactionOffice::findOrFail($request->integer('transaction_office_id')),
+            'office' => $office,
+            'has_assigned_users' => $office->users()->exists(),
         ]);
     }
 
@@ -61,7 +64,10 @@ class AdminTransactionOfficeController extends Controller
         $branchId = $request->integer('branch_id');
 
         $validated = $request->validate([
-            'branch_id' => ['required', 'integer', Rule::exists('branches', 'id')],
+            'branch_id' => [
+                'required', 'integer', Rule::exists('branches', 'id'),
+                ...($office?->users()->exists() ? [Rule::in([$office->branch_id])] : []),
+            ],
             'office_name' => [
                 'required', 'string', 'max:255',
                 Rule::unique('transaction_offices', 'office_name')
@@ -83,6 +89,7 @@ class AdminTransactionOfficeController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ], [
             'branch_id.required' => 'Vui lòng chọn chi nhánh quản lý.',
+            'branch_id.in' => 'PGD đã có nhân viên. Hãy điều chuyển nhân viên trước khi đổi chi nhánh quản lý.',
             'office_name.required' => 'Vui lòng nhập tên phòng giao dịch.',
             'office_name.unique' => 'Tên phòng giao dịch đã tồn tại trong chi nhánh này.',
             'office_code.unique' => 'Mã phòng giao dịch đã tồn tại trong chi nhánh này.',

@@ -30,7 +30,7 @@ class ImportDocumentArchive extends Command
         {--outgoing-sheet=* : Chỉ đọc các sheet đi này; truyền nhiều lần cho sổ thường và quyết định}
         {--unmatched=unclassified : Với file không có trong sổ: unclassified, skip, incoming hoặc outgoing}
         {--queue-ocr-missing : Xếp hàng OCR cho PDF không khớp/thiếu metadata sau khi nhập}
-        {--visibility=private : private, normal hoặc public; chỉ nơi được chọn mới xem}
+        {--visibility=normal : private, normal hoặc public; chỉ nơi được chọn mới xem}
         {--date-field=auto : auto, issued, received, forwarded hoặc both}
         {--extensions=pdf,doc,docx,xls,xlsx,ppt,pptx : Danh sách phần mở rộng được nhập}
         {--fallback-mtime : Dùng ngày sửa file nếu không tìm thấy folder NGAY dd-mm-yyyy}
@@ -184,6 +184,7 @@ class ImportDocumentArchive extends Command
         ];
         $previewRows = [];
         $importedDocumentIds = [];
+        $branchDepartments = \App\Models\Department::where('branch_id', $user->branch_id)->where('status', 'active')->get();
 
         try {
             $iterator = new RecursiveIteratorIterator(
@@ -315,6 +316,25 @@ class ImportDocumentArchive extends Command
                         hash_file('sha256', $file->getPathname()),
                         $user
                     );
+                    
+                    $permissions = [];
+                    $now = now();
+                    foreach ($branchDepartments as $department) {
+                        $permissions[] = [
+                            'document_id' => $document->id,
+                            'target_type' => 'department',
+                            'target_id' => $department->id,
+                            'permission' => 'view',
+                            'granted_by' => $user->id,
+                            'granted_at' => $now,
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ];
+                    }
+                    if ($permissions !== []) {
+                        \App\Models\DocumentPermission::insertOrIgnore($permissions);
+                    }
+
                     if (blank($document->issued_date) || blank($document->title)) {
                         $importedDocumentIds[] = (int) $document->id;
                     }

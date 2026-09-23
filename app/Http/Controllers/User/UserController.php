@@ -23,7 +23,17 @@ class UserController extends Controller
         $form_count = SupportForm::count();
         $branch = Session::get('UserBranchName');
         $branch_code = Session::get('UserBranchCode');
-        return view('user.index', compact('customer_count', 'account_count','branch','form_count','branch_code'));
+        $userId = Session::get('user_id');
+
+        $recentForms = SupportForm::select('support_forms.*', 'support_form_usages.used_at')
+            ->join('support_form_usages', 'support_forms.id', '=', 'support_form_usages.support_form_id')
+            ->where('support_form_usages.user_id', $userId)
+            ->with(['formType', 'supFormType'])
+            ->orderBy('support_form_usages.used_at', 'desc')
+            ->take(10)
+            ->get();
+
+        return view('user.index', compact('customer_count', 'account_count','branch','form_count','branch_code', 'recentForms'));
     }
     public function getDataReccentForm(Request $request)
     {

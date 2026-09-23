@@ -134,6 +134,9 @@ class FormDraftTest extends TestCase
         $this->assertSame(1, substr_count($html, 'js/ajax/libs/jquery/3.6.0/jquery.min.js'));
         $this->assertSame(1, substr_count($html, 'jquery.validate.min.js'));
         $this->assertSame(1, substr_count($html, 'jquery-ui.min.js'));
+        $this->assertSame(1, substr_count($html, 'bootstrap.bundle.min.js'));
+        $this->assertSame(1, substr_count($html, 'jquery.easing.min.js'));
+        $this->assertSame(1, substr_count($html, 'sb-admin-2.min.js'));
         $this->assertStringNotContainsString('vendor/jquery/jquery.min.js', $html);
         $this->assertTrue(strpos($html, 'jquery.min.js') < strpos($html, 'bootstrap.bundle.min.js'));
         $this->assertStringContainsString('id="search_topbar_mobile"', $html);

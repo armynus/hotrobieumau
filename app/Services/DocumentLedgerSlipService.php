@@ -20,7 +20,7 @@ class DocumentLedgerSlipService
         $department = $options['department_name'] ?? 'Phòng Tổng hợp';
         $placeName = $options['place_name'] ?? (string) $clerk->branch?->branch_place;
         $place = trim($placeName);
-        $signatureTitle = $options['signature_title'] ?? 'Trưởng phòng Tổng hợp';
+        $signatureTitle = $options['signature_title'] ?? 'P.Trưởng phòng Tổng Hợp';
 
         return [
             'branch_name' => mb_strtoupper((string) $clerk->branch?->branch_name, 'UTF-8'),
@@ -32,7 +32,7 @@ class DocumentLedgerSlipService
             'print_year' => $date->format('Y'),
             'submitted_to' => $options['submitted_to'] ?? 'Ban Giám đốc',
             'signature_title' => mb_strtoupper($signatureTitle, 'UTF-8'),
-            'prepared_by' => $options['prepared_by'] ?? '',
+            'prepared_by' => $options['prepared_by'] ?? 'Nguyễn Thị Thúy Nga',
             'number' => $entry->number, 'year' => (string) $entry->year,
             'book' => ['incoming' => 'Văn bản đến', 'outgoing' => 'Văn bản đi', 'decision' => 'Quyết định'][$entry->book],
             'document_code' => $this->text($entry->document_code),

@@ -22,6 +22,15 @@
 #ledgerEntryForm .ledger-book-choice select { border: 2px solid #6f8ce6; color: #294995; font-weight: 700; background-color: #fff; }
 #entryBookCurrent { display: block; margin-top: 7px; color: #3659bd; font-weight: 700; }
 #ledgerEntryForm .form-control.ledger-field-missing { border-color: #d5a137; background: #fffcf3; }
+.ledger-history-toggle { padding: 0 .55rem; font-size: .8rem; }
+.ledger-history-menu { width: min(26rem, calc(100vw - 3rem)); max-height: 18rem; overflow-y: auto; }
+.ledger-history-row { display: flex; align-items: stretch; border-bottom: 1px solid #eef0f5; }
+.ledger-history-select { min-width: 0; flex: 1; padding: .55rem .7rem; border: 0; color: #3a4561; background: transparent; text-align: left; overflow-wrap: anywhere; white-space: pre-line; }
+.ledger-history-select:hover, .ledger-history-select:focus { color: #224abe; background: #f2f6ff; }
+.ledger-history-remove { flex: 0 0 2.4rem; border: 0; color: #b54040; background: transparent; }
+.ledger-history-remove:hover, .ledger-history-remove:focus { color: #8c2222; background: #fff1f1; }
+.ledger-history-clear { width: 100%; padding: .6rem .7rem; border: 0; color: #b54040; background: #fff; text-align: left; }
+.ledger-history-clear:hover, .ledger-history-clear:focus { color: #8c2222; background: #fff1f1; }
 #ledgerCandidates { max-height: 230px; overflow-y: auto; }
 #ledgerMetadataFields:disabled .form-control { background: #f3f4f7; }
 #ledgerSlipModal .modal-content { border: 0; border-radius: 14px; overflow: hidden; }

@@ -85,8 +85,4 @@ $(function () {
     $('#ledgerConfirm').on('click', function () { runImport(false); });
     $('#ledgerImportModal').on('hide.bs.modal', function (e) { if (importBusy) e.preventDefault(); });
     $('#ledgerImportModal').on('hidden.bs.modal', function () { if (didImport) window.location.reload(); });
-    $('#ledgerExportForm [name="period_type"]').on('change', function () {
-        $('#ledgerExportForm .export-month').toggleClass('d-none', this.value !== 'month');
-        $('#ledgerExportForm .export-quarter').toggleClass('d-none', this.value !== 'quarter');
-    });
 });

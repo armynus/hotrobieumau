@@ -30,7 +30,13 @@
                         <div class="form-group col-md-3"><label for="entryNumber" id="entryNumberLabel">Số đến</label><input id="entryNumber" class="form-control" name="number" maxlength="50" value="{{ $book === 'incoming' ? ($nextNumber ?? '') : '' }}" placeholder="Đang lấy số tiếp theo…"></div>
                         <div class="form-group col-md-3"><label for="entryRegisteredDate"><span id="entryRegisteredLabel">Ngày tháng đến</span> <span class="text-danger">*</span></label><input id="entryRegisteredDate" class="form-control ledger-date" name="registered_date" placeholder="dd/mm/yyyy" value="{{ now()->format('Y-m-d') }}" required></div>
                     </div>
-                    <div class="form-group mb-2"><label for="entryCode">Số &amp; ký hiệu văn bản <span class="text-danger">*</span></label><input id="entryCode" class="form-control" name="document_code" maxlength="255" required placeholder="Ví dụ: 123/NHNo.ĐT-TH"></div>
+                    <div class="form-group mb-2"><label for="entryCode">Số &amp; ký hiệu văn bản <span class="text-danger">*</span></label>
+                        <div class="dropdown d-inline-block ml-2 ledger-history-dropdown">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill dropdown-toggle ledger-history-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Lịch sử số và ký hiệu văn bản" title="Chọn từ lịch sử đã nhập"><i class="fas fa-history" aria-hidden="true"></i></button>
+                            <div class="dropdown-menu shadow ledger-history-menu" data-history-kind="code" data-history-target="#entryCode"><span class="dropdown-item-text text-muted small">Chưa có lịch sử</span></div>
+                        </div>
+                        <input id="entryCode" class="form-control mt-1" name="document_code" maxlength="255" required placeholder="Ví dụ: 123/NHNo.ĐT-TH">
+                    </div>
                     <div class="small text-muted" id="entryNumberHint">Giữ số theo sổ gốc, cho phép số trùng. Năm sổ theo ngày đến, không theo ngày văn bản.</div>
                 </section>
                 <fieldset id="ledgerMetadataFields" class="mt-3">
@@ -39,19 +45,48 @@
                         <div class="form-row">
                             <div class="form-group col-md-6"><label for="entryIssuedDate">Ngày, tháng văn bản <span class="text-danger">*</span></label><input id="entryIssuedDate" class="form-control ledger-date" name="issued_date" placeholder="dd/mm/yyyy" required></div>
                             <div class="form-group col-md-6 ledger-incoming-field"><label for="entryAgency">Tác giả / Cơ quan gửi</label><input id="entryAgency" class="form-control" name="issuing_agency" maxlength="255" placeholder="Đơn vị ban hành văn bản"></div>
-                            <div class="form-group col-md-6 ledger-outgoing-field"><label for="entrySigner">Người ký văn bản</label><input id="entrySigner" class="form-control" name="signer" maxlength="255"></div>
+                            <div class="form-group col-md-6 ledger-outgoing-field"><label for="entrySigner">Người ký văn bản</label>
+                                <select id="entrySigner" class="form-control" name="signer">
+                                    <option value="">-- Chọn người ký --</option>
+                                    @if(isset($signers))
+                                        @foreach($signers as $signer)
+                                            <option value="{{ $signer->position->position_name }} ({{ $signer->name }})">{{ $signer->position->position_name }} ({{ $signer->name }})</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group mb-0"><label for="entryTitle">Tên loại và trích yếu nội dung văn bản <span class="text-danger">*</span></label><textarea id="entryTitle" class="form-control" name="title" rows="3" maxlength="5000" required placeholder="Nhập tên loại và tóm tắt nội dung như trong sổ văn bản..."></textarea></div>
+                        <div class="form-group mb-0"><label for="entryTitle">Tên loại và trích yếu nội dung văn bản <span class="text-danger">*</span></label>
+                            <div class="dropdown d-inline-block ml-2 ledger-history-dropdown">
+                                <button class="btn btn-sm btn-outline-primary rounded-pill dropdown-toggle ledger-history-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Lịch sử trích yếu văn bản" title="Chọn từ lịch sử đã nhập"><i class="fas fa-history" aria-hidden="true"></i></button>
+                                <div class="dropdown-menu shadow ledger-history-menu" data-history-kind="title" data-history-target="#entryTitle"><span class="dropdown-item-text text-muted small">Chưa có lịch sử</span></div>
+                            </div>
+                            <textarea id="entryTitle" class="form-control mt-1" name="title" rows="3" maxlength="5000" required placeholder="Nhập tên loại và tóm tắt nội dung như trong sổ văn bản..."></textarea>
+                        </div>
                     </section>
                     <section class="ledger-entry-section mt-3">
                         <h6 class="ledger-section-title"><span>03</span> Tiếp nhận và ghi chú</h6>
-                        <div class="form-group"><label for="entryRecipient" id="entryRecipientLabel">Đơn vị hoặc người nhận</label><textarea id="entryRecipient" class="form-control" name="recipient" rows="2" maxlength="5000"></textarea></div>
+                        <div class="form-group">
+                            <label for="entryRecipient" id="entryRecipientLabel">Đơn vị hoặc người nhận</label>
+                            <div class="dropdown d-inline-block ml-2 ledger-history-dropdown">
+                                <button class="btn btn-sm btn-outline-primary rounded-pill dropdown-toggle ledger-history-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Lịch sử người nhận" title="Chọn từ lịch sử đã nhập"><i class="fas fa-history" aria-hidden="true"></i></button>
+                                <div class="dropdown-menu shadow ledger-history-menu" data-history-kind="recipient" data-history-target="#entryRecipient"><span class="dropdown-item-text text-muted small">Chưa có lịch sử</span></div>
+                            </div>
+                            <textarea id="entryRecipient" class="form-control mt-1" name="recipient" rows="2" maxlength="5000"></textarea>
+                        </div>
                         <div class="form-row">
                             <div class="form-group col-md-6 ledger-incoming-field"><label for="entryForwardedDate">Ngày chuyển</label><input id="entryForwardedDate" class="form-control ledger-date" name="forwarded_date" placeholder="dd/mm/yyyy" value="{{ now()->format('Y-m-d') }}"></div>
                             <div class="form-group col-md-6 ledger-outgoing-field"><label for="entryCopies">Số lượng bản</label><input id="entryCopies" type="number" class="form-control" name="copy_count" min="1" max="100000"></div>
                             <div class="form-group col-md-6"><label for="entrySignature">Ký nhận</label><input id="entrySignature" class="form-control" name="receipt_signature" maxlength="255" placeholder="Ví dụ: iOffice"></div>
                         </div>
-                        <div class="form-group ledger-outgoing-field"><label for="entryArchiveRecipient">Đơn vị, người nhận bản lưu</label><textarea id="entryArchiveRecipient" class="form-control" name="archive_recipient" rows="2" maxlength="5000"></textarea></div>
+                        <div class="form-group ledger-outgoing-field">
+                            <label for="entryArchiveRecipient">Đơn vị, người nhận bản lưu</label>
+                            <div class="dropdown d-inline-block ml-2 ledger-history-dropdown">
+                                <button class="btn btn-sm btn-outline-primary rounded-pill dropdown-toggle ledger-history-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Lịch sử người nhận bản lưu" title="Chọn từ lịch sử đã nhập"><i class="fas fa-history" aria-hidden="true"></i></button>
+                                <div class="dropdown-menu shadow ledger-history-menu" data-history-kind="archive" data-history-target="#entryArchiveRecipient"><span class="dropdown-item-text text-muted small">Chưa có lịch sử</span></div>
+                            </div>
+                            <textarea id="entryArchiveRecipient" class="form-control mt-1" name="archive_recipient" rows="2" maxlength="5000"></textarea>
+                        </div>
                         <div class="form-group mb-0"><label for="entryNotes">Ghi chú</label><textarea id="entryNotes" class="form-control" name="notes" rows="2" maxlength="5000"></textarea></div>
                     </section>
                 </fieldset>

@@ -8,8 +8,9 @@ return [
         'web_import_timeout' => (int) env('DOCUMENT_LEDGER_WEB_IMPORT_TIMEOUT', 180),
     ],
     'exports' => [
-        // Giới hạn xuất đồng bộ để một yêu cầu không chiếm hết RAM/CPU của máy chủ.
+        // Sổ nhỏ tải trực tiếp; chỉ sổ lớn mới đưa qua worker nền.
         'max_rows' => (int) env('DOCUMENT_EXPORT_MAX_ROWS', 20000),
+        'background_min_rows' => (int) env('DOCUMENT_EXPORT_BACKGROUND_MIN_ROWS', 5000),
         'chunk_size' => (int) env('DOCUMENT_EXPORT_CHUNK_SIZE', 500),
         'lock_seconds' => (int) env('DOCUMENT_EXPORT_LOCK_SECONDS', 300),
         'disk' => env('DOCUMENT_EXPORT_DISK', 'local'),

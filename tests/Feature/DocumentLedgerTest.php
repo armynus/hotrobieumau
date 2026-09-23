@@ -976,7 +976,8 @@ class DocumentLedgerTest extends TestCase
         $this->assertSame('PHÒNG TỔNG HỢP', $values['department_name']);
         $this->assertSame('TP. Cao Lãnh', $values['place_name']);
         $this->assertSame('TP. Cao Lãnh,', $values['place_line']);
-        $this->assertSame('TRƯỞNG PHÒNG TỔNG HỢP', $values['signature_title']);
+        $this->assertSame('P.TRƯỞNG PHÒNG TỔNG HỢP', $values['signature_title']);
+        $this->assertSame('Nguyễn Thị Thúy Nga', $values['prepared_by']);
     }
 
     public function test_presentation_slip_rejects_other_branch_and_non_clerk(): void

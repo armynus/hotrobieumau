@@ -10,6 +10,7 @@ use App\Models\TransactionOffice;
 use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -53,7 +54,7 @@ class AdminUserController extends Controller
                 'users.document_role', 'users.status', 'users.created_at', 'users.updated_at',
                 'branches.branch_name', 'departments.department_name', 'transaction_offices.office_name as transaction_office_name', 'positions.position_name',
             ])
-            ->where('users.role_id', '!=', 0);
+            ->whereNotNull('users.role_id');
 
         return DataTables::eloquent($users)
             ->filterColumn('name', fn ($query, $keyword) => $query->where(function ($nested) use ($keyword): void {
@@ -89,7 +90,10 @@ class AdminUserController extends Controller
     public function edit(Request $request)
     {
         $user = Users::query()
-            ->where('role_id', '!=', 0)
+            ->where(function ($q) {
+                $q->where('role_id', '!=', 0)
+                  ->orWhere('id', Session::get('admin_id'));
+            })
             ->select('id', 'name', 'email', 'user_ipcas', 'branch_id', 'role_id', 'department_id', 'transaction_office_id', 'position_id', 'document_role')
             ->findOrFail($request->integer('user_id'));
 
@@ -100,7 +104,12 @@ class AdminUserController extends Controller
 
     public function update(Request $request)
     {
-        $user = Users::query()->where('role_id', '!=', 0)->findOrFail($request->integer('user_id'));
+        $user = Users::query()
+            ->where(function ($q) {
+                $q->where('role_id', '!=', 0)
+                  ->orWhere('id', Session::get('admin_id'));
+            })
+            ->findOrFail($request->integer('user_id'));
         $validated = $this->validateUser($request, $user);
         $password = $validated['password'] ?? null;
         unset($validated['password']);
@@ -152,6 +161,7 @@ class AdminUserController extends Controller
     private function validateUser(Request $request, ?Users $user = null): array
     {
         $branchId = $request->integer('branch_id');
+        $allowedRoles = $user && $user->role_id == 0 ? ['0', '1', '2', 0, 1, 2] : ['1', '2', 1, 2];
 
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -178,7 +188,7 @@ class AdminUserController extends Controller
                 }),
             ],
             'position_id' => ['nullable', 'integer', Rule::exists('positions', 'id')],
-            'role_id' => ['required', Rule::in(['1', '2', 1, 2])],
+            'role_id' => ['required', Rule::in($allowedRoles)],
             'document_role' => ['required', Rule::in(['user', 'clerk'])],
         ], [
             'department_id.exists' => 'Phòng ban không thuộc chi nhánh đã chọn.',

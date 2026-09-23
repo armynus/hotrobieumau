@@ -66,6 +66,7 @@
 
     <!-- Nhúng file dùng chung cho toàn bộ ứng dụng -->
  
+    @include('shared.shell-scripts')
     @stack('scripts') <!-- Thêm JS riêng -->
     <script src="{{ asset('js/user/sidebar-state.js') }}?v={{ filemtime(public_path('js/user/sidebar-state.js')) }}"></script>
     @include('search_topbar')

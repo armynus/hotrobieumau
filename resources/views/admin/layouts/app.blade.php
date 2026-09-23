@@ -58,6 +58,7 @@
     <!-- Logout Modal-->
     @include('admin.partials.logout_modal')
 
+    @include('shared.shell-scripts')
     @stack('scripts') <!-- Thêm JS riêng -->
     <script src="{{ asset('js/datatables-enhancements.js') }}?v={{ filemtime(public_path('js/datatables-enhancements.js')) }}"></script>
 </body>

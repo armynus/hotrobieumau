@@ -72,13 +72,15 @@ class DocumentExportController extends Controller
             }
 
             $fileName = $exportService->fileName($validated, $period);
-            if ($request->boolean('background')) {
+            $backgroundMinRows = max(1, (int) config('documents.exports.background_min_rows', 5000));
+            if ($request->boolean('background') && $rowCount >= $backgroundMinRows) {
                 return $this->queueExport($request, $user, $validated, $period, $fileName, $rowCount);
             }
 
             return Excel::download(new \App\Exports\DocumentLedgerWorkbook($documents, $direction, $period->label), $fileName, ExcelWriter::XLSX, [
                 'Cache-Control' => 'private, no-store, max-age=0',
                 'X-Content-Type-Options' => 'nosniff',
+                'X-Document-Export-Rows' => (string) $rowCount,
             ]);
         } catch (\Throwable $exception) {
             report($exception);

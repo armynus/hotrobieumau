@@ -80,6 +80,7 @@ class DocumentBackgroundExportTest extends TestCase
 
     public function test_background_export_is_queued_and_reports_a_private_download(): void
     {
+        config(['documents.exports.background_min_rows' => 1]);
         Queue::fake();
         $request = Request::create('/documents/export', 'POST', [
             'direction' => 'incoming', 'period_type' => 'year', 'year' => 2026, 'background' => 1,
@@ -150,6 +151,7 @@ class DocumentBackgroundExportTest extends TestCase
 
     public function test_queue_dispatch_failure_does_not_leave_export_stuck_as_queued(): void
     {
+        config(['documents.exports.background_min_rows' => 1]);
         $dispatcher = Mockery::mock(Dispatcher::class);
         $dispatcher->shouldReceive('dispatch')
             ->once()
@@ -168,6 +170,24 @@ class DocumentBackgroundExportTest extends TestCase
         $this->assertSame(500, $response->getStatusCode());
         $this->assertSame('failed', $operation->status);
         $this->assertNotNull($operation->finished_at);
+    }
+
+    public function test_small_background_export_downloads_directly_without_a_queue_worker(): void
+    {
+        config(['documents.exports.background_min_rows' => 5000]);
+        Queue::fake();
+        Excel::fake();
+        $request = Request::create('/documents/export', 'POST', [
+            'direction' => 'incoming', 'period_type' => 'year', 'year' => 2026, 'background' => 1,
+        ]);
+        $request->headers->set('Accept', 'application/json');
+        $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+
+        app(DocumentExportController::class)($request, app(DocumentLedgerExportService::class));
+
+        Excel::assertDownloaded('So-van-ban-den_2026.xlsx');
+        Queue::assertNothingPushed();
+        $this->assertSame(0, DocumentExportOperation::count());
     }
 
     public function test_expired_export_files_are_pruned(): void

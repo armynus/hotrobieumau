@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\AdminPositionController;
 use App\Http\Controllers\Admin\AdminTransactionOfficeController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\SupportFormController;
+use App\Http\Controllers\Admin\AdminMergerDataController;
 
 use App\Http\Controllers\Auth\LoginAdminController;
 use App\Http\Controllers\Auth\LoginUserController;
@@ -31,6 +32,8 @@ use App\Http\Controllers\User\DocumentLedgerController;
 use App\Http\Controllers\User\DataImportController;
 use App\Http\Controllers\User\DocumentNotificationController;
 use App\Http\Controllers\User\ProfileController;
+use App\Http\Controllers\User\ItSupportController as UserItSupportController;
+use App\Http\Controllers\Admin\ItSupportController as AdminItSupportController;
 
 
 Route::get('login_admin', [LoginAdminController::class, 'login_admin'])->name('login_admin');
@@ -42,6 +45,13 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('change_password_admin/{admin_id}', [LoginAdminController::class, 'change_password_admin'])->name('change_password_admin');
     Route::post('reset_password_admin', [LoginAdminController::class, 'reset_password_admin'])->name('reset_password_admin');
     Route::get('admin', [AdminController::class, 'index'])->name('admin');
+    
+    // IT Support Management
+    Route::get('admin/it-support', [AdminItSupportController::class, 'manage'])->name('admin.it_support.manage');
+    Route::get('admin/it-support/{id}', [AdminItSupportController::class, 'show'])->whereNumber('id')->name('admin.it_support.show');
+    Route::get('admin/it-support/{id}/files/{file}', [AdminItSupportController::class, 'download'])->whereNumber('id')->whereNumber('file')->name('admin.it_support.download');
+    Route::post('admin/it-support/{id}/status', [AdminItSupportController::class, 'updateStatus'])->name('admin.it_support.update_status');
+
     Route::get('admin/branches', [AdminController::class, 'branches'])->name('admin_branches');
     Route::get('admin_branches_create', [BranchController::class, 'create'])->name('admin_branches_create');
     Route::post('admin_branches_store', [BranchController::class, 'store'])->name('admin_branches_store');
@@ -54,6 +64,10 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('admin/transaction-offices', [AdminTransactionOfficeController::class, 'store'])->name('admin_transaction_offices_store');
     Route::get('admin/transaction-offices/edit', [AdminTransactionOfficeController::class, 'edit'])->name('admin_transaction_offices_edit');
     Route::post('admin/transaction-offices/update', [AdminTransactionOfficeController::class, 'update'])->name('admin_transaction_offices_update');
+
+    // Merger Data Routes
+    Route::get('admin/merger-data/import', [AdminMergerDataController::class, 'importView'])->name('admin_merger_data_import_view');
+    Route::post('admin/merger-data/import', [AdminMergerDataController::class, 'import'])->name('admin_merger_data_import');
 
     Route::get('admin/list_staff', [AdminUserController::class, 'index'])->name('admin_list_staff');
     Route::get('admin/list_staff/data', [AdminUserController::class, 'data'])->name('admin_list_staff_data');
@@ -105,6 +119,14 @@ Route::get('login', [LoginUserController::class, 'login'])->name('login');
 Route::post('logins', [LoginUserController::class, 'logins'])->name('logins');
 Route::group(['middleware'=> ['tenant']], function(){
     Route::get('logout', [LoginUserController::class, 'logout'])->name('logout');
+    
+    // IT Support (User)
+    Route::get('it-support', [UserItSupportController::class, 'index'])->name('user.it_support.index');
+    Route::get('it-support/create', [UserItSupportController::class, 'create'])->name('user.it_support.create');
+    Route::post('it-support/store', [UserItSupportController::class, 'store'])->name('user.it_support.store');
+    Route::get('it-support/{id}', [UserItSupportController::class, 'show'])->whereNumber('id')->name('user.it_support.show');
+    Route::post('it-support/{id}/reply', [UserItSupportController::class, 'reply'])->whereNumber('id')->middleware('throttle:10,1')->name('user.it_support.reply');
+    Route::get('it-support/{id}/files/{file}', [UserItSupportController::class, 'download'])->whereNumber('id')->whereNumber('file')->name('user.it_support.download');
     Route::get('change_password_user/{user_id}', [LoginUserController::class, 'change_password_user'])->name('change_password_user');
     Route::post('reset_password_user', [LoginUserController::class, 'reset_password_user'])->name('reset_password_user');
     Route::get('/', [UserController::class, 'index'])->name('index');

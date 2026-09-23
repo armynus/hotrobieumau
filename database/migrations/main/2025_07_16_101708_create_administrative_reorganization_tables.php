@@ -18,14 +18,14 @@ class CreateAdministrativeReorganizationTables extends Migration
         Schema::create('old_districts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('old_province_id');
-            $table->string('name');
+            $table->string('name')->index();
         });
 
         // Tạo bảng đơn vị hành chính cũ (xã, phường, thị trấn)
         Schema::create('old_wards', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('old_district_id');
-            $table->string('name');
+            $table->string('name')->index();
         });
 
         // Tạo bảng tỉnh sau sáp nhập
@@ -38,19 +38,19 @@ class CreateAdministrativeReorganizationTables extends Migration
         Schema::create('new_wards', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('new_province_id');
-            $table->string('name');
+            $table->string('name')->index();
         });
         // Tạo bảng ánh xạ đơn vị tỉnh cũ sang tỉnh mới
         Schema::create('province_mappings', function (Blueprint $table) {
             $table->unsignedBigInteger('old_province_id');
             $table->unsignedBigInteger('new_province_id');
-            $table->primary(['old_province_id','new_province_id']);
+            $table->primary(['old_province_id', 'new_province_id']);
         });
         // Tạo bảng ánh xạ từ đơn vị xã/phường/thị trấn cũ -> đơn vị mới
         Schema::create('ward_mappings', function (Blueprint $table) {
             $table->unsignedBigInteger('old_ward_id');
             $table->unsignedBigInteger('new_ward_id');
-            $table->primary(['old_ward_id','new_ward_id']);
+            $table->primary(['old_ward_id', 'new_ward_id']);
         });
     }
 

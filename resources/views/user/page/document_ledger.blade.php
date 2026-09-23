@@ -5,6 +5,7 @@
     <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
         <div><h1 class="h3 text-gray-800 mb-1">Sổ văn bản</h1><div class="text-muted">{{ $clerk->branch->branch_name }} · Năm {{ $year }}</div></div>
         <div class="mt-3 mt-md-0">
+            <button type="button" class="btn btn-success shadow-sm mr-1" data-toggle="modal" data-target="#documentExportModal"><i class="fas fa-file-excel mr-1" aria-hidden="true"></i> Xuất sổ Excel</button>
             <a class="btn {{ $checkOnly ? 'btn-primary' : 'btn-outline-primary' }} mr-1" id="ledgerCheckButton" href="{{ route('documents_ledger', ['year' => $year, 'book' => $book, 'q' => $checkOnly ? null : $keyword, 'check' => $checkOnly ? 0 : 1]) }}"><i class="fas {{ $checkOnly ? 'fa-sign-out-alt' : 'fa-clipboard-check' }} mr-1" aria-hidden="true"></i> {{ $checkOnly ? 'Thoát kiểm tra' : 'Kiểm tra sổ' }}</a>
             <button class="btn btn-primary mr-1" data-toggle="modal" data-target="#ledgerEntryModal" id="newLedgerEntry"><i class="fas fa-pen-nib mr-1"></i> Ghi mới vào sổ</button>
             <button class="btn btn-outline-primary mr-1" data-toggle="modal" data-target="#ledgerEntryModal" id="addLedgerEntry"><i class="fas fa-book-medical mr-1"></i> Đưa văn bản vào sổ</button>
@@ -55,24 +56,9 @@
             </table>
         </div>
     </div>
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h2 class="h6 font-weight-bold text-success"><i class="fas fa-file-excel mr-1"></i> Xuất sổ văn bản</h2>
-            <form method="POST" action="{{ route('documents_export') }}" class="form-row align-items-end" id="ledgerExportForm" data-document-export-form>@csrf
-                <input type="hidden" name="background" value="1">
-                <div class="form-group col-md-3"><label>Loại sổ</label><select name="direction" class="form-control"><option value="incoming" @selected($book === 'incoming')>Sổ văn bản đến</option><option value="outgoing" @selected($book !== 'incoming')>Sổ văn bản đi (2 sheet)</option></select></div>
-                <div class="form-group col-md-2"><label>Năm</label><input class="form-control" name="year" type="number" min="2000" max="2100" value="{{ $year }}" required></div>
-                <div class="form-group col-md-2"><label>Kỳ xuất</label><select class="form-control" name="period_type"><option value="month">Theo tháng</option><option value="quarter">Theo quý</option><option value="year" selected>Cả năm</option></select></div>
-                <div class="form-group col-md-2 export-month d-none"><label>Tháng</label><select class="form-control" name="month">@for($m=1;$m<=12;$m++)<option value="{{ $m }}" @selected($m === now()->month)>{{ $m }}</option>@endfor</select></div>
-                <div class="form-group col-md-2 export-quarter d-none"><label>Quý</label><select class="form-control" name="quarter">@for($q=1;$q<=4;$q++)<option value="{{ $q }}" @selected($q === now()->quarter)>{{ $q }}</option>@endfor</select></div>
-                <div class="form-group col-md-3"><button class="btn btn-success btn-block" data-document-export-submit><i class="fas fa-download mr-1"></i> Tạo file Excel</button></div>
-            </form>
-            @include('user.page.documents.partials.export_status')
-            <small class="text-muted">Văn bản đi tách sheet thông thường và quyết định. Ngày lọc là ngày vào sổ, không phải ngày ghi trên văn bản.</small>
-        </div>
-    </div>
 </div>
 
+@include('user.page.documents.partials.export_modal', ['exportDefaultYear' => $year, 'exportDefaultDirection' => $book === 'incoming' ? 'incoming' : 'outgoing', 'exportDefaultPeriod' => 'year'])
 @include('user.page.documents.partials.ledger_import_modal')
 
 @include('user.page.documents.partials.ledger_entry_modal')
@@ -83,12 +69,10 @@
 <link rel="stylesheet" href="{{ asset('css/user/document-ledger-entry.css') }}?v={{ filemtime(public_path('css/user/document-ledger-entry.css')) }}">
 <link rel="stylesheet" href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}">
 <link rel="stylesheet" href="{{ asset('css/user/document-ledger-table.css') }}?v={{ filemtime(public_path('css/user/document-ledger-table.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/user/document-export.css') }}?v={{ filemtime(public_path('css/user/document-export.css')) }}">
 <style>.ledger-table th,.ledger-table td{vertical-align:middle}.ledger-table th{white-space:nowrap}.ledger-title{min-width:260px;max-width:550px}.ledger-import-issues{max-height:230px;overflow:auto}.ledger-stats{display:flex;gap:12px;flex-wrap:wrap}.ledger-stats>div{padding:8px 12px;background:#f8f9fc;border-radius:6px}</style>
 @endpush
 @push('scripts')
-<script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-<script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
 <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
 <script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}"></script>
 <script src="{{ asset('vendor/flatpickr/vn.js') }}"></script>
@@ -96,6 +80,7 @@
 <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('js/user/document-ledger-table.js') }}?v={{ filemtime(public_path('js/user/document-ledger-table.js')) }}"></script>
 <script src="{{ asset('js/user/document-ledger.js') }}"></script>
+<script src="{{ asset('js/user/document-ledger-history.js') }}?v={{ filemtime(public_path('js/user/document-ledger-history.js')) }}"></script>
 <script src="{{ asset('js/user/document-ledger-entry.js') }}?v={{ filemtime(public_path('js/user/document-ledger-entry.js')) }}"></script>
 <script src="{{ asset('js/user/document-ledger-slip.js') }}?v={{ filemtime(public_path('js/user/document-ledger-slip.js')) }}"></script>
 <script src="{{ asset('js/user/document-export.js') }}?v={{ filemtime(public_path('js/user/document-export.js')) }}"></script>

@@ -24,5 +24,8 @@ class DocumentLedgerEntryModalTest extends TestCase
         $this->assertSame(0, $xpath->query('//*[contains(@class,"modal-body")]//*[@id="ledgerSave"]')->length);
         $this->assertStringContainsString('modal-dialog-scrollable', $html);
         $this->assertSame(0, $xpath->query('//input[@type="file"]')->length);
+        foreach (['code', 'title', 'recipient', 'archive'] as $kind) {
+            $this->assertSame(1, $xpath->query('//*[@data-history-kind="'.$kind.'"]')->length, $kind);
+        }
     }
 }

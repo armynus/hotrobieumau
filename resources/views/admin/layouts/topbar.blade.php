@@ -55,12 +55,11 @@
 
     <!-- Nav Item - Alerts -->
     <li class="nav-item dropdown no-arrow mx-1 dropdown-notifications" >
-        <a class="nav-link dropdown-toggle view_detail_document_admin"   id="alertsDropdown" role="button" data-toggle="dropdown"
+        <a class="nav-link dropdown-toggle view_detail_document_admin"   id="alertsDropdown" role="button"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i  class="fas fa-bell fa-fw" ></i>
             <!-- Counter - Alerts -->
             <span data-count="0"  class="badge badge-danger badge-counter"></span>
-        
 
         </a>
         <!-- Dropdown - Alerts -->
@@ -69,12 +68,10 @@
             <h6 class="dropdown-header">
                 Thông báo gần đây
             </h6>
-            <span class="dropdown-notification" style="widht:100%; height:100%;">
-                
-                
+            <span class="dropdown-notification">
+                <span class="dropdown-item text-center small text-gray-500">Chưa có thông báo.</span>
             </span>
             
-            <a class="dropdown-item text-center small text-gray-500" href="#">Xem Tất Cả</a>
         </div>
     </li>
 

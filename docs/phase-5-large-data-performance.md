@@ -15,9 +15,10 @@ Lệnh CLI không truyền giới hạn nên vẫn đọc mỗi sheet một lư�
 
 Với file thử này, nhánh web từ chối sớm giảm 23,5% thời gian và 18,8% RAM đỉnh. Đây là một lượt đo local, không đại diện p50/p95 production. Cần thử lại với file thật có nhiều sheet, công thức và dòng trống trên staging.
 
-## Xuất sổ Excel chạy nền
+## Xuất sổ Excel trực tiếp và chạy nền
 
-- Nút xuất trên danh sách và sổ văn bản gửi yêu cầu nền, nhận URL trạng thái rồi theo dõi tiến độ. Trạng thái được giữ trong `sessionStorage`, nên chuyển trang hoặc tải lại vẫn tiếp tục theo dõi.
+- Sổ dưới `DOCUMENT_EXPORT_BACKGROUND_MIN_ROWS` (mặc định 5.000 dòng) được tạo và tải trực tiếp. Cách này giúp các lượt xuất thông thường không bị treo nếu worker chưa chạy.
+- Sổ từ ngưỡng trên trở lên được gửi sang hàng đợi, nhận URL trạng thái rồi theo dõi tiến độ. Trạng thái được giữ trong `sessionStorage`, nên chuyển trang hoặc tải lại vẫn tiếp tục theo dõi.
 - Job chạy trên queue `document-exports`; file hoàn tất nằm trên disk private, chỉ tài khoản đã tạo mới xem trạng thái và tải được. Response tải xuống có `no-store` và `nosniff`.
 - Một yêu cầu đang chờ/chạy của cùng tài khoản, chi nhánh và khoảng ngày được dùng lại để tránh tạo job trùng. File hết hạn sau 24 giờ theo cấu hình và lệnh `documents:prune-exports` xóa cả file lẫn bản ghi hết hạn mỗi ngày.
 - Nếu queue không nhận được job, yêu cầu được đánh dấu `failed` ngay để lần xuất sau không bị chặn bởi trạng thái `queued` treo.

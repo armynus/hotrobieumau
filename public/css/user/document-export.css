@@ -1,0 +1,11 @@
+.document-export-header { background: linear-gradient(135deg, #16855b, #0f6847); border: 0; }
+.document-export-icon { display: inline-flex; width: 46px; height: 46px; align-items: center; justify-content: center; border-radius: .75rem; background: rgba(255,255,255,.16); font-size: 1.45rem; }
+.document-period-card { display: flex; min-height: 132px; margin: 0; padding: 1rem; cursor: pointer; border: 2px solid #e3e6f0; border-radius: .75rem; background: #fff; align-items: center; justify-content: center; flex-direction: column; text-align: center; transition: .18s ease; }
+.document-period-card i { margin-bottom: .65rem; color: #858796; font-size: 1.5rem; }
+.document-period-card small { margin-top: .25rem; color: #858796; }
+.export-period-radio:checked + .document-period-card { border-color: #1cc88a; background: #effaf6; box-shadow: 0 .25rem .9rem rgba(28,200,138,.14); transform: translateY(-1px); }
+.export-period-radio:checked + .document-period-card i { color: #1cc88a; }
+.document-export-selection { border: 1px solid #dfe5ec; background: #f8f9fc; }
+@media (prefers-reduced-motion: reduce) {
+    .document-period-card { transition: none; }
+}

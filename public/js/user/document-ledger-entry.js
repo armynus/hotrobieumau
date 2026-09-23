@@ -187,11 +187,20 @@ $(function () {
         if (mode !== 'new' && !id) { Swal.fire('Chọn văn bản', 'Hãy tìm và chọn văn bản cần ghi sổ.', 'info'); return; }
         const url = mode === 'new' ? page.data('create-url') : (mode === 'edit' ? page.data('update-url') + '/' + encodeURIComponent(id) : page.data('register-url') + '/' + encodeURIComponent(id) + '/register');
         const data = form.serialize() + '&' + $.param({operation: mode === 'edit' ? 'edit' : 'register'});
+        const historyValues = {
+            book: $('#entryBook').val(),
+            code: $('#entryCode').val(),
+            title: $('#entryTitle').val(),
+            recipient: $('#entryRecipient').val(),
+            archive: $('#entryArchiveRecipient').val()
+        };
+
         const printAfterSave = e.originalEvent && e.originalEvent.submitter && e.originalEvent.submitter.id === 'ledgerSaveAndPrint';
         busy = true;
         save.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang lưu…');
         saveAndPrint.prop('disabled', true);
         $.ajax({url: url, type: mode === 'edit' ? 'PUT' : 'POST', data: data}).done(function (response) {
+            saveHistoryAfterSuccess(historyValues);
             if (printAfterSave) {
                 busy = false;
                 modal.one('hidden.bs.modal', function () { page.trigger('ledger:print-slip', [response.entry, true]); });
@@ -212,5 +221,73 @@ $(function () {
             saveAndPrint.prop('disabled', mode === 'existing' && !form.find('[name="document_id"]').val());
         });
     });
+
+    const historyStore = window.DocumentLedgerHistory;
+    function historyKey(kind, book) {
+        if (kind === 'recipient') return 'ledger_history_recipient';
+        if (kind === 'archive') return 'ledger_history_archive_recipient';
+        return 'ledger_history_' + kind + '_' + book;
+    }
+
+    function saveHistoryAfterSuccess(values) {
+        historyStore.save(historyKey('code', values.book), values.code, false);
+        historyStore.save(historyKey('title', values.book), values.title, false);
+        historyStore.save(historyKey('recipient'), values.recipient, true);
+        historyStore.save(historyKey('archive'), values.archive, true);
+    }
+
+    function populateHistoryDropdown(menu) {
+        const kind = menu.data('history-kind');
+        const splitLines = kind === 'recipient' || kind === 'archive';
+        const key = historyKey(kind, $('#entryBook').val());
+        const history = historyStore.list(key, splitLines);
+        const target = $(menu.data('history-target'));
+        menu.empty();
+        if (!history.length) {
+            $('<span>', {class: 'dropdown-item-text text-muted small'}).text('Chưa có lịch sử').appendTo(menu);
+            return;
+        }
+
+        history.forEach(function (value) {
+            const row = $('<div>', {class: 'ledger-history-row'}).appendTo(menu);
+            $('<button>', {type: 'button', class: 'ledger-history-select', title: value})
+                .text(value.length > 100 ? value.slice(0, 100) + '…' : value)
+                .on('click', function () {
+                    if (splitLines) {
+                        const current = target.val().trim();
+                        const exists = current.split(/\r?\n/).some(line => line.trim().toLocaleLowerCase('vi') === value.toLocaleLowerCase('vi'));
+                        if (!exists) target.val(current ? current + '\n' + value : value);
+                    } else {
+                        target.val(value);
+                    }
+                    target.trigger('input').trigger('change').trigger('focus');
+                }).appendTo(row);
+            $('<button>', {type: 'button', class: 'ledger-history-remove', title: 'Xóa gợi ý này', 'aria-label': 'Xóa gợi ý này'})
+                .html('<i class="fas fa-trash-alt" aria-hidden="true"></i>')
+                .on('click', function (event) {
+                    event.stopPropagation();
+                    historyStore.remove(key, value, splitLines);
+                    populateHistoryDropdown(menu);
+                }).appendTo(row);
+        });
+
+        $('<button>', {type: 'button', class: 'ledger-history-clear'})
+            .html('<i class="fas fa-trash-alt mr-1" aria-hidden="true"></i> Xóa toàn bộ lịch sử ô này')
+            .on('click', function (event) {
+                event.stopPropagation();
+                Swal.fire({title: 'Xóa toàn bộ gợi ý?', text: 'Các mục đã lưu cho ô này sẽ bị xóa khỏi trình duyệt.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Xóa tất cả', cancelButtonText: 'Giữ lại'})
+                    .then(function (result) {
+                        if (result.isConfirmed) {
+                            historyStore.clear(key);
+                            populateHistoryDropdown(menu);
+                        }
+                    });
+            }).appendTo(menu);
+    }
+
+    $('.ledger-history-dropdown').on('show.bs.dropdown', function () {
+        populateHistoryDropdown($(this).find('.ledger-history-menu'));
+    });
+
     bookFields();
 });

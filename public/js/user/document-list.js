@@ -767,22 +767,4 @@ $(document).ready(function () {
 
     updateFilterUi();
 
-    function refreshDocumentExportForm() {
-        var periodType = $('.export-period-radio:checked').val() || 'month';
-        var year = $('#exportYear').val();
-        var typeLabel = $('input[name="direction"]:checked').val() === 'outgoing' ? 'sổ văn bản đi' : 'sổ văn bản đến';
-        var periodLabel = 'năm ' + year;
-
-        $('#exportMonthGroup').toggleClass('d-none', periodType !== 'month');
-        $('#exportQuarterGroup').toggleClass('d-none', periodType !== 'quarter');
-        if (periodType === 'month') periodLabel = 'tháng ' + $('#exportMonth').val() + '/' + year;
-        if (periodType === 'quarter') periodLabel = 'quý ' + $('#exportQuarter').val() + '/' + year;
-
-        $('#documentExportSummary').text('Xuất ' + typeLabel + ' theo ' + periodLabel + '.');
-    }
-
-    $('.export-period-radio, input[name="direction"], #exportYear, #exportMonth, #exportQuarter').on('change', refreshDocumentExportForm);
-    $('#documentExportModal').on('show.bs.modal', refreshDocumentExportForm);
-    refreshDocumentExportForm();
-
 });
