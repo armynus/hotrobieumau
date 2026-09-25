@@ -3,16 +3,13 @@
    
 @section('content')
 <div class="container-fluid">
-    <!-- Page Heading -->
-    <h1 class="h3 mb-2 text-gray-800">Danh Sách Các Biểu Mẫu</h1>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <div><h1 class="h3 mb-1 text-gray-800">Danh sách biểu mẫu</h1><p class="mb-0 text-muted small">Quản lý tệp mẫu Word, phân loại và lượt sử dụng.</p></div>
+        <button type="button" class="btn btn-primary mt-3 mt-sm-0" data-toggle="modal" data-target="#addFormModal"><i class="fas fa-plus mr-1" aria-hidden="true"></i> Thêm biểu mẫu</button>
+    </div>
     
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
-        <div class="mt-3 text-center">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addFormModal" >
-                Thêm Biểu Mẫu
-            </button>
-        </div>
         <!-- Modal -->   
         <x-support-form-modal mode="add" route="{{ route('support_forms_create') }}" :fields="$fields" :form_type="$form_type" />
         <x-support-form-modal mode="edit" route="{{ route('support_forms_update') }}" :fields="$fields" :form_type="$form_type" />
@@ -48,7 +45,7 @@
                     <tbody>
                         @foreach($list_forms as $key => $form)
                         <tr>
-                            <td>{{$key}}</td>
+                            <td>{{$key + 1}}</td>
                             <td>{{$form->name}}</td>
                             <td>{{$form->formType?->type_name }}</td>
                             <td>{{$form->usage_count}}</td>

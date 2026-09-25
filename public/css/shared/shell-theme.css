@@ -1,0 +1,11 @@
+:root {
+    --shell-brand: #a51c3e;
+    --shell-brand-dark: #77112d;
+    --shell-ink: #243249;
+    --shell-muted: #68758a;
+    --shell-border: #e1e7f0;
+    --shell-surface: #fff;
+    --shell-canvas: #f5f7fb;
+    --shell-sidebar: linear-gradient(180deg, #a51c3e 0%, #891632 48%, #651025 100%);
+    --shell-sidebar-shadow: 8px 0 28px rgba(74, 18, 38, .12);
+}

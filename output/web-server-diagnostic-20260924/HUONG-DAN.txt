@@ -1,0 +1,17 @@
+CHAY TREN SERVER 10.142.0.15 DANG BI LOI
+
+1. Giai nen goi ZIP vao mot thu muc tren server.
+2. Bam phai KIEM-TRA-WEB.cmd, chon Run as administrator.
+3. Doi den khi hien "Da luu ket qua".
+4. Gui file KET-QUA-KIEM-TRA.txt trong cung thu muc.
+
+Cong cu chi doc thong tin: trang thai IIS, cong dang lang nghe, tien trinh,
+IIS sites/apps/modules, kiem tra cau hinh Apache va 20 dong log loi gan nhat.
+Khong doc .env, khong dung/khoi dong dich vu, khong sua cau hinh.
+
+Can ket qua tu server 10.142.0.15; ket qua tu may local khac khong the
+xac nhan nguyen nhan ket noi bi tu choi tren server.
+
+May dang co website khac chay IIS. Khong dung/gỡ IIS de nhuong cong 80.
+Huong trien khai can giu IIS o cong 80, chuyen rieng yeu cau cua ung dung
+sang Apache o cong noi bo, sau khi xac dinh dung IIS site va duong dan.

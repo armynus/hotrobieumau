@@ -3,16 +3,13 @@
    
 @section('content')
 <div class="container-fluid">
-    <!-- Page Heading -->
-    <h1 class="h3 mb-2 text-gray-800">Danh Sách Thể Loại Form</h1>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <div><h1 class="h3 mb-1 text-gray-800">Thể loại biểu mẫu</h1><p class="mb-0 text-muted small">Tổ chức các biểu mẫu theo nhóm để dễ tìm và quản lý.</p></div>
+        <button type="button" class="btn btn-primary mt-3 mt-sm-0" data-toggle="modal" data-target="#addFormTypeModal"><i class="fas fa-plus mr-1" aria-hidden="true"></i> Thêm thể loại</button>
+    </div>
     
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
-        <div class="mt-3 text-center">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addFormTypeModal" >
-                Thêm Thể Loại Form
-            </button>
-        </div>
         <!-- Modal -->   
         <x-customer-form 
             modalId="addFormTypeModal"

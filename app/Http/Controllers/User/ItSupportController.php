@@ -13,26 +13,56 @@ class ItSupportController extends Controller
 {
     public function index(Request $request)
     {
-        $status = $request->query('status');
-        $query = ItSupportRequest::where('user_id', Session::get('user_id'));
-        $allowed = ['pending', 'processing', 'resolved', 'closed'];
-        $statuses = array_values(array_intersect($allowed, (array) $status));
-        if ($statuses) {
-            $query->whereIn('status', $statuses);
+        $status = $request->query('status', 'all');
+        if ($status === 'closed') {
+            $status = 'resolved';
         }
-        if ($request->filled('q')) {
-            $term = trim((string) $request->query('q'));
+        $status = in_array($status, ['all', 'open', 'pending', 'processing', 'resolved'], true) ? $status : 'all';
+        $query = ItSupportRequest::where('user_id', Session::get('user_id'));
+        if ($status !== 'all') {
+            $query->whereIn('status', match ($status) {
+                'open' => ['pending', 'processing'],
+                'resolved' => ['resolved', 'closed'],
+                default => [$status],
+            });
+        }
+        $term = $request->query('q');
+        $term = is_string($term) ? trim($term) : '';
+        if ($term !== '') {
             $query->where(function ($q) use ($term) {
-                $q->where('title', 'like', '%'.$term.'%');
+                $q->where('title', 'like', '%'.$term.'%')
+                    ->orWhere('description', 'like', '%'.$term.'%');
                 if (ctype_digit($term)) {
                     $q->orWhere('id', (int) $term);
                 }
             });
         }
-        $requests = $query->latest()->paginate(10)->withQueryString();
+        $category = $request->query('category');
+        if (in_array($category, ['Phần cứng', 'Phần mềm', 'Mạng', 'Khác'], true)) {
+            $query->where('category', $category);
+        } else {
+            $category = '';
+        }
+        $dates = ['date_from' => '', 'date_to' => ''];
+        foreach (['date_from' => '>=', 'date_to' => '<'] as $key => $operator) {
+            $date = $request->query($key);
+            if (is_string($date) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)
+                && \DateTimeImmutable::createFromFormat('!Y-m-d', $date)?->format('Y-m-d') === $date) {
+                $dates[$key] = $date;
+                $boundary = new \DateTimeImmutable($date);
+                $query->where('created_at', $operator, $key === 'date_to'
+                    ? $boundary->modify('+1 day')->format('Y-m-d 00:00:00')
+                    : $boundary->format('Y-m-d 00:00:00'));
+            }
+        }
+        $sort = $request->query('sort') === 'oldest' ? 'oldest' : 'newest';
+        $query->orderBy('created_at', $sort === 'oldest' ? 'asc' : 'desc')
+            ->orderBy('id', $sort === 'oldest' ? 'asc' : 'desc');
+        $requests = $query->paginate(10)->withQueryString();
         $counts = ItSupportRequest::where('user_id', Session::get('user_id'))
             ->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
-        return view('user.it_support.index', compact('requests', 'counts', 'status', 'statuses'));
+
+        return view('user.it_support.index', compact('requests', 'counts', 'status', 'sort', 'term', 'category', 'dates'));
     }
 
     public function create()
@@ -64,14 +94,17 @@ class ItSupportController extends Controller
                 'actor_name' => Session::get('user_name', 'Người gửi'),
                 'to_status' => 'pending', 'message' => 'Đã gửi phiếu yêu cầu.',
             ]);
+
             return $ticket;
         });
+
         return redirect()->route('user.it_support.show', $ticket)->with('success', 'Đã gửi phiếu hỗ trợ #'.$ticket->id.'.');
     }
 
     public function show(int $id)
     {
         $ticket = $this->ownedTicket($id)->load('events');
+
         return view('user.it_support.show', compact('ticket'));
     }
 
@@ -90,6 +123,7 @@ class ItSupportController extends Controller
         ]);
         $ticket->unsetRelation('events');
         $storage->writeManifest($ticket);
+
         return back()->with('success', 'Đã bổ sung thông tin cho phiếu.');
     }
 

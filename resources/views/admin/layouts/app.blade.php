@@ -6,11 +6,13 @@
     <title>@yield('title', 'Agribank')</title>
     <!-- Head dùng chung -->
     @include('head_template')
+    <link rel="stylesheet" href="{{ asset('css/shared/shell-theme.css') }}?v={{ filemtime(public_path('css/shared/shell-theme.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/admin-experience.css') }}?v={{ filemtime(public_path('css/admin/admin-experience.css')) }}">
     <!-- CSS dùng chung -->
     {{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}
     @stack('styles') <!-- Thêm CSS riêng của từng view -->
 </head>
-<body id="page-top">
+<body id="page-top" class="admin-shell">
     <div id="wrapper">
 
         <!-- Sidebar -->

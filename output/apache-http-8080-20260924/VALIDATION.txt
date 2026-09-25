@@ -1,0 +1,20 @@
+Apache validation using the packaged HTTP configuration and local XAMPP dependencies.
+SYNTAX CHECK, exit 0:
+Syntax OK
+
+VHOST MAP, exit 0:
+VirtualHost configuration:
+*:8080                 10.142.0.15 (D:/hotrobieumau/output/apache-http-8080-20260924/conf/extra/httpd-vhosts.conf:3)
+ServerRoot: "D:/xampp/apache"
+Main DocumentRoot: "D:/xampp/htdocs"
+Main ErrorLog: "D:/xampp/apache/logs/error.log"
+Mutex proxy: using_defaults
+Mutex default: dir="D:/xampp/apache/logs/" mechanism=default 
+Mutex rewrite-map: using_defaults
+PidFile: "D:/xampp/apache/logs/httpd.pid"
+Define: DUMP_VHOSTS
+Define: DUMP_RUN_CFG
+Define: SRVROOT=D:/xampp/apache
+
+SSL module absent; rewrite_module and php_module checked below.
+PASS: HTTP 8080 virtual host, PHP and rewrite enabled, SSL disabled. No production startup or login test performed.

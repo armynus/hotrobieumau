@@ -1,0 +1,10 @@
+<!-- TEMPLATE ONLY. Merge this rule into the selected site's existing rewrite/rules.
+     Do NOT replace an existing web.config with this fragment.
+     If other websites use 10.142.0.15/path, add path exclusions BEFORE using it. -->
+<rule name="HotroBieuMau HTTP" stopProcessing="true">
+  <match url="(.*)" />
+  <conditions logicalGrouping="MatchAll">
+    <add input="{HTTP_HOST}" pattern="^10\.142\.0\.15(?::80)?$" />
+  </conditions>
+  <action type="Rewrite" url="http://127.0.0.1:8080/{R:1}" appendQueryString="true" />
+</rule>

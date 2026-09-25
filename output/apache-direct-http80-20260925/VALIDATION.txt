@@ -1,0 +1,18 @@
+Validation date: 2026-09-25
+
+PASS - PowerShell parse checks for installer, patch library and runtime diagnostic.
+PASS - Native Apache wrapper handles stderr containing Syntax OK.
+PASS - Final single vhost configuration: *:80, ServerName 10.142.0.15.
+PASS - PHP module loaded.
+PASS - Isolated Apache process started on loopback 18080 with separate PID/log/config.
+PASS - Actual application .htaccess routes /login_admin to test PHP front controller.
+PASS - Laravel Request/UrlGenerator use http://10.142.0.15 without a custom port.
+PASS - GET query and POST body/method preserved.
+PASS - PHP/Laravel-generated 302 and Apache directory 301 use correct public origin.
+PASS - XAMPP management aliases and restricted direct document paths return 403.
+PASS - Unrelated dummy database, APP_KEY and SESSION_DRIVER values preserved.
+PASS - Duplicate HTTP env setting consolidated; repeated patch stable.
+PASS - Extra listener removal and absolute/SRVROOT include handling.
+
+Only the isolated test process was stopped. No live local XAMPP config or app .env was changed.
+Production server execution, database login and LAN client access are not yet verified.

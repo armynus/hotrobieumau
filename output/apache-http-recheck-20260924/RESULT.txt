@@ -1,0 +1,7 @@
+Uploaded files from E:/modify/conf match the delivered port 80 package exactly.
+Syntax test: Syntax OK, exit 0.
+Virtual host test: *:80, ServerName 10.142.0.15, exit 0.
+Isolated runtime: Apache started, static application CSS returned HTTP 200.
+Runtime isolation changes: bind 127.0.0.1:18080, separate PID/log paths, uploaded include paths.
+Only the isolated test process was stopped after verification.
+Production port 80 and startup failure remain unverified; need foreground startup error from the failing machine.

@@ -1,0 +1,19 @@
+Apache 2.4.56 local validation using packaged configuration and local XAMPP dependencies.
+
+Syntax OK
+
+VirtualHost configuration:
+*:80                   10.142.0.15 (D:/hotrobieumau/output/apache-http-80-20260924/conf/extra/httpd-vhosts.conf:3)
+ServerRoot: "D:/xampp/apache"
+Main DocumentRoot: "D:/xampp/htdocs"
+Main ErrorLog: "D:/xampp/apache/logs/error.log"
+Mutex default: dir="D:/xampp/apache/logs/" mechanism=default 
+Mutex rewrite-map: using_defaults
+Mutex proxy: using_defaults
+PidFile: "D:/xampp/apache/logs/httpd.pid"
+Define: DUMP_VHOSTS
+Define: DUMP_RUN_CFG
+Define: SRVROOT=D:/xampp/apache
+
+PASS: PHP and rewrite loaded, SSL not loaded, no old port in configuration.
+Production port availability and login have not been tested.

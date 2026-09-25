@@ -1,11 +1,11 @@
 :root {
-    --user-brand: #a51c3e;
-    --user-brand-dark: #77112d;
-    --user-ink: #243249;
-    --user-muted: #68758a;
-    --user-border: #e1e7f0;
-    --user-surface: #fff;
-    --user-canvas: #f5f7fb;
+    --user-brand: var(--shell-brand);
+    --user-brand-dark: var(--shell-brand-dark);
+    --user-ink: var(--shell-ink);
+    --user-muted: var(--shell-muted);
+    --user-border: var(--shell-border);
+    --user-surface: var(--shell-surface);
+    --user-canvas: var(--shell-canvas);
 }
 
 body.user-shell {
@@ -37,9 +37,9 @@ body.user-shell {
 }
 
 .user-sidebar {
-    background: linear-gradient(180deg, #a51c3e 0%, #891632 48%, #651025 100%);
+    background: var(--shell-sidebar);
     background-size: cover;
-    box-shadow: 8px 0 28px rgba(74, 18, 38, .12);
+    box-shadow: var(--shell-sidebar-shadow);
 }
 
 @media (min-width: 768px) {
@@ -125,6 +125,10 @@ body.user-shell {
 .user-sidebar .nav-item.active > .nav-link,
 .user-sidebar .nav-item .nav-link:hover {
     background: rgba(255, 255, 255, .12);
+}
+
+.user-sidebar .nav-item .nav-link > i {
+    color: inherit;
 }
 
 .user-shell .topbar {

@@ -51,8 +51,7 @@ class ItSupportRequest extends Model
         return match ($this->status) {
             'pending' => 'Chờ tiếp nhận',
             'processing' => 'Đang xử lý',
-            'resolved' => 'Đã hoàn thành',
-            'closed' => 'Đã đóng',
+            'resolved', 'closed' => 'Đã xử lý',
             default => 'Chưa rõ',
         };
     }

@@ -1,0 +1,3 @@
+[Fri Sep 25 10:19:28.585084 2026] [authz_core:error] [pid 22636:tid 2008] [client 127.0.0.1:54190] AH01630: client denied by server configuration: D:/xampp/phpMyAdmin/
+[Fri Sep 25 10:19:28.616082 2026] [authz_core:error] [pid 22636:tid 2008] [client 127.0.0.1:54190] AH01630: client denied by server configuration: D:/xampp/php/php-cgi.exe
+[Fri Sep 25 10:19:28.617082 2026] [authz_core:error] [pid 22636:tid 2008] [client 127.0.0.1:54190] AH01630: client denied by server configuration: D:/hotrobieumau/output/apache-direct-http80-validation-20260925/public/server-status

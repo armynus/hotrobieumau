@@ -12,7 +12,8 @@ use App\Http\Controllers\Admin\AdminPositionController;
 use App\Http\Controllers\Admin\AdminTransactionOfficeController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\SupportFormController;
-use App\Http\Controllers\Admin\AdminMergerDataController;
+use App\Http\Controllers\Admin\GeographyController;
+use App\Http\Controllers\User\GeographyLookupController;
 
 use App\Http\Controllers\Auth\LoginAdminController;
 use App\Http\Controllers\Auth\LoginUserController;
@@ -66,8 +67,16 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('admin/transaction-offices/update', [AdminTransactionOfficeController::class, 'update'])->name('admin_transaction_offices_update');
 
     // Merger Data Routes
-    Route::get('admin/merger-data/import', [AdminMergerDataController::class, 'importView'])->name('admin_merger_data_import_view');
-    Route::post('admin/merger-data/import', [AdminMergerDataController::class, 'import'])->name('admin_merger_data_import');
+    Route::prefix('admin/geography')->name('admin.geography.')->group(function () {
+        Route::get('/', [GeographyController::class, 'index'])->name('index');
+        Route::post('import', [GeographyController::class, 'import'])->middleware('throttle:6,1')->name('import');
+        Route::get('notes', [GeographyController::class, 'notes'])->name('notes');
+        Route::get('source', [GeographyController::class, 'source'])->name('source');
+        Route::get('records/{record}', [GeographyController::class, 'edit'])->whereNumber('record')->name('edit');
+        Route::post('records/{record}', [GeographyController::class, 'update'])->whereNumber('record')->name('update');
+    });
+    Route::get('admin/merger-data/import', fn () => redirect()->route('admin.geography.index'))->name('admin_merger_data_import_view');
+    Route::post('admin/merger-data/import', [GeographyController::class, 'import'])->middleware('throttle:6,1')->name('admin_merger_data_import');
 
     Route::get('admin/list_staff', [AdminUserController::class, 'index'])->name('admin_list_staff');
     Route::get('admin/list_staff/data', [AdminUserController::class, 'data'])->name('admin_list_staff_data');
@@ -165,7 +174,10 @@ Route::group(['middleware'=> ['tenant']], function(){
     Route::get('scan_qr_code', [ScanQRCodeController::class, 'index'])->name('scan_qr_code');
 
     // Search old provinces, districts, wards
-    Route::get('merger_lookup', [MergerLookupController::class, 'index'])->name('merger_lookup');
+    Route::get('merger_lookup', [GeographyLookupController::class, 'index'])->name('merger_lookup');
+    Route::get('merger_lookup/legacy', fn () => redirect()->route('merger_lookup'))->name('merger_lookup.legacy');
+    Route::get('merger_lookup/options', [GeographyLookupController::class, 'options'])->name('geography.options');
+    Route::get('merger_lookup/detail', [GeographyLookupController::class, 'detail'])->name('geography.detail');
     Route::get('merger_lookup/old_province_search', [MergerLookupController::class, 'old_provinces_search'])->name('old_provinces.search');
     Route::get('merger_lookup/old_province_detail', [MergerLookupController::class, 'old_provinces_detail'])->name('old_provinces.detail');
     Route::get('merger_lookup/old_district_search', [MergerLookupController::class, 'old_districts_search'])->name('old_districts.search');

@@ -1,0 +1,28 @@
+{
+  "originalFilesUnchanged": true,
+  "summaryFormulaValues": [
+    3321,
+    10602,
+    308,
+    6,
+    10288,
+    102,
+    1104
+  ],
+  "stats": {
+    "inputRows": 10602,
+    "newUnits": 3321,
+    "newProvinces": 34,
+    "oldUnits": 10040,
+    "splitCandidates": 471,
+    "verifiedLinks": 308,
+    "rejectedLinks": 6,
+    "pendingLinks": 10288,
+    "officialNewUnits": 102,
+    "expectedDongThapLinks": 308,
+    "unresolvedDongThapMembers": 0,
+    "issues": 1130,
+    "pendingIssues": 1104
+  },
+  "outputSha256": "0d2cbc828bd4cd54f2b1fd6eddaa8e9b0155365dc9445068de5704e45ee0f8c0"
+}

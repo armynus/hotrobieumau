@@ -3,16 +3,13 @@
    
 @section('content')
 <div class="container-fluid">
-    <!-- Page Heading -->
-    <h1 class="h3 mb-2 text-gray-800">Danh Sách Trường Dữ Liệu</h1>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <div><h1 class="h3 mb-1 text-gray-800">Trường dữ liệu</h1><p class="mb-0 text-muted small">Sắp xếp nhóm nội dung và cấu hình các trường điền biểu mẫu.</p></div>
+        <button type="button" class="btn btn-primary mt-3 mt-sm-0" data-toggle="modal" data-target="#addFormFieldModal"><i class="fas fa-plus mr-1" aria-hidden="true"></i> Thêm trường dữ liệu</button>
+    </div>
     
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
-        <div class="mt-3 text-center">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addFormFieldModal" >
-                Thêm Trường Dữ Liệu
-            </button>
-        </div>
         <!-- Modal -->   
         @include('admin.forms.partials.add_form_field_modal')
         @include('admin.forms.partials.edit_form_field_modal')
@@ -53,7 +50,7 @@
                     <tbody>
                         @foreach($list_fields as $key => $form)
                         <tr>
-                            <td>{{$key}}</td>
+                            <td>{{$key + 1}}</td>
                             <td>{{$form->field_name}}</td>
                             <td>{{$form->field_code}}</td>
                             <td><span class="badge badge-light border px-2 py-1">{{ $content_groups[$form->content_group] ?? 'Nội dung giao dịch / yêu cầu' }}</span></td>

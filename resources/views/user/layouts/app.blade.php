@@ -6,6 +6,7 @@
     <title>@yield('title', 'Agribank')</title>
     <!-- Head dùng chung -->
     @include('head_template')
+    <link rel="stylesheet" href="{{ asset('css/shared/shell-theme.css') }}?v={{ filemtime(public_path('css/shared/shell-theme.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/user/user-experience.css') }}?v={{ filemtime(public_path('css/user/user-experience.css')) }}">
     <!-- CSS dùng chung -->
     {{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}

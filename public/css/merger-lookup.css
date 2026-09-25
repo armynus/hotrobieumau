@@ -1,0 +1,78 @@
+.merger-lookup { --merger-brand: #a61940; max-width: 1240px; color: #25364b; padding-left: 24px; padding-right: 24px; }
+.merger-heading { display: flex; align-items: center; gap: 16px; margin: 4px 0 26px; }
+.merger-heading-icon { display: grid; place-items: center; flex: 0 0 54px; height: 54px; border-radius: 15px; background: #f7e8ed; color: var(--merger-brand); font-size: 1.5rem; }
+.merger-heading h1 { margin: 0 0 5px; font-size: 1.8rem; font-weight: 700; letter-spacing: -.025em; }
+.merger-heading p { margin: 0; color: #617086; font-size: .95rem; }
+.merger-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.merger-tabs { display: inline-flex; flex-wrap: nowrap; gap: 5px; padding: 5px; border: 1px solid #e1d9df; border-radius: 12px; background: #fff; }
+.merger-tabs .nav-link { padding: 11px 18px; border-radius: 8px; color: #58677c; font-weight: 600; font-size: 1rem; white-space: nowrap; }
+.merger-tabs .nav-link:hover { background: #faf0f3; color: var(--merger-brand); }
+.merger-tabs .nav-link.active { color: #fff; background: var(--merger-brand); box-shadow: 0 3px 8px #a6194020; }
+.merger-reset { flex-shrink: 0; padding: 10px 14px; border: 1px solid #cbd4e0; border-radius: 9px; color: #43546b; background: #fff; font-size: .9rem; font-weight: 600; }
+.merger-reset:hover { color: var(--merger-brand); border-color: #c77d92; background: #fff7fa; }
+.merger-lookup .merger-reset:focus-visible, .merger-lookup .nav-link:focus-visible { outline: 3px solid #a6194055; outline-offset: 3px; }
+.merger-filters { padding: 22px 22px 16px; border: 1px solid #dbe3ef; border-top: 3px solid #c3cede; border-radius: 13px; background: #fff; box-shadow: 0 5px 18px #25364b05; }
+.merger-filters .form-row { margin-left: -8px; margin-right: -8px; }
+.merger-filters .form-group { padding-left: 8px; padding-right: 8px; margin-bottom: 14px; }
+.merger-filters label { display: flex; align-items: center; gap: 7px; min-height: 24px; font-size: .9rem; font-weight: 700; margin-bottom: 10px; }
+.merger-step { display: inline-grid; place-items: center; flex: 0 0 22px; height: 22px; border-radius: 6px; color: #5b6780; background: #edf1f7; font-size: .75rem; }
+.merger-lookup .form-control { min-height: 46px; height: auto; background: #fff; border-color: #b8c5d6; border-radius: 8px; font-size: 1rem; color: #26394e; }
+.merger-lookup .form-control:disabled { background: #f2f5f9; border-color: #e0e6ef; opacity: 1; }
+.merger-lookup .form-control::placeholder { color: #69788c; }
+.merger-lookup .form-control:focus { border-color: var(--merger-brand); box-shadow: 0 0 0 .18rem #ab19421c; }
+.merger-filter-help { margin: 0; color: #617086; font-size: .85rem; }
+.merger-results-title { margin: 24px 0 16px; font-size: 1.1rem; font-weight: 700; }
+.merger-results-title i { color: var(--merger-brand); }
+.merger-lookup .merger-card { border: 1px solid #d5deea; background: #fff; border-radius: 12px; margin-bottom: 18px; overflow: hidden; box-shadow: 0 4px 14px #26394e04; }
+.merger-card-head { padding: 18px 20px; background: #f0f6fb; border-bottom: 1px solid #dce7f0; }
+.merger-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.merger-lookup .merger-card h3 { font-size: 1.15rem; margin: 0; color: #26394e; font-weight: 700; }
+.merger-card-head .merger-context { margin-top: 5px; }
+.merger-code { color: #345879; background: #fff; border: 1px solid #ccdae8; border-radius: 6px; padding: 3px 8px; font-size: .8rem; white-space: nowrap; }
+.merger-card-body { padding: 17px 20px 20px; }
+.merger-members-heading { margin-bottom: 12px; color: #485a71; font-size: .9rem; font-weight: 600; }
+.merger-lookup .merger-members { display: grid; grid-template-columns: 1fr; gap: 10px; padding: 0; margin: 0; list-style: none; }
+.merger-members > li { padding: 11px 13px; border: 1px solid #e5eaf1; border-radius: 8px; background: #fafbfd; min-width: 0; overflow-wrap: anywhere; }
+.merger-members > li.is-selected { border-color: #deb0bf; border-left: 3px solid var(--merger-brand); background: #fff4f7; }
+.merger-member-title { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.merger-selected-label { font-size: .73rem; font-weight: 600; color: #9b2143; background: #f6dfe6; border-radius: 4px; padding: 2px 6px; }
+.merger-lookup .merger-context { color: #617086; font-size: .85rem; display: block; line-height: 1.6; }
+.merger-members .merger-context { margin-top: 3px; }
+.merger-lookup .merger-note { color: #805517; font-size: .9rem; line-height: 1.65; }
+.merger-members .merger-note { margin-top: 4px; }
+.merger-scope { display: inline-block; padding: 3px 9px; border: 1px solid #e8d3a7; border-radius: 6px; background: #fff8e7; color: #805517; font-size: .8rem; margin-top: 10px; }
+.merger-split-note { padding: 13px 16px; border: 1px solid #e8d3a7; border-left: 3px solid #c99131; border-radius: 9px; background: #fff8e9; margin: 0 0 15px; font-weight: 600; }
+.merger-province-card .merger-card-head { background: #edf6f3; border-color: #d6e6e0; }
+.merger-eyebrow { display: block; font-size: .8rem; color: #4c6b61; font-weight: 600; margin-bottom: 6px; }
+.merger-province-names { display: flex; flex-wrap: wrap; gap: 7px; }
+.merger-province-names > span, .merger-province-names > strong { padding: 5px 9px; border: 1px solid #dce5e1; border-radius: 6px; background: #f5f9f7; font-size: .9rem; }
+.merger-province-names > strong { background: #e8f2ed; color: #315e4c; border-color: #bad3c6; }
+.merger-empty { display: flex; align-items: center; gap: 15px; padding: 25px; margin-top: 20px; border: 1px dashed #c9d4e2; border-radius: 12px; color: #627189; background: #f9fbfe; }
+.merger-empty > i { font-size: 1.5rem; color: #899bb2; }
+.merger-empty strong { display: block; color: #485a71; font-size: 1rem; margin-bottom: 4px; }
+.merger-empty span { display: block; font-size: .9rem; }
+.merger-ward-hint { margin-top: 0; font-size: .95rem; }
+.merger-status:empty { display: none; }
+.merger-status:not(:empty) { padding: 10px 14px; margin-top: 15px; background: #fff8e9; border-radius: 8px; color: #805517; }
+.merger-lookup [hidden] { display: none !important; }
+#post_results:not(:empty) { margin-top: 22px; }
+.merger-source-note { display: flex; align-items: baseline; color: #617086; font-size: .8rem; margin: 20px 0 0; line-height: 1.6; }
+.merger-lookup .ui-autocomplete { max-height: 290px; overflow-y: auto; overflow-x: hidden; z-index: 1050; padding: 5px; border: 1px solid #ccd5e2; border-radius: 9px; background: #fff; color: #26394e; box-shadow: 0 8px 24px #25364b1c; font: inherit; }
+.merger-lookup .ui-menu-item-wrapper { padding: 9px 11px; border: 1px solid transparent; border-radius: 5px; }
+.merger-lookup .ui-menu-item-wrapper.ui-state-active { margin: 0; border-color: #f1d6df; background: #faeaf0; color: #91213f; }
+@media (min-width: 1200px) { .merger-lookup .merger-members { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 767px) {
+    .merger-lookup { padding-left: 16px; padding-right: 16px; }
+    .merger-heading h1 { font-size: 1.5rem; }
+    .merger-toolbar { align-items: flex-start; flex-wrap: wrap; }
+    .merger-filters { padding: 18px 16px 14px; }
+    .merger-heading { gap: 12px; margin-bottom: 20px; }
+    .merger-heading-icon { flex-basis: 46px; height: 46px; }
+    .merger-tabs { flex: 1 1 100%; }
+    .merger-tabs .nav-item { flex: 1; text-align: center; }
+    .merger-tabs .nav-link { padding: 10px 8px; font-size: .9rem; }
+    .merger-reset { margin-left: auto; }
+    .merger-empty { padding: 20px 16px; }
+    .merger-card-head, .merger-card-body { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .merger-lookup .fade { transition: none; } }
