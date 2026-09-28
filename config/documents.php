@@ -19,6 +19,14 @@ return [
         'ttl_hours' => (int) env('DOCUMENT_EXPORT_TTL_HOURS', 24),
     ],
 
+    'review' => [
+        'node_binary' => env('DOCUMENT_REVIEW_NODE_BINARY'),
+        'models_path' => env('DOCUMENT_REVIEW_MODELS_PATH', storage_path('app/private/ocr-models')),
+        'max_pages' => (int) env('DOCUMENT_REVIEW_MAX_PAGES', 2),
+        'dpi' => (int) env('DOCUMENT_REVIEW_DPI', 220),
+        'timeout_seconds' => (int) env('DOCUMENT_REVIEW_TIMEOUT_SECONDS', 180),
+    ],
+
     'metadata_extraction' => [
         // Để trống để tự tìm trong PATH, hoặc truyền đường dẫn tuyệt đối trên máy chủ.
         'pdftotext_binary' => env('DOCUMENT_PDFTOTEXT_BINARY'),
