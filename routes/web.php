@@ -99,6 +99,7 @@ Route::group(['middleware' => ['admin']], function () {
 
     Route::get('admin/forms', [AdminController::class, 'admin_forms'])->name('admin_forms');
     Route::post('support_forms_create', [SupportFormController::class, 'support_forms_create'])->name('support_forms_create');
+    Route::post('support_forms_parse_tags', [SupportFormController::class, 'parse_tags'])->name('support_forms_parse_tags');
     Route::get('/support_forms/{id}/edit', [SupportFormController::class, 'editform']);
     // Route::post('/support_forms/{id}/update', [SupportFormController::class, 'update']);
     Route::post('/support_forms/{id}/delete', [SupportFormController::class, 'destroy']);

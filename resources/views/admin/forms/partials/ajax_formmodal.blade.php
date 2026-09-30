@@ -326,5 +326,75 @@ $(document).ready(function(){
             }
         });
     });
+
+    // Handle auto-detecting tags when file is selected
+    $('input[type="file"][name="form_file"]').on('change', function() {
+        let fileInput = this;
+        if (fileInput.files.length === 0) return;
+        
+        let formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        
+        // Find the closest modal to know if it's add or edit form
+        let $modal = $(this).closest('.modal');
+        
+        // Optional: show some loading state
+        swal({
+            title: "Đang phân tích file...",
+            text: "Vui lòng đợi trong khi hệ thống quét các trường dữ liệu.",
+            icon: "info",
+            buttons: false,
+            closeOnClickOutside: false,
+        });
+
+        $.ajax({
+            url: '{{ route("support_forms_parse_tags") }}',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                swal.close();
+                if (response.status && response.data) {
+                    let detectedFields = response.data;
+                    let matchCount = 0;
+                    
+                    // Do NOT uncheck existing fields, just append
+                    
+                    // Check matched fields
+                    $modal.find("input[name='selected_fields[]']").each(function() {
+                        let fieldVal = $(this).val();
+                        if (detectedFields.includes(fieldVal)) {
+                            if (!$(this).prop("checked")) {
+                                $(this).prop("checked", true);
+                                matchCount++;
+                            }
+                        }
+                    });
+                    
+                    if (matchCount > 0) {
+                        swal("Thành công!", "Đã tự động chọn thêm " + matchCount + " trường dữ liệu từ file.", "success");
+                    } else if (detectedFields.length > 0) {
+                        swal("Thông báo", "Các trường trong file đều đã được chọn sẵn.", "info");
+                    } else {
+                        swal("Thông báo", "Không tìm thấy trường dữ liệu nào khớp với hệ thống.", "info");
+                    }
+                } else if (response.message) {
+                    swal("Thông báo", response.message, "info");
+                }
+            },
+            error: function(xhr) {
+                swal.close();
+                let msg = "Không thể phân tích file Word.";
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                swal("Lỗi!", msg, "warning");
+            }
+        });
+    });
 });
 </script>

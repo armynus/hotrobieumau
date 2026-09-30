@@ -50,7 +50,18 @@
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4">
                 <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Trạng thái đọc của bạn</h6></div>
-                <div class="card-body"><div class="chart-pie pt-4 pb-2"><canvas id="readStatusChart"></canvas></div><div class="mt-4 text-center small"><span class="mr-2"><i class="fas fa-circle text-success"></i> Đã đọc</span><span><i class="fas fa-circle text-warning"></i> Chưa đọc</span></div></div>
+                <div class="card-body">
+                    @if($readStatusEligibleTotal > 0)
+                    <div class="chart-pie pt-4 pb-2"><canvas id="readStatusChart"></canvas></div>
+                    <div class="mt-4 text-center small"><span class="mr-2"><i class="fas fa-circle text-success"></i> Đã đọc</span><span><i class="fas fa-circle text-warning"></i> Chưa đọc</span></div>
+                    @else
+                    <div class="py-5 text-center text-muted" role="status">
+                        <i class="fas fa-inbox fa-2x mb-3 d-block"></i>
+                        Chưa có văn bản mới thuộc phạm vi thống kê trạng thái đọc.
+                        <div class="small mt-2">Văn bản trong kho lưu trữ cũ không được tính vào thống kê này.</div>
+                    </div>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
@@ -122,10 +133,12 @@ new Chart(document.getElementById('monthlyDocumentsChart'), {
     }
 });
 
+@if($readStatusEligibleTotal > 0)
 new Chart(document.getElementById('readStatusChart'), {
     type: 'doughnut',
     data: { labels: ['Đã đọc', 'Chưa đọc'], datasets: [{ data: [@json($readTotal), @json($unreadTotal)], backgroundColor: ['#1cc88a', '#f6c23e'], hoverBackgroundColor: ['#17a673', '#dda20a'], borderWidth: 0 }] },
     options: { maintainAspectRatio: false, legend: { display: false }, cutoutPercentage: 72, tooltips: { callbacks: { label: function(item, data) { return ' ' + data.labels[item.index] + ': ' + data.datasets[0].data[item.index]; } } } }
 });
+@endif
 </script>
 @endpush

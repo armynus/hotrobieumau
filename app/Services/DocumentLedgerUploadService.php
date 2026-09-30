@@ -38,9 +38,13 @@ class DocumentLedgerUploadService
                 }
             });
         $total = (clone $query)->count();
-        $entries = $query->orderBy('sequence_number')->orderBy('id')->limit(50)->get();
+        $exactTotal = (clone $query)->where('code_key', $code)->count();
+        // Keep exact symbol matches in the limited result set when a number-only
+        // lookup also finds many other documents with the same number.
+        $entries = $query->orderByRaw('CASE WHEN code_key = ? THEN 0 ELSE 1 END', [$code])
+            ->orderBy('sequence_number')->orderBy('id')->limit(50)->get();
 
-        return ['total' => $total, 'matches' => $entries->map(function ($entry) {
+        return ['total' => $total, 'matches' => $entries->map(function ($entry) use ($code) {
             $data = $entry->only(DocumentLedgerEntry::METADATA_FIELDS);
             foreach (['issued_date', 'received_date', 'forwarded_date'] as $field) {
                 $data[$field] = $entry->{$field}?->format('Y-m-d');
@@ -53,9 +57,10 @@ class DocumentLedgerUploadService
                 'id' => $entry->id, 'number' => $entry->number, 'year' => $entry->year, 'book' => $entry->book,
                 'source_sheet' => $entry->source_sheet, 'source_row' => $entry->source_row,
                 'registered_date' => $entry->registered_date?->format('d/m/Y'),
+                'code_match' => $entry->code_key === $code,
                 'data' => $data,
             ];
-        })->all()];
+        })->all(), 'exact_total' => $exactTotal];
     }
 
 }

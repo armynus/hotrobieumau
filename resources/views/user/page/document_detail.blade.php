@@ -183,6 +183,7 @@
 <script>
 $(document).ready(function() {
     const docId = @json($id);
+    const appTimezone = @json(config('app.timezone'));
     let loadedDocument = null;
     $('#editDocumentModal').on('show.bs.modal', function() {
         if (loadedDocument) populateEditForm(loadedDocument);
@@ -200,9 +201,29 @@ $(document).ready(function() {
 
     function formatDate(value, includeTime) {
         if (!value) return '---';
-        const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/);
+        const text = String(value);
+        const match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
         if (!match) return value;
-        return match[3] + '/' + match[2] + '/' + match[1] + (includeTime && match[4] ? ' ' + match[4] + ':' + match[5] : '');
+        let result = match[3] + '/' + match[2] + '/' + match[1];
+        if (!includeTime || !/[T ]\d{2}:\d{2}/.test(text)) return result;
+
+        const instant = new Date(text);
+        if (Number.isNaN(instant.getTime())) return result;
+
+        try {
+            const parts = new Intl.DateTimeFormat('en-GB', {
+                timeZone: appTimezone,
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+            }).formatToParts(instant).reduce(function(values, part) {
+                values[part.type] = part.value;
+                return values;
+            }, {});
+            return parts.day + '/' + parts.month + '/' + parts.year + ' ' + parts.hour + ':' + parts.minute;
+        } catch (error) {
+            const time = text.match(/[T ](\d{2}:\d{2})/);
+            return result + (time ? ' ' + time[1] : '');
+        }
     }
 
     function visibilityLabel(doc) {

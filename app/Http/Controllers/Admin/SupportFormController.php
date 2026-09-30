@@ -180,6 +180,63 @@ class SupportFormController extends Controller
     }
 
 
+    public function parse_tags(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:doc,docx|max:5120',
+        ]);
+
+        try {
+            $extension = strtolower($request->file('file')->getClientOriginalExtension());
+            if ($extension !== 'docx') {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Tính năng nhận diện tự động chỉ hỗ trợ file .docx. Vui lòng chọn trường dữ liệu thủ công.'
+                ]);
+            }
+
+            $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($request->file('file')->getPathname());
+            $variables = $templateProcessor->getVariables();
+            $variables = array_values(array_unique($variables));
+
+            $mappedFields = $variables;
+            
+            // Typical mappings based on DocumentService
+            $map = [
+                'Check_NAM' => 'gender', 'Check_NU' => 'gender',
+                'ccvc' => 'NgheNghiepKH', 'cabd' => 'NgheNghiepKH', 'gvbs' => 'NgheNghiepKH', 'ks' => 'NgheNghiepKH',
+                'cn' => 'NgheNghiepKH', 'nd' => 'NgheNghiepKH', 'lsncm' => 'NgheNghiepKH', 'kdtd' => 'NgheNghiepKH',
+                'hdvtvhk' => 'NgheNghiepKH', 'ctgd' => 'NgheNghiepKH', 'hssv' => 'NgheNghiepKH', 'nt' => 'NgheNghiepKH', 'nnkhac' => 'NgheNghiepKH',
+                'ChucVu_CTGD' => 'ChucVuKH', 'ChucVu_CBNV' => 'ChucVuKH', 'ChucVu_CTTD' => 'ChucVuKH', 'ChucVu_QLCT' => 'ChucVuKH', 'ChucVu_Khac' => 'ChucVuKH',
+                'Check_TheND' => 'LoaiThe', 'Check_TheNapas' => 'LoaiThe', 'Check_TheJCB' => 'LoaiThe', 'Check_TheTH' => 'LoaiThe', 'Check_TheVS' => 'LoaiThe', 'Check_TheMT' => 'LoaiThe', 'Check_TheKHAC' => 'LoaiThe',
+                'Check_VND' => 'ccycd', 'Check_USD' => 'ccycd', 'Check_EUR' => 'ccycd', 'Check_TienKhac' => 'ccycd',
+                'LoaiTK_Auto' => 'SoTKTT', 'LoaiTK_Chon' => 'SoTKTT', 'LoaiTK_ChDung' => 'SoTKTT',
+                'Check_Vang' => 'HangThe', 'Check_Chuan' => 'HangThe',
+                'Check_Nuoc' => 'ThuTuDong', 'Check_Dien' => 'ThuTuDong', 'Check_VienT' => 'ThuTuDong', 'Check_HocP' => 'ThuTuDong', 'Check_BH' => 'ThuTuDong',
+                'MB_APLUS' => 'MobileBanking', 'MB_EC' => 'MobileBanking', 'MB_SMS' => 'MobileBanking', 'MB_VDT' => 'MobileBanking', 'MB_BPLUS' => 'MobileBanking',
+                'EBANK_Mobile' => 'RetaileBanking', 'EBANK_Internet' => 'RetaileBanking', 'Goi_PTC' => 'RetaileBanking', 'Goi_TC' => 'RetaileBanking', 'Goi_SMS' => 'RetaileBanking', 'Goi_Soft' => 'RetaileBanking', 'Goi_Token' => 'RetaileBanking',
+                'DV_VV' => 'DichVuKhac', 'DV_TK' => 'DichVuKhac', 'DV_KH' => 'DichVuKhac', 'DV_CTNN' => 'DichVuKhac', 'DV_MBNT' => 'DichVuKhac', 'DV_BH' => 'DichVuKhac', 'DV_KHAC' => 'DichVuKhac',
+            ];
+            foreach($variables as $var) {
+                if (isset($map[$var])) {
+                    $mappedFields[] = $map[$var];
+                }
+            }
+            $mappedFields = array_values(array_unique($mappedFields));
+
+            return response()->json([
+                'status'  => true,
+                'data'    => $mappedFields,
+                'message' => 'Đã phân tích các trường từ file Word thành công!'
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Không thể đọc nội dung file: ' . $e->getMessage()
+            ], 400);
+        }
+    }
+
     public function destroy(int $id)
     {
         try {

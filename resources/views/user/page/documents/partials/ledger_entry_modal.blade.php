@@ -28,7 +28,7 @@
                         </div>
                         <div class="form-group col-md-2"><label for="entryYear">Năm sổ <span class="text-danger">*</span></label><input id="entryYear" type="number" class="form-control" name="year" value="{{ $year }}" min="2000" max="2100" required></div>
                         <div class="form-group col-md-3"><label for="entryNumber" id="entryNumberLabel">Số đến</label><input id="entryNumber" class="form-control" name="number" maxlength="50" value="{{ $book === 'incoming' ? ($nextNumber ?? '') : '' }}" placeholder="Đang lấy số tiếp theo…"></div>
-                        <div class="form-group col-md-3"><label for="entryRegisteredDate"><span id="entryRegisteredLabel">Ngày tháng đến</span> <span class="text-danger">*</span></label><input id="entryRegisteredDate" class="form-control ledger-date" name="registered_date" placeholder="dd/mm/yyyy" value="{{ now()->format('Y-m-d') }}" required></div>
+                        <div class="form-group col-md-3"><label for="entryRegisteredDate"><span id="entryRegisteredLabel">Ngày tháng đến</span> <span class="text-danger">*</span></label><input id="entryRegisteredDate" class="form-control ledger-date" name="registered_date" placeholder="dd/mm/yyyy" value="{{ now()->format('Y-m-d') }}" data-today="{{ now()->format('Y-m-d') }}" required></div>
                     </div>
                     <div class="form-group mb-2"><label for="entryCode">Số &amp; ký hiệu văn bản <span class="text-danger">*</span></label>
                         <div class="dropdown d-inline-block ml-2 ledger-history-dropdown">

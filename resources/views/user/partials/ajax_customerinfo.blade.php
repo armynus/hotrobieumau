@@ -1,5 +1,24 @@
 
 <script>
+    window.userDateToInputValue = window.userDateToInputValue || function (value, timeZone) {
+        if (!value) return '';
+        const text = String(value).trim();
+        const dateOnly = text.match(/^(\d{4}-\d{2}-\d{2})$/);
+        if (dateOnly) return dateOnly[1];
+        const instant = new Date(text);
+        if (Number.isNaN(instant.getTime())) return '';
+        const parts = new Intl.DateTimeFormat('en-GB', {
+            timeZone: timeZone, year: 'numeric', month: '2-digit', day: '2-digit'
+        }).formatToParts(instant).reduce(function (result, part) {
+            result[part.type] = part.value;
+            return result;
+        }, {});
+        return parts.year + '-' + parts.month + '-' + parts.day;
+    };
+    window.userTodayDateInputValue = window.userTodayDateInputValue || function (timeZone) {
+        return window.userDateToInputValue(new Date(), timeZone);
+    };
+
     document.getElementById('pasteClipboardAddCusTomerBtn').addEventListener('click', function () {
         try {
             const fieldMapping = {
@@ -366,8 +385,7 @@
                 fields.forEach(field => {
                     if (dateFields.includes(field)) {
                         if (data.user[field]) {
-                            const isoDate = new Date(data.user[field]);
-                            const formattedDate = isoDate.toISOString().split('T')[0];
+                            const formattedDate = window.userDateToInputValue(data.user[field], @json(config('app.timezone')));
                             $('#' + field).val(formattedDate);
                         }
                     } else {
@@ -392,8 +410,7 @@
         const add_dateInput = document.getElementById('add_identity_date'); // Lấy thẻ input
 
         // Lấy ngày hiện tại
-        const today = new Date();
-        const maxDate = today.toISOString().split('T')[0]; // Chuyển sang định dạng yyyy-mm-dd
+        const maxDate = window.userTodayDateInputValue(@json(config('app.timezone')));
 
         // Gán ngày tối đa cho thẻ input
         birthday.setAttribute('max', maxDate);

@@ -77,14 +77,22 @@
     <script>
     $(function () {
         const currentAdminId = {{ Session::get('admin_id') ?? 'null' }};
+        const appTimezone = @json(config('app.timezone'));
         const textRenderer = $.fn.dataTable.render.text();
         function escapeText(value) {
             return $('<div>').text(value || '').html();
         }
         function formatDate(value, type) {
             if (type !== 'display' || !value) return value || '';
-            const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
-            return match ? match[3] + '/' + match[2] + '/' + match[1] : value;
+            const instant = new Date(value);
+            if (Number.isNaN(instant.getTime())) return value;
+            const parts = new Intl.DateTimeFormat('en-GB', {
+                timeZone: appTimezone, day: '2-digit', month: '2-digit', year: 'numeric'
+            }).formatToParts(instant).reduce(function (result, part) {
+                result[part.type] = part.value;
+                return result;
+            }, {});
+            return parts.day + '/' + parts.month + '/' + parts.year;
         }
 
         $('#dataTable').DataTable({

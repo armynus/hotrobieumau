@@ -420,9 +420,13 @@ class DocumentLedgerTest extends TestCase
         $lookup = app(\App\Services\DocumentLedgerUploadService::class);
         $result = $lookup->lookup($this->clerk(), 'incoming', 2026, '1');
         $this->assertSame(2, $result['total']);
+        $this->assertSame(0, $result['exact_total']);
         $this->assertNotSame($result['matches'][0]['id'], $result['matches'][1]['id']);
         $this->assertSame('2025-12-31', $result['matches'][0]['data']['issued_date']);
-        $this->assertSame(2, $lookup->lookup($this->clerk(), 'incoming', 2026, '21389-NHNo-KHCL')['total']);
+        $codeResult = $lookup->lookup($this->clerk(), 'incoming', 2026, '21389-NHNo-KHCL');
+        $this->assertSame(2, $codeResult['total']);
+        $this->assertSame(2, $codeResult['exact_total']);
+        $this->assertTrue($codeResult['matches'][0]['code_match']);
         $this->assertSame(0, $lookup->lookup($this->clerk(), 'incoming', 2025, '1')['total']);
         $this->assertSame(0, $lookup->lookup($this->clerk(), 'decision', 2026, '1')['total']);
         $other = $this->clerk();

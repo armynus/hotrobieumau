@@ -217,6 +217,7 @@ class DocumentPhaseFourTest extends TestCase
         $this->assertSame(1, $report['decisionTotal']);
         $this->assertSame(1, $report['unclassifiedTotal']);
         $this->assertSame(5, $report['visibleTotal']);
+        $this->assertSame(4, $report['readStatusEligibleTotal']);
         $this->assertSame(1, $report['readTotal']);
         $this->assertSame(3, $report['unreadTotal']);
         $this->assertSame(3, $report['yearTotal']);
@@ -227,6 +228,23 @@ class DocumentPhaseFourTest extends TestCase
         $monthlyQuery = collect($queries)->first(fn (array $query) => str_contains($query['query'], 'report_month'));
         $this->assertStringContainsString('"issued_date" >= ?', $monthlyQuery['query']);
         $this->assertStringContainsString('"issued_date" < ?', $monthlyQuery['query']);
+    }
+
+    public function test_report_read_status_scope_is_empty_when_only_archived_documents_are_visible(): void
+    {
+        $archive = $this->document();
+        DB::table('document_logs')->insert([
+            'document_id' => $archive, 'user_id' => 1, 'action' => 'archive_imported',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $user = User::with(['branch', 'position'])->findOrFail(1);
+
+        $report = app(DocumentReportService::class)->forUser($user, 2026);
+
+        $this->assertSame(1, $report['visibleTotal']);
+        $this->assertSame(0, $report['readStatusEligibleTotal']);
+        $this->assertSame(0, $report['readTotal']);
+        $this->assertSame(0, $report['unreadTotal']);
     }
 
     public function test_query_index_migration_adds_indexes_matching_the_read_paths(): void

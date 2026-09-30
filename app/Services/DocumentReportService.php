@@ -112,6 +112,7 @@ class DocumentReportService
             'decisionTotal' => (int) ($system?->decision_total ?? 0),
             'unclassifiedTotal' => (int) ($system?->unclassified_total ?? 0),
             'visibleTotal' => $visibleTotal,
+            'readStatusEligibleTotal' => $readStatusTotal,
             'readTotal' => $readTotal,
             'unreadTotal' => max(0, $readStatusTotal - $readTotal),
             'yearTotal' => array_sum($monthlyCounts),

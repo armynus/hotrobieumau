@@ -9,6 +9,7 @@ use App\Models\Document;
 use App\Models\User;
 use App\Services\DocumentQueryService;
 use App\Services\DocumentService;
+use App\Support\DocumentCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -200,10 +201,30 @@ class DocumentApiController extends Controller
             'to_department_ids.*' => 'integer|distinct',
             'to_branch_ids' => 'nullable|array',
             'to_branch_ids.*' => 'integer|distinct',
+            'allow_duplicate' => 'sometimes|boolean',
         ], [
             'issued_date.required' => 'Vui lòng nhập ngày, tháng văn bản.',
             'issued_date.date' => 'Ngày, tháng văn bản không hợp lệ.',
         ]);
+
+        if (! $request->boolean('allow_duplicate')) {
+            $documentCodeKey = DocumentCode::normalize($validated['document_code']);
+            $duplicate = Document::query()
+                ->where('managing_branch_id', $user->branch_id)
+                ->where('direction', $validated['direction'])
+                ->whereDate('issued_date', $validated['issued_date'])
+                ->whereNotNull('document_code')
+                ->get(['id', 'document_code'])
+                ->first(fn (Document $document) => DocumentCode::normalize($document->document_code) === $documentCodeKey);
+
+            if ($duplicate) {
+                return response()->json([
+                    'success' => false,
+                    'code' => 'duplicate_document',
+                    'message' => 'Trong kho chi nhánh đã có văn bản cùng loại, cùng số/ký hiệu và ngày ban hành. Kiểm tra danh sách trước khi đăng lại; nếu đây là bản khác, bạn có thể xác nhận để tiếp tục.',
+                ], 409);
+            }
+        }
 
         $recipients = app(\App\Services\DocumentRecipientService::class);
         $recipients->validateTargets($user, $validated['to_user_ids'] ?? [], $validated['to_department_ids'] ?? []);
@@ -315,9 +336,16 @@ class DocumentApiController extends Controller
             'transfers' => $this->trimInitialHistory($document, 'transfers'),
         ];
 
+        // These are calendar dates, not instants. Keep them as YYYY-MM-DD so
+        // JSON timezone conversion cannot move them to the previous day.
+        $documentData = $document->toArray();
+        foreach (['issued_date', 'received_date', 'forwarded_date'] as $dateField) {
+            $documentData[$dateField] = $document->{$dateField}?->format('Y-m-d');
+        }
+
         return response()->json([
             'success' => true,
-            'data' => $document,
+            'data' => $documentData,
             'history' => $history,
             'capabilities' => [
                 'can_edit' => $document->canBeEditedBy($user),

@@ -98,7 +98,8 @@ $(function () {
         if (mode !== 'edit') {
             $('#entryNumber').val($('#entryBook').val() === 'incoming' ? page.data('next-number') : '');
             if (mode === 'new') {
-                const today = flatpickr.formatDate(new Date(), 'Y-m-d');
+                // Use the app's calendar day rather than the browser timezone.
+                const today = $('#entryRegisteredDate').attr('data-today') || $('#entryRegisteredDate').val();
                 dates.forEach(picker => {
                     if (picker.element.name === 'registered_date' || picker.element.name === 'forwarded_date') {
                         picker.setDate(today);

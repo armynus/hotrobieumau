@@ -30,7 +30,7 @@
                     <div class="form-group col-md-8"><label for="uploadLedgerQuery">Số vào sổ hoặc đầy đủ số, ký hiệu văn bản</label><input id="uploadLedgerQuery" class="form-control" maxlength="255" placeholder="Ví dụ: 123 hoặc 123/NHNo.ĐT-TH" autocomplete="off"></div>
                     <div class="form-group col-md-2"><button type="button" id="uploadLedgerSearch" class="btn btn-outline-primary btn-block"><i class="fas fa-search mr-1"></i> Tra sổ</button></div>
                 </div>
-                <div id="uploadLedgerStatus" class="small text-muted" role="status">Nhập số để tự điền thông tin. Nếu trùng nhiều dòng, hãy chọn đúng văn bản trước khi tải file.</div>
+                <div id="uploadLedgerStatus" class="small text-muted" role="status">Chọn file hoặc nhập số, ký hiệu văn bản để tự đối chiếu sổ tương ứng. Nếu trùng nhiều dòng, hãy chọn đúng văn bản trước khi tải file.</div>
                 <div id="uploadLedgerChoices" class="d-none mt-2"><label for="uploadLedgerEntry">Chọn dòng trong sổ</label><select id="uploadLedgerEntry" class="form-control"></select></div>
                 <button type="button" id="uploadLedgerReset" class="btn btn-sm btn-link d-none mt-2">Bỏ chọn và nhập văn bản khác</button>
             </div>
@@ -263,8 +263,8 @@ $(document).ready(function() {
         if (!documentCode.prop('readonly') && (!documentCode.val().trim() || documentCode.val().trim() === autoFilledDocumentCode)) {
             documentCode.val(codeFromFileName);
             autoFilledDocumentCode = codeFromFileName;
-            documentCode.trigger('input');
         }
+        documentCode.trigger('input');
     });
     $('#documentUploadZone').on('dragenter dragover', function(e) { e.preventDefault(); $(this).addClass('is-dragging'); })
         .on('dragleave drop', function(e) { e.preventDefault(); $(this).removeClass('is-dragging'); })
@@ -285,16 +285,38 @@ $(document).ready(function() {
         }
         const button = $('#submitBtn');
         const original = button.html();
+        const allowDuplicate = button.data('allow-duplicate') === true;
+        button.removeData('allow-duplicate');
         button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang tải lên...');
-        $.ajax({ url: '/api/documents', type: 'POST', data: new FormData(this), contentType: false, processData: false })
+        const formData = new FormData(this);
+        if (allowDuplicate) formData.append('allow_duplicate', '1');
+        $.ajax({ url: '/api/documents', type: 'POST', data: formData, contentType: false, processData: false, timeout: 120000 })
             .done(function(response) {
                 resetRegisterForm();
                 Swal.fire({ icon: 'success', title: 'Thành công', text: response.message, confirmButtonText: 'Đăng tiếp ' + directionLabel })
                     .then(function() { $('[name="' + firstFieldName + '"]').trigger('focus'); });
             })
-            .fail(function(xhr) {
+            .fail(function(xhr, textStatus) {
+                if (xhr.responseJSON?.code === 'duplicate_document') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Có thể văn bản đã được đăng tải',
+                        text: xhr.responseJSON.message,
+                        showCancelButton: true,
+                        confirmButtonText: 'Vẫn đăng tải',
+                        cancelButtonText: 'Quay lại kiểm tra',
+                        reverseButtons: true
+                    }).then(function(result) {
+                        if (!result.isConfirmed) return;
+                        button.data('allow-duplicate', true);
+                        form.trigger('submit');
+                    });
+                    return;
+                }
                 const errors = xhr.responseJSON?.errors;
-                const message = errors ? Object.values(errors).flat().join('\n') : (xhr.responseJSON?.message || 'Không thể đăng tải văn bản.');
+                const message = textStatus === 'timeout'
+                    ? 'Máy chủ xử lý quá lâu nên đã dừng chờ. Hãy kiểm tra danh sách văn bản trước khi gửi lại để tránh đăng trùng.'
+                    : (errors ? Object.values(errors).flat().join('\n') : (xhr.responseJSON?.message || 'Không thể đăng tải văn bản.'));
                 Swal.fire('Lỗi', message, 'error');
             })
             .always(function() { button.prop('disabled', false).html(original); });

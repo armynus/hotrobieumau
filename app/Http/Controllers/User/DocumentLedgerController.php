@@ -95,21 +95,21 @@ class DocumentLedgerController extends Controller
         ]));
     }
 
-    public function register(Request $request, int $document, DocumentQueryService $queryService)
+    public function register(Request $request, int $document, DocumentQueryService $queryService, DocumentLedgerFormService $formService)
     {
         $clerk = $this->clerk();
         $request->validate(['operation' => 'required|in:register']);
         $document = $queryService->getDocumentsForUser($clerk)->findOrFail($document);
-        $entry = app(DocumentLedgerFormService::class)->save($clerk, $document, $request->all());
+        $entry = $formService->save($clerk, $document, $request->all());
 
-        return response()->json(['message' => 'Đã lưu thông tin vào sổ văn bản.', 'entry' => $entry]);
+        return response()->json(['message' => 'Đã lưu thông tin vào sổ văn bản.', 'entry' => $formService->entryData($entry)]);
     }
 
     public function create(Request $request, DocumentLedgerFormService $formService)
     {
         $entry = $formService->save($this->clerk(), null, $request->all());
 
-        return response()->json(['message' => 'Đã ghi sổ văn bản. Không tạo văn bản trong kho.', 'entry' => $entry], 201);
+        return response()->json(['message' => 'Đã ghi sổ văn bản. Không tạo văn bản trong kho.', 'entry' => $formService->entryData($entry)], 201);
     }
 
     public function update(Request $request, int $entry, DocumentLedgerFormService $formService)
@@ -118,7 +118,7 @@ class DocumentLedgerController extends Controller
         $entry = DocumentLedgerEntry::where('branch_id', $clerk->branch_id)->findOrFail($entry);
         $entry = $formService->save($clerk, null, $request->all(), $entry);
 
-        return response()->json(['message' => 'Đã cập nhật sổ. Thông tin kho văn bản không thay đổi.', 'entry' => $entry]);
+        return response()->json(['message' => 'Đã cập nhật sổ. Thông tin kho văn bản không thay đổi.', 'entry' => $formService->entryData($entry)]);
     }
 
     public function import(Request $request, DocumentLedgerReader $reader, DocumentLedgerImportService $importer)
