@@ -30,7 +30,7 @@
                     <div class="form-group col-md-8"><label for="uploadLedgerQuery">Số vào sổ hoặc đầy đủ số, ký hiệu văn bản</label><input id="uploadLedgerQuery" class="form-control" maxlength="255" placeholder="Ví dụ: 123 hoặc 123/NHNo.ĐT-TH" autocomplete="off"></div>
                     <div class="form-group col-md-2"><button type="button" id="uploadLedgerSearch" class="btn btn-outline-primary btn-block"><i class="fas fa-search mr-1"></i> Tra sổ</button></div>
                 </div>
-                <div id="uploadLedgerStatus" class="small text-muted" role="status">Chọn file hoặc nhập số, ký hiệu văn bản để tự đối chiếu sổ tương ứng. Nếu trùng nhiều dòng, hãy chọn đúng văn bản trước khi tải file.</div>
+                <div id="uploadLedgerStatus" class="small text-muted" role="status">Kéo thả file để tự đối chiếu với sổ văn bản, hoặc nhập thông tin tra cứu vào ô bên trên để lấy dữ liệu nhanh.</div>
                 <div id="uploadLedgerChoices" class="d-none mt-2"><label for="uploadLedgerEntry">Chọn dòng trong sổ</label><select id="uploadLedgerEntry" class="form-control"></select></div>
                 <button type="button" id="uploadLedgerReset" class="btn btn-sm btn-link d-none mt-2">Bỏ chọn và nhập văn bản khác</button>
             </div>
@@ -178,7 +178,7 @@
                         <input type="file" class="d-none" id="documentFiles" name="files[]" multiple>
                         <div id="selectedFileList" class="selected-file-list mt-3"></div>
                         <small class="form-text text-muted">Có thể chỉ nhập thông tin để lưu và xuất sổ văn bản đến/đi mà không cần đính kèm file.</small>
-                        <small class="form-text text-muted">Tên file đầu tiên sẽ tự điền vào Số, ký hiệu văn bản. Tối đa 50MB cho mỗi file.</small>
+                        <small class="form-text text-muted">Tên file đầu tiên sẽ tự điền vào Số, ký hiệu văn bản và đối chiếu với sổ nếu có. Tối đa 50MB cho mỗi file.</small>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-success btn-block btn-lg mb-4" id="submitBtn">
@@ -264,7 +264,9 @@ $(document).ready(function() {
             documentCode.val(codeFromFileName);
             autoFilledDocumentCode = codeFromFileName;
         }
-        documentCode.trigger('input');
+        if (codeFromFileName) {
+            $('#documentRegisterForm').trigger('document-register:file-lookup', [codeFromFileName]);
+        }
     });
     $('#documentUploadZone').on('dragenter dragover', function(e) { e.preventDefault(); $(this).addClass('is-dragging'); })
         .on('dragleave drop', function(e) { e.preventDefault(); $(this).removeClass('is-dragging'); })

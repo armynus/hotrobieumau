@@ -8,8 +8,8 @@
             <h1 class="h3 mb-1 text-gray-800">Chi tiết Văn bản</h1>
             <div class="small text-muted" id="documentSubTitle">Đang tải thông tin...</div>
         </div>
-        <a href="{{ route('documents_forward') }}" id="backToDocumentList" class="btn btn-sm btn-secondary shadow-sm mt-2 mt-sm-0">
-            <i class="fas fa-arrow-left fa-sm mr-1"></i> Quay lại danh sách
+        <a href="{{ request()->query('from') === 'incoming' ? route('documents_incoming') : route('documents_forward') }}" id="backToDocumentList" class="btn btn-sm btn-secondary shadow-sm mt-2 mt-sm-0">
+            <i class="fas fa-arrow-left fa-sm mr-1"></i> {{ request()->query('from') === 'incoming' ? 'Quay lại Văn bản đến' : 'Quay lại danh sách' }}
         </a>
     </div>
 

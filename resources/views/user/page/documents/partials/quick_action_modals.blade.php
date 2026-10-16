@@ -1,36 +1,62 @@
 <div class="modal fade" id="quickTransferModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable document-distribution-modal" role="document"><div class="modal-content">
         <form id="quickTransferForm">
             @csrf
-            <input type="hidden" name="target_type" id="quickTransferTargetType">
-            <div class="modal-header"><h5 class="modal-title" id="quickTransferModalTitle">Chuyển văn bản</h5><button type="button" class="close" data-dismiss="modal"><span>&times;</span></button></div>
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold text-primary" id="quickTransferModalTitle">
+                    <i class="fas fa-share-alt mr-2"></i>Chuyển tiếp văn bản
+                </h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
             <div class="modal-body">
-                <div class="form-group" id="quickTransferModeGroup">
-                    <label for="quickTransferMode">Chuyển đến</label>
-                    <select class="form-control" id="quickTransferMode">
-                        <option value="branch">Chi nhánh loại II</option>
-                        <option value="local">Ban giám đốc / phòng ban chi nhánh mình</option>
-                    </select>
-                </div>
-                <div class="form-group" id="quickBranchTransferGroup">
-                    <label>Chi nhánh loại II nhận văn bản <span class="text-danger">*</span></label>
-                    <div class="border rounded p-2 bg-white" style="max-height: 260px; overflow-y: auto;">
-                        <div class="custom-control custom-checkbox mb-2 border-bottom pb-2">
-                            <input type="checkbox" class="custom-control-input" id="quickCheckAllBranches">
-                            <label class="custom-control-label font-weight-bold text-primary" for="quickCheckAllBranches">-- Tất cả Chi nhánh loại II --</label>
-                        </div>
-                        @foreach($type2Branches as $branch)
-                        <div class="custom-control custom-checkbox mb-1">
-                            <input type="checkbox" class="custom-control-input quick-transfer-branch" name="to_branch_ids[]" id="quick_transfer_branch_{{ $branch->id }}" value="{{ $branch->id }}">
-                            <label class="custom-control-label" for="quick_transfer_branch_{{ $branch->id }}">{{ $branch->branch_name }}</label>
-                        </div>
-                        @endforeach
+                <div class="alert alert-light border mb-3 py-2 px-3 d-flex align-items-center justify-content-between" id="quickTransferDocInfo">
+                    <div>
+                        <span class="badge badge-primary mr-2" id="quickTransferDocDirection">VB đến</span>
+                        <strong id="quickTransferDocCode">-</strong>
+                        <div class="small text-muted text-truncate mt-1" id="quickTransferDocTitle" style="max-width: 650px;">-</div>
                     </div>
                 </div>
-                <div id="quickLocalTransferGroup">@include('user.page.documents.partials.local_recipients')</div>
-                <div class="form-group mb-0"><label>Ghi chú</label><textarea class="form-control" name="note" rows="3" maxlength="2000"></textarea></div>
+
+                <div class="distribution-recipients-wrapper">
+                    @include('user.page.documents.partials.local_recipients')
+                </div>
+
+                <div class="distribution-branches mt-2" id="quickTransferBranchSection">
+                    <div class="font-weight-bold text-primary mb-2">
+                        <i class="fas fa-building mr-1" aria-hidden="true"></i> Chi nhánh loại II nhận văn bản
+                    </div>
+                    <small class="d-block text-muted mb-2">Gửi cho văn thư chi nhánh nhận để chuyển tiếp người/phòng ban trong chi nhánh đó.</small>
+                    <div class="border rounded p-3 bg-light" style="max-height:220px;overflow-y:auto;">
+                        @if(isset($type2Branches) && $type2Branches->isNotEmpty())
+                            <label class="d-flex align-items-center border-bottom pb-2">
+                                <input type="checkbox" class="mr-2" id="quickCheckAllBranches" onchange="this.closest('div').querySelectorAll('[name=&quot;to_branch_ids[]&quot;]').forEach(input => input.checked = this.checked)">
+                                Chọn tất cả chi nhánh
+                            </label>
+                        @endif
+                        @if(isset($type2Branches))
+                            @forelse($type2Branches as $branch)
+                                <label class="d-flex align-items-start mb-2">
+                                    <input type="checkbox" name="to_branch_ids[]" value="{{ $branch->id }}" class="mr-2 mt-1 quick-transfer-branch">
+                                    <span>{{ $branch->branch_name }}</span>
+                                </label>
+                            @empty
+                                <small class="text-muted">Chưa có chi nhánh loại II đang hoạt động.</small>
+                            @endforelse
+                        @endif
+                    </div>
+                </div>
+
+                <div class="form-group mt-3 mb-0">
+                    <label class="font-weight-bold"><i class="fas fa-comment-dots mr-1"></i> Ghi chú chuyển tiếp</label>
+                    <textarea class="form-control" name="note" id="quickTransferNote" rows="2" placeholder="Nhập ghi chú chuyển tiếp nếu có (ví dụ: Chuyển xử lý gấp, Xin ý kiến chỉ đạo...)" maxlength="2000"></textarea>
+                </div>
             </div>
-            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button><button type="submit" class="btn btn-primary" id="quickTransferSubmit">Xác nhận</button></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" class="btn btn-primary" id="quickTransferSubmit">
+                    <i class="fas fa-paper-plane mr-1"></i> Xác nhận
+                </button>
+            </div>
         </form>
     </div></div>
 </div>

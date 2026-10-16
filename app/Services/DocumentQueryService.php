@@ -70,6 +70,23 @@ class DocumentQueryService
         });
 
         // Apply Filters
+        if (! empty($filters['scope']) && $filters['scope'] === 'incoming') {
+            $query->where(function (Builder $incomingQuery) use ($user) {
+                $incomingQuery->where('direction', Document::DIRECTION_INCOMING)
+                    ->orWhereHas('activeTransfers', fn ($t) => $t->where('to_user_id', $user->id))
+                    ->orWhereHas('permissions', fn ($p) => $p->where('target_type', 'user')->where('target_id', $user->id));
+
+                if ($user->department_id) {
+                    $incomingQuery->orWhereHas('activeTransfers', fn ($t) => $t->where('to_department_id', $user->department_id))
+                        ->orWhereHas('permissions', fn ($p) => $p->where('target_type', 'department')->where('target_id', $user->department_id));
+                }
+
+                if ($user->branch_id) {
+                    $incomingQuery->orWhereHas('activeTransfers', fn ($t) => $t->where('to_branch_id', $user->branch_id));
+                }
+            });
+        }
+
         if (! empty($filters['direction'])) {
             $query->where('direction', $filters['direction']);
         }
@@ -80,13 +97,16 @@ class DocumentQueryService
 
         if (! empty($filters['keyword'])) {
             $keyword = '%'.$filters['keyword'].'%';
-            $query->where('document_code', 'like', $keyword);
+            $query->where(function (Builder $keywordQuery) use ($keyword) {
+                $keywordQuery->where('document_code', 'like', $keyword)
+                    ->orWhere('title', 'like', $keyword);
+            });
         }
 
         $dateColumn = match ($filters['direction'] ?? null) {
             Document::DIRECTION_INCOMING => 'received_date',
             Document::DIRECTION_OUTGOING, Document::DIRECTION_DECISION => 'forwarded_date',
-            default => 'issued_date',
+            default => (($filters['scope'] ?? null) === 'incoming' ? 'received_date' : 'issued_date'),
         };
 
         if (! empty($filters['date_from'])) {

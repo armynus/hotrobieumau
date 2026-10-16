@@ -45,10 +45,22 @@
             class="collapse @menuOpen('documents_forward', 'documents_incoming', 'documents_outgoing', 'documents_incoming_register', 'documents_outgoing_register', 'documents_decision_register', 'document_register', 'document_detail', 'document_reports', 'documents_ledger')"
             data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item {{ request()->routeIs('documents_forward', 'documents_incoming', 'documents_outgoing') ? 'active' : '' }}"
-                    href="{{ route('documents_forward') }}">Danh sách văn bản</a>
+                <a class="collapse-item {{ request()->routeIs('documents_incoming') ? 'active' : '' }}"
+                    href="{{ route('documents_incoming') }}">
+                    <i class="fas fa-inbox fa-fw text-primary mr-1"></i>
+                    <span>Văn bản đến tôi</span>
+                    <span class="badge badge-danger ml-1" id="sidebarIncomingUnreadBadge" style="display:none; font-size: 0.7rem; padding: 2px 6px;"></span>
+                </a>
+                <a class="collapse-item {{ request()->routeIs('documents_forward', 'documents_outgoing') ? 'active' : '' }}"
+                    href="{{ route('documents_forward') }}">
+                    <i class="fas fa-list fa-fw mr-1"></i>
+                    <span>Kho văn bản</span>
+                </a>
                 <a class="collapse-item @active('document_reports')"
-                    href="{{ route('document_reports') }}">Báo cáo</a>
+                    href="{{ route('document_reports') }}">
+                    <i class="fas fa-chart-bar fa-fw mr-1"></i>
+                    <span>Báo cáo</span>
+                </a>
 
                 @php
                 $user = \App\Models\User::find(Session::get('user_id'));
@@ -68,17 +80,28 @@
             </div>
         </div>
     </li>
-    {{-- ===== HỖ TRỢ ĐIỆN TOÁN ===== --}}
-    <li class="nav-item {{ request()->routeIs('user.it_support.*') ? 'active' : '' }}">
-        <a class="nav-link {{ request()->routeIs('user.it_support.*') ? '' : 'collapsed' }}"
+    {{-- ===== MẪU BIỂU IT ===== --}}
+    <li class="nav-item {{ request()->routeIs('user.it_support.templates.*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('user.it_support.templates.index') }}">
+            <i class="fas fa-fw fa-laptop-code" style="color:white;"></i>
+            <span>Mẫu biểu IT</span>
+        </a>
+    </li>
+
+    {{-- ===== GỬI HỖ TRỢ IT ===== --}}
+    @php
+        $isItSupportActive = request()->routeIs('user.it_support.*') && !request()->routeIs('user.it_support.templates.*');
+    @endphp
+    <li class="nav-item {{ $isItSupportActive ? 'active' : '' }}">
+        <a class="nav-link {{ $isItSupportActive ? '' : 'collapsed' }}"
             href="#" data-toggle="collapse" data-target="#collapseItSupport"
-            aria-expanded="{{ request()->routeIs('user.it_support.*') ? 'true' : 'false' }}"
+            aria-expanded="{{ $isItSupportActive ? 'true' : 'false' }}"
             aria-controls="collapseItSupport">
             <i class="fas fa-fw fa-headset" style="color:white;"></i>
             <span>Gửi hỗ trợ IT</span>
         </a>
         <div id="collapseItSupport"
-            class="collapse {{ request()->routeIs('user.it_support.*') ? 'show' : '' }}"
+            class="collapse {{ $isItSupportActive ? 'show' : '' }}"
             data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item {{ request()->routeIs('user.it_support.create') ? 'active' : '' }}"

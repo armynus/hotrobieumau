@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid" id="ledgerPage" data-check-only="{{ $checkOnly ? 1 : 0 }}" data-table-url="{{ route('documents_ledger', ['year' => $year, 'book' => $book, 'check' => $checkOnly ? 1 : 0]) }}" data-update-url="{{ url('documents/ledger/entries') }}" data-import-url="{{ route('documents_ledger_import') }}" data-candidates-url="{{ route('documents_ledger_candidates') }}" data-create-url="{{ route('documents_ledger_create') }}" data-next-url="{{ route('documents_ledger_next_number') }}" data-next-number="{{ $nextNumber }}" data-register-url="{{ url('documents/ledger') }}">
     <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
-        <div><h1 class="h3 text-gray-800 mb-1">Sổ văn bản</h1><div class="text-muted">{{ $clerk->branch->branch_name }} · Năm {{ $year }}</div></div>
+        <div><h1 class="h3 text-gray-800 mb-1">Sổ văn bản</h1><div class="text-muted">{{ $clerk->branch->branch_name }} · Năm <span id="ledgerHeaderYear">{{ $year }}</span></div></div>
         <div class="mt-3 mt-md-0">
             <button type="button" class="btn btn-success shadow-sm mr-1" data-toggle="modal" data-target="#documentExportModal"><i class="fas fa-file-excel mr-1" aria-hidden="true"></i> Xuất sổ Excel</button>
             <a class="btn {{ $checkOnly ? 'btn-primary' : 'btn-outline-primary' }} mr-1" id="ledgerCheckButton" href="{{ route('documents_ledger', ['year' => $year, 'book' => $book, 'q' => $checkOnly ? null : $keyword, 'check' => $checkOnly ? 0 : 1]) }}"><i class="fas {{ $checkOnly ? 'fa-sign-out-alt' : 'fa-clipboard-check' }} mr-1" aria-hidden="true"></i> {{ $checkOnly ? 'Thoát kiểm tra' : 'Kiểm tra sổ' }}</a>
@@ -16,22 +16,30 @@
     <div class="row">
         @foreach($bookLabels as $key => $label)
         <div class="col-md-4 mb-3">
-            <a class="card h-100 shadow-sm ledger-book {{ $key === $book ? 'selected' : '' }}" href="{{ route('documents_ledger', ['year' => $year, 'book' => $key, 'q' => $keyword, 'check' => $checkOnly ? 1 : 0]) }}" @if($key === $book) aria-current="page" @endif>
-                <div class="card-body d-flex justify-content-between align-items-center"><div><div class="ledger-book-label font-weight-bold">{{ $label }}</div><div class="h3 ledger-book-count mb-0 mt-2">{{ number_format($counts[$key] ?? 0) }}</div>@if($key === $book)<small class="ledger-book-active"><i class="fas fa-check-circle mr-1"></i> Đang xem</small>@endif</div><span class="ledger-book-icon"><i class="fas {{ ['incoming' => 'fa-inbox', 'outgoing' => 'fa-paper-plane', 'decision' => 'fa-gavel'][$key] }}" aria-hidden="true"></i></span></div>
+            <a class="card h-100 shadow-sm ledger-book {{ $key === $book ? 'selected' : '' }}" data-book="{{ $key }}" href="{{ route('documents_ledger', ['year' => $year, 'book' => $key, 'q' => $keyword, 'check' => $checkOnly ? 1 : 0]) }}" @if($key === $book) aria-current="page" @endif>
+                <div class="card-body d-flex justify-content-between align-items-center"><div><div class="ledger-book-label font-weight-bold">{{ $label }}</div><div class="h3 ledger-book-count mb-0 mt-2" data-book-count="{{ $key }}">{{ number_format($counts[$key] ?? 0) }}</div>@if($key === $book)<small class="ledger-book-active"><i class="fas fa-check-circle mr-1"></i> Đang xem</small>@endif</div><span class="ledger-book-icon"><i class="fas {{ ['incoming' => 'fa-inbox', 'outgoing' => 'fa-paper-plane', 'decision' => 'fa-gavel'][$key] }}" aria-hidden="true"></i></span></div>
             </a>
         </div>
         @endforeach
     </div>
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('documents_ledger') }}" class="form-row align-items-end">
+            <form id="ledgerFilterForm" method="GET" action="{{ route('documents_ledger') }}" class="form-row align-items-end">
                 <input type="hidden" name="check" value="{{ $checkOnly ? 1 : 0 }}">
                 <div class="form-group col-md-2"><label for="ledgerYear">Năm sổ</label><input id="ledgerYear" class="form-control" type="number" name="year" min="2000" max="2100" value="{{ $year }}" required></div>
                 <div class="form-group col-md-3"><label for="ledgerBook">Loại sổ</label><select class="form-control" name="book" id="ledgerBook">@foreach($bookLabels as $key => $label)<option value="{{ $key }}" @selected($book === $key)>{{ $label }}</option>@endforeach</select></div>
-                <div class="form-group col-md-5"><label for="ledgerKeyword">Tra cứu trong sổ</label><input class="form-control" id="ledgerKeyword" name="q" value="{{ $keyword }}" placeholder="Số sổ, số ký hiệu hoặc trích yếu" maxlength="255"></div>
-                <div class="form-group col-md-2"><button class="btn btn-primary btn-block"><i class="fas fa-search mr-1"></i> Tra cứu</button></div>
+                <div class="form-group col-md-5">
+                    <label for="ledgerKeyword">Tra cứu trong sổ</label>
+                    <div class="input-group">
+                        <input class="form-control" id="ledgerKeyword" name="q" value="{{ $keyword }}" placeholder="Số sổ, số ký hiệu hoặc trích yếu" maxlength="255" autocomplete="off">
+                        <div class="input-group-append {{ $keyword ? '' : 'd-none' }}" id="clearLedgerKeywordWrap">
+                            <button type="button" class="btn btn-light border" id="clearLedgerKeyword" title="Xóa từ khóa" aria-label="Xóa từ khóa"><i class="fas fa-times" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-2"><button type="button" id="btnLedgerFilter" class="btn btn-primary btn-block"><i class="fas fa-search mr-1"></i> Tra cứu</button></div>
             </form>
-            <div class="d-flex flex-wrap justify-content-between small text-muted"><span>Số tiếp theo dự kiến: <strong class="text-primary">{{ $nextNumber }}</strong> · Cấp riêng theo năm và loại sổ.</span><span>Chỉ các dòng đã vào sổ được đưa vào file Excel.</span></div>
+            <div class="d-flex flex-wrap justify-content-between small text-muted"><span>Số tiếp theo dự kiến: <strong class="text-primary" id="ledgerNextNumber">{{ $nextNumber }}</strong> · Cấp riêng theo năm và loại sổ.</span><span>Chỉ các dòng đã vào sổ được đưa vào file Excel.</span></div>
         </div>
         <section class="ledger-check-summary mx-3 mb-3" aria-labelledby="ledgerCheckHeading">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
@@ -79,7 +87,7 @@
 <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('js/user/document-ledger-table.js') }}?v={{ filemtime(public_path('js/user/document-ledger-table.js')) }}"></script>
-<script src="{{ asset('js/user/document-ledger.js') }}"></script>
+<script src="{{ asset('js/user/document-ledger.js') }}?v={{ filemtime(public_path('js/user/document-ledger.js')) }}"></script>
 <script src="{{ asset('js/user/document-ledger-history.js') }}?v={{ filemtime(public_path('js/user/document-ledger-history.js')) }}"></script>
 <script src="{{ asset('js/user/document-ledger-entry.js') }}?v={{ filemtime(public_path('js/user/document-ledger-entry.js')) }}"></script>
 <script src="{{ asset('js/user/document-ledger-slip.js') }}?v={{ filemtime(public_path('js/user/document-ledger-slip.js')) }}"></script>

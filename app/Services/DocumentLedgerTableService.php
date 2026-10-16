@@ -53,9 +53,20 @@ class DocumentLedgerTableService
             ->offset((int) ($input['start'] ?? 0))->limit($length)->get();
         $form = app(DocumentLedgerFormService::class);
 
+        $baseYear = DocumentLedgerEntry::query()->where('branch_id', $clerk->branch_id)->where('year', $year);
+        $bookCounts = (clone $baseYear)->selectRaw('book, count(*) as aggregate')->groupBy('book')->pluck('aggregate', 'book');
+        $counts = [
+            'incoming' => (int) ($bookCounts['incoming'] ?? 0),
+            'outgoing' => (int) ($bookCounts['outgoing'] ?? 0),
+            'decision' => (int) ($bookCounts['decision'] ?? 0),
+        ];
+        $nextNumber = app(DocumentLedgerService::class)->nextNumber((int) $clerk->branch_id, $year, $book);
+
         return [
             'draw' => (int) $input['draw'], 'recordsTotal' => $total, 'recordsFiltered' => $filtered,
             'incompleteCount' => $incomplete,
+            'counts' => $counts,
+            'nextNumber' => $nextNumber,
             'data' => $entries->map(fn ($entry) => [
                 'id' => $entry->id, 'number' => $entry->number,
                 'registered_date' => $entry->registered_date?->format('d/m/Y'),

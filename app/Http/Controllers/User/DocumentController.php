@@ -20,7 +20,30 @@ class DocumentController extends Controller
 
     public function incomingDocuments()
     {
-        return redirect()->route('documents_forward');
+        $userId = Session::get('user_id');
+        if (! $userId) {
+            return redirect()->route('login_user');
+        }
+
+        $user = \App\Models\User::with('branch')->find($userId);
+        if (! $user) {
+            return redirect()->route('login_user');
+        }
+
+        $documentTypes = DocumentType::query()->where('status', 'active')->orderBy('name')->get();
+        $type2Branches = Branches::query()
+            ->where('branch_type', 'type_2')
+            ->where('status', 'active')
+            ->orderBy('branch_name')
+            ->get();
+        $departments = Department::query()
+            ->where('branch_id', $user->branch_id)
+            ->where('status', 'active')
+            ->orderBy('department_name')
+            ->get();
+
+        return view('user.page.document_incoming', compact('documentTypes', 'type2Branches', 'departments'))
+            ->with('directors', app(\App\Services\DocumentRecipientService::class)->directors((int) $user->branch_id));
     }
 
     public function outgoingDocuments()

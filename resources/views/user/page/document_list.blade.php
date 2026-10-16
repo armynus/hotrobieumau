@@ -49,7 +49,7 @@
         <div class="card-header document-filter-header py-3 d-flex flex-wrap align-items-center justify-content-between">
             <div>
                 <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-sliders-h mr-2" aria-hidden="true"></i>Bộ lọc tra cứu</h6>
-                <small class="text-muted">Lọc nhanh theo số, ký hiệu, ngày văn bản và trạng thái đọc</small>
+                <small class="text-muted">Lọc nhanh theo số, ký hiệu, trích yếu, ngày văn bản và trạng thái đọc</small>
             </div>
             <button type="button" class="btn btn-sm btn-light border d-none mt-2 mt-sm-0" id="btnResetFilter">
                 <i class="fas fa-undo-alt mr-1" aria-hidden="true"></i> Xóa bộ lọc
@@ -58,10 +58,10 @@
         <div class="card-body">
             <form id="filterForm" class="row align-items-end">
                 <div class="col-12 col-md-6 col-xl-4 mb-3">
-                    <label for="documentKeyword">Số, ký hiệu văn bản</label>
+                    <label for="documentKeyword">Số, ký hiệu hoặc trích yếu</label>
                     <div class="input-group document-keyword-group">
                         <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-search" aria-hidden="true"></i></span></div>
-                        <input type="search" class="form-control" id="documentKeyword" name="keyword" placeholder="Ví dụ: 123/NHNo-ĐT-TH" autocomplete="off">
+                        <input type="search" class="form-control" id="documentKeyword" name="keyword" placeholder="Nhập số, ký hiệu, trích yếu..." autocomplete="off">
                         <div class="input-group-append d-none" id="clearDocumentKeywordWrap">
                             <button type="button" class="btn btn-light border" id="clearDocumentKeyword" title="Xóa từ khóa" aria-label="Xóa từ khóa"><i class="fas fa-times" aria-hidden="true"></i></button>
                         </div>

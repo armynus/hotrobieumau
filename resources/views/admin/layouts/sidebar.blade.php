@@ -78,10 +78,13 @@
         </div>
     </li>
 
-    <li class="nav-item {{ request()->routeIs('admin_forms', 'admin_form_fields') ? 'active' : '' }}">
-        <a class="nav-link {{ request()->routeIs('admin_forms', 'admin_form_fields') ? '' : 'collapsed' }}"
+    @php
+        $isTransactionFormsActive = request()->routeIs('admin_forms') || (request()->routeIs('admin_form_fields') && request()->query('tab') !== 'it' && !request()->routeIs('admin.it_support.*'));
+    @endphp
+    <li class="nav-item {{ $isTransactionFormsActive ? 'active' : '' }}" id="sidebar-item-forms">
+        <a class="nav-link {{ $isTransactionFormsActive ? '' : 'collapsed' }}"
             href="#" data-toggle="collapse" data-target="#collapseForm"
-            aria-expanded="{{ request()->routeIs('admin_forms', 'admin_form_fields') ? 'true' : 'false' }}"
+            aria-expanded="{{ $isTransactionFormsActive ? 'true' : 'false' }}"
             aria-controls="collapseForm">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-journal-bookmark-fill" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M6 1h6v7a.5.5 0 0 1-.757.429L9 7.083 6.757 8.43A.5.5 0 0 1 6 8z" />
@@ -91,12 +94,13 @@
             <span>Biểu mẫu</span>
         </a>
         <div id="collapseForm"
-            class="collapse @menuOpen('admin_forms', 'admin_form_fields')"
+            class="collapse {{ $isTransactionFormsActive ? 'show' : '' }}"
             data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item @active('admin_forms')"
+                <a class="collapse-item {{ request()->routeIs('admin_forms') ? 'active' : '' }}"
                     href="{{ route('admin_forms') }}">Danh sách biểu mẫu</a>
-                <a class="collapse-item @active('admin_form_fields')"
+                <a class="collapse-item {{ request()->routeIs('admin_form_fields') && request()->query('tab') !== 'it' && !request()->routeIs('admin.it_support.*') ? 'active' : '' }}"
+                    id="sidebar-link-transaction-fields"
                     href="{{ route('admin_form_fields') }}">Danh sách trường dữ liệu</a>
             </div>
         </div>
@@ -124,16 +128,19 @@
 
 
 
-    <li class="nav-item {{ request()->routeIs('admin.it_support.*') ? 'active' : '' }}">
-        <a class="nav-link {{ request()->routeIs('admin.it_support.*') ? '' : 'collapsed' }}"
+    @php
+        $isItSupportActive = request()->routeIs('admin.it_support.manage');
+    @endphp
+    <li class="nav-item {{ $isItSupportActive ? 'active' : '' }}" id="sidebar-item-it-support">
+        <a class="nav-link {{ $isItSupportActive ? '' : 'collapsed' }}"
             href="#" data-toggle="collapse" data-target="#collapseAdminItSupport"
-            aria-expanded="{{ request()->routeIs('admin.it_support.*') ? 'true' : 'false' }}"
+            aria-expanded="{{ $isItSupportActive ? 'true' : 'false' }}"
             aria-controls="collapseAdminItSupport">
             <i class="fas fa-fw fa-headset"></i>
             <span>Yêu cầu IT</span>
         </a>
         <div id="collapseAdminItSupport"
-            class="collapse {{ request()->routeIs('admin.it_support.*') ? 'show' : '' }}"
+            class="collapse {{ $isItSupportActive ? 'show' : '' }}"
             data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item {{ request()->routeIs('admin.it_support.manage') && in_array(request()->query('status'), [null, 'all'], true) ? 'active' : '' }}"
@@ -142,6 +149,35 @@
                     href="{{ route('admin.it_support.manage', ['status' => 'processing']) }}">Đang xử lý</a>
                 <a class="collapse-item {{ request()->routeIs('admin.it_support.manage') && in_array(request()->query('status'), ['resolved', 'closed'], true) ? 'active' : '' }}"
                     href="{{ route('admin.it_support.manage', ['status' => 'resolved']) }}">Phiếu đã xử lý</a>
+            </div>
+        </div>
+    </li>
+
+    @php
+        $isItTemplatesActive = request()->routeIs('admin.it_support.categories.*')
+            || request()->routeIs('admin.it_support.templates*')
+            || request()->routeIs('admin.it_support.form_fields.*')
+            || (request()->routeIs('admin_form_fields') && request()->query('tab') === 'it');
+    @endphp
+    <li class="nav-item {{ $isItTemplatesActive ? 'active' : '' }}" id="sidebar-item-it-templates">
+        <a class="nav-link {{ $isItTemplatesActive ? '' : 'collapsed' }}"
+            href="#" data-toggle="collapse" data-target="#collapseAdminItTemplates"
+            aria-expanded="{{ $isItTemplatesActive ? 'true' : 'false' }}"
+            aria-controls="collapseAdminItTemplates">
+            <i class="fas fa-fw fa-laptop-code"></i>
+            <span>Biểu Mẫu IT</span>
+        </a>
+        <div id="collapseAdminItTemplates"
+            class="collapse {{ $isItTemplatesActive ? 'show' : '' }}"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ request()->routeIs('admin.it_support.categories.*') ? 'active' : '' }}"
+                    href="{{ route('admin.it_support.categories.index') }}">Danh mục Mẫu biểu</a>
+                <a class="collapse-item {{ request()->routeIs('admin.it_support.templates*') ? 'active' : '' }}"
+                    href="{{ route('admin.it_support.templates') }}">Quản lý Mẫu biểu</a>
+                <a class="collapse-item {{ request()->routeIs('admin.it_support.form_fields.index') || (request()->routeIs('admin_form_fields') && request()->query('tab') === 'it') ? 'active' : '' }}"
+                    id="sidebar-link-it-fields"
+                    href="{{ route('admin.it_support.form_fields.index') }}">Trường biểu mẫu IT</a>
             </div>
         </div>
     </li>

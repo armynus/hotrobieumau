@@ -86,24 +86,53 @@ class SupportFormService
         }
     }
 
+    public function parseDateRobust(mixed $date): ?\Carbon\Carbon
+    {
+        if (empty($date) || !is_string($date)) {
+            return null;
+        }
+        $date = trim($date);
+
+        // 1. Format YYYY-MM-DD (date picker / ISO)
+        if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})/', $date, $m)) {
+            return \Carbon\Carbon::createFromDate((int) $m[1], (int) $m[2], (int) $m[3]);
+        }
+
+        // 2. Format DD/MM/YYYY (Vietnamese slash)
+        if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $date, $m)) {
+            return \Carbon\Carbon::createFromDate((int) $m[3], (int) $m[2], (int) $m[1]);
+        }
+
+        // 3. Format DD-MM-YYYY (Vietnamese dash)
+        if (preg_match('/^(\d{1,2})-(\d{1,2})-(\d{4})$/', $date, $m)) {
+            return \Carbon\Carbon::createFromDate((int) $m[3], (int) $m[2], (int) $m[1]);
+        }
+
+        try {
+            return \Carbon\Carbon::parse($date);
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    public function formatDateInWords(mixed $date): string
+    {
+        $carbon = $this->parseDateRobust($date);
+        if (!$carbon) {
+            return is_string($date) ? $date : '';
+        }
+
+        return sprintf('ngày %s tháng %s năm %s', $carbon->format('d'), $carbon->format('m'), $carbon->format('Y'));
+    }
+
     public function convertDateFormat($date)
     {
-        // Nếu date không tồn tại, trả về chuỗi trống
         if (! $date) {
             return '';
         }
 
-        try {
-            $timestamp = strtotime($date);
-            if ($timestamp === false) {
-                return '';
-            }
-
-            // Đảm bảo format luôn có đủ số 0
-            return date('d/m/Y', $timestamp);
-        } catch (\Exception $e) {
-            return '';
-        }
+        $carbon = $this->parseDateRobust($date);
+        return $carbon ? $carbon->format('d/m/Y') : '';
     }
 
     public function convertDateNowFormat($date)
@@ -112,10 +141,14 @@ class SupportFormService
             return '';
         }
 
-        $timestamp = strtotime($date);
-        $day = date('d', $timestamp);
-        $month = date('m', $timestamp);
-        $year = date('Y', $timestamp);
+        $carbon = $this->parseDateRobust($date);
+        if (!$carbon) {
+            return '';
+        }
+
+        $day = $carbon->format('d');
+        $month = $carbon->format('m');
+        $year = $carbon->format('Y');
 
         return "ngày $day tháng $month năm $year";
     }
@@ -126,10 +159,14 @@ class SupportFormService
             return '';
         }
 
-        $timestamp = strtotime($date);
-        $day = date('d', $timestamp);
-        $month = date('m', $timestamp);
-        $year = date('Y', $timestamp);
+        $carbon = $this->parseDateRobust($date);
+        if (!$carbon) {
+            return '';
+        }
+
+        $day = $carbon->format('d');
+        $month = $carbon->format('m');
+        $year = $carbon->format('Y');
 
         return "ngày (date) $day tháng (month) $month năm (year) $year";
     }
@@ -140,10 +177,14 @@ class SupportFormService
             return '';
         }
 
-        $timestamp = strtotime($date);
-        $day = date('d', $timestamp);
-        $month = date('m', $timestamp);
-        $year = date('Y', $timestamp);
+        $carbon = $this->parseDateRobust($date);
+        if (!$carbon) {
+            return '';
+        }
+
+        $day = $carbon->format('d');
+        $month = $carbon->format('m');
+        $year = $carbon->format('Y');
 
         return "date $day month $month year $year";
     }

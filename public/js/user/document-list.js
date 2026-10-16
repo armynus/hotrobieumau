@@ -292,7 +292,7 @@ $(document).ready(function () {
         var filters = collectFilters();
         var chips = [];
         if (filters.direction) chips.push(filterChip('direction', directionLabel(filters.direction)));
-        if (filters.keyword) chips.push(filterChip('keyword', 'Số/KH: ' + filters.keyword));
+        if (filters.keyword) chips.push(filterChip('keyword', 'Từ khóa: ' + filters.keyword));
         if (filters.dateFrom || filters.dateTo) {
             var fromLabel = formatDocumentDate(filters.dateFrom) || '…';
             var toLabel = formatDocumentDate(filters.dateTo) || '…';
@@ -432,10 +432,7 @@ $(document).ready(function () {
                     actions += '<button type="button" class="btn btn-primary btn-sm shadow-sm mr-1 quick-edit-action" data-document-id="' + data + '" title="Chỉnh sửa văn bản" aria-label="Chỉnh sửa văn bản"><i class="fas fa-edit"></i></button>';
                 }
                 if (capabilities.can_transfer) {
-                    var isDepartmentTransfer = capabilities.transfer_target_type === 'local';
-                    var transferClass = isDepartmentTransfer ? 'btn-info' : 'btn-warning';
-                    var transferIcon = isDepartmentTransfer ? 'fa-sitemap' : 'fa-share';
-                    actions += '<button type="button" class="btn ' + transferClass + ' btn-sm shadow-sm quick-transfer-action" data-document-id="' + data + '" data-target-type="' + capabilities.transfer_target_type + '" title="Chuyển tiếp văn bản" aria-label="Chuyển tiếp văn bản"><i class="fas ' + transferIcon + '"></i></button>';
+                    actions += '<button type="button" class="btn btn-warning btn-sm shadow-sm quick-transfer-action" data-document-id="' + data + '" title="Chuyển tiếp văn bản" aria-label="Chuyển tiếp văn bản"><i class="fas fa-share"></i></button>';
                 }
                 if (capabilities.can_delete) {
                     actions += '<button type="button" class="btn btn-danger btn-sm shadow-sm ml-1 quick-delete-action" data-document-id="' + data + '" title="Xóa văn bản" aria-label="Xóa văn bản"><i class="fas fa-trash-alt"></i></button>';
@@ -571,40 +568,113 @@ $(document).ready(function () {
         });
     });
 
-    function setQuickTransferMode(targetType) {
-        $('#quickTransferTargetType').val(targetType);
-        $('#quickBranchTransferGroup').toggle(targetType === 'branch').find('input').prop('disabled', targetType !== 'branch');
-        $('#quickLocalTransferGroup').toggle(targetType === 'local').find('input').prop('disabled', targetType !== 'local');
-        $('#quickTransferModalTitle').text(targetType === 'branch' ? 'Chuyển đến Chi nhánh loại II' : 'Gửi đến ban giám đốc / phòng ban chi nhánh mình');
+    function syncQuickTransferSelectAll() {
+        var form = $('#quickTransferForm');
+
+        // BGD
+        var userGroup = form.find('.local-recipients .col-md-6:first');
+        var userAll = userGroup.find('[name="to_user_ids[]"]:not(:disabled)');
+        var userChecked = userAll.filter(':checked');
+        var userToggle = userGroup.find('label.border-bottom input[type="checkbox"]');
+        if (userAll.length > 0) {
+            userToggle.prop('checked', userChecked.length === userAll.length)
+                      .prop('indeterminate', userChecked.length > 0 && userChecked.length < userAll.length);
+        }
+
+        // Phòng ban
+        var deptGroup = form.find('.local-recipient-departments');
+        var deptAll = deptGroup.find('[name="to_department_ids[]"]:not(:disabled)');
+        var deptChecked = deptAll.filter(':checked');
+        var deptToggle = deptGroup.find('label.border-bottom input[type="checkbox"]');
+        if (deptAll.length > 0) {
+            deptToggle.prop('checked', deptChecked.length === deptAll.length)
+                      .prop('indeterminate', deptChecked.length > 0 && deptChecked.length < deptAll.length);
+        }
+
+        // Chi nhánh loại II
+        var branchGroup = form.find('#quickTransferBranchSection');
+        var branchAll = branchGroup.find('[name="to_branch_ids[]"]:not(:disabled)');
+        var branchChecked = branchAll.filter(':checked');
+        var branchToggle = $('#quickCheckAllBranches');
+        if (branchAll.length > 0) {
+            branchToggle.prop('checked', branchChecked.length === branchAll.length)
+                        .prop('indeterminate', branchChecked.length > 0 && branchChecked.length < branchAll.length);
+        }
     }
 
-    $('#quickTransferMode').on('change', function () {
-        setQuickTransferMode(this.value);
+    $('#quickTransferForm').on('change', 'input[type="checkbox"]', function () {
+        setTimeout(syncQuickTransferSelectAll, 10);
     });
 
     $('#dataTable').on('click', '.quick-transfer-action', function () {
-        quickDocumentId = $(this).data('document-id');
-        var targetType = $(this).data('target-type');
+        var button = $(this);
+        quickDocumentId = button.data('document-id');
         var form = $('#quickTransferForm');
+        var row = table.row(button.closest('tr')).data() || {};
 
         form[0].reset();
-        $('#quickTransferModeGroup').toggle(targetType === 'branch');
-        $('#quickTransferMode').val(targetType);
-        setQuickTransferMode(targetType);
-        var documentRow = table.row($(this).closest('tr')).data();
-        $('#quickLocalTransferGroup .local-recipient-departments').toggle(documentRow.visibility !== 'private').find('input').prop('disabled', documentRow.visibility === 'private').prop('checked', false);
+        form.find('input[type="checkbox"]').prop('checked', false).prop('indeterminate', false);
+        $('#quickTransferNote').val('');
+
+        // Populate doc header preview
+        var directionBadgeClass = 'badge-primary';
+        var directionText = 'VB đến';
+        if (row.direction === 'outgoing') {
+            directionBadgeClass = 'badge-info';
+            directionText = 'VB đi';
+        } else if (row.direction === 'decision') {
+            directionBadgeClass = 'badge-success';
+            directionText = 'Quyết định';
+        }
+        $('#quickTransferDocDirection').removeClass('badge-primary badge-info badge-success badge-secondary')
+            .addClass(directionBadgeClass).text(directionText);
+        $('#quickTransferDocCode').text(row.document_code || '(Chưa có số VB)');
+        $('#quickTransferDocTitle').text(row.title || 'Chưa cập nhật trích yếu');
+
+        // Check capabilities and visibility
+        var isPrivate = row.visibility === 'private';
+        var capabilities = row.capabilities || {};
+        var canTransferToBranch = Boolean(capabilities.can_transfer_to_branch);
+        var canDistributeLocal = Boolean(capabilities.can_distribute_local !== false);
+
+        // Ban giám đốc chi nhánh mình
+        var bgdSection = form.find('.local-recipients .col-md-6:first');
+        bgdSection.toggle(canDistributeLocal).find('input').prop('disabled', !canDistributeLocal);
+
+        // Phòng ban chi nhánh mình (not allowed if private)
+        var deptSection = form.find('.local-recipient-departments');
+        var canShowDept = canDistributeLocal && !isPrivate;
+        deptSection.toggle(canShowDept).find('input').prop('disabled', !canShowDept);
+
+        // Chi nhánh loại II nhận văn bản (not allowed if private or not permitted)
+        var branchSection = $('#quickTransferBranchSection');
+        var canShowBranch = canTransferToBranch && !isPrivate;
+        branchSection.toggle(canShowBranch).find('input').prop('disabled', !canShowBranch);
+
+        syncQuickTransferSelectAll();
         $('#quickTransferModal').modal('show');
-    });
 
-    $('#quickCheckAllBranches').on('change', function () {
-        $('.quick-transfer-branch').prop('checked', this.checked);
-    });
+        // Pre-check currently distributed recipients
+        $.get('/api/documents/' + quickDocumentId).done(function (res) {
+            if (res.data && res.data.distribution) {
+                var dist = res.data.distribution;
+                var userIds = (dist.to_user_ids || []).map(String);
+                var deptIds = (dist.to_department_ids || []).map(String);
+                var branchIds = (dist.to_branch_ids || []).map(String);
 
-    $('.quick-transfer-branch').on('change', function () {
-        $('#quickCheckAllBranches').prop(
-            'checked',
-            $('.quick-transfer-branch').length > 0 && $('.quick-transfer-branch:checked').length === $('.quick-transfer-branch').length
-        );
+                form.find('[name="to_user_ids[]"]:not(:disabled)').each(function () {
+                    this.checked = userIds.indexOf(String(this.value)) !== -1;
+                });
+                form.find('[name="to_department_ids[]"]:not(:disabled)').each(function () {
+                    this.checked = deptIds.indexOf(String(this.value)) !== -1;
+                });
+                form.find('[name="to_branch_ids[]"]:not(:disabled)').each(function () {
+                    this.checked = branchIds.indexOf(String(this.value)) !== -1;
+                });
+
+                syncQuickTransferSelectAll();
+            }
+        });
     });
 
     $('#dataTable').on('click', '.quick-delete-action', function () {
@@ -662,24 +732,32 @@ $(document).ready(function () {
         e.preventDefault();
         if (!quickDocumentId) return;
 
-        if ($('#quickTransferTargetType').val() === 'branch' && $('.quick-transfer-branch:checked').length === 0) {
-            Swal.fire('Chưa chọn chi nhánh', 'Vui lòng chọn ít nhất một chi nhánh nhận văn bản.', 'warning');
-            return;
-        }
-        if ($('#quickTransferTargetType').val() === 'local' && $('#quickLocalTransferGroup input[name]:checked').length === 0) {
-            Swal.fire('Chưa chọn nơi nhận', 'Vui lòng chọn ít nhất một người hoặc phòng ban nhận văn bản.', 'warning');
+        var checkedUsers = $(this).find('[name="to_user_ids[]"]:checked').length;
+        var checkedDepts = $(this).find('[name="to_department_ids[]"]:checked').length;
+        var checkedBranches = $(this).find('[name="to_branch_ids[]"]:checked').length;
+
+        if (checkedUsers === 0 && checkedDepts === 0 && checkedBranches === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Chưa chọn nơi nhận',
+                text: 'Vui lòng chọn ít nhất một nơi nhận (Ban giám đốc, phòng ban hoặc chi nhánh loại II).'
+            });
             return;
         }
 
         var button = $('#quickTransferSubmit').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang xử lý...');
-        $.post('/api/documents/' + quickDocumentId + '/transfer', $(this).serialize()).done(function (response) {
+        $.ajax({
+            url: '/api/documents/' + quickDocumentId + '/transfer',
+            type: 'POST',
+            data: $(this).serialize()
+        }).done(function (response) {
             $('#quickTransferModal').modal('hide');
             Swal.fire('Thành công', response.message, 'success');
             table.ajax.reload(null, false);
         }).fail(function (xhr) {
             Swal.fire('Lỗi', ajaxErrorMessage(xhr, 'Không thể chuyển văn bản.'), 'error');
         }).always(function () {
-            button.prop('disabled', false).text('Xác nhận');
+            button.prop('disabled', false).html('<i class="fas fa-paper-plane mr-1"></i> Xác nhận');
         });
     });
 

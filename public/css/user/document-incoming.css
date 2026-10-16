@@ -1,0 +1,280 @@
+/* Styles for Document Incoming Page */
+
+.incoming-stats-row {
+    margin-bottom: 1.5rem;
+}
+
+.incoming-stat-card {
+    border: 1px solid #e3e6f0;
+    border-radius: 12px;
+    transition: all 0.25s ease-in-out;
+    background: #ffffff;
+    box-shadow: 0 0.15rem 1.25rem 0 rgba(58, 59, 69, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.incoming-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.incoming-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+}
+
+.incoming-stat-card.card-total::before {
+    background: linear-gradient(180deg, #4e73df 0%, #224abe 100%);
+}
+
+.incoming-stat-card.card-unread::before {
+    background: linear-gradient(180deg, #f6c23e 0%, #dda20a 100%);
+}
+
+.incoming-stat-card.card-read::before {
+    background: linear-gradient(180deg, #1cc88a 0%, #13855c 100%);
+}
+
+.incoming-stat-card .stat-icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+}
+
+.incoming-stat-card.card-total .stat-icon-circle {
+    background: rgba(78, 115, 223, 0.12);
+    color: #4e73df;
+}
+
+.incoming-stat-card.card-unread .stat-icon-circle {
+    background: rgba(246, 194, 62, 0.16);
+    color: #c69500;
+}
+
+.incoming-stat-card.card-read .stat-icon-circle {
+    background: rgba(28, 200, 138, 0.14);
+    color: #1cc88a;
+}
+
+/* Unread glowing indicator */
+.incoming-stat-card.has-unread-items {
+    border-color: #ffe8a1;
+}
+
+.incoming-stat-card.has-unread-items .stat-badge-pulse {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e74a3b;
+    margin-right: 5px;
+    box-shadow: 0 0 0 0 rgba(231, 74, 59, 0.7);
+    animation: pulse-ring 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+@keyframes pulse-ring {
+    0% {
+        box-shadow: 0 0 0 0 rgba(231, 74, 59, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(231, 74, 59, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(231, 74, 59, 0);
+    }
+}
+
+/* Status Filter Tabs */
+.incoming-status-tabs-container {
+    background: #ffffff;
+    border: 1px solid #e3e6f0;
+    border-radius: 12px;
+    padding: 10px 16px;
+    box-shadow: 0 0.15rem 1rem 0 rgba(58, 59, 69, 0.05);
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.incoming-status-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.incoming-status-tab {
+    border: 1px solid #d1d3e2;
+    background: #f8f9fc;
+    color: #5a5c69;
+    border-radius: 30px;
+    padding: 7px 18px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.incoming-status-tab:hover {
+    background: #eaecf4;
+    color: #3a3b45;
+    border-color: #b7b9cc;
+}
+
+.incoming-status-tab.active[data-read="0"] {
+    background: #fff8e5;
+    border-color: #f6c23e;
+    color: #a07800;
+    box-shadow: 0 2px 8px rgba(246, 194, 62, 0.3);
+}
+
+.incoming-status-tab.active[data-read=""] {
+    background: #edf2ff;
+    border-color: #4e73df;
+    color: #224abe;
+    box-shadow: 0 2px 8px rgba(78, 115, 223, 0.25);
+}
+
+.incoming-status-tab.active[data-read="1"] {
+    background: #eafaf1;
+    border-color: #1cc88a;
+    color: #0e6c49;
+    box-shadow: 0 2px 8px rgba(28, 200, 138, 0.25);
+}
+
+.incoming-status-tab .badge-count {
+    font-size: 0.75rem;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+/* Status Badges */
+.badge-status-unread {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.badge-status-read {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Sender & Transfer cell */
+.sender-info-box {
+    line-height: 1.35;
+}
+
+.sender-info-box strong {
+    color: #2e384d;
+    font-size: 0.86rem;
+}
+
+.sender-info-box .sender-time {
+    color: #858796;
+    font-size: 0.76rem;
+    margin-top: 2px;
+}
+
+.sender-info-box .sender-note {
+    color: #4e73df;
+    font-size: 0.76rem;
+    background: #f0f4ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 3px;
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Document Code Cell */
+.document-code-cell a {
+    color: #4e73df;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.document-code-cell a:hover {
+    color: #224abe;
+    text-decoration: underline;
+}
+
+/* Table Card */
+.document-incoming-card {
+    border: 1px solid #e1e7f2;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0.15rem 1.25rem 0 rgba(58, 59, 69, 0.08);
+}
+
+.document-incoming-card .card-header {
+    background: linear-gradient(135deg, #f8faff 0%, #f1f5ff 100%);
+    border-bottom: 1px solid #e1e7f2;
+}
+
+/* Quick Action Tooltips & Row Hover */
+#incomingTable tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+#incomingTable tbody tr.row-unread {
+    background-color: #fffdf5;
+}
+
+#incomingTable tbody tr.row-unread:hover {
+    background-color: #fff9e6;
+}
+
+#incomingTable tbody tr:hover {
+    background-color: #f7f9fd;
+}
+
+.incoming-action-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    margin-right: 4px;
+    font-size: 0.85rem;
+}
+
+.incoming-action-btn:last-child {
+    margin-right: 0;
+}

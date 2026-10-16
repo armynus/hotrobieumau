@@ -13,6 +13,8 @@ use App\Services\FormWorkspaceService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
+use App\Models\ItSupportFormField;
+
 class AdminController extends Controller
 {
     public function index(){
@@ -41,11 +43,18 @@ class AdminController extends Controller
         $fields = FormField::pluck('field_name', 'field_code')->toArray();
         return view('admin.forms.list_form', compact('list_forms', 'fields','form_type'));
     }
-    public function admin_form_fields(){
-        $list_fields =  FormField::orderBy('id', 'asc')->get();
+    public function admin_form_fields(Request $request)
+    {
+        $list_fields = FormField::orderBy('id', 'asc')->get();
         $content_groups = FormWorkspaceService::contentGroupOptions();
+        $it_fields = ItSupportFormField::orderBy('display_order', 'asc')->orderBy('id', 'asc')->get();
+        $it_content_groups = ItSupportFormField::CONTENT_GROUPS;
 
-        return view('admin.forms.list_form_field', compact('list_fields', 'content_groups'));
+        $defaultTab = ($request->routeIs('admin.it_support.*') || $request->query('tab') === 'it') ? 'it' : 'transaction';
+
+        return view('admin.forms.list_form_field', compact(
+            'list_fields', 'content_groups', 'it_fields', 'it_content_groups', 'defaultTab'
+        ));
     }
     
 }

@@ -45,7 +45,7 @@ $(function () {
         filledValues = {};
         matches = [];
         $('#uploadLedgerChoices, #uploadLedgerReset').addClass('d-none');
-        if (!q) { block(false); status.text('Chọn file hoặc nhập số/ký hiệu văn bản để tự đối chiếu; cũng có thể tra theo số vào sổ.'); return; }
+        if (!q) { block(false); status.text('Chọn file hoặc nhập số vào sổ / số ký hiệu vào ô tra cứu để lấy thông tin từ sổ.'); return; }
         block(true);
         if (!Number.isInteger(year) || year < 2000 || year > 2100) { status.text('Năm sổ phải từ 2000 đến 2100.'); return; }
         status.text(exactOnly ? 'Đang đối chiếu số, ký hiệu văn bản với sổ…' : 'Đang tra sổ…');
@@ -108,9 +108,7 @@ $(function () {
     $('#uploadLedgerYear').on('input change', function () {
         const manualQuery = $('#uploadLedgerQuery').val().trim();
         if (manualQuery) schedule(manualQuery, false);
-        else schedule($('[name="document_code"]').val().trim(), true);
     });
-    $('[name="document_code"]').on('input', function () { schedule(this.value.trim(), true); });
     $('#uploadLedgerQuery').on('keydown', function (event) { if (event.key === 'Enter') { event.preventDefault(); search(null, false); } });
     select.on('change', function () {
         const entry = matches.find(entry => String(entry.id) === this.value);
@@ -118,6 +116,11 @@ $(function () {
         else { block(true); }
     });
     $('#uploadLedgerReset').on('click', function () { form.trigger('document-register:reset-request'); });
+    form.on('document-register:file-lookup', function (e, code) {
+        if (code) {
+            search(code, true);
+        }
+    });
     form.on('document-register:reset', function () {
         generation++;
         clearTimeout(timer);
@@ -127,6 +130,6 @@ $(function () {
         matches = [];
         block(false);
         $('#uploadLedgerChoices, #uploadLedgerReset').addClass('d-none');
-        status.text('Chọn file hoặc nhập số/ký hiệu văn bản để lấy thông tin từ sổ.');
+        status.text('Chọn file hoặc nhập số vào sổ / số ký hiệu vào ô tra cứu để lấy thông tin từ sổ.');
     });
 });

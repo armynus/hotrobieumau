@@ -35,7 +35,16 @@ $(function () {
         page.trigger('ledger:print-slip', [entry, false]);
     });
     modal.on('hide.bs.modal', function (event) { if (busy) event.preventDefault(); });
-    modal.on('hidden.bs.modal', function () { if (reloadAfterClose) window.location.reload(); });
+    modal.on('hidden.bs.modal', function () {
+        if (reloadAfterClose) {
+            reloadAfterClose = false;
+            if (window.refreshLedgerTable) {
+                window.refreshLedgerTable(false);
+            } else {
+                $('#ledgerTable').DataTable().ajax.reload(null, false);
+            }
+        }
+    });
     form.on('submit', async function (event) {
         event.preventDefault();
         if (busy || !entryId || !form[0].reportValidity()) return;

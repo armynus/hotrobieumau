@@ -138,3 +138,177 @@
 @media (max-width: 1100px) { .admin-metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .admin-quick-grid { grid-template-columns: 1fr; } }
 @media (max-width: 767px) { .admin-shell .sidebar .sidebar-brand-icon img { width: 36px; height: 36px; } .admin-shell .sidebar .sidebar-brand-text { display: none; } .admin-shell .sidebar .nav-item .nav-link { margin: 2px auto; width: calc(100% - 10px); } .admin-shell .admin-topbar { padding: 0 16px; } .admin-dashboard-hero { padding: 22px; } .admin-dashboard-hero-icon { display: none; } }
 @media (max-width: 550px) { .admin-metric-grid { grid-template-columns: 1fr; } .admin-dashboard-hero { margin-bottom: 20px; } .admin-quick-panel { padding: 18px; } .admin-shell .card-body { padding: 14px; } .admin-shell #content > .container-fluid > .d-sm-flex:first-child { padding: 18px; } }
+
+/* ========================================================
+   MODERN FILE UPLOAD & DROPZONE CONTROLS (Admin)
+   Follows modern-web-guidance: ::file-selector-button & accessible custom UI
+   ======================================================== */
+.visually-hidden {
+    position: absolute !important;
+    clip-path: inset(50%) !important;
+    overflow: hidden !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    white-space: nowrap !important;
+}
+
+/* Native file input selector button styling (Modern Web Baseline) */
+input[type="file"]::file-selector-button {
+    padding: 7px 16px;
+    margin-right: 14px;
+    border-radius: 8px;
+    border: 1.5px solid #c7d8f0;
+    background: linear-gradient(135deg, #f8fafc 0%, #eef4fc 100%);
+    color: #1a4f9c;
+    font-weight: 650;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+input[type="file"]::file-selector-button:hover {
+    background: linear-gradient(135deg, #1a4f9c 0%, #103a75 100%);
+    color: #ffffff;
+    border-color: #103a75;
+    box-shadow: 0 4px 12px rgba(26, 79, 156, 0.25);
+    transform: translateY(-1px);
+}
+
+/* File Upload Card */
+.it-file-upload-card {
+    position: relative;
+    border-radius: 12px;
+}
+
+/* Dropzone */
+.it-file-dropzone {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+.it-file-dropzone:hover,
+.it-file-dropzone.is-dragover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.12);
+    transform: translateY(-1px);
+}
+.it-file-dropzone__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 100%);
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.45rem;
+    flex-shrink: 0;
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+.it-file-dropzone:hover .it-file-dropzone__icon,
+.it-file-dropzone.is-dragover .it-file-dropzone__icon {
+    transform: scale(1.08);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+.it-file-dropzone__meta {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+.it-file-dropzone__action {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.it-btn-upload-file {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 16px;
+    border-radius: 9px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, #185abd 0%, #0f438c 100%);
+    border: none;
+    box-shadow: 0 2px 6px rgba(24, 90, 189, 0.25);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.it-btn-upload-file:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+    transform: translateY(-1px);
+    color: #ffffff;
+}
+
+/* File Selected Preview Box */
+.it-file-selected-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 12px;
+    background: #f0f7ff;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+    animation: fadeInFile 0.22s ease-out;
+}
+.it-file-badge {
+    width: 46px;
+    height: 46px;
+    border-radius: 11px;
+    background: #ffffff;
+    border: 1.5px solid #dbeafe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+@keyframes fadeInFile {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scan & Magic buttons */
+.btn-scan-template,
+.btn-scan-edit-template,
+.btn-scan-add-file {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 13px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.81rem;
+    color: #0369a1;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #7dd3fc;
+    transition: all 0.18s ease;
+    box-shadow: 0 1px 3px rgba(3, 105, 161, 0.06);
+}
+.btn-scan-template:hover,
+.btn-scan-edit-template:hover,
+.btn-scan-add-file:hover {
+    color: #ffffff;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    border-color: #0284c7;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    transform: translateY(-1px);
+}
+

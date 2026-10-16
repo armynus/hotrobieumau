@@ -7,11 +7,17 @@
     @if($errors->any())<div class="alert alert-danger" role="alert"><strong>Chưa gửi được phiếu.</strong><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
     <div class="it-form-layout"><form class="it-panel" action="{{ route('user.it_support.store') }}" method="POST" enctype="multipart/form-data">@csrf
         <h2>Thông tin cần hỗ trợ</h2><p class="it-muted">Các mục có dấu * cần được điền.</p>
-        <div class="form-group"><label for="title">Tiêu đề <span class="text-danger">*</span></label><input class="form-control" id="title" name="title" value="{{ old('title') }}" maxlength="255" required placeholder="Ví dụ: Máy in tại quầy giao dịch không kết nối"></div>
+        <div class="form-group"><label for="title">Tiêu đề <span class="text-danger">*</span></label><input class="form-control" id="title" name="title" value="{{ old('title', request('auto_title')) }}" maxlength="255" required placeholder="Ví dụ: Máy in tại quầy giao dịch không kết nối"></div>
         <div class="form-group"><label for="description">Mô tả sự cố <span class="text-danger">*</span></label><textarea class="form-control" id="description" name="description" rows="6" minlength="10" maxlength="5000" required placeholder="Thiết bị hoặc ứng dụng nào gặp vấn đề? Lỗi xuất hiện từ khi nào? Bạn đã thử thao tác gì?">{{ old('description') }}</textarea><small class="form-text text-muted">Không ghi mật khẩu hoặc thông tin khách hàng nhạy cảm vào phiếu.</small></div>
         <div class="it-two"><div class="form-group"><label for="category">Nhóm hỗ trợ</label><select class="form-control" id="category" name="category"><option value="">Chọn nhóm (không bắt buộc)</option>@foreach(['Phần cứng','Phần mềm','Mạng','Khác'] as $item)<option value="{{ $item }}" @selected(old('category') === $item)>{{ $item }}</option>@endforeach</select></div><div class="form-group"><label for="contact_phone">Số điện thoại liên hệ</label><input class="form-control" id="contact_phone" name="contact_phone" value="{{ old('contact_phone') }}" maxlength="20" inputmode="tel" placeholder="Để IT gọi khi cần"></div></div>
         <div class="form-group it-upload-field">
             <p class="it-upload-label" id="attachmentsLabel">Ảnh chụp lỗi hoặc tài liệu đính kèm</p>
+            @if(request('auto_attachment'))
+                <div class="alert alert-info mt-2 mb-3">
+                    <i class="fas fa-file-word"></i> Hệ thống đã tự động đính kèm phiếu yêu cầu: <strong>{{ request('auto_attachment_name', 'Bieu_mau.docx') }}</strong>
+                    <input type="hidden" name="auto_attachment" value="{{ request('auto_attachment') }}">
+                </div>
+            @endif
             <div class="it-upload-zone" id="itUploadZone">
                 <input class="it-upload-input" type="file" id="attachments" name="attachments[]" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple aria-labelledby="attachmentsLabel" aria-describedby="fileHelp fileError">
                 <label class="it-upload-target" for="attachments">

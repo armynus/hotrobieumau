@@ -13,6 +13,16 @@ class SupportFormDocumentService
     {
         $tempFile = null;
         try {
+            if (!file_exists($filePath)) {
+                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($filePath)) {
+                    $filePath = \Illuminate\Support\Facades\Storage::disk('public')->path($filePath);
+                } elseif (file_exists(storage_path('app/public/' . $filePath))) {
+                    $filePath = storage_path('app/public/' . $filePath);
+                } elseif (file_exists(public_path('storage/' . $filePath))) {
+                    $filePath = public_path('storage/' . $filePath);
+                }
+            }
+
             $templateProcessor = new TemplateProcessor($filePath);
             $checkboxes = [];
             // Gắn dữ liệu từ form vào file Word
@@ -146,9 +156,25 @@ class SupportFormDocumentService
                     $key,
                     $this->supportformService->wordSafe($value)
                 );
-                // Nếu có key branch, tạo thêm biến 'ChiNhanhHOA' với giá trị được chuyển thành in hoa
-                if ($key === 'branch') {
-                    $templateProcessor->setValue('ChiNhanhHOA', (string) $this->supportformService->convertToUppercase($value) ?? ' ');
+                // Nếu có key chi nhánh, tự động gán các biến 'ChiNhanhHOA' và 'TenChiNhanhHOA' in hoa
+                if ($key === 'branch' || $key === 'TenChiNhanh' || $key === 'ChiNhanh') {
+                    $upperBranch = (string) $this->supportformService->convertToUppercase($value) ?? ' ';
+                    $templateProcessor->setValue('ChiNhanhHOA', $upperBranch);
+                    $templateProcessor->setValue('TenChiNhanhHOA', $upperBranch);
+                }
+                // Nếu có key cán bộ, tự động gán biến 'TenCanBoHOA' in hoa
+                if ($key === 'TenCanBo' || $key === 'CanBoYeuCau' || $key === 'HoTen') {
+                    $upperOfficer = (string) $this->supportformService->convertToUppercase($value) ?? ' ';
+                    $templateProcessor->setValue('TenCanBoHOA', $upperOfficer);
+                    $templateProcessor->setValue('HoTenHOA', $upperOfficer);
+                }
+                // Nếu có key phòng ban/mã phòng, đồng bộ các placeholder phòng ban liên quan
+                if ($key === 'PhongBan' || $key === 'BoPhan' || $key === 'MaPhong' || $key === 'MaPhongBan') {
+                    $safeVal = $this->supportformService->wordSafe($value);
+                    $templateProcessor->setValue('PhongBan', $safeVal);
+                    $templateProcessor->setValue('BoPhan', $safeVal);
+                    $templateProcessor->setValue('MaPhong', $safeVal);
+                    $templateProcessor->setValue('MaPhongBan', $safeVal);
                 }
                 if ($key === 'SoTienDoi' || isset($formData['TyGia']) || isset($formData['LoaiTienNhan'])) {
                     $sotiendoi = is_numeric($formData['SoTienDoi'] ?? null) ? (float) $formData['SoTienDoi'] : 0;
@@ -162,6 +188,12 @@ class SupportFormDocumentService
                     $templateProcessor->setValue('SoTienNhan_Chu', $value_in_words);
                 }
             }
+            // Thay thế toàn bộ các placeholder còn lại trong mẫu bằng chuỗi rỗng để không để sót chuỗi ${...}
+            $remainingVariables = $templateProcessor->getVariables();
+            foreach ($remainingVariables as $remainingVar) {
+                $templateProcessor->setValue($remainingVar, '');
+            }
+
             // Lưu file tạm trước khi chỉnh sửa XML
             $tempFile = tempnam(sys_get_temp_dir(), 'word');
             $templateProcessor->saveAs($tempFile);

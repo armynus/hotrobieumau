@@ -41,10 +41,12 @@
         return line;
     }
 
-    async function load() {
-        if (loaded || loading || !endpoint) return;
+    async function load(force = false) {
+        if ((loaded && !force) || loading || !endpoint) return;
         loading = true;
-        list.replaceChildren(message('Đang tải thông báo…'));
+        if (!loaded) {
+            list.replaceChildren(message('Đang tải thông báo…'));
+        }
 
         try {
             const response = await fetch(endpoint, {
@@ -57,16 +59,33 @@
             const count = Number(data.unread_count || 0);
             badge.textContent = count > 9 ? '9+' : String(count);
             badge.hidden = count === 0;
+            const sidebarBadge = document.getElementById('sidebarIncomingUnreadBadge');
+            if (sidebarBadge) {
+                sidebarBadge.textContent = count > 99 ? '99+' : String(count);
+                sidebarBadge.style.display = count > 0 ? 'inline-block' : 'none';
+            }
             const items = Array.isArray(data.items) ? data.items : [];
             list.replaceChildren(...(items.length ? items.map(item) : [message('Không có văn bản mới')]));
             loaded = true;
         } catch (_) {
-            list.replaceChildren(message('Không tải được thông báo. Bấm chuông để thử lại.'));
+            if (!loaded) {
+                list.replaceChildren(message('Không tải được thông báo. Bấm chuông để thử lại.'));
+            }
         } finally {
             loading = false;
         }
     }
 
-    toggle.addEventListener('click', load);
-    toggle.addEventListener('focus', load, {once: true});
+    // Tự động tải thông báo trên toàn hệ thống ngay khi tải trang
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => load(false));
+    } else {
+        load(false);
+    }
+
+    toggle.addEventListener('click', () => load(true));
+    toggle.addEventListener('focus', () => load(false), {once: true});
+
+    // Định kỳ kiểm tra thông báo mới mỗi 60 giây
+    setInterval(() => load(true), 60000);
 })();

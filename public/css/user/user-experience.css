@@ -140,19 +140,188 @@ body.user-shell {
     box-shadow: 0 4px 18px rgba(34, 48, 78, .07) !important;
 }
 
-.user-shell .topbar .navbar-search .form-control {
-    min-height: 42px;
-    border: 1px solid #dce3ee !important;
-    border-right: 0 !important;
-    border-radius: 10px 0 0 10px;
-    background: #f7f9fc !important;
+/* ========================================================
+   USER TOPBAR SEARCH - MODERN ZERO LAYOUT SHIFT REDESIGN
+   ======================================================== */
+
+.user-shell .topbar .user-search-container {
+    height: 42px;
+    margin: 0;
+    display: flex;
+    align-items: center;
 }
 
-.user-shell .topbar .navbar-search .btn {
-    min-width: 46px;
-    border-radius: 0 10px 10px 0;
-    background: var(--user-brand);
-    border-color: var(--user-brand);
+.user-shell .topbar .user-topbar-search {
+    position: relative;
+    width: clamp(280px, 32vw, 440px);
+    height: 42px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+.user-shell .topbar .user-topbar-search .user-search-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 42px;
+    box-sizing: border-box;
+    background: #f8fafc;
+    border: 1.5px solid #d8e2ed;
+    border-radius: 21px;
+    padding: 0 4px 0 14px;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Leading Icon */
+.user-shell .topbar .user-search-leading-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 0.88rem;
+    margin-right: 8px;
+    flex-shrink: 0;
+    pointer-events: none;
+    transition: color 0.2s ease;
+}
+
+/* Search Input */
+.user-shell .topbar .user-search-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 6px 0 0 !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    color: #1e293b !important;
+    line-height: 38px !important;
+}
+
+/* Placeholder styling with high contrast (WCAG AA compliant) */
+.user-shell .topbar .user-search-input::placeholder {
+    color: #64748b !important;
+    font-size: 0.88rem !important;
+    font-weight: 400 !important;
+    opacity: 1 !important;
+}
+
+.user-shell .topbar .user-search-input::-webkit-search-cancel-button {
+    cursor: pointer;
+    filter: grayscale(1);
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.user-shell .topbar .user-search-input::-webkit-search-cancel-button:hover {
+    opacity: 1;
+}
+
+/* Action Search Button */
+.user-shell .topbar .user-search-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 32px;
+    min-width: 58px;
+    padding: 0 12px;
+    border-radius: 16px;
+    border: none !important;
+    outline: none !important;
+    background: var(--user-brand, #a51c3e);
+    color: #ffffff !important;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(165, 28, 62, 0.25);
+    transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.user-shell .topbar .user-search-btn:hover {
+    background: var(--user-brand-dark, #891632);
+    box-shadow: 0 2px 6px rgba(165, 28, 62, 0.35);
+    color: #ffffff !important;
+}
+
+.user-shell .topbar .user-search-btn:active {
+    transform: scale(0.97);
+}
+
+/* --- STATES: Hover, Focus-Within, Filled --- */
+
+/* Hover state on container - Zero dimension change, strictly paint properties */
+.user-shell .topbar .user-topbar-search:hover .user-search-inner {
+    background: #ffffff;
+    border-color: #b8c7d9;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+
+.user-shell .topbar .user-topbar-search:hover .user-search-leading-icon {
+    color: var(--user-brand, #a51c3e);
+}
+
+/* Focus state: crisp Agribank burgundy accent ring */
+.user-shell .topbar .user-topbar-search:focus-within .user-search-inner {
+    background: #ffffff;
+    border-color: var(--user-brand, #a51c3e);
+    box-shadow: 0 0 0 3.5px rgba(165, 28, 62, 0.12), 0 2px 8px rgba(165, 28, 62, 0.06);
+}
+
+.user-shell .topbar .user-topbar-search:focus-within .user-search-leading-icon {
+    color: var(--user-brand, #a51c3e);
+}
+
+/* Filled state */
+.user-shell .topbar .user-search-input:not(:placeholder-shown) {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+}
+
+/* Floating Status Pill (Zero Layout Shift) */
+.user-shell .user-topbar-search .form-search-status,
+.user-shell .navbar-search .form-search-status,
+.navbar-search .form-search-status {
+    position: absolute !important;
+    top: calc(100% + 6px) !important;
+    left: 12px !important;
+    z-index: 1055 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 5px 12px !important;
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18) !important;
+    white-space: nowrap !important;
+    pointer-events: none !important;
+    line-height: 1.3 !important;
+}
+
+.user-shell .user-topbar-search .form-search-status:empty,
+.user-shell .navbar-search .form-search-status:empty,
+.navbar-search .form-search-status:empty {
+    display: none !important;
+}
+
+/* Mobile search within dropdown */
+.user-shell .topbar .form-search-mobile.user-topbar-search {
+    width: 100% !important;
+    height: 42px;
+}
+
+.user-shell .topbar .form-search-mobile .user-search-inner {
+    width: 100%;
 }
 
 .user-shell .topbar .nav-link:focus-visible,

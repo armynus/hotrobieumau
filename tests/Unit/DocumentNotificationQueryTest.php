@@ -86,7 +86,7 @@ class DocumentNotificationQueryTest extends TestCase
         $this->assertContains('public', $query->getBindings());
     }
 
-    public function test_keyword_filter_searches_only_the_document_code(): void
+    public function test_keyword_filter_searches_document_code_and_title(): void
     {
         $user = new User([
             'branch_id' => 1,
@@ -99,7 +99,7 @@ class DocumentNotificationQueryTest extends TestCase
         $sql = mb_strtolower($query->toSql());
 
         $this->assertStringContainsString('document_code', $sql);
-        $this->assertStringNotContainsString('title` like', $sql);
+        $this->assertStringContainsString('title', $sql);
         $this->assertStringNotContainsString('issuing_agency` like', $sql);
         $this->assertContains('%KHCN%', $query->getBindings());
     }

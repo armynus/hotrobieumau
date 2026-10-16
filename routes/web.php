@@ -49,6 +49,21 @@ Route::group(['middleware' => ['admin']], function () {
     
     // IT Support Management
     Route::get('admin/it-support', [AdminItSupportController::class, 'manage'])->name('admin.it_support.manage');
+    Route::get('admin/it-support/templates', [App\Http\Controllers\Admin\ItSupportTemplateController::class, 'index'])->name('admin.it_support.templates');
+    Route::post('admin/it-support/templates', [App\Http\Controllers\Admin\ItSupportTemplateController::class, 'store'])->name('admin.it_support.templates.store');
+    Route::post('admin/it-support/templates/{id}/update', [App\Http\Controllers\Admin\ItSupportTemplateController::class, 'update'])->name('admin.it_support.templates.update');
+    Route::delete('admin/it-support/templates/{id}', [App\Http\Controllers\Admin\ItSupportTemplateController::class, 'destroy'])->name('admin.it_support.templates.destroy');
+    Route::post('admin/it-support/templates/parse-tags', [App\Http\Controllers\Admin\ItSupportTemplateController::class, 'parse_tags'])->name('admin.it_support.templates.parse_tags');
+    Route::get('admin/it-support/categories', [App\Http\Controllers\Admin\ItSupportCategoryController::class, 'index'])->name('admin.it_support.categories.index');
+    Route::post('admin/it-support/categories', [App\Http\Controllers\Admin\ItSupportCategoryController::class, 'store'])->name('admin.it_support.categories.store');
+    Route::get('admin/it-support/categories/{id}/edit', [App\Http\Controllers\Admin\ItSupportCategoryController::class, 'edit'])->name('admin.it_support.categories.edit');
+    Route::post('admin/it-support/categories/{id}/update', [App\Http\Controllers\Admin\ItSupportCategoryController::class, 'update'])->name('admin.it_support.categories.update');
+    Route::delete('admin/it-support/categories/{id}', [App\Http\Controllers\Admin\ItSupportCategoryController::class, 'destroy'])->name('admin.it_support.categories.destroy');
+    Route::get('admin/it-support/form-fields', [AdminController::class, 'admin_form_fields'])->name('admin.it_support.form_fields.index');
+    Route::post('admin/it-support/form-fields', [App\Http\Controllers\Admin\ItSupportFormFieldController::class, 'store'])->name('admin.it_support.form_fields.store');
+    Route::get('admin/it-support/form-fields/edit', [App\Http\Controllers\Admin\ItSupportFormFieldController::class, 'edit'])->name('admin.it_support.form_fields.edit');
+    Route::post('admin/it-support/form-fields/update', [App\Http\Controllers\Admin\ItSupportFormFieldController::class, 'update'])->name('admin.it_support.form_fields.update');
+    Route::post('admin/it-support/form-fields/delete', [App\Http\Controllers\Admin\ItSupportFormFieldController::class, 'destroy'])->name('admin.it_support.form_fields.destroy');
     Route::get('admin/it-support/{id}', [AdminItSupportController::class, 'show'])->whereNumber('id')->name('admin.it_support.show');
     Route::get('admin/it-support/{id}/files/{file}', [AdminItSupportController::class, 'download'])->whereNumber('id')->whereNumber('file')->name('admin.it_support.download');
     Route::post('admin/it-support/{id}/status', [AdminItSupportController::class, 'updateStatus'])->name('admin.it_support.update_status');
@@ -132,6 +147,9 @@ Route::group(['middleware'=> ['tenant']], function(){
     
     // IT Support (User)
     Route::get('it-support', [UserItSupportController::class, 'index'])->name('user.it_support.index');
+    Route::get('it-support/templates', [App\Http\Controllers\User\ItSupportTemplateController::class, 'index'])->name('user.it_support.templates.index');
+    Route::get('it-support/templates/{id}', [App\Http\Controllers\User\ItSupportTemplateController::class, 'show'])->whereNumber('id')->name('user.it_support.templates.show');
+    Route::post('it-support/templates/printAndCreate', [App\Http\Controllers\User\ItSupportTemplateController::class, 'printAndCreate'])->name('user.it_support.templates.printAndCreate');
     Route::get('it-support/create', [UserItSupportController::class, 'create'])->name('user.it_support.create');
     Route::post('it-support/store', [UserItSupportController::class, 'store'])->name('user.it_support.store');
     Route::get('it-support/{id}', [UserItSupportController::class, 'show'])->whereNumber('id')->name('user.it_support.show');
@@ -229,6 +247,7 @@ Route::group(['middleware'=> ['tenant']], function(){
 
     // Các Route API cho hệ thống Văn bản mới xây dựng
     Route::prefix('api/documents')->group(function () {
+        Route::get('incoming-stats', [DocumentApiController::class, 'incomingStats'])->name('api.documents.incoming_stats');
         Route::get('/', [DocumentApiController::class, 'index'])->name('api.documents.index');
         Route::post('/', [DocumentApiController::class, 'store'])->name('api.documents.store');
         Route::get('/{id}/history', [DocumentApiController::class, 'history'])->name('api.documents.history');
@@ -236,6 +255,7 @@ Route::group(['middleware'=> ['tenant']], function(){
         Route::put('/{id}', [DocumentApiController::class, 'update'])->name('api.documents.update');
         Route::delete('/{id}', [DocumentApiController::class, 'destroy'])->name('api.documents.destroy');
         Route::post('/{id}/transfer', [DocumentApiController::class, 'transfer'])->name('api.documents.transfer');
+        Route::post('/{id}/read', [DocumentApiController::class, 'markRead'])->name('api.documents.mark_read');
     });
     
 });

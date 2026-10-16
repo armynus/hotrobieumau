@@ -72,7 +72,18 @@ $(function () {
         $('#ledgerImportForm :input').prop('disabled', true);
         $('#ledgerPreview').html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang xử lý…');
         $.ajax({url: page.data('import-url'), type: 'POST', data: data, contentType: false, processData: false})
-            .done(function (response) { showStats(response, preview); token = preview ? response.preview_token : null; if (!preview) didImport = true; })
+            .done(function (response) {
+                showStats(response, preview);
+                token = preview ? response.preview_token : null;
+                if (!preview) {
+                    didImport = true;
+                    if (window.refreshLedgerTable) {
+                        window.refreshLedgerTable(false);
+                    } else {
+                        $('#ledgerTable').DataTable().ajax.reload(null, false);
+                    }
+                }
+            })
             .fail(function (xhr) { invalidatePreview(); Swal.fire('Lỗi', errorText(xhr), 'error'); })
             .always(function () {
                 importBusy = false;
@@ -84,5 +95,23 @@ $(function () {
     $('#ledgerImportForm').on('submit', function (e) { e.preventDefault(); runImport(true); });
     $('#ledgerConfirm').on('click', function () { runImport(false); });
     $('#ledgerImportModal').on('hide.bs.modal', function (e) { if (importBusy) e.preventDefault(); });
-    $('#ledgerImportModal').on('hidden.bs.modal', function () { if (didImport) window.location.reload(); });
+    $('#ledgerImportModal').on('hidden.bs.modal', function () {
+        if (didImport) {
+            didImport = false;
+            if (window.refreshLedgerTable) {
+                window.refreshLedgerTable(false);
+            } else {
+                $('#ledgerTable').DataTable().ajax.reload(null, false);
+            }
+            Swal.fire({
+                icon: 'success',
+                title: 'Đã cập nhật sổ',
+                text: 'Dữ liệu sổ văn bản đã được làm mới từ file Excel.',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+        }
+    });
 });

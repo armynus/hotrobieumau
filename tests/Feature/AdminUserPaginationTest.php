@@ -49,6 +49,8 @@ class AdminUserPaginationTest extends TestCase
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('citizen_id')->nullable();
+            $table->string('employee_code')->nullable();
             $table->string('email');
             $table->string('user_ipcas')->nullable();
             $table->unsignedBigInteger('branch_id');
@@ -115,5 +117,96 @@ class AdminUserPaginationTest extends TestCase
         $filtered = app(AdminUserController::class)->data($request)->getData(true);
         $this->assertSame(1, $filtered['recordsFiltered']);
         $this->assertSame('user23@example.test', $filtered['data'][0]['email']);
+    }
+
+    public function test_admin_user_data_supports_multi_criteria_filters_and_returns_stats(): void
+    {
+        $branch2Id = DB::table('branches')->insertGetId(['branch_name' => 'Chi nhánh Sa Đéc', 'branch_type' => 'type_2']);
+        $deptId = DB::table('departments')->insertGetId(['branch_id' => 1, 'department_name' => 'Phòng Khách hàng']);
+        $posId = DB::table('positions')->insertGetId(['position_name' => 'Trưởng phòng']);
+
+        // Insert distinct users for testing filters
+        DB::table('users')->insert([
+            'name' => 'Trần Văn Clerk',
+            'email' => 'clerk@example.test',
+            'user_ipcas' => 'CLK001',
+            'branch_id' => 1,
+            'department_id' => $deptId,
+            'position_id' => $posId,
+            'role_id' => 2,
+            'document_role' => 'clerk',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('users')->insert([
+            'name' => 'Lê Quản Trị',
+            'email' => 'admin@example.test',
+            'user_ipcas' => 'ADM001',
+            'branch_id' => $branch2Id,
+            'role_id' => 0,
+            'document_role' => 'user',
+            'status' => 'inactive',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 1. Filter by branch_id = $branch2Id
+        $req = Request::create('/admin/list_staff/data', 'GET', ['branch_id' => $branch2Id]);
+        $this->app->instance('request', $req);
+        $res = app(AdminUserController::class)->data($req)->getData(true);
+        $this->assertSame(1, $res['recordsFiltered']);
+        $this->assertSame('Lê Quản Trị', $res['data'][0]['name']);
+
+        // 2. Filter by document_role = 'clerk'
+        $req = Request::create('/admin/list_staff/data', 'GET', ['document_role' => 'clerk']);
+        $this->app->instance('request', $req);
+        $res = app(AdminUserController::class)->data($req)->getData(true);
+        $this->assertSame(1, $res['recordsFiltered']);
+        $this->assertSame('Trần Văn Clerk', $res['data'][0]['name']);
+
+        // 3. Filter by role_id = 0 (Admin)
+        $req = Request::create('/admin/list_staff/data', 'GET', ['role_id' => 0]);
+        $this->app->instance('request', $req);
+        $res = app(AdminUserController::class)->data($req)->getData(true);
+        $this->assertSame(1, $res['recordsFiltered']);
+        $this->assertSame('Lê Quản Trị', $res['data'][0]['name']);
+
+        // 4. Filter by status = 'inactive'
+        $req = Request::create('/admin/list_staff/data', 'GET', ['status' => 'inactive']);
+        $this->app->instance('request', $req);
+        $res = app(AdminUserController::class)->data($req)->getData(true);
+        $this->assertSame(1, $res['recordsFiltered']);
+        $this->assertSame('Lê Quản Trị', $res['data'][0]['name']);
+
+        // 5. Filter by department_id
+        $req = Request::create('/admin/list_staff/data', 'GET', ['department_id' => $deptId]);
+        $this->app->instance('request', $req);
+        $res = app(AdminUserController::class)->data($req)->getData(true);
+        $this->assertSame(1, $res['recordsFiltered']);
+        $this->assertSame('Trần Văn Clerk', $res['data'][0]['name']);
+
+        // 6. Filter by position_id
+        $req = Request::create('/admin/list_staff/data', 'GET', ['position_id' => $posId]);
+        $this->app->instance('request', $req);
+        $res = app(AdminUserController::class)->data($req)->getData(true);
+        $this->assertSame(1, $res['recordsFiltered']);
+        $this->assertSame('Trần Văn Clerk', $res['data'][0]['name']);
+
+        // 7. Filter by keyword (IPCAS)
+        $req = Request::create('/admin/list_staff/data', 'GET', ['keyword' => 'CLK001']);
+        $this->app->instance('request', $req);
+        $res = app(AdminUserController::class)->data($req)->getData(true);
+        $this->assertSame(1, $res['recordsFiltered']);
+        $this->assertSame('Trần Văn Clerk', $res['data'][0]['name']);
+
+        // 8. Stats check
+        $this->assertArrayHasKey('stats', $res);
+        $this->assertSame(27, $res['stats']['total']);
+        $this->assertSame(26, $res['stats']['active']);
+        $this->assertSame(1, $res['stats']['inactive']);
+        $this->assertSame(1, $res['stats']['clerk']);
+        $this->assertSame(1, $res['stats']['admin']);
     }
 }

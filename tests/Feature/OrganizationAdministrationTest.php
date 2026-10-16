@@ -68,6 +68,8 @@ class OrganizationAdministrationTest extends TestCase
             $table->unsignedBigInteger('transaction_office_id')->nullable();
             $table->unsignedBigInteger('position_id')->nullable();
             $table->string('name');
+            $table->string('citizen_id')->nullable();
+            $table->string('employee_code')->nullable();
             $table->string('email')->unique();
             $table->string('user_ipcas')->nullable();
             $table->string('password');

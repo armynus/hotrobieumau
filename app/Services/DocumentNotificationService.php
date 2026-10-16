@@ -15,6 +15,7 @@ class DocumentNotificationService
     public function unread(User $user, int $limit = 5): array
     {
         $query = $this->documents->getDocumentsForUser($user, [
+            'scope' => 'incoming',
             'is_read' => false,
             'exclude_archive_imports' => true,
             'skip_sort' => true,
@@ -34,7 +35,7 @@ class DocumentNotificationService
                 'id' => (int) $document->id,
                 'document_code' => Str::limit($document->document_code ?: 'Chưa cập nhật số, ký hiệu', 40),
                 'date' => ($document->issued_date ?? $document->created_at)?->format('d/m/Y') ?? '',
-                'detail_url' => route('document_detail', $document->id),
+                'detail_url' => route('document_detail', $document->id).'?from=incoming',
             ])->all(),
         ];
     }

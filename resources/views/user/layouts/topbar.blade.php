@@ -6,16 +6,22 @@
     </button>
 
     <!-- Topbar Search -->
-    <div
-        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-        @csrf
-        <div class="input-group">
-           
-            <input type="search" class="form-control bg-light border-0 small form-search-input" placeholder="Tra cứu biểu mẫu theo tên"
-                aria-label="Tìm biểu mẫu" name="search_topbar" id="search_topbar" >
-            <div class="input-group-append">
-                <button class="btn btn-primary form-search-button" type="button" aria-label="Tìm biểu mẫu">
-                    <i class="fas fa-search fa-sm"></i>
+    <div class="d-none d-sm-flex align-items-center mr-auto ml-md-3 my-2 my-md-0 user-search-container">
+        <div class="navbar-search user-topbar-search" role="search">
+            @csrf
+            <div class="user-search-inner">
+                <span class="user-search-leading-icon" aria-hidden="true">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="search" class="form-control user-search-input form-search-input"
+                    placeholder="Tra cứu biểu mẫu theo tên..."
+                    aria-label="Tìm biểu mẫu"
+                    name="search_topbar"
+                    id="search_topbar"
+                    autocomplete="off"
+                    spellcheck="false">
+                <button class="btn user-search-btn form-search-button" type="button" aria-label="Tìm kiếm biểu mẫu">
+                    <i class="fas fa-search mr-1 d-none d-md-inline-block"></i><span>Tìm</span>
                 </button>
             </div>
         </div>
@@ -33,16 +39,21 @@
         <!-- Dropdown - Messages -->
         <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
             aria-labelledby="searchDropdown">
-            <form class="form-inline mr-auto w-100 navbar-search form-search-mobile">
-                <div class="input-group">
-                    <input type="search" class="form-control bg-light border-0 small form-search-input"
-                        placeholder="Tra cứu biểu mẫu theo tên" aria-label="Tìm biểu mẫu"
-                        id="search_topbar_mobile" name="search_topbar_mobile">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary form-search-button" type="submit" aria-label="Tìm biểu mẫu">
-                            <i class="fas fa-search fa-sm"></i>
-                        </button>
-                    </div>
+            <form class="form-inline mr-auto w-100 navbar-search user-topbar-search form-search-mobile" role="search">
+                <div class="user-search-inner w-100">
+                    <span class="user-search-leading-icon" aria-hidden="true">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="search" class="form-control user-search-input form-search-input"
+                        placeholder="Tra cứu biểu mẫu theo tên..."
+                        aria-label="Tìm biểu mẫu"
+                        id="search_topbar_mobile"
+                        name="search_topbar_mobile"
+                        autocomplete="off"
+                        spellcheck="false">
+                    <button class="btn user-search-btn form-search-button" type="submit" aria-label="Tìm kiếm biểu mẫu">
+                        <span>Tìm</span>
+                    </button>
                 </div>
             </form>
         </div>

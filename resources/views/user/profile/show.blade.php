@@ -19,7 +19,7 @@
         <div>
             <p class="profile-eyebrow">TÀI KHOẢN CỦA TÔI</p>
             <h1>Thông tin cá nhân</h1>
-            <p>Kiểm tra thông tin tài khoản và cập nhật tên hiển thị hoặc ảnh đại diện.</p>
+            <p>Kiểm tra thông tin tài khoản và cập nhật thông tin cá nhân, mã nhân viên, số CCCD hoặc ảnh đại diện.</p>
         </div>
         <a class="btn btn-light" href="{{ route('index') }}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Về trang chủ</a>
     </header>
@@ -60,7 +60,28 @@
                 <div class="form-group text-left">
                     <label for="name">Tên hiển thị</label>
                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" maxlength="100" value="{{ old('name', $user->name) }}" required autocomplete="name">
+                    @error('name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                     <small class="form-text text-muted">Tên này hiển thị trên thanh điều hướng và trong các chức năng nghiệp vụ.</small>
+                </div>
+
+                <div class="form-group text-left">
+                    <label for="employee_code">Mã nhân viên</label>
+                    <input type="text" class="form-control @error('employee_code') is-invalid @enderror" id="employee_code" name="employee_code" maxlength="50" value="{{ old('employee_code', $user->employee_code) }}" placeholder="Ví dụ: NV-6500-089">
+                    @error('employee_code')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <small class="form-text text-muted">Dùng để tự động điền vào các phiếu yêu cầu IT.</small>
+                </div>
+
+                <div class="form-group text-left">
+                    <label for="citizen_id">Số CCCD / CMND</label>
+                    <input type="text" class="form-control @error('citizen_id') is-invalid @enderror" id="citizen_id" name="citizen_id" maxlength="20" value="{{ old('citizen_id', $user->citizen_id) }}" placeholder="Ví dụ: 087095001234">
+                    @error('citizen_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <small class="form-text text-muted">Gồm 9 đến 20 chữ số (dùng tự động điền các biểu mẫu).</small>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block profile-save"><i class="fas fa-save" aria-hidden="true"></i> Lưu thay đổi</button>
@@ -71,12 +92,14 @@
             <section class="card profile-card" aria-labelledby="accountInfoTitle">
                 <div class="profile-card-header"><div class="profile-card-icon profile-card-icon--blue"><i class="fas fa-id-card" aria-hidden="true"></i></div><div><h2 id="accountInfoTitle">Thông tin tài khoản</h2><p>Dữ liệu nhận diện và trạng thái đăng nhập.</p></div></div>
                 <dl class="profile-info-grid">
+                    <div><dt>Mã nhân viên</dt><dd>{{ $user->employee_code ?: 'Chưa cập nhật' }}</dd></div>
+                    <div><dt>Số CCCD / CMND</dt><dd>{{ $user->citizen_id ?: 'Chưa cập nhật' }}</dd></div>
                     <div><dt>Email đăng nhập</dt><dd>{{ $user->email }}</dd></div>
                     <div><dt>Mã người dùng IPCAS</dt><dd>{{ $user->user_ipcas ?: 'Chưa cập nhật' }}</dd></div>
                     <div><dt>Trạng thái</dt><dd><span class="profile-badge {{ $user->status === 'active' ? 'profile-badge--success' : 'profile-badge--muted' }}">{{ $user->status === 'active' ? 'Đang hoạt động' : 'Tạm khóa' }}</span></dd></div>
                     <div><dt>Ngày tạo tài khoản</dt><dd>{{ optional($user->created_at)->format('d/m/Y') ?: '—' }}</dd></div>
                 </dl>
-                <p class="profile-note"><i class="fas fa-info-circle" aria-hidden="true"></i>Email đăng nhập và mã IPCAS do quản trị viên quản lý.</p>
+                <p class="profile-note"><i class="fas fa-info-circle" aria-hidden="true"></i>Email đăng nhập và mã IPCAS do quản trị viên quản lý. Bạn có thể tự cập nhật Họ tên, Mã nhân viên và Số CCCD để hệ thống tự động điền các biểu mẫu.</p>
             </section>
 
             <section class="card profile-card" aria-labelledby="organizationInfoTitle">

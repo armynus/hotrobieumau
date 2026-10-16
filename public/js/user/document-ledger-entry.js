@@ -204,18 +204,33 @@ $(function () {
             saveHistoryAfterSuccess(historyValues);
             if (printAfterSave) {
                 busy = false;
-                modal.one('hidden.bs.modal', function () { page.trigger('ledger:print-slip', [response.entry, true]); });
+                modal.one('hidden.bs.modal', function () { page.trigger('ledger:print-slip', [response.entry, false]); });
                 modal.modal('hide');
+                if (window.refreshLedgerTable) {
+                    window.refreshLedgerTable(mode === 'edit');
+                } else {
+                    $('#ledgerTable').DataTable().ajax.reload(null, mode !== 'edit');
+                }
                 return;
             }
-            if (mode === 'edit' && Number(page.data('check-only')) === 1) {
-                busy = false;
-                modal.modal('hide');
-                $('#ledgerTable').DataTable().ajax.reload();
-                Swal.fire({icon: 'success', title: 'Đã cập nhật dòng sổ', text: 'Danh sách thiếu thông tin đã được kiểm tra lại.', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500});
-                return;
+
+            busy = false;
+            modal.modal('hide');
+            if (window.refreshLedgerTable) {
+                window.refreshLedgerTable(mode === 'edit');
+            } else {
+                $('#ledgerTable').DataTable().ajax.reload(null, mode !== 'edit');
             }
-            Swal.fire('Đã lưu', response.message, 'success').then(function () { window.location.reload(); });
+
+            Swal.fire({
+                icon: 'success',
+                title: mode === 'edit' ? 'Đã cập nhật' : 'Đã lưu vào sổ',
+                text: response.message,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
         }).fail(function (xhr) { Swal.fire('Lỗi', errorText(xhr), 'error'); }).always(function () {
             busy = false;
             save.prop('disabled', false).html(saveLabel());

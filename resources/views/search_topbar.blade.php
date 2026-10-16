@@ -1,59 +1,137 @@
 @include('shared.jquery-ui')
 
-
 <style>
-    .ui-autocomplete {
-    max-height: 400px;
+/* ========================================================
+   AUTOCOMPLETE DROPDOWN & SEARCH ENHANCEMENTS
+   ======================================================== */
+.ui-autocomplete {
+    max-height: 420px;
     overflow-y: auto;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 4px 0; /* Thêm padding để tạo khoảng trống */
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+    padding: 6px !important;
+    z-index: 1060 !important;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
 }
 
-.ui-menu-item {
-    padding: 8px 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    transition: background 0.3s, color 0.3s; /* Hiệu ứng hover */
+.ui-autocomplete::-webkit-scrollbar {
+    width: 6px;
 }
 
-.ui-menu-item:last-child {
-    border-bottom: none;
+.ui-autocomplete::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
 }
 
-/* Phần tử chứa icon và text */
-.ui-menu-item-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px; /* Tạo khoảng cách giữa icon và chữ */
-    width: 100%;
-    color: #333; /* Màu chữ mặc định */
+.ui-autocomplete::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-/* Icon */
-.ui-menu-item-wrapper svg {
-    width: 18px;
-    height: 18px;
-    color: #007bff; /* Màu xanh đặc trưng */
-    flex-shrink: 0; /* Giữ icon không bị co lại */
+/* Menu Item */
+.ui-menu .ui-menu-item {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 0 3px 0 !important;
+    border: none !important;
 }
 
-/* Hover effect */
-
-
-.ui-menu-item:hover .ui-menu-item-wrapper {
-    color: white; /* Đổi màu chữ khi hover */
+.ui-menu .ui-menu-item:last-child {
+    margin-bottom: 0 !important;
 }
 
-.ui-menu-item:hover svg {
-    color: white; /* Đổi màu icon khi hover */
+/* Menu Item Wrapper (Text & Icon) */
+.ui-menu .ui-menu-item-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    margin: 0 !important; /* Ghi đè triệt để margin: -1px của jquery-ui */
+    padding: 9px 12px !important;
+    border-radius: 9px !important;
+    color: #1e293b !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
+    cursor: pointer !important;
+    line-height: 1.4 !important;
+    box-sizing: border-box !important;
 }
 
-    
+.ui-menu .ui-menu-item-text {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    color: inherit !important;
+    line-height: 1.4 !important;
+}
+
+/* Icon (Word doc / form icon) */
+.ui-menu-item-wrapper svg,
+.ui-menu-item-wrapper i {
+    width: 18px !important;
+    height: 18px !important;
+    color: #a51c3e !important;
+    flex-shrink: 0 !important;
+    transition: color 0.15s ease !important;
+}
+
+/* Hover & Active Keyboard Navigation State (Agribank Brand Style) */
+/* QUAN TRỌNG: Giữ nguyên font-weight 500 và margin 0 để tuyệt đối không làm giãn chữ gây nhảy dòng */
+.ui-menu .ui-menu-item-wrapper.ui-state-focus,
+.ui-menu .ui-menu-item-wrapper.ui-state-active,
+.ui-menu .ui-menu-item:hover .ui-menu-item-wrapper {
+    margin: 0 !important;
+    background: #fff0f3 !important;
+    border: 1px solid #fecdd3 !important;
+    color: #a51c3e !important;
+    font-weight: 500 !important;
+}
+
+.ui-menu .ui-menu-item-wrapper.ui-state-focus .ui-menu-item-text,
+.ui-menu .ui-menu-item-wrapper.ui-state-active .ui-menu-item-text,
+.ui-menu .ui-menu-item:hover .ui-menu-item-text {
+    font-weight: 500 !important;
+    color: #a51c3e !important;
+}
+
+.ui-menu .ui-menu-item-wrapper.ui-state-focus svg,
+.ui-menu .ui-menu-item-wrapper.ui-state-focus i,
+.ui-menu .ui-menu-item-wrapper.ui-state-active svg,
+.ui-menu .ui-menu-item-wrapper.ui-state-active i,
+.ui-menu .ui-menu-item:hover svg,
+.ui-menu .ui-menu-item:hover i {
+    color: #a51c3e !important;
+}
+
+/* Search Status Pill (Zero Layout Shift) */
+.form-search-status {
+    position: absolute !important;
+    top: calc(100% + 6px) !important;
+    left: 12px !important;
+    z-index: 1055 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 5px 12px !important;
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18) !important;
+    white-space: nowrap !important;
+    pointer-events: none !important;
+    line-height: 1.3 !important;
+}
+
+.form-search-status:empty {
+    display: none !important;
+}
 </style>
 
 <script>

@@ -50,21 +50,91 @@ class AdminUserController extends Controller
             ->leftJoin('transaction_offices', 'users.transaction_office_id', '=', 'transaction_offices.id')
             ->leftJoin('positions', 'users.position_id', '=', 'positions.id')
             ->select([
-                'users.id', 'users.name', 'users.email', 'users.user_ipcas', 'users.role_id',
+                'users.id', 'users.name', 'users.citizen_id', 'users.employee_code',
+                'users.email', 'users.user_ipcas', 'users.role_id',
                 'users.document_role', 'users.status', 'users.created_at', 'users.updated_at',
                 'branches.branch_name', 'departments.department_name', 'transaction_offices.office_name as transaction_office_name', 'positions.position_name',
             ])
             ->whereNotNull('users.role_id');
 
+        if ($request->filled('branch_id')) {
+            $users->where('users.branch_id', $request->input('branch_id'));
+        }
+
+        if ($request->filled('department_id')) {
+            $users->where('users.department_id', $request->input('department_id'));
+        }
+
+        if ($request->filled('transaction_office_id')) {
+            $users->where('users.transaction_office_id', $request->input('transaction_office_id'));
+        }
+
+        if ($request->filled('position_id')) {
+            $users->where('users.position_id', $request->input('position_id'));
+        }
+
+        if ($request->filled('role_id')) {
+            $users->where('users.role_id', $request->input('role_id'));
+        }
+
+        if ($request->filled('document_role')) {
+            $docRole = $request->input('document_role');
+            if ($docRole === 'clerk') {
+                $users->where('users.document_role', 'clerk');
+            } elseif ($docRole === 'user') {
+                $users->where(function ($q) {
+                    $q->whereNull('users.document_role')->orWhere('users.document_role', '!=', 'clerk');
+                });
+            }
+        }
+
+        if ($request->filled('status')) {
+            $users->where('users.status', $request->input('status'));
+        }
+
+        if ($request->filled('keyword')) {
+            $keyword = trim((string) $request->input('keyword'));
+            if ($keyword !== '') {
+                $users->where(function ($q) use ($keyword) {
+                    $q->where('users.name', 'like', '%'.$keyword.'%')
+                        ->orWhere('users.email', 'like', '%'.$keyword.'%')
+                        ->orWhere('users.user_ipcas', 'like', '%'.$keyword.'%')
+                        ->orWhere('users.citizen_id', 'like', '%'.$keyword.'%')
+                        ->orWhere('users.employee_code', 'like', '%'.$keyword.'%');
+                });
+            }
+        }
+
+        $stats = Users::whereNotNull('role_id')
+            ->selectRaw("
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
+                SUM(CASE WHEN status != 'active' THEN 1 ELSE 0 END) as inactive,
+                SUM(CASE WHEN document_role = 'clerk' THEN 1 ELSE 0 END) as clerk,
+                SUM(CASE WHEN role_id = 0 THEN 1 ELSE 0 END) as admin
+            ")
+            ->first();
+
         return DataTables::eloquent($users)
             ->filterColumn('name', fn ($query, $keyword) => $query->where(function ($nested) use ($keyword): void {
                 $nested->where('users.name', 'like', '%'.$keyword.'%')
-                    ->orWhere('users.user_ipcas', 'like', '%'.$keyword.'%');
+                    ->orWhere('users.user_ipcas', 'like', '%'.$keyword.'%')
+                    ->orWhere('users.citizen_id', 'like', '%'.$keyword.'%')
+                    ->orWhere('users.employee_code', 'like', '%'.$keyword.'%');
             }))
+            ->filterColumn('citizen_id', fn ($query, $keyword) => $query->where('users.citizen_id', 'like', '%'.$keyword.'%'))
+            ->filterColumn('employee_code', fn ($query, $keyword) => $query->where('users.employee_code', 'like', '%'.$keyword.'%'))
             ->filterColumn('branch_name', fn ($query, $keyword) => $query->where('branches.branch_name', 'like', '%'.$keyword.'%'))
             ->filterColumn('department_name', fn ($query, $keyword) => $query->where('departments.department_name', 'like', '%'.$keyword.'%'))
             ->filterColumn('transaction_office_name', fn ($query, $keyword) => $query->where('transaction_offices.office_name', 'like', '%'.$keyword.'%'))
             ->filterColumn('position_name', fn ($query, $keyword) => $query->where('positions.position_name', 'like', '%'.$keyword.'%'))
+            ->with('stats', [
+                'total' => (int) ($stats->total ?? 0),
+                'active' => (int) ($stats->active ?? 0),
+                'inactive' => (int) ($stats->inactive ?? 0),
+                'clerk' => (int) ($stats->clerk ?? 0),
+                'admin' => (int) ($stats->admin ?? 0),
+            ])
             ->toJson();
     }
 
@@ -73,6 +143,8 @@ class AdminUserController extends Controller
         $validated = $this->validateUser($request);
         $validated['password'] = Hash::make($validated['password']);
         $validated['status'] = 'active';
+        $validated['citizen_id'] = $validated['citizen_id'] ?? null;
+        $validated['employee_code'] = $validated['employee_code'] ?? null;
         $validated['user_ipcas'] = $validated['user_ipcas'] ?? null;
         $validated['department_id'] = $validated['department_id'] ?? null;
         $validated['transaction_office_id'] = $validated['transaction_office_id'] ?? null;
@@ -94,7 +166,11 @@ class AdminUserController extends Controller
                 $q->where('role_id', '!=', 0)
                   ->orWhere('id', Session::get('admin_id'));
             })
-            ->select('id', 'name', 'email', 'user_ipcas', 'branch_id', 'role_id', 'department_id', 'transaction_office_id', 'position_id', 'document_role')
+            ->select([
+                'id', 'name', 'citizen_id', 'employee_code', 'email', 'user_ipcas',
+                'branch_id', 'role_id', 'department_id', 'transaction_office_id',
+                'position_id', 'document_role', 'status', 'created_at', 'updated_at',
+            ])
             ->findOrFail($request->integer('user_id'));
 
         return response()->json([
@@ -113,6 +189,8 @@ class AdminUserController extends Controller
         $validated = $this->validateUser($request, $user);
         $password = $validated['password'] ?? null;
         unset($validated['password']);
+        $validated['citizen_id'] = $validated['citizen_id'] ?? null;
+        $validated['employee_code'] = $validated['employee_code'] ?? null;
         $validated['user_ipcas'] = $validated['user_ipcas'] ?? null;
         $validated['department_id'] = $validated['department_id'] ?? null;
         $validated['transaction_office_id'] = $validated['transaction_office_id'] ?? null;
@@ -165,6 +243,8 @@ class AdminUserController extends Controller
 
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'citizen_id' => ['nullable', 'string', 'max:20', Rule::unique('users', 'citizen_id')->ignore($user?->id)],
+            'employee_code' => ['nullable', 'string', 'max:50', Rule::unique('users', 'employee_code')->ignore($user?->id)],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user?->id)],
             'user_ipcas' => ['nullable', 'string', 'max:50', Rule::unique('users', 'user_ipcas')->ignore($user?->id)],
             'password' => [$user ? 'nullable' : 'required', 'string', 'min:6', 'max:255'],
@@ -191,6 +271,8 @@ class AdminUserController extends Controller
             'role_id' => ['required', Rule::in($allowedRoles)],
             'document_role' => ['required', Rule::in(['user', 'clerk'])],
         ], [
+            'citizen_id.unique' => 'Số CCCD đã được sử dụng bởi tài khoản khác.',
+            'employee_code.unique' => 'Mã nhân viên đã được sử dụng bởi tài khoản khác.',
             'department_id.exists' => 'Phòng ban không thuộc chi nhánh đã chọn.',
             'transaction_office_id.exists' => 'Phòng giao dịch không hoạt động hoặc không thuộc chi nhánh đã chọn.',
             'email.unique' => 'Email đã được sử dụng.',

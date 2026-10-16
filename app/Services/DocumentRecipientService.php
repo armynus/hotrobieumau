@@ -86,16 +86,17 @@ class DocumentRecipientService
     }
 
     /** Current uploader-branch choices; downstream choices remain managed by their clerks. */
-    public function selection(Document $document): array
+    public function selection(Document $document, ?User $user = null): array
     {
+        $branchId = $user ? (int) $user->branch_id : (int) $document->managing_branch_id;
         $permissions = $document->permissions()->get(['target_type', 'target_id']);
-        $localUsers = User::where('branch_id', $document->managing_branch_id)->pluck('id');
-        $localDepartments = Department::where('branch_id', $document->managing_branch_id)->pluck('id');
+        $localUsers = User::where('branch_id', $branchId)->pluck('id');
+        $localDepartments = Department::where('branch_id', $branchId)->pluck('id');
 
         return [
             'to_user_ids' => $permissions->where('target_type', 'user')->pluck('target_id')->intersect($localUsers)->values()->all(),
             'to_department_ids' => $permissions->where('target_type', 'department')->pluck('target_id')->intersect($localDepartments)->values()->all(),
-            'to_branch_ids' => $document->activeTransfers()->where('from_branch_id', $document->managing_branch_id)
+            'to_branch_ids' => $document->activeTransfers()->where('from_branch_id', $branchId)
                 ->whereNotNull('to_branch_id')->pluck('to_branch_id')->unique()->values()->all(),
         ];
     }

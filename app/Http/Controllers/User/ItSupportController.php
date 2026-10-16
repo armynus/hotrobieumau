@@ -80,7 +80,9 @@ class ItSupportController extends Controller
             'attachments' => 'nullable|array|max:5',
             'attachments.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:20480',
         ]);
-        $ticket = DB::transaction(function () use ($data, $request, $storage) {
+        $autoAttachment = $request->input('auto_attachment');
+
+        $ticket = DB::transaction(function () use ($data, $request, $storage, $autoAttachment) {
             $ticket = ItSupportRequest::create([
                 'user_id' => Session::get('user_id'),
                 'title' => $data['title'], 'description' => $data['description'],
@@ -89,6 +91,14 @@ class ItSupportController extends Controller
                 'status' => 'pending',
             ]);
             $storage->storeUploads($ticket, $request->file('attachments', []));
+            
+            if ($autoAttachment) {
+                $currentPaths = $ticket->attachmentFiles(); // get current array
+                $currentPaths[] = ['path' => $autoAttachment, 'name' => $request->input('auto_attachment_name', 'Bieu_mau.docx')];
+                $ticket->attachment_paths = $currentPaths;
+                $ticket->save();
+            }
+
             $ticket->events()->create([
                 'actor_type' => 'user', 'actor_id' => Session::get('user_id'),
                 'actor_name' => Session::get('user_name', 'Người gửi'),

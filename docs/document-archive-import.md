@@ -265,3 +265,7 @@ Lệnh này sẽ:
 - Không cần OCR và không thông báo văn bản mới.
 - File đã nhập báo Trùng → bỏ qua, không tự cập nhật ngày cũ.
 Chưa thêm --fallback-mtime nhé: chỉ dùng khi mày chấp nhận lấy ngày sửa file cho những thư mục không xác định được ngày.
+
+Cập nhật từ file excel:
+
+php artisan documents:enrich-from-scanned-excel "duong_dan_excel.xlsx" --user=1 --commit

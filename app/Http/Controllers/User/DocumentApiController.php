@@ -44,6 +44,7 @@ class DocumentApiController extends Controller
         }
 
         $request->validate([
+            'scope' => 'nullable|string|in:incoming',
             'direction' => 'nullable|in:incoming,outgoing,decision,unclassified',
             'document_type_id' => 'nullable|integer',
             'keyword' => 'nullable|string|max:255',
@@ -57,11 +58,11 @@ class DocumentApiController extends Controller
             'search.value' => 'nullable|string|max:255',
         ]);
         $filters = $request->only([
-            'direction', 'document_type_id', 'keyword', 'date_from', 'date_to',
+            'scope', 'direction', 'document_type_id', 'keyword', 'date_from', 'date_to',
             'issued_date_from', 'issued_date_to', 'is_read',
         ]);
         $filters['keyword'] = trim((string) (($filters['keyword'] ?? null) ?: $request->input('search.value')));
-        if (($filters['is_read'] ?? '') === '0') {
+        if (($filters['is_read'] ?? '') === '0' || ($filters['scope'] ?? '') === 'incoming') {
             $filters['exclude_archive_imports'] = true;
         }
 
@@ -76,14 +77,18 @@ class DocumentApiController extends Controller
             : match ($filters['direction'] ?? null) {
                 Document::DIRECTION_INCOMING => 'received_date',
                 Document::DIRECTION_OUTGOING, Document::DIRECTION_DECISION => 'forwarded_date',
-                default => 'issued_date',
+                default => (($filters['scope'] ?? null) === 'incoming' ? 'received_date' : 'issued_date'),
             };
         $filters['sort_dir'] = $request->input('order.0.dir') === 'asc' ? 'asc' : 'desc';
 
         // Tổng số văn bản người dùng được phép xem, chưa áp dụng bộ lọc tra cứu.
         $totalFilters = array_filter([
+            'scope' => $filters['scope'] ?? null,
             'direction' => $filters['direction'] ?? null,
         ]);
+        if (! empty($filters['exclude_archive_imports'])) {
+            $totalFilters['exclude_archive_imports'] = true;
+        }
         $recordsTotal = $this->documentQueryService
             ->getDocumentsForUser($user, $totalFilters + ['skip_sort' => true])
             ->count();
@@ -101,10 +106,29 @@ class DocumentApiController extends Controller
         $query = $this->documentQueryService
             ->getDocumentsForUser($user, $filters)
             ->select([
-                'id', 'direction', 'document_code', 'title', 'issued_date',
-                'visibility', 'created_by', 'managing_branch_id',
+                'id', 'direction', 'document_code', 'title', 'issued_date', 'received_date', 'forwarded_date',
+                'visibility', 'created_by', 'managing_branch_id', 'issuing_agency',
             ])
-            ->with('attachments:id,document_id,file_name');
+            ->with([
+                'attachments:id,document_id,file_name',
+                'creator:id,name',
+                'transfers' => fn ($tQuery) => $tQuery
+                    ->where('status', '!=', 'revoked')
+                    ->where(function ($match) use ($user) {
+                        $match->where('to_user_id', $user->id);
+                        if ($user->department_id) {
+                            $match->orWhere('to_department_id', $user->department_id);
+                        }
+                        if ($user->branch_id) {
+                            $match->orWhere('to_branch_id', $user->branch_id);
+                        }
+                    })
+                    ->with('transferer:id,name')
+                    ->orderByDesc('transferred_at')
+            ])
+            ->withExists([
+                'reads as is_read' => fn ($q) => $q->where('user_id', $user->id),
+            ]);
 
         $isTypeTwoClerk = $user->isClerk() && $user->branch?->branch_type === 'type_2';
         if ($isTypeTwoClerk) {
@@ -126,12 +150,41 @@ class DocumentApiController extends Controller
             $canDistribute = $document->visibility !== Document::VISIBILITY_PRIVATE && $isTypeTwoClerk && (bool) $document->getAttribute('has_incoming_branch_transfer');
             $canTransferToBranch = $document->canBeTransferredToBranchBy($user);
 
+            $transfer = $document->transfers?->first();
+            $senderInfo = null;
+            if ($transfer && $transfer->transferer) {
+                $senderInfo = [
+                    'type' => 'transfer',
+                    'sender_name' => $transfer->transferer->name,
+                    'transferred_at' => $transfer->transferred_at?->format('d/m/Y H:i'),
+                    'note' => $transfer->note,
+                ];
+            } elseif ($document->issuing_agency) {
+                $senderInfo = [
+                    'type' => 'agency',
+                    'sender_name' => $document->issuing_agency,
+                    'transferred_at' => null,
+                    'note' => null,
+                ];
+            } elseif ($document->creator) {
+                $senderInfo = [
+                    'type' => 'creator',
+                    'sender_name' => $document->creator->name,
+                    'transferred_at' => $document->created_at?->format('d/m/Y H:i'),
+                    'note' => null,
+                ];
+            }
+
             return [
                 'id' => (int) $document->id,
                 'direction' => $document->direction,
                 'document_code' => $document->document_code,
                 'title' => $document->title,
                 'issued_date' => $document->issued_date?->format('Y-m-d'),
+                'received_date' => $document->received_date?->format('Y-m-d'),
+                'forwarded_date' => $document->forwarded_date?->format('Y-m-d'),
+                'is_read' => (bool) $document->is_read,
+                'sender_info' => $senderInfo,
                 'visibility' => $document->visibility,
                 'attachments' => $document->attachments->map(fn ($attachment) => [
                     'id' => (int) $attachment->id,
@@ -141,7 +194,7 @@ class DocumentApiController extends Controller
                 'capabilities' => [
                     'can_edit' => $canEdit,
                     'can_delete' => $document->canBeDeletedBy($user),
-                    'can_transfer' => $canEdit || $canDistribute,
+                    'can_transfer' => $canEdit || $canDistribute || $canTransferToBranch,
                     'can_distribute_local' => $canEdit || $canDistribute,
                     'can_transfer_to_branch' => $canTransferToBranch,
                     'transfer_target_type' => $canTransferToBranch ? 'branch' : (($canEdit || $canDistribute) ? 'local' : null),
@@ -327,8 +380,8 @@ class DocumentApiController extends Controller
         // Mark as read
         $this->documentService->markAsRead($document, $user);
 
-        if ($document->canBeEditedBy($user)) {
-            $document->setAttribute('distribution', app(\App\Services\DocumentRecipientService::class)->selection($document));
+        if ($document->canBeEditedBy($user) || $document->canBeDistributedToDepartmentBy($user)) {
+            $document->setAttribute('distribution', app(\App\Services\DocumentRecipientService::class)->selection($document, $user));
         }
 
         $history = [
@@ -559,90 +612,139 @@ class DocumentApiController extends Controller
         }
 
         $validated = $request->validate([
-            'target_type' => 'required|in:branch,department,local',
+            'target_type' => 'nullable|string',
             'to_user_ids' => 'nullable|array',
             'to_user_ids.*' => 'integer|distinct',
             'to_department_ids' => 'nullable|array',
             'to_department_ids.*' => 'integer|distinct',
-            'to_branch_ids' => 'required_if:target_type,branch|array|min:1',
+            'to_branch_ids' => 'nullable|array',
             'to_branch_ids.*' => 'integer|distinct',
-            'to_department_id' => 'required_if:target_type,department|nullable|integer',
+            'to_department_id' => 'nullable|integer',
             'note' => 'nullable|string|max:2000',
         ]);
 
-        $note = $validated['note'] ?? null;
-
-        if ($validated['target_type'] === 'local') {
-            abort_unless($document->canBeDistributedToDepartmentBy($user), 403);
-            $users = $validated['to_user_ids'] ?? [];
-            $departments = $validated['to_department_ids'] ?? [];
-            if ($users === [] && $departments === []) {
-                throw \Illuminate\Validation\ValidationException::withMessages(['recipients' => 'Vui lòng chọn ít nhất một người hoặc phòng ban nhận.']);
-            }
-            app(\App\Services\DocumentRecipientService::class)->distribute($document, $user, $users, $departments, $note);
-
-            return response()->json(['success' => true, 'message' => 'Đã chuyển văn bản đến ban giám đốc / phòng ban được chọn.']);
+        if (! empty($validated['to_department_id'])) {
+            $validated['to_department_ids'] = array_merge($validated['to_department_ids'] ?? [], [(int) $validated['to_department_id']]);
         }
 
-        if ($validated['target_type'] === 'branch') {
+        $users = array_values(array_unique(array_filter($validated['to_user_ids'] ?? [])));
+        $departments = array_values(array_unique(array_filter($validated['to_department_ids'] ?? [])));
+        $branchIds = array_values(array_unique(array_filter($validated['to_branch_ids'] ?? [])));
+        $note = $validated['note'] ?? null;
+
+        if ($users === [] && $departments === [] && $branchIds === []) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vui lòng chọn ít nhất một nơi nhận (Ban giám đốc, phòng ban hoặc chi nhánh loại II).',
+            ], 422);
+        }
+
+        if ($users !== [] || $departments !== []) {
+            abort_unless($document->canBeDistributedToDepartmentBy($user), 403);
+            app(\App\Services\DocumentRecipientService::class)->distribute($document, $user, $users, $departments, $note);
+        }
+
+        if ($branchIds !== []) {
             if (! $document->canBeTransferredToBranchBy($user)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Chỉ văn thư Chi nhánh loại I đã đăng tải văn bản mới được chuyển đến chi nhánh.',
+                    'message' => 'Chỉ văn thư Chi nhánh loại I đã đăng tải văn bản mới được chuyển đến chi nhánh loại II.',
                 ], 403);
             }
 
-            $branchIds = collect($validated['to_branch_ids'] ?? [])->map(fn ($id) => (int) $id)->unique()->values();
             $targetBranches = Branches::query()
                 ->where('status', 'active')
                 ->where('branch_type', 'type_2')
                 ->whereIn('id', $branchIds)
                 ->get();
 
-            if ($targetBranches->count() !== $branchIds->count()) {
+            if ($targetBranches->count() !== count($branchIds)) {
                 return response()->json(['success' => false, 'message' => 'Có chi nhánh nhận không hợp lệ.'], 422);
             }
 
-            $transfer = DB::transaction(function () use ($targetBranches, $document, $user, $note) {
-                return $targetBranches->map(fn ($targetBranch) => $this->documentService->transferDocument(
+            foreach ($targetBranches as $targetBranch) {
+                $this->documentService->transferDocument(
                     $document,
                     $user->branch_id,
                     $targetBranch->id,
                     $user,
                     $note
-                ));
-            });
-        } else {
-            if (! $document->canBeDistributedToDepartmentBy($user)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Văn thư Chi nhánh loại II chỉ được phân phối văn bản đã nhận đến phòng ban của mình.',
-                ], 403);
+                );
             }
-
-            $department = Department::query()
-                ->where('branch_id', $user->branch_id)
-                ->where('status', 'active')
-                ->find($validated['to_department_id'] ?? 0);
-
-            if (! $department) {
-                return response()->json(['success' => false, 'message' => 'Phòng ban nhận không hợp lệ.'], 422);
-            }
-
-            $transfer = $this->documentService->transferDocumentToDepartment(
-                $document,
-                $department->id,
-                $user,
-                $note
-            );
         }
 
         return response()->json([
             'success' => true,
-            'message' => $validated['target_type'] === 'branch'
-                ? 'Đã chuyển văn bản đến '.$targetBranches->count().' chi nhánh.'
-                : 'Đã phân phối văn bản đến phòng ban.',
-            'data' => $transfer,
+            'message' => 'Chuyển tiếp văn bản thành công!',
+        ]);
+    }
+
+    /**
+     * Thống kê tổng số, chưa đọc và đã đọc cho trang văn bản đến
+     */
+    public function incomingStats(Request $request)
+    {
+        $userId = Session::get('user_id');
+        if (! $userId) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $user = User::with(['position', 'branch'])->find($userId);
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $baseQuery = $this->documentQueryService->getDocumentsForUser($user, [
+            'scope' => 'incoming',
+            'exclude_archive_imports' => true,
+            'skip_sort' => true,
+        ]);
+
+        $total = (clone $baseQuery)->count();
+        $unread = (clone $baseQuery)->whereDoesntHave('reads', fn ($q) => $q->where('user_id', $user->id))->count();
+        $read = max(0, $total - $unread);
+
+        return response()->json([
+            'success' => true,
+            'total' => $total,
+            'unread' => $unread,
+            'read' => $read,
+        ]);
+    }
+
+    /**
+     * Đánh dấu văn bản là đã đọc hoặc chưa đọc
+     */
+    public function markRead(Request $request, $id)
+    {
+        $userId = Session::get('user_id');
+        if (! $userId) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $user = User::with('branch')->find($userId);
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $document = $this->documentQueryService->getDocumentsForUser($user)->find($id);
+        if (! $document) {
+            return response()->json(['success' => false, 'message' => 'Không tìm thấy văn bản hoặc không có quyền truy cập.'], 404);
+        }
+
+        $isRead = $request->boolean('is_read', true);
+        if ($isRead) {
+            $this->documentService->markAsRead($document, $user);
+            $message = 'Đã đánh dấu văn bản là đã đọc.';
+        } else {
+            $document->reads()->where('user_id', $user->id)->delete();
+            $message = 'Đã đánh dấu văn bản là chưa đọc.';
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'is_read' => $isRead,
         ]);
     }
 }

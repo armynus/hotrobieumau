@@ -9,7 +9,7 @@ class Users extends Model
     protected $table = 'users';
 
     protected $fillable = [
-        'name', 'email', 'user_ipcas', 'avatar_path', 'password', 'branch_id', 'status', 'role_id', 'failed_login_attempts',
+        'name', 'citizen_id', 'email', 'user_ipcas', 'employee_code', 'avatar_path', 'password', 'branch_id', 'status', 'role_id', 'failed_login_attempts',
         // Form quản trị gửi các trường này khi tạo user; không được bỏ qua chức vụ/văn thư.
         'department_id', 'transaction_office_id', 'position_id', 'document_role',
     ];
