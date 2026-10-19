@@ -4,6 +4,12 @@ $(function () {
         const group = input.closest('.navbar-search');
         const status = $('<div>', {class: 'small text-muted form-search-status', role: 'status', 'aria-live': 'polite'}).appendTo(group);
         let pending;
+        const cfgEl = document.getElementById('form-search-config');
+        if (cfgEl && cfgEl.dataset && cfgEl.dataset.config) {
+            try { window.FormSearchConfig = JSON.parse(cfgEl.dataset.config); } catch (e) {}
+        }
+        window.FormSearchConfig = window.FormSearchConfig || {};
+        const searchUrl = window.FormSearchConfig.url || input.data('search-url') || input.closest('form').data('search-url');
         input.autocomplete({
             minLength: 2,
             delay: 300,
@@ -15,7 +21,7 @@ $(function () {
             source: function (request, response) {
                 if (pending) pending.abort();
                 status.text('Đang tìm…');
-                pending = $.ajax({url: window.FormSearchConfig.url, dataType: 'json', timeout: 15000, data: {query: request.term}})
+                pending = $.ajax({url: searchUrl, dataType: 'json', timeout: 15000, data: {query: request.term}})
                     .done(function (data) { status.text(data.length ? '' : 'Không tìm thấy biểu mẫu.'); response(data); })
                     .fail(function (xhr, reason) {
                         if (reason !== 'abort') status.text(xhr.status === 401 ? 'Phiên đăng nhập đã hết. Vui lòng đăng nhập lại.' : 'Không tìm được lúc này. Vui lòng thử lại.');

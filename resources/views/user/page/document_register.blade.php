@@ -203,127 +203,14 @@
 @endpush
 
 @push('scripts')
-<script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
-<script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}"></script>
-<script src="{{ asset('vendor/flatpickr/vn.js') }}"></script>
-<script>
-$(document).ready(function() {
-    const directionLabel = @json(mb_strtolower($directionLabel));
-    const firstFieldName = @json($isOutgoing ? 'document_code' : 'registry_number');
-    let autoFilledDocumentCode = '';
-    flatpickr('.register-date-picker', { locale: flatpickr.l10ns.vn, dateFormat: 'Y-m-d', altInput: true, altFormat: 'd/m/Y', allowInput: true, disableMobile: true });
-    $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
-
-    function formatFileSize(bytes) { return bytes < 1048576 ? (bytes / 1024).toFixed(1) + ' KB' : (bytes / 1048576).toFixed(2) + ' MB'; }
-    function renderSelectedFiles(files) {
-        const list = $('#selectedFileList').empty();
-        Array.from(files || []).forEach(function(file) {
-            const item = $('<div>', { class: 'selected-file-item' });
-            item.append($('<i>', { class: 'fas fa-file-alt text-primary mr-2' }));
-            item.append($('<div>', { class: 'selected-file-name text-truncate', text: file.name }));
-            item.append($('<small>', { class: 'text-muted ml-2', text: formatFileSize(file.size) }));
-            list.append(item);
-        });
-    }
-    function resetRegisterForm() {
-        $('#documentRegisterForm')[0].reset();
-        autoFilledDocumentCode = '';
-        $('#selectedFileList').empty();
-        document.querySelectorAll('.register-date-picker').forEach(function(input) { if (input._flatpickr) input._flatpickr.clear(); });
-        $('#branch_selection_area input[type="checkbox"]').prop('disabled', false).prop('checked', false);
-        $('#publicLevel').trigger('change');
-        $('#documentRegisterForm').trigger('document-register:reset');
-    }
-    $('#documentRegisterForm').on('document-register:reset-request', resetRegisterForm);
-
-
-    $('#checkAllBranches').on('change', function() { $('.branch-checkbox').prop('checked', this.checked); });
-    $('.branch-checkbox').on('change', function() {
-        $('#checkAllBranches').prop('checked', $('.branch-checkbox').length > 0 && $('.branch-checkbox:checked').length === $('.branch-checkbox').length);
-    });
-    $('#publicLevel').on('change', function() {
-        const descriptions = {
-            private: 'Chỉ văn thư cùng chi nhánh và ban giám đốc được tích chọn được xem. Không gửi xuống phòng ban hoặc chi nhánh cấp dưới.',
-            normal: 'Văn thư cùng chi nhánh, ban giám đốc được chọn và lãnh đạo phòng ban được chọn được xem; nhân viên chưa được xem.',
-            public: 'Như Bình Thường, thêm nhân viên ở phòng ban được chọn được xem. Không công khai cho toàn hệ thống.'
-        };
-        $('#publicLevelHelp').text(descriptions[this.value] || '');
-        const disabled = this.value === 'private';
-        $('#branch_selection_label, #branch_selection_help, #branch_selection_area, #documentRegisterForm .local-recipient-departments').toggle(!disabled);
-        $('#branch_selection_area input, #documentRegisterForm .local-recipient-departments input').prop('disabled', disabled);
-        if (disabled) $('#branch_selection_area input, #documentRegisterForm .local-recipient-departments input').prop('checked', false);
-    }).trigger('change');
-
-    $('#documentFiles').on('change', function() {
-        const files = this.files;
-        renderSelectedFiles(files);
-        if (!files || !files.length) return;
-        const documentCode = $('[name="document_code"]');
-        const codeFromFileName = files[0].name.replace(/\.[^.]+$/, '').trim();
-        if (!documentCode.prop('readonly') && (!documentCode.val().trim() || documentCode.val().trim() === autoFilledDocumentCode)) {
-            documentCode.val(codeFromFileName);
-            autoFilledDocumentCode = codeFromFileName;
-        }
-        if (codeFromFileName) {
-            $('#documentRegisterForm').trigger('document-register:file-lookup', [codeFromFileName]);
-        }
-    });
-    $('#documentUploadZone').on('dragenter dragover', function(e) { e.preventDefault(); $(this).addClass('is-dragging'); })
-        .on('dragleave drop', function(e) { e.preventDefault(); $(this).removeClass('is-dragging'); })
-        .on('drop', function(e) {
-            const files = e.originalEvent.dataTransfer.files;
-            if (!files || !files.length) return;
-            const transfer = new DataTransfer();
-            Array.from(files).forEach(function(file) { transfer.items.add(file); });
-            document.getElementById('documentFiles').files = transfer.files;
-            $('#documentFiles').trigger('change');
-        });
-
-    $('#documentRegisterForm').on('submit', function(e) {
-        e.preventDefault();
-        if ($(this).data('ledger-lookup-blocked')) {
-            Swal.fire('Chọn dòng sổ', 'Hãy hoàn tất tra sổ và chọn đúng dòng văn bản trước khi đăng tải.', 'info');
-            return;
-        }
-        const button = $('#submitBtn');
-        const original = button.html();
-        const allowDuplicate = button.data('allow-duplicate') === true;
-        button.removeData('allow-duplicate');
-        button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang tải lên...');
-        const formData = new FormData(this);
-        if (allowDuplicate) formData.append('allow_duplicate', '1');
-        $.ajax({ url: '/api/documents', type: 'POST', data: formData, contentType: false, processData: false, timeout: 120000 })
-            .done(function(response) {
-                resetRegisterForm();
-                Swal.fire({ icon: 'success', title: 'Thành công', text: response.message, confirmButtonText: 'Đăng tiếp ' + directionLabel })
-                    .then(function() { $('[name="' + firstFieldName + '"]').trigger('focus'); });
-            })
-            .fail(function(xhr, textStatus) {
-                if (xhr.responseJSON?.code === 'duplicate_document') {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Có thể văn bản đã được đăng tải',
-                        text: xhr.responseJSON.message,
-                        showCancelButton: true,
-                        confirmButtonText: 'Vẫn đăng tải',
-                        cancelButtonText: 'Quay lại kiểm tra',
-                        reverseButtons: true
-                    }).then(function(result) {
-                        if (!result.isConfirmed) return;
-                        button.data('allow-duplicate', true);
-                        form.trigger('submit');
-                    });
-                    return;
-                }
-                const errors = xhr.responseJSON?.errors;
-                const message = textStatus === 'timeout'
-                    ? 'Máy chủ xử lý quá lâu nên đã dừng chờ. Hãy kiểm tra danh sách văn bản trước khi gửi lại để tránh đăng trùng.'
-                    : (errors ? Object.values(errors).flat().join('\n') : (xhr.responseJSON?.message || 'Không thể đăng tải văn bản.'));
-                Swal.fire('Lỗi', message, 'error');
-            })
-            .always(function() { button.prop('disabled', false).html(original); });
-    });
-});
-</script>
-<script src="{{ asset('js/user/document-register-ledger.js') }}"></script>
+<script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}?v={{ filemtime(public_path('vendor/sweetalert2/sweetalert2.all.min.js')) }}"></script>
+<script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}?v={{ filemtime(public_path('vendor/flatpickr/flatpickr.min.js')) }}"></script>
+<script src="{{ asset('vendor/flatpickr/vn.js') }}?v={{ filemtime(public_path('vendor/flatpickr/vn.js')) }}"></script>
+<span id="document-register-config" hidden data-config="{{ json_encode([
+    "directionLabel" => mb_strtolower($directionLabel),
+    "firstFieldName" => $isOutgoing ? "document_code" : "registry_number"
+]) }}"></span>
+<script src="{{ asset('js/user/document-register-form.js') }}?v={{ filemtime(public_path('js/user/document-register-form.js')) }}"></script>
+<script src="{{ asset('js/user/document-register-ledger.js') }}?v={{ filemtime(public_path('js/user/document-register-ledger.js')) }}"></script>
 @endpush
+

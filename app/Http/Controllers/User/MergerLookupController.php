@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\DB;
 
 class MergerLookupController extends Controller
 {
+    public function __construct()
+    {
+    }
+
     public function index()
     {
         // Logic to handle the merger lookup functionality

@@ -24,8 +24,11 @@ class BranchController extends Controller
         $validated['parent_id'] = $validated['branch_type'] === 'type_2' ? $validated['parent_id'] : null;
         $validated['status'] = 'active';
 
-        $branch = Branches::create($validated);
-        $databaseName = 'branch_'.$branch->id;
+        $branchId = (int) $branch->id;
+        if ($branchId <= 0) {
+            throw new \RuntimeException('Mã chi nhánh không hợp lệ để tạo database.');
+        }
+        $databaseName = 'branch_'.$branchId;
         $branch->update(['database_name' => $databaseName]);
 
         $databaseCreated = false;

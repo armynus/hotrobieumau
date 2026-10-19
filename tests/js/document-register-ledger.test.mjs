@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 import test from 'node:test';
 
 const script = readFileSync(new URL('../../public/js/user/document-register-ledger.js', import.meta.url), 'utf8');
+const registerForm = readFileSync(new URL('../../public/js/user/document-register-form.js', import.meta.url), 'utf8');
 const view = readFileSync(new URL('../../resources/views/user/page/document_register.blade.php', import.meta.url), 'utf8');
 
 test('document register ledger lookup does not bind to document_code typing', () => {
@@ -19,6 +20,8 @@ test('document register ledger lookup binds to top controls and file-lookup even
 });
 
 test('file selection in document register triggers file-lookup event with extracted code', () => {
-    assert.match(view, /document-register:file-lookup/);
-    assert.doesNotMatch(view, /documentCode\.trigger\('input'\)/);
+    assert.match(view, /document-register-form\.js/);
+    assert.match(registerForm, /document-register:file-lookup/);
+    assert.doesNotMatch(registerForm, /documentCode\.trigger\('input'\)/);
 });
+

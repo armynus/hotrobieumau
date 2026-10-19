@@ -365,7 +365,7 @@ class ItSupportTemplatePrintAndScanTest extends TestCase
             'template_id'  => $template->id,
             'action'       => 'print',
             'TenCanBo'     => 'Nguyễn Đỗ Tuấn Kiệt',
-            'SoDienThoai'  => '02773851364',
+            'SoDienThoai'  => '0912345678',
             'EmailNV'      => 'armynus11@gmail.com',
             'ChucVu'       => 'Phó phòng',
             'PhongBan'     => 'Phòng Kế toán & Ngân quỹ',
@@ -378,7 +378,7 @@ class ItSupportTemplatePrintAndScanTest extends TestCase
         // Kiểm tra thông tin đã được cache an toàn
         $cached = \Illuminate\Support\Facades\Cache::get("it_officer_profile_{$user->id}");
         $this->assertIsArray($cached);
-        $this->assertEquals('02773851364', $cached['SoDienThoai']);
+        $this->assertEquals('0912345678', $cached['SoDienThoai']);
         $this->assertEquals('armynus11@gmail.com', $cached['EmailNV']);
     }
 
@@ -481,5 +481,135 @@ class ItSupportTemplatePrintAndScanTest extends TestCase
         $response->assertSee('In biểu mẫu Word');
         $response->assertDontSee('In & Tạo Yêu Cầu IT');
         $response->assertDontSee('name="action" value="create"', false);
+    }
+
+    public function test_phone_field_renders_in_requester_group(): void
+    {
+        $this->withoutMiddleware();
+
+        $user = User::first();
+        $this->assertNotNull($user);
+        $user->update(['phone_no' => '0988776655']);
+
+        $template = ItSupportTemplate::firstOrCreate(
+            ['name' => 'Biểu mẫu kiểm tra trường SDT'],
+            [
+                'fields' => ['TenCanBo', 'SDT'],
+                'file_template' => 'it_support_templates/sample.docx',
+                'usage_count' => 0,
+            ]
+        );
+        $template->update(['fields' => ['TenCanBo', 'SDT']]);
+
+        $response = $this->withSession(['user_id' => $user->id])
+            ->get(route('user.it_support.templates.show', $template->id));
+
+        $response->assertOk();
+
+        // Kiểm tra trường SDT hiển thị đúng nhãn và tự động điền phone_no của cán bộ
+        $response->assertSee('Số điện thoại');
+        $response->assertSee('name="SDT"', false);
+        $response->assertSee('value="0988776655"', false);
+    }
+
+    public function test_null_phone_no_leaves_sdt_empty_and_warns_without_using_branch_phone(): void
+    {
+        $this->withoutMiddleware();
+
+        $user = User::first();
+        $this->assertNotNull($user);
+        $user->update(['phone_no' => null]);
+
+        $branchPhone = '02773851364';
+        if ($user->branch) {
+            $user->branch->update(['branch_phone' => $branchPhone]);
+        }
+
+        $template = ItSupportTemplate::firstOrCreate(
+            ['name' => 'Biểu mẫu kiểm tra trường SDT trống'],
+            [
+                'fields' => ['TenCanBo', 'SDT'],
+                'file_template' => 'it_support_templates/sample.docx',
+                'usage_count' => 0,
+            ]
+        );
+        $template->update(['fields' => ['TenCanBo', 'SDT']]);
+
+        $response = $this->withSession([
+            'user_id' => $user->id,
+            'UserBranchPhone' => $branchPhone,
+        ])->get(route('user.it_support.templates.show', $template->id));
+
+        $response->assertOk();
+
+        // Kiểm tra trường SDT để trống, KHÔNG lấy nhầm số điện thoại chi nhánh và hiển thị cảnh báo
+        $response->assertDontSee('name="SDT" class="it-form-control it-field-input it-form-control--autofilled" value="' . $branchPhone . '"', false);
+        $response->assertSee('Chưa khai báo SĐT');
+        $response->assertSee('Chưa khai báo SĐT cá nhân trong hồ sơ');
+    }
+
+    public function test_sdt_co_quan_field_auto_fills_branch_phone(): void
+    {
+        $this->withoutMiddleware();
+
+        $user = User::first();
+        $this->assertNotNull($user);
+        $user->update(['phone_no' => '0912345678']);
+
+        $branchPhone = '02773851364';
+        if ($user->branch) {
+            $user->branch->update(['branch_phone' => $branchPhone]);
+        }
+
+        $template = ItSupportTemplate::firstOrCreate(
+            ['name' => 'Biểu mẫu kiểm tra SDTCoQuan'],
+            [
+                'fields' => ['TenCanBo', 'SDT', 'SDTCoQuan'],
+                'file_template' => 'it_support_templates/sample.docx',
+                'usage_count' => 0,
+            ]
+        );
+        $template->update(['fields' => ['TenCanBo', 'SDT', 'SDTCoQuan']]);
+
+        $response = $this->withSession([
+            'user_id' => $user->id,
+            'UserBranchPhone' => $branchPhone,
+        ])->get(route('user.it_support.templates.show', $template->id));
+
+        $response->assertOk();
+
+        // SDT lấy từ user.phone_no
+        $response->assertSee('name="SDT"', false);
+        $response->assertSee('value="0912345678"', false);
+
+        // SDTCoQuan lấy từ branch.branch_phone
+        $response->assertSee('name="SDTCoQuan"', false);
+        $response->assertSee('value="' . $branchPhone . '"', false);
+    }
+
+    public function test_empty_phone_no_falls_back_gracefully_and_does_not_break_export(): void
+    {
+        $this->withoutMiddleware();
+
+        $user = User::first();
+        $this->assertNotNull($user);
+        $user->update(['phone_no' => null]);
+
+        $template = ItSupportTemplate::where('file_template', 'like', '%.docx%')->first();
+        if (!$template) {
+            $this->markTestSkipped('Không có template để test.');
+        }
+
+        $response = $this->withSession(['user_id' => $user->id])
+            ->post(route('user.it_support.templates.printAndCreate'), [
+                'template_id' => $template->id,
+                'action' => 'print',
+                'TenCanBo' => 'Cán bộ test',
+                'SDT' => '',
+                'SDTCoQuan' => '02773851364',
+            ]);
+
+        $response->assertOk();
+        $this->assertStringContainsString('attachment;', $response->headers->get('Content-Disposition') ?? '');
     }
 }

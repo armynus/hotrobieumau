@@ -1,5 +1,5 @@
 <div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg">
             <!-- Header -->
             <div class="modal-header" style="background-color: #4e73df; color: #ffffff;">
@@ -52,6 +52,9 @@
                                     <dt class="col-sm-5 text-muted mb-2 font-weight-semibold">Số CCCD:</dt>
                                     <dd class="col-sm-7 mb-2 font-weight-bold text-gray-900" id="view_user_citizen_id">—</dd>
 
+                                    <dt class="col-sm-5 text-muted mb-2 font-weight-semibold">Số điện thoại:</dt>
+                                    <dd class="col-sm-7 mb-2 font-weight-bold text-gray-900" id="view_user_phone_no">—</dd>
+
                                     <dt class="col-sm-5 text-muted mb-2 font-weight-semibold">Mã người dùng IPCAS:</dt>
                                     <dd class="col-sm-7 mb-2 font-weight-bold text-gray-900" id="view_user_ipcas">—</dd>
 
@@ -96,11 +99,10 @@
                             </div>
                             <div class="card-body p-3">
                                 <dl class="row mb-0 small">
-                                    <dt class="col-sm-5 text-muted mb-2 font-weight-semibold">Quyền hệ thống:</dt>
-                                    <dd class="col-sm-7 mb-2" id="view_user_role">—</dd>
-
-                                    <dt class="col-sm-5 text-muted mb-2 font-weight-semibold">Vai trò văn thư:</dt>
-                                    <dd class="col-sm-7 mb-2" id="view_user_document_role">—</dd>
+                                    <dt class="col-sm-5 text-muted mb-2 font-weight-semibold">Vai trò đảm nhiệm:</dt>
+                                    <dd class="col-sm-7 mb-2" id="view_user_roles_badges">
+                                        <span id="view_user_role">—</span>
+                                    </dd>
 
                                     <dt class="col-sm-5 text-muted mb-0 font-weight-semibold">Trạng thái:</dt>
                                     <dd class="col-sm-7 mb-0" id="view_user_status_text">—</dd>
@@ -120,6 +122,9 @@
                                 <dl class="row mb-0 small">
                                     <dt class="col-sm-5 text-muted mb-2 font-weight-semibold">ID tài khoản:</dt>
                                     <dd class="col-sm-7 mb-2"><span class="badge badge-light border text-monospace font-weight-bold" id="view_user_id">#—</span></dd>
+
+                                    <dt class="col-sm-5 text-muted mb-2 font-weight-semibold">Lần đăng nhập sai:</dt>
+                                    <dd class="col-sm-7 mb-2" id="view_user_failed_attempts">—</dd>
 
                                     <dt class="col-sm-5 text-muted mb-2 font-weight-semibold">Thời gian tạo:</dt>
                                     <dd class="col-sm-7 mb-2 text-gray-700" id="view_user_created_at">—</dd>

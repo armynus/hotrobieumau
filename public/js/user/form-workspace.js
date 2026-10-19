@@ -2,6 +2,10 @@ import {readFields} from './support-form-draft-state.js';
 import {fieldIssue, prepareWorkspaceNavigation} from './form-workspace-state.js';
 
 const form = document.getElementById('supportForm');
+const cfgEl = document.getElementById('form-workspace-config');
+if (cfgEl && cfgEl.dataset && cfgEl.dataset.config) {
+    try { window.FormWorkspaceConfig = JSON.parse(cfgEl.dataset.config); } catch (e) {}
+}
 if (form && window.FormWorkspaceConfig) {
     prepareWorkspaceNavigation();
     const cfg = window.FormWorkspaceConfig;

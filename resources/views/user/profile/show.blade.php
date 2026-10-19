@@ -19,7 +19,7 @@
         <div>
             <p class="profile-eyebrow">TÀI KHOẢN CỦA TÔI</p>
             <h1>Thông tin cá nhân</h1>
-            <p>Kiểm tra thông tin tài khoản và cập nhật thông tin cá nhân, mã nhân viên, số CCCD hoặc ảnh đại diện.</p>
+            <p>Kiểm tra thông tin tài khoản và cập nhật thông tin cá nhân, mã nhân viên, số điện thoại, số CCCD hoặc ảnh đại diện.</p>
         </div>
         <a class="btn btn-light" href="{{ route('index') }}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Về trang chủ</a>
     </header>
@@ -76,6 +76,15 @@
                 </div>
 
                 <div class="form-group text-left">
+                    <label for="phone_no">Số điện thoại liên hệ</label>
+                    <input type="tel" class="form-control @error('phone_no') is-invalid @enderror" id="phone_no" name="phone_no" maxlength="20" value="{{ old('phone_no', $user->phone_no) }}" placeholder="Ví dụ: 0912345678" autocomplete="tel">
+                    @error('phone_no')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <small class="form-text text-muted">Dùng để liên hệ và tự động điền các biểu mẫu nghiệp vụ / IT.</small>
+                </div>
+
+                <div class="form-group text-left">
                     <label for="citizen_id">Số CCCD / CMND</label>
                     <input type="text" class="form-control @error('citizen_id') is-invalid @enderror" id="citizen_id" name="citizen_id" maxlength="20" value="{{ old('citizen_id', $user->citizen_id) }}" placeholder="Ví dụ: 087095001234">
                     @error('citizen_id')
@@ -93,13 +102,14 @@
                 <div class="profile-card-header"><div class="profile-card-icon profile-card-icon--blue"><i class="fas fa-id-card" aria-hidden="true"></i></div><div><h2 id="accountInfoTitle">Thông tin tài khoản</h2><p>Dữ liệu nhận diện và trạng thái đăng nhập.</p></div></div>
                 <dl class="profile-info-grid">
                     <div><dt>Mã nhân viên</dt><dd>{{ $user->employee_code ?: 'Chưa cập nhật' }}</dd></div>
+                    <div><dt>Số điện thoại</dt><dd>{{ $user->phone_no ?: 'Chưa cập nhật' }}</dd></div>
                     <div><dt>Số CCCD / CMND</dt><dd>{{ $user->citizen_id ?: 'Chưa cập nhật' }}</dd></div>
                     <div><dt>Email đăng nhập</dt><dd>{{ $user->email }}</dd></div>
                     <div><dt>Mã người dùng IPCAS</dt><dd>{{ $user->user_ipcas ?: 'Chưa cập nhật' }}</dd></div>
                     <div><dt>Trạng thái</dt><dd><span class="profile-badge {{ $user->status === 'active' ? 'profile-badge--success' : 'profile-badge--muted' }}">{{ $user->status === 'active' ? 'Đang hoạt động' : 'Tạm khóa' }}</span></dd></div>
                     <div><dt>Ngày tạo tài khoản</dt><dd>{{ optional($user->created_at)->format('d/m/Y') ?: '—' }}</dd></div>
                 </dl>
-                <p class="profile-note"><i class="fas fa-info-circle" aria-hidden="true"></i>Email đăng nhập và mã IPCAS do quản trị viên quản lý. Bạn có thể tự cập nhật Họ tên, Mã nhân viên và Số CCCD để hệ thống tự động điền các biểu mẫu.</p>
+                <p class="profile-note"><i class="fas fa-info-circle" aria-hidden="true"></i>Email đăng nhập và mã IPCAS do quản trị viên quản lý. Bạn có thể tự cập nhật Họ tên, Mã nhân viên, Số điện thoại và Số CCCD để hệ thống tự động điền các biểu mẫu.</p>
             </section>
 
             <section class="card profile-card" aria-labelledby="organizationInfoTitle">
@@ -109,7 +119,7 @@
                     <div><dt>Mã chi nhánh</dt><dd>{{ $user->branch?->branch_code ?: '—' }}</dd></div>
                     <div><dt>Phòng giao dịch</dt><dd>{{ $user->transactionOffice?->office_name ?: 'Không thuộc phòng giao dịch' }}</dd></div>
                     <div><dt>Mã phòng giao dịch</dt><dd>{{ $user->transactionOffice?->office_code ?: '—' }}</dd></div>
-                    <div><dt>Phòng ban</dt><dd>{{ $user->department?->department_name ?: 'Chưa cập nhật' }}</dd></div>
+                    <div><dt>Phòng ban</dt><dd>{{ $user->department?->department_name ? ($user->department->department_name . ($user->department->department_code ? ' ('.$user->department->department_code.')' : '')) : 'Chưa cập nhật' }}</dd></div>
                     <div><dt>Chức vụ</dt><dd>{{ $user->position?->position_name ?: 'Chưa cập nhật' }}</dd></div>
                     @if($user->transactionOffice?->office_address || $user->transactionOffice?->office_place)
                         <div class="profile-info-wide"><dt>Địa chỉ phòng giao dịch</dt><dd>{{ collect([$user->transactionOffice->office_address, $user->transactionOffice->office_place])->filter()->join(', ') }}</dd></div>

@@ -8,7 +8,9 @@ use Illuminate\Http\Request;
 
 class GeographyLookupController extends Controller
 {
-    public function __construct(private GeographyStore $store) {}
+    public function __construct(private GeographyStore $store)
+    {
+    }
 
     public function index()
     {

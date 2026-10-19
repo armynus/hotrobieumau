@@ -20,6 +20,18 @@ class TenantDatabase
             return redirect()->route('login');
         }
 
+        $userId = session('user_id');
+        $syncResult = \App\Models\User::syncSessionPermissionsIfNeeded($userId, $request->hasSession() ? $request->session() : null);
+        if ($syncResult === false) {
+            if ($request->hasSession()) {
+                $request->session()->flush();
+            }
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Tài khoản của bạn đã bị khóa hoặc không còn hoạt động.'], 403);
+            }
+            return redirect()->route('login')->with('error', 'Tài khoản của bạn đã bị khóa hoặc không còn hoạt động.');
+        }
+
         // Lấy thông tin chi nhánh của user từ session
         $branchId = session('UserBranchId');
 

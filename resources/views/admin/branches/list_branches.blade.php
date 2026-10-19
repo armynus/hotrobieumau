@@ -83,8 +83,8 @@
 @endsection
 
 @push('scripts')
-    <script src="{{asset('vendor/datatables/jquery.dataTables.min.js')}}"></script>
-    <script src="{{asset('vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
-    <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
+    <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}?v={{ filemtime(public_path('vendor/datatables/jquery.dataTables.min.js')) }}"></script>
+    <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}?v={{ filemtime(public_path('vendor/datatables/dataTables.bootstrap4.min.js')) }}"></script>
+    <script src="{{ asset('js/demo/datatables-demo.js') }}?v={{ filemtime(public_path('js/demo/datatables-demo.js')) }}"></script>
     @include('admin.partials.ajax_branch')
 @endpush

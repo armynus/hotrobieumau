@@ -36,6 +36,7 @@ class UserProfileTest extends TestCase
             $table->id();
             $table->unsignedBigInteger('branch_id');
             $table->string('department_name');
+            $table->string('department_code')->nullable();
             $table->timestamps();
         });
         Schema::create('positions', function (Blueprint $table): void {
@@ -64,6 +65,7 @@ class UserProfileTest extends TestCase
             $table->string('name');
             $table->string('email')->unique();
             $table->string('user_ipcas')->nullable();
+            $table->string('phone_no')->nullable();
             $table->string('avatar_path')->nullable();
             $table->string('password');
             $table->string('role_id');
@@ -77,7 +79,7 @@ class UserProfileTest extends TestCase
             'branch_type' => 'type_1', 'status' => 'active', 'created_at' => now(), 'updated_at' => now(),
         ]);
         DB::table('departments')->insert([
-            'id' => 2, 'branch_id' => 1, 'department_name' => 'Phòng Khách hàng',
+            'id' => 2, 'branch_id' => 1, 'department_name' => 'Phòng Khách hàng', 'department_code' => 'PKH',
             'created_at' => now(), 'updated_at' => now(),
         ]);
         DB::table('positions')->insert([
@@ -92,7 +94,7 @@ class UserProfileTest extends TestCase
         ]);
         DB::table('users')->insert([
             'id' => 4, 'branch_id' => 1, 'department_id' => 2, 'transaction_office_id' => 6, 'position_id' => 3,
-            'name' => 'Nguyễn Văn A', 'email' => 'a@example.test', 'user_ipcas' => 'NVA001',
+            'name' => 'Nguyễn Văn A', 'email' => 'a@example.test', 'user_ipcas' => 'NVA001', 'phone_no' => '0912345678',
             'password' => bcrypt('secret1'), 'role_id' => '2', 'document_role' => 'user',
             'status' => 'active', 'created_at' => now(), 'updated_at' => now(),
         ]);
@@ -106,11 +108,13 @@ class UserProfileTest extends TestCase
             ->assertSee('Thông tin cá nhân')
             ->assertSee('a@example.test')
             ->assertSee('NVA001')
+            ->assertSee('0912345678')
             ->assertSee('Agribank Đồng Tháp')
             ->assertSee('Phòng giao dịch Sa Đéc')
             ->assertSee('12 Nguyễn Huệ, Đồng Tháp')
             ->assertSee('0277 123 4567')
             ->assertSee('Phòng Khách hàng')
+            ->assertSee('PKH')
             ->assertSee('Giao dịch viên');
     }
 
@@ -120,6 +124,7 @@ class UserProfileTest extends TestCase
 
         $response = $this->withSession($this->sessionData())->put('/profile', [
             'name' => 'Nguyễn Văn B',
+            'phone_no' => '0987654321',
             'avatar' => $avatar,
             'branch_id' => 999,
             'role_id' => '1',
@@ -134,6 +139,7 @@ class UserProfileTest extends TestCase
 
         $user = User::findOrFail(4);
         $this->assertSame('Nguyễn Văn B', $user->name);
+        $this->assertSame('0987654321', $user->phone_no);
         $this->assertSame('a@example.test', $user->email);
         $this->assertSame(1, $user->branch_id);
         $this->assertSame('2', $user->role_id);
@@ -185,6 +191,14 @@ class UserProfileTest extends TestCase
         ])->assertSessionHasErrors('avatar');
 
         $this->assertNull(User::findOrFail(4)->avatar_path);
+    }
+
+    public function test_user_phone_no_validation_rejects_invalid_format(): void
+    {
+        $this->withSession($this->sessionData())->put('/profile', [
+            'name' => 'Nguyễn Văn A',
+            'phone_no' => 'abc1234',
+        ])->assertSessionHasErrors('phone_no');
     }
 
     public function test_password_change_ignores_a_forged_user_id_and_updates_only_the_session_user(): void

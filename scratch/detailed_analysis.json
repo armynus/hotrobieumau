@@ -1,0 +1,771 @@
+[
+  {
+    "rel_path": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+    "title": "Danh mục mẫu biểu hệ thống quản trị User BE-ADMIN",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu: .................................................................................................................",
+      "Mã đơn vị trên IPCAS: .....................................................................................................",
+      "Mã liên ngân hàng: ...........................................................................................................",
+      "Yêu cầu khác: ...................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại: .......................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "Thời gian phê duyệt: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "Kính gửi: ..............................................................................................................................................................................",
+      "Đơn vị yêu cầu: ....................................................................................................................................................................................",
+      "Mã đơn vị trên IPCAS: .........................................................................................................................................................................",
+      "Mã liên ngân hàng: ...............................................................................................................................................................................",
+      "Yêu cầu khác:....................................................................................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại:........................................................................................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20.................................................................................................................",
+      "Mã đơn vị trên IPCAS: ......................................................................................................"
+    ],
+    "table_headers": [
+      "Table 1: STT | Mẫu biểu | Nội dung | Mục dịch vụ trên hệ thống ITSM được lựa chọn để gửi về bộ phận quản trị tại TSC",
+      "Table 4: STT | Họ và tên | Phòng/Đơn vị | Chức vụ | Mã nhân viên | Mã người dùng IPCAS | Số CMND/CCCD | Email",
+      "Table 5: STT | Họ và tên | Mã nhân viên1 | Mã người dùng BE-ADMIN | Loại thông tin cần cập nhật | Nội dung cập nhật | Ghi chú",
+      "Table 8: STT | Họ và tên | Phòng/Đơn vị | Mã nhân viên | User IPCAS | Số CMND/CCCD | Email | Số điện thoại di động",
+      "Table 12: STT | Họ và tên | Mã nhân viên | Mã người dùng BE-ADMIN | Loại thông tin cần cập nhật | Nội dung cập nhật | Ghi chú"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu: .................................................................................................................",
+      "Mã đơn vị trên IPCAS: .....................................................................................................",
+      "Mã liên ngân hàng: ...........................................................................................................",
+      "Yêu cầu khác: ...................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại: .......................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "Thời gian phê duyệt: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "................, ngày ..... tháng ..... năm ........"
+    ],
+    "table_headers": [
+      "Table 3: STT | Họ và tên | Phòng/Đơn vị | Chức vụ | Mã nhân viên | Mã người dùng IPCAS | Số CMND/CCCD | Email",
+      "Table 4: STT | Họ và tên | Mã nhân viên1 | Mã người dùng BE-ADMIN | Loại thông tin cần cập nhật | Nội dung cập nhật | Ghi chú"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Kính gửi: ..............................................................................................................................................................................",
+      "Đơn vị yêu cầu: ....................................................................................................................................................................................",
+      "Mã đơn vị trên IPCAS: .........................................................................................................................................................................",
+      "Mã liên ngân hàng: ...............................................................................................................................................................................",
+      "Yêu cầu khác:....................................................................................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại:........................................................................................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20.................................................................................................................",
+      ".............., ngày ..... tháng ..... năm.........."
+    ],
+    "table_headers": [
+      "Table 1: STT | Họ và tên | Phòng/Đơn vị | Mã nhân viên | User IPCAS | Số CMND/CCCD | Email | Số điện thoại di động"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu: .................................................................................................................",
+      "Mã đơn vị trên IPCAS: ......................................................................................................",
+      "Mã liên ngân hàng: ...........................................................................................................",
+      "Yêu cầu khác: ...................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại: .......................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "............, ngày ...... tháng ...... năm 20......"
+    ],
+    "table_headers": [
+      "Table 2: STT | Họ và tên | Mã nhân viên | Mã người dùng BE-ADMIN | Loại thông tin cần cập nhật | Nội dung cập nhật | Ghi chú",
+      "Table 3: STT | Họ và tên | Phòng/Đơn vị | Mã nhân viên2 | Mã người dùng BE-ADMIN3 | Nhóm quyền  truy cập | Yêu cầu thay đổi | Ghi chú"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Kính gửi: …………………………………………..….",
+      "Họ và tên Người dùng: ……………………………………………………………….",
+      "Chức vụ:……………………………………………………………………….………",
+      "Số điện thoại liên hệ: ………….………………………………………..……………..",
+      "Đơn vị công tác:………………………………………….………….…………………",
+      "Mã đơn vị trên IPCAS:…………………………………………………..…………….",
+      "Mã liên ngân hàng: ……………………………………….………………...................",
+      "Lý do: …………………………………………………………………………..…...",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "Kính gửi: ………………………………",
+      "Họ và tên Người dùng: ……………………………………………….……………",
+      "Chức vụ:………………………………………… …………………………………",
+      "Số điện thoại liên hệ: …………………………………………….………………...",
+      "Đơn vị công tác:……………………………………………………………….……",
+      "Mã đơn vị trên IPCAS:…………………………………………………………..…."
+    ],
+    "table_headers": [],
+    "sample_text": []
+  },
+  {
+    "rel_path": "BeAdmin\\Mau-05_Yeu-Cau-Thay-Doi-Trang-Thai-Nguoi-Su-Dung-BE-ADMIN.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu:..................................................................................................................",
+      "Mã đơn vị trên IPCAS: .....................................................................................................",
+      "Mã liên ngân hàng: ...........................................................................................................",
+      "Yêu cầu khác: ...................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại: .......................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20................................................"
+    ],
+    "table_headers": [
+      "Table 2: STT | Mã đơn vị (mã liên ngân hàng) | Mã đơn vị (IPCAS) | Họ và tên | Phòng/ Đơn vị | Mã nhân viên | Mã người dùng BE-ADMIN | Yêu cầu"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "BeAdmin\\Mau-06_Phieu-Yeu-Cau-BeAdmin.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Yêu cầu khác: ..................................................................................................................."
+    ],
+    "table_headers": [
+      "Table 3: STT | Mã đơn vị (mã liên ngân hàng) | Mã đơn vị (IPCAS) | Họ và tên | Phòng/ Đơn vị | Mã nhân viên | Mã người dùng BE-ADMIN | Yêu cầu"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin.docx",
+    "title": "Mẫu CSUS/01",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [
+      "${CCCD}",
+      "${ChucVu}",
+      "${DiaDanh}",
+      "${EmailNV}",
+      "${IPCAS}",
+      "${MaChiNhanh}",
+      "${MaNV}",
+      "${NgayYeuCau}",
+      "${PhongBan}",
+      "${SoDienThoai}",
+      "${TenCanBo}",
+      "${TenChiNhanh}"
+    ],
+    "dotted_fields": [],
+    "table_headers": [
+      "Table 2: STT | Họ và tên | Phòng ban | Chức vụ | Mã số nhân viên | Địa chỉ E-Mail | Số điện thoại | Số CMND/Số thẻ căn cước",
+      "Table 3: STT | Họ và tên | Mã người dùng | Thông tin cần bổ sung/thay đổi | Ghi chú"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+    "title": "Mẫu CSUS/02",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "............, ngày ...... tháng ...... năm 20......"
+    ],
+    "table_headers": [
+      "Table 2: STT | Họ và tên | Phòng ban | Chức vụ | Mã số  nhân viên | Địa chỉ         E-Mail | Số điện thoại | Số CMND/Số thẻ căn cước",
+      "Table 3: TT | Họ và tên | Mã số nhân viên | Chức năng giao dịch/Nhóm chức năng nghiệp vụ đề nghị cấp | Chức năng giao dịch/Nhóm chức năng nghiệp vụ loại trừ | Quyền nghiệp vụ giao dịch đề nghị cấp",
+      "Table 4: LẬP BIỂU (Ký, ghi rõ họ tên) | TRƯỞNG PHÒNG/ GIÁM ĐỐC CN LOẠI II/ TRƯỞNG ĐOÀN KIỂM TRA | THỦ TRƯỞNG ĐƠN VỊ (Ký, đóng dấu)"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+    "title": "Mẫu CSUS/03",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "............, ngày ...... tháng ...... năm 20......"
+    ],
+    "table_headers": [
+      "Table 2: STT | Họ và tên | Mã người dùng | Thông tin cần bổ sung/hủy bỏ | Ghi chú",
+      "Table 3: STT | Họ và tên | Mã số nhân viên | Chức năng giao dịch/Nhóm chức năng nghiệp vụ đề nghị thay đổi | Quyền nghiệp vụ giao dịch đề nghị thay đổi",
+      "Table 4: LẬP BIỂU (Ký, ghi rõ họ tên) | TRƯỞNG PHÒNG/ GIÁM ĐỐC CN LOẠI II/ TRƯỞNG ĐOÀN KIỂM TRA | THỦ TRƯỞNG ĐƠN VỊ (Ký, đóng dấu)"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+    "title": "Mẫu CSUS/03",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "............, ngày ...... tháng ...... năm 20......"
+    ],
+    "table_headers": [
+      "Table 2: STT | Họ và tên | Mã người dùng | Thông tin cần bổ sung/hủy bỏ | Ghi chú",
+      "Table 3: STT | Họ và tên | Mã số nhân viên | Chức năng giao dịch/Nhóm chức năng nghiệp vụ đề nghị thay đổi | Quyền nghiệp vụ giao dịch đề nghị thay đổi",
+      "Table 4: LẬP BIỂU (Ký, ghi rõ họ tên) | TRƯỞNG PHÒNG/ GIÁM ĐỐC CN LOẠI II/ TRƯỞNG ĐOÀN KIỂM TRA | THỦ TRƯỞNG ĐƠN VỊ (Ký, đóng dấu)"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx",
+    "title": "Mẫu CSUS/04",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Thời gian tiếp nhận:…….giờ……..phút, ngày……/……/",
+      "............, ngày ...... tháng ...... năm 20......"
+    ],
+    "table_headers": [
+      "Table 2: Sử dụng lại mã người dùng (3.1) | Xử lý công việc còn tồn đọng (3.2)",
+      "Table 3: NGƯỜI LẬP BIÊN BẢN (Ký, ghi rõ họ tên) | NGƯỜI TIẾP NHẬN (Ký, ghi rõ họ tên) | TRƯỞNG PHÒNG/ GIÁM ĐỐC CHI NHÁNH LOẠI II"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+    "title": "Mẫu CSUS/05",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Thời gian tiếp nhận:…….giờ……..phút, ngày……/……/",
+      "............, ngày ...... tháng ...... năm 20......"
+    ],
+    "table_headers": [
+      "Table 2: NGƯỜI LẬP BIÊN BẢN (Ký, ghi rõ họ tên) | NGƯỜI TIẾP NHẬN (Ký, ghi rõ họ tên) | TRƯỞNG PHÒNG/ GIÁM ĐỐC CHI NHÁNH LOẠI II"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx",
+    "title": "Mẫu CSUS/06",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Thời gian bàn giao:…….giờ……..phút, ngày……/……/",
+      "Hai bên đã thực hiện bàn giao/tiếp nhận mã người dùng và mật khẩu của IPCAS với mã người dùng là ................................",
+      "............, ngày ...... tháng ...... năm 20......"
+    ],
+    "table_headers": [],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+    "title": "Mẫu CSUS/07",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Tôi xin xác nhận đã nhận được mã người dùng:………..……….. và mật khẩu khởi tạo từ bộ phận quản trị hệ thống vào hồi ……giờ……phút ngày………………………",
+      "............, ngày ...... tháng ...... năm 20......"
+    ],
+    "table_headers": [],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-08_Thu-Hoi-Tam-Khoa-User.docx",
+    "title": "Mẫu CSUS/08",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Thời gian yêu cầu thu hồi: Từ ngày …../……/…..……."
+    ],
+    "table_headers": [
+      "Table 2: Đề nghị bộ phận quản trị hệ thống thu hồi tạm thời (Revoked) mã người dùng: ……… Thời gian thu hồi tạm thời: Từ ngày 27/07/2026  đến 31/07/2026 Lý do thu hồi: Nghỉ phép bắt buộc",
+      "Table 3: Đề nghị bộ phận quản trị hệ thống thu hồi vĩnh viễn (Deleted) mã người dùng: ……… Thời gian yêu cầu thu hồi: Từ ngày …../……/…..……. Lý do thu hồi:",
+      "Table 4: NGƯỜI DÙNG (Ký, ghi rõ họ tên) | TRƯỞNG PHÒNG (Ký, ghi rõ họ tên) | THỦ TRƯỞNG ĐƠN VỊ (Ký, đóng dấu)"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-08_Yeu-Cau-Thu-Hoi-Ma-Nguoi-Dung.docx",
+    "title": "Mẫu CSUS/08",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "............, ngày ...... tháng ...... năm 20......",
+      "Thời gian yêu cầu thu hồi: Từ ngày …../……/…..……."
+    ],
+    "table_headers": [
+      "Table 2: Đề nghị bộ phận quản trị hệ thống thu hồi tạm thời (Revoked) mã người dùng: ……… Thời gian thu hồi tạm thời: Từ ngày 01/07/2026. Đến 12/01/2027 Lý do thu hồi: Nghỉ phép và nghỉ thai sản",
+      "Table 3: Đề nghị bộ phận quản trị hệ thống thu hồi vĩnh viễn (Deleted) mã người dùng: ……… Thời gian yêu cầu thu hồi: Từ ngày …../……/…..……. Lý do thu hồi:",
+      "Table 4: NGƯỜI DÙNG (Ký, ghi rõ họ tên) | TRƯỞNG PHÒNG | THỦ TRƯỞNG ĐƠN VỊ (Ký, đóng dấu)"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+    "title": "Mẫu CSUS/09",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [],
+    "table_headers": [
+      "Table 2: NGƯỜI DÙNG (Ký, ghi rõ họ tên) | TRƯỞNG PHÒNG/ GIÁM ĐỐC CN LOẠI II/ TRƯỞNG ĐOÀN KIỂM TRA | THỦ TRƯỞNG ĐƠN VỊ (Ký, đóng dấu)"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+    "title": "Mẫu CSUS/09",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "............, ngày ...... tháng ...... năm 20......"
+    ],
+    "table_headers": [
+      "Table 2: NGƯỜI DÙNG (Ký, ghi rõ họ tên) | TRƯỞNG PHÒNG/ GIÁM ĐỐC CN LOẠI II/ TRƯỞNG ĐOÀN KIỂM TRA | THỦ TRƯỞNG ĐƠN VỊ (Ký, đóng dấu)"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+    "title": "Mẫu CSUS/10",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "............, ngày ...... tháng ...... năm 20......"
+    ],
+    "table_headers": [
+      "Table 2: STT | Mã nhóm người dùng | Tên nhóm | Chức năng giao dịch/Nhóm chức năng nghiệp vụ | CRUD/Auto Sync | Chức năng giao dịch/Nhóm chức năng nghiệp vụ loại trừ | Ghi chú",
+      "Table 3: LẬP BIỂU | TRƯỞNG PHÒNG | THỦ TRƯỞNG ĐƠN VỊ"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+    "title": "Mẫu CSUS/01",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Thời gian tiếp nhận:…….giờ……..phút, ngày……/……/",
+      "Thời gian bàn giao:…….giờ……..phút, ngày……/……/",
+      "Hai bên đã thực hiện bàn giao/tiếp nhận mã người dùng và mật khẩu của IPCAS với mã người dùng là ................................",
+      "Tôi xin xác nhận đã nhận được mã người dùng:………..……….. và mật khẩu khởi tạo từ bộ phận quản trị hệ thống vào hồi ……giờ……phút ngày………………………",
+      "............, ngày ...... tháng ...... năm 20......",
+      "Thời gian yêu cầu thu hồi: Từ ngày …../……/…..……."
+    ],
+    "table_headers": [
+      "Table 2: STT | Họ và tên | Phòng ban | Chức vụ | Mã số nhân viên | Địa chỉ E-Mail | Số điện thoại | Số CMND/Số thẻ căn cước",
+      "Table 3: STT | Họ và tên | Mã người dùng | Thông tin cần bổ sung/thay đổi | Ghi chú",
+      "Table 8: STT | Họ và tên | Phòng ban | Chức vụ | Mã số  nhân viên | Địa chỉ         E-Mail | Số điện thoại | Số CMND/Số thẻ căn cước",
+      "Table 9: TT | Họ và tên | Mã số nhân viên | Chức năng giao dịch/Nhóm chức năng nghiệp vụ đề nghị cấp | Chức năng giao dịch/Nhóm chức năng nghiệp vụ loại trừ | Quyền nghiệp vụ giao dịch đề nghị cấp",
+      "Table 10: LẬP BIỂU (Ký, ghi rõ họ tên) | TRƯỞNG PHÒNG/ GIÁM ĐỐC CN LOẠI II/ TRƯỞNG ĐOÀN KIỂM TRA | THỦ TRƯỞNG ĐƠN VỊ (Ký, đóng dấu)"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx",
+    "title": "Mẫu số 15/TT",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [],
+    "table_headers": [
+      "Table 2: STT | Mã chi nhánh | Họ và tên | Chức vụ | USER IPCAS",
+      "Table 3: STT | Mã chi nhánh | Họ và tên | Chức vụ | User AD | User IPCAS | Địa chỉ Email (Agribank)"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "Mẫu PKI\\Mau-13A-PKI_Doi-Mat-Khau-PKI.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Thời gian thực hiện:………….User thực hiện:………..User phê duyệt:……………."
+    ],
+    "table_headers": [
+      "Table 2: NGƯỜI DÙNG (Ký và ghi rõ họ tên) | TRƯỞNG PHÒNG/ GIÁM ĐỐC CN LOẠI II | THỦ TRƯỞNG ĐƠN VỊ (Ký và ghi rõ họ tên)"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+    "title": "GIẤY ĐỀ NGHỊ VỀ CHỨNG THƯ CHỮ KÝ ĐIỆN TỬ",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Họ và tên: .............................................................................",
+      "Ngày sinh: .................... Nơi sinh:........................ Quốc tịch: Việt Nam",
+      "Số CCCD: ...................... Ngày cấp: .................. Nơi cấp: Cục QLHCVTTXH",
+      "Chức vụ: ..................................... Bộ phận: .....................................",
+      "Di động: ..................................... Email: ........................................",
+      "Mã nhận sự : ............................................",
+      "Thông tin về chi nhánh và User: BranchID: ................... User ID: ...............",
+      "Ngày hết hạn của chứng thư chữ ký điện tử : ......................................................",
+      "Lý do : .................................................................................................................",
+      "Thời gian : ......................... tháng",
+      "Ngày.... tháng .... năm ...."
+    ],
+    "table_headers": [],
+    "sample_text": []
+  },
+  {
+    "rel_path": "Mẫu PKI\\Mau-1B-PKI_De-Nghi-CTS-Cho-To-Chuc.docx",
+    "title": "MẪU SỐ 1B",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Lý do(3): ...."
+    ],
+    "table_headers": [],
+    "sample_text": []
+  },
+  {
+    "rel_path": "Mẫu PKI\\Mau-2A-PKI_Xac-Nhan-Da-Nhan-PKI.docx",
+    "title": "MẪU SỐ 2A",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Agribank chi nhánh Đồng Tháp Đồng Tháp, ngày……. tháng……năm……",
+      "...phút ngày"
+    ],
+    "table_headers": [],
+    "sample_text": []
+  },
+  {
+    "rel_path": "Mẫu PKI\\Mau-2B-PKI_Xac-Nhan-Da-Nhan-PKI-To-Chuc.docx",
+    "title": "CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM\nĐộc lập - Tự do - Hạnh phúc",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Kính gửi: Ngân hàng Agribank chi nhánh ...",
+      "Tôi xin xác nhận đã nhận được các chứng thư chữ ký điện tử của Đơn vị với các Serial number của chứng thư từ hệ thống vào hồi……..giờ……….phút ………ngày"
+    ],
+    "table_headers": [],
+    "sample_text": []
+  },
+  {
+    "rel_path": "Mẫu PKI\\Mau-3A-PKI_Giay-De-Nghi-Mo-Khoa-PKI.docx",
+    "title": "MẪU SỐ 3",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [],
+    "table_headers": [],
+    "sample_text": []
+  },
+  {
+    "rel_path": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+    "title": "CÁC TRẠNG THÁI NGƯỜI SỬ DỤNG VÀ CÁC MẪU BIỂU TRÊN PMNV",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "(Kèm theo Quy trình số ......./QTr-NHNo-CNTT ngày ...../....../2025 của Tổng Giám đốc)",
+      "Đơn vị yêu cầu: .................................................................................................................",
+      "Mã chi nhánh:....................................................................................................................",
+      "Tên Phần mềm nghiệp vụ: ………………………………………………………………",
+      "Yêu cầu khác: ...........................................................................................................................................................................................",
+      "Người liên hệ: ................................................. Số điện thoại: .......................................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20.................................................",
+      "Thời gian phê duyệt: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "Mã chi nhánh: ...................................................................................................................",
+      "Yêu cầu khác: .......................................................................................................................................................................................................",
+      "Người liên hệ: .............................................. Số điện thoại: .............................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20.........................................",
+      "Thời gian phê duyệt: ...... giờ ..... phút, ngày ..... / ..... /20.",
+      "Yêu cầu khác: ...................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại: ......................................."
+    ],
+    "table_headers": [
+      "Table 1: STT | Trạng thái | Ý nghĩa",
+      "Table 2: STT | Mẫu biểu | Nội dung",
+      "Table 5: STT | Họ và tên | Phòng/ Đơn vị | Mã nhân viên | User AD | Email AD | User IPCAS | Phương thức xác thực (PKI/SMS/IP…)",
+      "Table 9: STT | Họ và tên | Phòng/ Đơn vị | Mã nhân viên | User AD | Email AD | User IPCAS | Nhóm chức  năng",
+      "Table 13: STT | Họ và tên | User AD | Nội dung  cập nhật | Lý do  cập nhật"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu: .................................................................................................................",
+      "Mã chi nhánh:....................................................................................................................",
+      "Tên Phần mềm nghiệp vụ: ………………………………………………………………",
+      "Yêu cầu khác: ...........................................................................................................................................................................................",
+      "Người liên hệ: ................................................. Số điện thoại: .......................................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20.................................................",
+      "Thời gian phê duyệt: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      ".............., ngày ..... tháng ..... năm.........."
+    ],
+    "table_headers": [
+      "Table 3: STT | Họ và tên | Phòng/ Đơn vị | Mã nhân viên | User AD | Email AD | User IPCAS | Phương thức xác thực (PKI/SMS/IP…)"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu: .................................................................................................................",
+      "Mã chi nhánh: ...................................................................................................................",
+      "Tên Phần mềm nghiệp vụ: ………………………………………………………………",
+      "Yêu cầu khác: .......................................................................................................................................................................................................",
+      "Người liên hệ: .............................................. Số điện thoại: .............................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20.........................................",
+      "Thời gian phê duyệt: ...... giờ ..... phút, ngày ..... / ..... /20.",
+      ".............., ngày ..... tháng ..... năm.........."
+    ],
+    "table_headers": [
+      "Table 3: STT | Họ và tên | Phòng/ Đơn vị | Mã nhân viên | User AD | Email AD | User IPCAS | Nhóm chức  năng"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu: .................................................................................................................",
+      "Mã chi nhánh: ...................................................................................................................",
+      "Tên Phần mềm nghiệp vụ: ………………………………………………………………",
+      "Yêu cầu khác: ...................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại: .......................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "Thời gian phê duyệt: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      ".............., ngày ..... tháng ..... năm.........."
+    ],
+    "table_headers": [
+      "Table 3: STT | Họ và tên | User AD | Nội dung  cập nhật | Lý do  cập nhật"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu: .................................................................................................................",
+      "Mã chi nhánh: ………………….......................................................................................",
+      "Tên Phần mềm nghiệp vụ: ………………………………………………………………",
+      "Yêu cầu khác: ...................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại: .......................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "Thời gian phê duyệt: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      ".............., ngày ..... tháng ..... năm ........"
+    ],
+    "table_headers": [
+      "Table 3: STT | Họ và tên | User AD | Yêu cầu | Lý do"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu: .................................................................................................................................................................................................................",
+      "Mã đơn vị trên IPCAS: ......................................................................................................................................................................................................",
+      "Mã liên ngân hàng: ......................................................................................................................................................................................................",
+      "Yêu cầu khác: ......................................................................................................................................................................................................................................",
+      "Yêu cầu khác: .....................................................................................................................................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại: .......................................................................................................................................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "Thời gian phê duyệt: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "................, ngày ..... tháng ..... năm ........"
+    ],
+    "table_headers": [
+      "Table 1: STT | Họ và tên | Phòng/ Đơn vị | Chức vụ | Mã nhân viên | Mã người dùng IPCAS | Email AD | Mã đăng nhập",
+      "Table 2: STT | Họ và tên | Mã nhân viên1 | Mã đăng nhập | Loại thông tin cần cập nhật | Nội dung cập nhật | Ghi chú"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Kính gửi: ...........................................................................................................................................................................................................................................",
+      "Đơn vị yêu cầu: ....................................................................................................................................................................................................................................",
+      "Mã chi nhánh: .....................................................................................................................................................................................................................................",
+      "Yêu cầu khác:....................................................................................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại:........................................................................................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20.................................................................................................................",
+      ".............., ngày ..... tháng ..... năm.........."
+    ],
+    "table_headers": [
+      "Table 1: STT | Họ và tên | Phòng/Đơn vị | Mã nhân viên | Mã người dùng IPCAS | Email AD | User Name | Số điện thoại di động"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu: .................................................................................................................",
+      "Mã chi nhánh: ...................................................................................................................",
+      "Yêu cầu khác: ...................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại: .......................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "Thời gian phê duyệt: ...... giờ ..... phút, ngày ..... / ..... /20................................................"
+    ],
+    "table_headers": [
+      "Table 2: STT | Họ và tên | Mã nhân viên | Email AD | User Name | Loại thông tin cần cập nhật | Nội dung cập nhật | Ghi chú",
+      "Table 3: STT | Họ và tên | Phòng/ Đơn vị | Mã nhân viên1 | Email AD | Chức năng, quyền giao dịch | Yêu cầu thay đổi | Ghi chú"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+    "title": "Mẫu 04/SMF - USER",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Kính gửi: …………………………………………..….",
+      "Họ và tên Người dùng: ………………………………………………………….",
+      "Chức vụ:……………………………………………………………………….…",
+      "Đơn vị công tác:………………………………………………………….………",
+      "Số điện thoại liên hệ: ………………………………………………………..…..",
+      "Mã đơn vị trên IPCAS:………………………………………………………..….",
+      "Mã liên ngân hàng: ……………………………………………………………....",
+      "Đề nghị bộ phận quản trị hệ thống đổi lại mật khẩu Mã người dùng:……………",
+      "Lý do đổi lại: ……………………………………………………………………...",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "............, ngày ...... tháng ...... năm 20......"
+    ],
+    "table_headers": [],
+    "sample_text": []
+  },
+  {
+    "rel_path": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+    "title": "Mẫu 05/SMF - USER",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Kính gửi: …………………………………………..….",
+      "Họ và tên Người dùng: ………………………………………………………….",
+      "Chức vụ:……………… ………………………………………………………….",
+      "Đơn vị công tác:……… ………………………………………………………….",
+      "Số điện thoại liên hệ: …………………………………………………………….",
+      "Mã đơn vị trên IPCAS: ………………………………………………………….",
+      "Mã liên ngân hàng: …………………………………………………………….",
+      "Tôi xin xác nhận đã nhận được mã người dùng:……………………………….. và mật khẩu khởi tạo từ bộ phận quản trị hệ thống vào hồi ……giờ……phút ngày………………………",
+      "............, ngày ...... tháng ...... năm 20......",
+      ".............., ngày ..... tháng ..... năm ........"
+    ],
+    "table_headers": [],
+    "sample_text": []
+  },
+  {
+    "rel_path": "SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx",
+    "title": "PHIẾU YÊU CẦU",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu:..................................................................................................................",
+      "Mã chi nhánh: …………………........................................................................................",
+      "Yêu cầu khác: ...................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại: .......................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      ".............., ngày ..... tháng ..... năm ........"
+    ],
+    "table_headers": [
+      "Table 2: STT | Họ và tên | Phòng/ Đơn vị | Mã nhân viên | Mã người dùng SmartForm | Yêu cầu | Lý do"
+    ],
+    "sample_text": []
+  },
+  {
+    "rel_path": "SMF\\Mau-07_Phieu-Yeu-Cau-Ho-Tro.docx",
+    "title": "PHIẾU YÊU CẦU HỖ TRỢ",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu:...............................................................................................................",
+      "Mã chi nhánh: ………………….....................................................................................",
+      "Yêu cầu cụ thể như sau: …………………………………………………………………",
+      "Thông tin liên hệ của cán bộ yêu cầu (SĐT, email):…………………………………….."
+    ],
+    "table_headers": [],
+    "sample_text": []
+  },
+  {
+    "rel_path": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+    "title": "DANH MỤC MẪU BIỂU CẤP PHÁT USER SỬ DỤNG HỆ THỐNG SMARTFORM",
+    "can_read": true,
+    "error": null,
+    "var_placeholders": [],
+    "dotted_fields": [
+      "Đơn vị yêu cầu: .................................................................................................................................................................................................................",
+      "Mã đơn vị trên IPCAS: ......................................................................................................................................................................................................",
+      "Mã liên ngân hàng: ......................................................................................................................................................................................................",
+      "Yêu cầu khác: ......................................................................................................................................................................................................................................",
+      "Yêu cầu khác: .....................................................................................................................................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại: .......................................................................................................................................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "Thời gian phê duyệt: ...... giờ ..... phút, ngày ..... / ..... /20................................................",
+      "Kính gửi: ...........................................................................................................................................................................................................................................",
+      "Đơn vị yêu cầu: ....................................................................................................................................................................................................................................",
+      "Mã chi nhánh: .....................................................................................................................................................................................................................................",
+      "Yêu cầu khác:....................................................................................................................................................................................",
+      "Người liên hệ: .................................................... Số điện thoại:........................................................................................................",
+      "Thời gian thực hiện: ...... giờ ..... phút, ngày ..... / ..... /20.................................................................................................................",
+      "Đơn vị yêu cầu: ................................................................................................................."
+    ],
+    "table_headers": [
+      "Table 1: STT | Trạng thái | Ý nghĩa",
+      "Table 2: STT | Mẫu biểu | Nội dung",
+      "Table 4: STT | Họ và tên | Phòng/ Đơn vị | Chức vụ | Mã nhân viên | Mã người dùng IPCAS | Email AD | Mã đăng nhập",
+      "Table 5: STT | Họ và tên | Mã nhân viên1 | Mã đăng nhập | Loại thông tin cần cập nhật | Nội dung cập nhật | Ghi chú",
+      "Table 8: STT | Họ và tên | Phòng/Đơn vị | Mã nhân viên | Mã người dùng IPCAS | Email AD | User Name | Số điện thoại di động"
+    ],
+    "sample_text": []
+  }
+]

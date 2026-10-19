@@ -43,17 +43,20 @@
             </li> --}}
 
     <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item {{ request()->routeIs('admin_list_staff', 'admin_position_list') ? 'active' : '' }}">
-        <a class="nav-link  {{ request()->routeIs('admin_list_staff', 'admin_position_list') ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseTwo"
-            aria-expanded="{{ request()->routeIs('admin_list_staff', 'admin_position_list') ? 'true' : 'false' }}" aria-controls="collapseTwo">
+    <li class="nav-item {{ request()->routeIs('admin_list_staff', 'admin_position_list', 'admin.roles.*') ? 'active' : '' }}">
+        <a class="nav-link  {{ request()->routeIs('admin_list_staff', 'admin_position_list', 'admin.roles.*') ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseTwo"
+            aria-expanded="{{ request()->routeIs('admin_list_staff', 'admin_position_list', 'admin.roles.*') ? 'true' : 'false' }}" aria-controls="collapseTwo">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
                 <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
             </svg>
-            <span>Người dùng</span>
+            <span>Người dùng & Quyền</span>
         </a>
-        <div id="collapseTwo" class="collapse {{ request()->routeIs('admin_list_staff', 'admin_position_list') ? 'show' : '' }}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+        <div id="collapseTwo" class="collapse {{ request()->routeIs('admin_list_staff', 'admin_position_list', 'admin.roles.*') ? 'show' : '' }}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item {{ request()->routeIs('admin_list_staff') ? 'active' : '' }}" href="{{route('admin_list_staff')}}">Danh sách tài khoản</a>
+                <a class="collapse-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}" href="{{route('admin.roles.index')}}">
+                    <i class="fas fa-shield-alt text-primary mr-1"></i>Phân quyền hệ thống
+                </a>
                 <a class="collapse-item {{ request()->routeIs('admin_position_list') ? 'active' : '' }}" href="{{route('admin_position_list')}}">Chức vụ</a>
             </div>
         </div>
@@ -79,7 +82,7 @@
     </li>
 
     @php
-        $isTransactionFormsActive = request()->routeIs('admin_forms') || (request()->routeIs('admin_form_fields') && request()->query('tab') !== 'it' && !request()->routeIs('admin.it_support.*'));
+    $isTransactionFormsActive = request()->routeIs('admin_forms') || (request()->routeIs('admin_form_fields') && request()->query('tab') !== 'it' && !request()->routeIs('admin.it_support.*'));
     @endphp
     <li class="nav-item {{ $isTransactionFormsActive ? 'active' : '' }}" id="sidebar-item-forms">
         <a class="nav-link {{ $isTransactionFormsActive ? '' : 'collapsed' }}"
@@ -91,7 +94,7 @@
                 <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2" />
                 <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z" />
             </svg>
-            <span>Biểu mẫu</span>
+            <span>Biểu mẫu giao dịch</span>
         </a>
         <div id="collapseForm"
             class="collapse {{ $isTransactionFormsActive ? 'show' : '' }}"
@@ -129,7 +132,7 @@
 
 
     @php
-        $isItSupportActive = request()->routeIs('admin.it_support.manage');
+    $isItSupportActive = request()->routeIs('admin.it_support.manage');
     @endphp
     <li class="nav-item {{ $isItSupportActive ? 'active' : '' }}" id="sidebar-item-it-support">
         <a class="nav-link {{ $isItSupportActive ? '' : 'collapsed' }}"
@@ -154,10 +157,10 @@
     </li>
 
     @php
-        $isItTemplatesActive = request()->routeIs('admin.it_support.categories.*')
-            || request()->routeIs('admin.it_support.templates*')
-            || request()->routeIs('admin.it_support.form_fields.*')
-            || (request()->routeIs('admin_form_fields') && request()->query('tab') === 'it');
+    $isItTemplatesActive = request()->routeIs('admin.it_support.categories.*')
+    || request()->routeIs('admin.it_support.templates*')
+    || request()->routeIs('admin.it_support.form_fields.*')
+    || (request()->routeIs('admin_form_fields') && request()->query('tab') === 'it');
     @endphp
     <li class="nav-item {{ $isItTemplatesActive ? 'active' : '' }}" id="sidebar-item-it-templates">
         <a class="nav-link {{ $isItTemplatesActive ? '' : 'collapsed' }}"

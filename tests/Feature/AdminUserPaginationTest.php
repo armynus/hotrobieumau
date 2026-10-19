@@ -59,6 +59,8 @@ class AdminUserPaginationTest extends TestCase
             $table->unsignedBigInteger('position_id')->nullable();
             $table->unsignedTinyInteger('role_id');
             $table->string('document_role')->default('user');
+            $table->string('phone_no')->nullable();
+            $table->unsignedInteger('failed_login_attempts')->default(0);
             $table->string('status');
             $table->timestamps();
         });

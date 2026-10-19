@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Document\StoreDocumentRequest;
+use App\Http\Requests\Document\UpdateDocumentRequest;
+use App\Http\Requests\Document\TransferDocumentRequest;
 use App\Models\Branches;
 use App\Models\Department;
 use App\Models\Document;
@@ -216,6 +219,7 @@ class DocumentApiController extends Controller
      */
     public function store(Request $request)
     {
+        $request = $this->resolveFormRequest($request, StoreDocumentRequest::class);
         $userId = Session::get('user_id');
         if (! $userId) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
@@ -227,38 +231,7 @@ class DocumentApiController extends Controller
         }
 
         // Validate
-        $validated = $request->validate([
-            'direction' => 'required|in:incoming,outgoing,decision',
-            'title' => 'required|string|max:5000',
-            'registry_number' => 'nullable|string|max:255',
-            'document_code' => 'required|string|max:255',
-            'document_type_id' => 'nullable|integer|exists:document_types,id',
-            'issued_date' => 'required|date',
-            'received_date' => 'required_if:direction,incoming|nullable|date',
-            'forwarded_date' => 'required_if:direction,outgoing,decision|nullable|date',
-            'issuing_agency' => 'nullable|string|max:255',
-            'signer' => 'nullable|string|max:255',
-            'recipient' => 'nullable|string|max:5000',
-            'archive_recipient' => 'nullable|string|max:5000',
-            'copy_count' => 'nullable|integer|min:1|max:100000',
-            'receipt_signature' => 'nullable|string|max:255',
-            'notes' => 'nullable|string|max:5000',
-            'priority' => 'nullable|in:normal,urgent,very_urgent',
-            'security_level' => 'nullable|in:normal,confidential,secret,top_secret',
-            'files' => 'nullable|array',
-            'files.*' => 'file|max:51200', // 50MB max per file
-            'is_public_level' => 'required|in:private,normal,public',
-            'to_user_ids' => 'nullable|array',
-            'to_user_ids.*' => 'integer|distinct',
-            'to_department_ids' => 'nullable|array',
-            'to_department_ids.*' => 'integer|distinct',
-            'to_branch_ids' => 'nullable|array',
-            'to_branch_ids.*' => 'integer|distinct',
-            'allow_duplicate' => 'sometimes|boolean',
-        ], [
-            'issued_date.required' => 'Vui lòng nhập ngày, tháng văn bản.',
-            'issued_date.date' => 'Ngày, tháng văn bản không hợp lệ.',
-        ]);
+        $validated = $request->validated();
 
         if (! $request->boolean('allow_duplicate')) {
             $documentCodeKey = DocumentCode::normalize($validated['document_code']);
@@ -479,6 +452,7 @@ class DocumentApiController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request = $this->resolveFormRequest($request, UpdateDocumentRequest::class);
         $userId = Session::get('user_id');
         if (! $userId) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
@@ -494,45 +468,18 @@ class DocumentApiController extends Controller
             ], 403);
         }
 
-        $validated = $request->validate([
-            'direction' => 'required|in:incoming,outgoing,decision,unclassified',
-            'title' => 'required|string|max:5000',
-            'registry_number' => 'nullable|string|max:255',
-            'document_code' => 'required|string|max:255',
-            'document_type_id' => 'nullable|integer|exists:document_types,id',
-            'issued_date' => 'nullable|date',
-            'received_date' => 'nullable|date',
-            'forwarded_date' => 'nullable|date',
-            'issuing_agency' => 'nullable|string|max:255',
-            'signer' => 'nullable|string|max:255',
-            'recipient' => 'nullable|string|max:5000',
-            'archive_recipient' => 'nullable|string|max:5000',
-            'copy_count' => 'nullable|integer|min:1|max:100000',
-            'receipt_signature' => 'nullable|string|max:255',
-            'notes' => 'nullable|string|max:5000',
-            'priority' => 'required|in:normal,urgent,very_urgent',
-            'security_level' => 'required|in:normal,confidential,secret,top_secret',
-            'is_public_level' => 'required|in:private,normal,public',
-        ], [
-            'direction.required' => 'Vui lòng chọn phân loại văn bản.',
-            'direction.in' => 'Phân loại văn bản không hợp lệ.',
-            'title.required' => 'Vui lòng nhập trích yếu nội dung văn bản.',
-            'document_code.required' => 'Vui lòng nhập số, ký hiệu văn bản.',
-            'priority.required' => 'Vui lòng chọn mức độ ưu tiên.',
-            'security_level.required' => 'Vui lòng chọn độ mật.',
-            'is_public_level.required' => 'Vui lòng chọn mức độ công khai.',
-        ]);
-
+        $validated = $request->validated();
         $level = $validated['is_public_level'];
         unset($validated['is_public_level']);
         $validated['visibility'] = $level;
 
-        $distribution = $request->validate([
-            'sync_recipients' => 'sometimes|boolean',
-            'to_user_ids' => 'nullable|array', 'to_user_ids.*' => 'integer|distinct',
-            'to_department_ids' => 'nullable|array', 'to_department_ids.*' => 'integer|distinct',
-            'to_branch_ids' => 'nullable|array', 'to_branch_ids.*' => 'integer|distinct',
-        ]);
+        $distribution = [
+            'sync_recipients' => $validated['sync_recipients'] ?? false,
+            'to_user_ids' => $validated['to_user_ids'] ?? [],
+            'to_department_ids' => $validated['to_department_ids'] ?? [],
+            'to_branch_ids' => $validated['to_branch_ids'] ?? [],
+        ];
+        unset($validated['sync_recipients'], $validated['to_user_ids'], $validated['to_department_ids'], $validated['to_branch_ids']);
         $updatedDocument = DB::transaction(function () use ($document, $validated, $user, $distribution) {
             $locked = Document::whereKey($document->id)->lockForUpdate()->firstOrFail();
             abort_unless($locked->canBeEditedBy($user), 403);
@@ -595,6 +542,7 @@ class DocumentApiController extends Controller
      */
     public function transfer(Request $request, $id)
     {
+        $request = $this->resolveFormRequest($request, TransferDocumentRequest::class);
         $userId = Session::get('user_id');
         if (! $userId) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
@@ -611,17 +559,7 @@ class DocumentApiController extends Controller
             return response()->json(['success' => false, 'message' => 'Not found or forbidden'], 404);
         }
 
-        $validated = $request->validate([
-            'target_type' => 'nullable|string',
-            'to_user_ids' => 'nullable|array',
-            'to_user_ids.*' => 'integer|distinct',
-            'to_department_ids' => 'nullable|array',
-            'to_department_ids.*' => 'integer|distinct',
-            'to_branch_ids' => 'nullable|array',
-            'to_branch_ids.*' => 'integer|distinct',
-            'to_department_id' => 'nullable|integer',
-            'note' => 'nullable|string|max:2000',
-        ]);
+        $validated = $request->validated();
 
         if (! empty($validated['to_department_id'])) {
             $validated['to_department_ids'] = array_merge($validated['to_department_ids'] ?? [], [(int) $validated['to_department_id']]);

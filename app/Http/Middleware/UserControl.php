@@ -15,9 +15,9 @@ class UserControl
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(session()->get('user_role') != 1){
-            return redirect()->route('login');
+        if (auth_user_can('data.customers.upload') || auth_user_can('data.accounts.upload')) {
+            return $next($request);
         }
-        return $next($request);
+        return redirect()->route('login');
     }
 }

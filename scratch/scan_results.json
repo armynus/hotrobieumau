@@ -1,0 +1,531 @@
+[
+  {
+    "path": "Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 4,
+    "paragraphs_count": 17
+  },
+  {
+    "path": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã đơn vị trên IPCAS: .....................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)",
+      "Field: 'Đơn vị yêu cầu: ....................................................................................................................................................................................' (loc: body)",
+      "Field: 'Mã đơn vị trên IPCAS: .........................................................................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại:........................................................................................................' (loc: body)",
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã đơn vị trên IPCAS: ......................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)",
+      "Field: 'Đơn vị yêu cầu:..................................................................................................................' (loc: body)",
+      "Field: 'Mã đơn vị trên IPCAS: .....................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)"
+    ],
+    "tables_count": 22,
+    "paragraphs_count": 120
+  },
+  {
+    "path": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã đơn vị trên IPCAS: .....................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)"
+    ],
+    "tables_count": 5,
+    "paragraphs_count": 19
+  },
+  {
+    "path": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: ....................................................................................................................................................................................' (loc: body)",
+      "Field: 'Mã đơn vị trên IPCAS: .........................................................................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại:........................................................................................................' (loc: body)"
+    ],
+    "tables_count": 3,
+    "paragraphs_count": 17
+  },
+  {
+    "path": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã đơn vị trên IPCAS: ......................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)"
+    ],
+    "tables_count": 5,
+    "paragraphs_count": 23
+  },
+  {
+    "path": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 4,
+    "paragraphs_count": 33
+  },
+  {
+    "path": "BeAdmin\\Mau-05_Yeu-Cau-Thay-Doi-Trang-Thai-Nguoi-Su-Dung-BE-ADMIN.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\BeAdmin\\Mau-05_Yeu-Cau-Thay-Doi-Trang-Thai-Nguoi-Su-Dung-BE-ADMIN.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu:..................................................................................................................' (loc: body)",
+      "Field: 'Mã đơn vị trên IPCAS: .....................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)"
+    ],
+    "tables_count": 3,
+    "paragraphs_count": 18
+  },
+  {
+    "path": "BeAdmin\\Mau-06_Phieu-Yeu-Cau-BeAdmin.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\BeAdmin\\Mau-06_Phieu-Yeu-Cau-BeAdmin.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 4,
+    "paragraphs_count": 11
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [
+      "${CCCD} (in table[1][2,7])",
+      "${EmailNV} (in table[1][2,5])",
+      "${MaChiNhanh} (in body)",
+      "${IPCAS} (in table[1][2,8])",
+      "${DiaDanh} (in table[0][1,2])",
+      "${SoDienThoai} (in table[1][2,6])",
+      "${TenChiNhanh} (in body)",
+      "${NgayYeuCau} (in table[0][1,2])",
+      "${ChucVu} (in table[1][2,3])",
+      "${TenCanBo} (in body)",
+      "${TenChiNhanh} (in table[0][0,0])",
+      "${TenCanBo} (in table[1][2,1])",
+      "${MaNV} (in table[1][2,4])",
+      "${PhongBan} (in table[1][2,2])"
+    ],
+    "suspected_fields": [],
+    "tables_count": 6,
+    "paragraphs_count": 46
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 4,
+    "paragraphs_count": 27
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 4,
+    "paragraphs_count": 19
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 4,
+    "paragraphs_count": 32
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 3,
+    "paragraphs_count": 39
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 2,
+    "paragraphs_count": 33
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Hai bên đã thực hiện bàn giao/tiếp nhận mã người dùng và mật khẩu của IPCAS với mã người dùng là ................................' (loc: body)"
+    ],
+    "tables_count": 2,
+    "paragraphs_count": 21
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 2,
+    "paragraphs_count": 20
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-08_Thu-Hoi-Tam-Khoa-User.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-08_Thu-Hoi-Tam-Khoa-User.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 4,
+    "paragraphs_count": 13
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-08_Yeu-Cau-Thu-Hoi-Ma-Nguoi-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-08_Yeu-Cau-Thu-Hoi-Ma-Nguoi-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 4,
+    "paragraphs_count": 21
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 2,
+    "paragraphs_count": 18
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 2,
+    "paragraphs_count": 24
+  },
+  {
+    "path": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 3,
+    "paragraphs_count": 30
+  },
+  {
+    "path": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Hai bên đã thực hiện bàn giao/tiếp nhận mã người dùng và mật khẩu của IPCAS với mã người dùng là ................................' (loc: body)"
+    ],
+    "tables_count": 32,
+    "paragraphs_count": 292
+  },
+  {
+    "path": "Mẫu PKI\\Mau-13A-PKI_Doi-Mat-Khau-PKI.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\Mẫu PKI\\Mau-13A-PKI_Doi-Mat-Khau-PKI.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 2,
+    "paragraphs_count": 20
+  },
+  {
+    "path": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Họ và tên: .............................................................................' (loc: body)",
+      "Field: 'Chức vụ:  .....................................        Bộ phận: .....................................' (loc: body)",
+      "Field: 'Di động:  .....................................         Email: ........................................' (loc: body)",
+      "Field: 'Thông tin về chi nhánh và User: BranchID: ................... User ID: ...............' (loc: body)",
+      "Field: 'Lý do : .................................................................................................................' (loc: body)"
+    ],
+    "tables_count": 1,
+    "paragraphs_count": 29
+  },
+  {
+    "path": "Mẫu PKI\\Mau-1B-PKI_De-Nghi-CTS-Cho-To-Chuc.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\Mẫu PKI\\Mau-1B-PKI_De-Nghi-CTS-Cho-To-Chuc.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Lý do(3):\t....' (loc: body)"
+    ],
+    "tables_count": 0,
+    "paragraphs_count": 38
+  },
+  {
+    "path": "Mẫu PKI\\Mau-2A-PKI_Xac-Nhan-Da-Nhan-PKI.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\Mẫu PKI\\Mau-2A-PKI_Xac-Nhan-Da-Nhan-PKI.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 0,
+    "paragraphs_count": 19
+  },
+  {
+    "path": "Mẫu PKI\\Mau-2B-PKI_Xac-Nhan-Da-Nhan-PKI-To-Chuc.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\Mẫu PKI\\Mau-2B-PKI_Xac-Nhan-Da-Nhan-PKI-To-Chuc.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 0,
+    "paragraphs_count": 21
+  },
+  {
+    "path": "Mẫu PKI\\Mau-3A-PKI_Giay-De-Nghi-Mo-Khoa-PKI.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\Mẫu PKI\\Mau-3A-PKI_Giay-De-Nghi-Mo-Khoa-PKI.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 0,
+    "paragraphs_count": 19
+  },
+  {
+    "path": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh:....................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: ................................................. \t\t\t\t\t\tSố điện thoại: .......................................................' (loc: body)",
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: ...................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .............................................. \t\t\t\t\t\t\t\tSố điện thoại: .............................................' (loc: body)",
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: ...................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)",
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: ………………….......................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)"
+    ],
+    "tables_count": 18,
+    "paragraphs_count": 121
+  },
+  {
+    "path": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh:....................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: ................................................. \t\t\t\t\t\tSố điện thoại: .......................................................' (loc: body)"
+    ],
+    "tables_count": 4,
+    "paragraphs_count": 31
+  },
+  {
+    "path": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: ...................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .............................................. \t\t\t\t\t\t\t\tSố điện thoại: .............................................' (loc: body)"
+    ],
+    "tables_count": 4,
+    "paragraphs_count": 24
+  },
+  {
+    "path": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: ...................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)"
+    ],
+    "tables_count": 4,
+    "paragraphs_count": 19
+  },
+  {
+    "path": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: ………………….......................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)"
+    ],
+    "tables_count": 4,
+    "paragraphs_count": 22
+  },
+  {
+    "path": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................................................................................................................' (loc: body)",
+      "Field: 'Mã đơn vị trên IPCAS: ......................................................................................................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................................................................................................................................' (loc: body)"
+    ],
+    "tables_count": 4,
+    "paragraphs_count": 16
+  },
+  {
+    "path": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: ....................................................................................................................................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: .....................................................................................................................................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại:........................................................................................................' (loc: body)"
+    ],
+    "tables_count": 3,
+    "paragraphs_count": 21
+  },
+  {
+    "path": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: ...................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)"
+    ],
+    "tables_count": 4,
+    "paragraphs_count": 15
+  },
+  {
+    "path": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 2,
+    "paragraphs_count": 20
+  },
+  {
+    "path": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [],
+    "tables_count": 3,
+    "paragraphs_count": 18
+  },
+  {
+    "path": "SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu:..................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: …………………........................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)"
+    ],
+    "tables_count": 4,
+    "paragraphs_count": 15
+  },
+  {
+    "path": "SMF\\Mau-07_Phieu-Yeu-Cau-Ho-Tro.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\SMF\\Mau-07_Phieu-Yeu-Cau-Ho-Tro.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu:...............................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: ………………….....................................................................................' (loc: body)"
+    ],
+    "tables_count": 2,
+    "paragraphs_count": 18
+  },
+  {
+    "path": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+    "full_path": "D:\\hotrobieumau\\Mau Bieu IT\\SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+    "can_read": true,
+    "error": null,
+    "placeholders_found": [],
+    "suspected_fields": [
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................................................................................................................' (loc: body)",
+      "Field: 'Mã đơn vị trên IPCAS: ......................................................................................................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................................................................................................................................' (loc: body)",
+      "Field: 'Đơn vị yêu cầu: ....................................................................................................................................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: .....................................................................................................................................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại:........................................................................................................' (loc: body)",
+      "Field: 'Đơn vị yêu cầu: .................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: ...................................................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)",
+      "Field: 'Đơn vị yêu cầu:..................................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: …………………........................................................................................' (loc: body)",
+      "Field: 'Người liên hệ: .................................................... Số điện thoại: .......................................' (loc: body)",
+      "Field: 'Đơn vị yêu cầu:...............................................................................................................' (loc: body)",
+      "Field: 'Mã chi nhánh: ………………….....................................................................................' (loc: body)"
+    ],
+    "tables_count": 25,
+    "paragraphs_count": 153
+  }
+]

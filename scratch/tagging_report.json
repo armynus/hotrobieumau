@@ -1,0 +1,5384 @@
+{
+  "total_files": 41,
+  "file_summary": {
+    "Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx": {
+      "tagged_count": 7,
+      "unconf_count": 2,
+      "tags": [
+        "${ChucVu}",
+        "${EmailNV}",
+        "${IPCAS}",
+        "${TenCanBo}"
+      ]
+    },
+    "BeAdmin\\CacMauBieuHTBeadmin_new.docx": {
+      "tagged_count": 38,
+      "unconf_count": 10,
+      "tags": [
+        "${CCCD}",
+        "${ChucVu}",
+        "${DiaDanh}",
+        "${EmailNV}",
+        "${IPCAS}",
+        "${LyDo}",
+        "${MaChiNhanh}",
+        "${MaNV}",
+        "${NgayThangNam}",
+        "${PhongBan}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx": {
+      "tagged_count": 10,
+      "unconf_count": 1,
+      "tags": [
+        "${MaChiNhanh}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx": {
+      "tagged_count": 14,
+      "unconf_count": 3,
+      "tags": [
+        "${CCCD}",
+        "${DiaDanh}",
+        "${EmailNV}",
+        "${IPCAS}",
+        "${MaChiNhanh}",
+        "${MaNV}",
+        "${NgayThangNam}",
+        "${PhongBan}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx": {
+      "tagged_count": 12,
+      "unconf_count": 2,
+      "tags": [
+        "${DiaDanh}",
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx": {
+      "tagged_count": 14,
+      "unconf_count": 7,
+      "tags": [
+        "${ChucVu}",
+        "${DiaDanh}",
+        "${LyDo}",
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "BeAdmin\\Mau-05_Yeu-Cau-Thay-Doi-Trang-Thai-Nguoi-Su-Dung-BE-ADMIN.docx": {
+      "tagged_count": 7,
+      "unconf_count": 1,
+      "tags": [
+        "${MaChiNhanh}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "BeAdmin\\Mau-06_Phieu-Yeu-Cau-BeAdmin.docx": {
+      "tagged_count": 2,
+      "unconf_count": 2,
+      "tags": [
+        "${TenCanBo}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin.docx": {
+      "tagged_count": 4,
+      "unconf_count": 2,
+      "tags": [
+        "${TenCanBo}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx": {
+      "tagged_count": 10,
+      "unconf_count": 10,
+      "tags": [
+        "${DiaDanh}",
+        "${MaChiNhanh}",
+        "${MaNV}",
+        "${NgayThangNam}",
+        "${TenCanBo}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx": {
+      "tagged_count": 10,
+      "unconf_count": 5,
+      "tags": [
+        "${DiaDanh}",
+        "${MaChiNhanh}",
+        "${MaNV}",
+        "${NgayThangNam}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx": {
+      "tagged_count": 10,
+      "unconf_count": 8,
+      "tags": [
+        "${DiaDanh}",
+        "${MaChiNhanh}",
+        "${MaNV}",
+        "${NgayThangNam}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx": {
+      "tagged_count": 7,
+      "unconf_count": 2,
+      "tags": [
+        "${ChucVu}",
+        "${DiaDanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx": {
+      "tagged_count": 9,
+      "unconf_count": 2,
+      "tags": [
+        "${ChucVu}",
+        "${DiaDanh}",
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx": {
+      "tagged_count": 9,
+      "unconf_count": 0,
+      "tags": [
+        "${ChucVu}",
+        "${DiaDanh}",
+        "${IPCAS}",
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx": {
+      "tagged_count": 10,
+      "unconf_count": 1,
+      "tags": [
+        "${ChucVu}",
+        "${DiaDanh}",
+        "${IPCAS}",
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-08_Thu-Hoi-Tam-Khoa-User.docx": {
+      "tagged_count": 1,
+      "unconf_count": 2,
+      "tags": [
+        "${TenCanBo}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-08_Yeu-Cau-Thu-Hoi-Ma-Nguoi-Dung.docx": {
+      "tagged_count": 3,
+      "unconf_count": 2,
+      "tags": [
+        "${DiaDanh}",
+        "${NgayThangNam}",
+        "${TenCanBo}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx": {
+      "tagged_count": 9,
+      "unconf_count": 1,
+      "tags": [
+        "${ChucVu}",
+        "${DiaDanh / NgayThangNam}",
+        "${EmailNV}",
+        "${IPCAS}",
+        "${MaChiNhanh}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx": {
+      "tagged_count": 12,
+      "unconf_count": 2,
+      "tags": [
+        "${ChucVu}",
+        "${DiaDanh}",
+        "${EmailNV}",
+        "${IPCAS}",
+        "${LyDo}",
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx": {
+      "tagged_count": 6,
+      "unconf_count": 8,
+      "tags": [
+        "${DiaDanh}",
+        "${NgayThangNam}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}"
+      ]
+    },
+    "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx": {
+      "tagged_count": 39,
+      "unconf_count": 20,
+      "tags": [
+        "${ChucVu}",
+        "${DiaDanh}",
+        "${EmailNV}",
+        "${IPCAS}",
+        "${LyDo}",
+        "${MaChiNhanh}",
+        "${MaNV}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "Mẫu PKI\\Mau-13A-PKI_Doi-Mat-Khau-PKI.docx": {
+      "tagged_count": 5,
+      "unconf_count": 1,
+      "tags": [
+        "${ChucVu}",
+        "${MaChiNhanh}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx": {
+      "tagged_count": 10,
+      "unconf_count": 4,
+      "tags": [
+        "${CCCD}",
+        "${ChucVu}",
+        "${EmailNV}",
+        "${IPCAS}",
+        "${LyDo}",
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${PhongBan}",
+        "${SDT}",
+        "${TenCanBo}"
+      ]
+    },
+    "Mẫu PKI\\Mau-1B-PKI_De-Nghi-CTS-Cho-To-Chuc.docx": {
+      "tagged_count": 4,
+      "unconf_count": 1,
+      "tags": [
+        "${EmailNV / SDT}",
+        "${LyDo}",
+        "${TenCanBo / ChucVu}",
+        "${TenChiNhanhHOA}"
+      ]
+    },
+    "Mẫu PKI\\Mau-2A-PKI_Xac-Nhan-Da-Nhan-PKI.docx": {
+      "tagged_count": 5,
+      "unconf_count": 0,
+      "tags": [
+        "${ChucVu}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "Mẫu PKI\\Mau-2B-PKI_Xac-Nhan-Da-Nhan-PKI-To-Chuc.docx": {
+      "tagged_count": 4,
+      "unconf_count": 0,
+      "tags": [
+        "${ChucVu}",
+        "${TenCanBo}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "Mẫu PKI\\Mau-3A-PKI_Giay-De-Nghi-Mo-Khoa-PKI.docx": {
+      "tagged_count": 3,
+      "unconf_count": 2,
+      "tags": [
+        "${EmailNV}",
+        "${TenCanBo / PhongBan}",
+        "${TenChiNhanh / SDT}"
+      ]
+    },
+    "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx": {
+      "tagged_count": 26,
+      "unconf_count": 8,
+      "tags": [
+        "${DiaDanh}",
+        "${EmailNV}",
+        "${IPCAS}",
+        "${LyDo}",
+        "${MaChiNhanh}",
+        "${MaNV}",
+        "${NgayThangNam}",
+        "${PhongBan}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}",
+        "${TenChuongTrinh}"
+      ]
+    },
+    "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx": {
+      "tagged_count": 14,
+      "unconf_count": 3,
+      "tags": [
+        "${DiaDanh}",
+        "${EmailNV}",
+        "${IPCAS}",
+        "${MaChiNhanh}",
+        "${MaNV}",
+        "${NgayThangNam}",
+        "${PhongBan}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}",
+        "${TenChuongTrinh}"
+      ]
+    },
+    "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx": {
+      "tagged_count": 14,
+      "unconf_count": 3,
+      "tags": [
+        "${DiaDanh}",
+        "${EmailNV}",
+        "${IPCAS}",
+        "${MaChiNhanh}",
+        "${MaNV}",
+        "${NgayThangNam}",
+        "${PhongBan}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}",
+        "${TenChuongTrinh}"
+      ]
+    },
+    "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx": {
+      "tagged_count": 10,
+      "unconf_count": 2,
+      "tags": [
+        "${DiaDanh}",
+        "${LyDo}",
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}",
+        "${TenChuongTrinh}"
+      ]
+    },
+    "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx": {
+      "tagged_count": 9,
+      "unconf_count": 3,
+      "tags": [
+        "${LyDo}",
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}",
+        "${TenChuongTrinh}"
+      ]
+    },
+    "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx": {
+      "tagged_count": 9,
+      "unconf_count": 4,
+      "tags": [
+        "${MaChiNhanh}",
+        "${MaNV}",
+        "${NoiDungYeuCau}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx": {
+      "tagged_count": 10,
+      "unconf_count": 2,
+      "tags": [
+        "${DiaDanh}",
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx": {
+      "tagged_count": 12,
+      "unconf_count": 4,
+      "tags": [
+        "${EmailNV}",
+        "${MaChiNhanh}",
+        "${MaNV}",
+        "${NoiDungYeuCau}",
+        "${PhongBan}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx": {
+      "tagged_count": 12,
+      "unconf_count": 2,
+      "tags": [
+        "${ChucVu}",
+        "${DiaDanh}",
+        "${IPCAS}",
+        "${LyDo}",
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx": {
+      "tagged_count": 12,
+      "unconf_count": 3,
+      "tags": [
+        "${ChucVu}",
+        "${DiaDanh}",
+        "${IPCAS}",
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx": {
+      "tagged_count": 8,
+      "unconf_count": 1,
+      "tags": [
+        "${MaChiNhanh}",
+        "${NgayThangNam}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "SMF\\Mau-07_Phieu-Yeu-Cau-Ho-Tro.docx": {
+      "tagged_count": 5,
+      "unconf_count": 0,
+      "tags": [
+        "${EmailNV}",
+        "${MaChiNhanh}",
+        "${NoiDungYeuCau}",
+        "${SDT}",
+        "${TenChiNhanh}"
+      ]
+    },
+    "SMF\\Mẫu biểu đăng ký user SmartForm.docx": {
+      "tagged_count": 40,
+      "unconf_count": 13,
+      "tags": [
+        "${ChucVu}",
+        "${DiaDanh}",
+        "${EmailNV}",
+        "${IPCAS}",
+        "${LyDo}",
+        "${MaChiNhanh}",
+        "${MaNV}",
+        "${NgayThangNam}",
+        "${NoiDungYeuCau}",
+        "${PhongBan}",
+        "${SDT}",
+        "${TenCanBo}",
+        "${TenChiNhanhHOA}",
+        "${TenChiNhanh}"
+      ]
+    }
+  },
+  "all_tagged_records": [
+    {
+      "file": "Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Họ và tên\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Bảng 2, Cột \"Chức vụ\", Dòng 2",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx",
+      "field_label": "Mã người dùng IPCAS",
+      "tag": "${IPCAS}",
+      "location": "Bảng 2, Cột \"USER IPCAS\", Dòng 2",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Họ và tên\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Bảng 3, Cột \"Chức vụ\", Dòng 2",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx",
+      "field_label": "Mã người dùng IPCAS",
+      "tag": "${IPCAS}",
+      "location": "Bảng 3, Cột \"User IPCAS\", Dòng 2",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx",
+      "field_label": "Email nhân viên",
+      "tag": "${EmailNV}",
+      "location": "Bảng 3, Cột \"Địa chỉ Email (Agribank)\", Dòng 2",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "<ĐƠN VỊ>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Họ và tên Người dùng",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người dùng",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Đoạn văn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Số điện thoại liên hệ",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Lý do",
+      "tag": "${LyDo}",
+      "location": "Đoạn văn lý do",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"Mã người dùng IPCAS\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"Mã người dùng IPCAS\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"Mã người dùng IPCAS\", Dòng 4",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 5, Cột \"Mã người dùng BE-ADMIN\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 5, Cột \"Mã người dùng BE-ADMIN\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 5, Cột \"Mã người dùng BE-ADMIN\", Dòng 4",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 8, Cột \"Họ và tên\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Phòng ban / Bộ phận",
+      "tag": "${PhongBan}",
+      "location": "Bảng 8, Cột \"Phòng/Đơn vị\", Dòng 3",
+      "source": "departments.department_code / department_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 8, Cột \"Mã nhân viên\", Dòng 3",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Mã người dùng IPCAS",
+      "tag": "${IPCAS}",
+      "location": "Bảng 8, Cột \"User IPCAS\", Dòng 3",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "CCCD/CMND Cán bộ",
+      "tag": "${CCCD}",
+      "location": "Bảng 8, Cột \"Số CMND/CCCD\", Dòng 3",
+      "source": "users.citizen_id / cache CCCD",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Email nhân viên",
+      "tag": "${EmailNV}",
+      "location": "Bảng 8, Cột \"Email\", Dòng 3",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Số điện thoại cá nhân",
+      "tag": "${SDT}",
+      "location": "Bảng 8, Cột \"Số điện thoại di động\", Dòng 3",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 12, Cột \"Mã người dùng BE-ADMIN\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 12, Cột \"Mã người dùng BE-ADMIN\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 13, Cột \"Mã người dùng BE-ADMIN3\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 13, Cột \"Mã người dùng BE-ADMIN3\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 13, Cột \"Mã người dùng BE-ADMIN3\", Dòng 4",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 16, Cột \"NGƯỜI DÙNG\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 16, Cột \"NGƯỜI DÙNG\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 18, Cột \"NGƯỜI DÙNG\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Ngày tháng năm bằng chữ",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 21, Cột \"Mã người dùng BE-ADMIN\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 21, Cột \"Mã người dùng BE-ADMIN\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 21, Cột \"Mã người dùng BE-ADMIN\", Dòng 4",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Mã người dùng IPCAS\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Mã người dùng IPCAS\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Mã người dùng IPCAS\", Dòng 4",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"Mã người dùng BE-ADMIN\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"Mã người dùng BE-ADMIN\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"Mã người dùng BE-ADMIN\", Dòng 4",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "<ĐƠN VỊ>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 1, Cột \"Họ và tên\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Phòng ban / Bộ phận",
+      "tag": "${PhongBan}",
+      "location": "Bảng 1, Cột \"Phòng/Đơn vị\", Dòng 3",
+      "source": "departments.department_code / department_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 1, Cột \"Mã nhân viên\", Dòng 3",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Mã người dùng IPCAS",
+      "tag": "${IPCAS}",
+      "location": "Bảng 1, Cột \"User IPCAS\", Dòng 3",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "CCCD/CMND Cán bộ",
+      "tag": "${CCCD}",
+      "location": "Bảng 1, Cột \"Số CMND/CCCD\", Dòng 3",
+      "source": "users.citizen_id / cache CCCD",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Email nhân viên",
+      "tag": "${EmailNV}",
+      "location": "Bảng 1, Cột \"Email\", Dòng 3",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Số điện thoại cá nhân",
+      "tag": "${SDT}",
+      "location": "Bảng 1, Cột \"Số điện thoại di động\", Dòng 3",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng BE-ADMIN\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng BE-ADMIN\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Mã người dùng BE-ADMIN3\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Mã người dùng BE-ADMIN3\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Mã người dùng BE-ADMIN3\", Dòng 4",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Họ và tên Người dùng",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người dùng",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Đoạn văn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Số điện thoại liên hệ",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Lý do",
+      "tag": "${LyDo}",
+      "location": "Đoạn văn lý do",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 1, Cột \"NGƯỜI DÙNG\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 1, Cột \"NGƯỜI DÙNG\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"NGƯỜI DÙNG\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "<ĐƠN VỊ>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Ngày tháng năm bằng chữ",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-05_Yeu-Cau-Thay-Doi-Trang-Thai-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-05_Yeu-Cau-Thay-Doi-Trang-Thai-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-05_Yeu-Cau-Thay-Doi-Trang-Thai-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-05_Yeu-Cau-Thay-Doi-Trang-Thai-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-05_Yeu-Cau-Thay-Doi-Trang-Thai-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng BE-ADMIN\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-05_Yeu-Cau-Thay-Doi-Trang-Thai-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng BE-ADMIN\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-05_Yeu-Cau-Thay-Doi-Trang-Thai-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng BE-ADMIN\", Dòng 4",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-06_Phieu-Yeu-Cau-BeAdmin.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Mã người dùng BE-ADMIN\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "BeAdmin\\Mau-06_Phieu-Yeu-Cau-BeAdmin.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Mã người dùng BE-ADMIN\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng được cấp\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Mã người dùng\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Mã người dùng\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"LẬP BIỂU\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng nhãn đơn vị yêu cầu",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Dòng nhãn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Kiểu người dùng\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng được cấp\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng được cấp\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Họ và tên\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 3, Cột \"Mã số nhân viên\", Dòng 2",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"LẬP BIỂU (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng nhãn đơn vị yêu cầu",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Dòng nhãn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Họ và tên\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 3, Cột \"Mã số nhân viên\", Dòng 2",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"LẬP BIỂU (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng nhãn đơn vị yêu cầu",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Dòng nhãn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Họ và tên\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 3, Cột \"Mã số nhân viên\", Dòng 2",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"LẬP BIỂU (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Dòng nhãn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Dòng nhãn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"NGƯỜI LẬP BIÊN BẢN (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Dòng nhãn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Dòng nhãn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Dòng nhãn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"NGƯỜI LẬP BIÊN BẢN (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"NGƯỜI LẬP BIÊN BẢN (Ký, ghi rõ họ tên)\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Dòng nhãn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx",
+      "field_label": "Họ và tên người dùng",
+      "tag": "${TenCanBo}",
+      "location": "Dòng nhãn họ tên",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Dòng nhãn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Dòng nhãn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx",
+      "field_label": "mã người dùng là",
+      "tag": "${IPCAS}",
+      "location": "Đoạn văn mã người dùng",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-06_Bien-Ban-Ban-Giao-Ma-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+      "field_label": "Họ và tên người dùng",
+      "tag": "${TenCanBo}",
+      "location": "Dòng nhãn họ tên",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Dòng nhãn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Dòng nhãn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Dòng nhãn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+      "field_label": "Mã người dùng",
+      "tag": "${IPCAS}",
+      "location": "Đoạn văn mã người dùng",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"NGƯỜI DÙNG\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-08_Thu-Hoi-Tam-Khoa-User.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"NGƯỜI DÙNG (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-08_Yeu-Cau-Thu-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-08_Yeu-Cau-Thu-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-08_Yeu-Cau-Thu-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"NGƯỜI DÙNG (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+      "field_label": "Họ và tên người dùng",
+      "tag": "${TenCanBo}",
+      "location": "Dòng họ tên người dùng",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Dòng chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng đơn vị công tác",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+      "field_label": "Số điện thoại liên hệ",
+      "tag": "${SDT}",
+      "location": "Dòng số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+      "field_label": "Địa chỉ thư điện tử",
+      "tag": "${EmailNV}",
+      "location": "Dòng email",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Dòng mã đơn vị IPCAS",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+      "field_label": "Mã người dùng đổi mật khẩu",
+      "tag": "${IPCAS}",
+      "location": "Dòng mã người dùng",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh / NgayThangNam}",
+      "location": "Dòng địa danh ngày tháng",
+      "source": "Hệ thống IT",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"NGƯỜI DÙNG (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Họ và tên người dùng",
+      "tag": "${TenCanBo}",
+      "location": "Dòng nhãn họ tên",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Dòng nhãn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Dòng nhãn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Địa chỉ thư điện tử",
+      "tag": "${EmailNV}",
+      "location": "Dòng nhãn email",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Dòng nhãn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Đổi mật khẩu người dùng",
+      "tag": "${IPCAS}",
+      "location": "Dòng nhãn đổi mật khẩu",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Lý do đổi lại",
+      "tag": "${LyDo}",
+      "location": "Dòng nhãn lý do",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"NGƯỜI DÙNG (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã nhóm người dùng\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã nhóm người dùng\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"LẬP BIỂU\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng nhãn đơn vị yêu cầu",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Dòng nhãn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Dòng nhãn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Dòng nhãn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Họ và tên người dùng",
+      "tag": "${TenCanBo}",
+      "location": "Dòng nhãn họ tên",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "mã người dùng là",
+      "tag": "${IPCAS}",
+      "location": "Đoạn văn mã người dùng",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Mã người dùng",
+      "tag": "${IPCAS}",
+      "location": "Đoạn văn mã người dùng",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Địa chỉ thư điện tử",
+      "tag": "${EmailNV}",
+      "location": "Dòng nhãn email",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Đổi mật khẩu người dùng",
+      "tag": "${IPCAS}",
+      "location": "Dòng nhãn đổi mật khẩu",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Lý do đổi lại",
+      "tag": "${LyDo}",
+      "location": "Dòng nhãn lý do",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng được cấp\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng được cấp\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Mã người dùng\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Mã người dùng\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"LẬP BIỂU\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 8, Cột \"Kiểu người dùng\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 8, Cột \"Mã người dùng được cấp\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 8, Cột \"Mã người dùng được cấp\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 9, Cột \"Họ và tên\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 9, Cột \"Mã số nhân viên\", Dòng 2",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 10, Cột \"LẬP BIỂU (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 12, Cột \"Mã người dùng\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 12, Cột \"Mã người dùng\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 13, Cột \"Họ và tên\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 13, Cột \"Mã số nhân viên\", Dòng 2",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 14, Cột \"LẬP BIỂU (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 17, Cột \"NGƯỜI LẬP BIÊN BẢN (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 19, Cột \"NGƯỜI LẬP BIÊN BẢN (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 19, Cột \"NGƯỜI LẬP BIÊN BẢN (Ký, ghi rõ họ tên)\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 23, Cột \"NGƯỜI DÙNG\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 27, Cột \"NGƯỜI DÙNG (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 29, Cột \"NGƯỜI DÙNG (Ký, ghi rõ họ tên)\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 31, Cột \"Mã nhóm người dùng\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 31, Cột \"Mã nhóm người dùng\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 32, Cột \"LẬP BIỂU\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-13A-PKI_Doi-Mat-Khau-PKI.docx",
+      "field_label": "Họ và tên người sử dụng",
+      "tag": "${TenCanBo}",
+      "location": "Dòng họ tên người sử dụng",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-13A-PKI_Doi-Mat-Khau-PKI.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Dòng chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-13A-PKI_Doi-Mat-Khau-PKI.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng đơn vị công tác",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-13A-PKI_Doi-Mat-Khau-PKI.docx",
+      "field_label": "Số điện thoại liên hệ",
+      "tag": "${SDT}",
+      "location": "Dòng số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-13A-PKI_Doi-Mat-Khau-PKI.docx",
+      "field_label": "Mã chi nhánh trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Dòng mã chi nhánh IPCAS",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "Họ và tên",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn họ tên",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "Số CCCD",
+      "tag": "${CCCD}",
+      "location": "Đoạn văn CCCD",
+      "source": "users.citizen_id / cache CCCD",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Đoạn văn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "Bộ phận",
+      "tag": "${PhongBan}",
+      "location": "Đoạn văn phòng ban",
+      "source": "departments.department_code / department_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "Di động",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "Email",
+      "tag": "${EmailNV}",
+      "location": "Đoạn văn email",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "BranchID",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "User ID",
+      "tag": "${IPCAS}",
+      "location": "Đoạn văn mã người dùng",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "Lý do",
+      "tag": "${LyDo}",
+      "location": "Đoạn văn lý do",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "Ngày tháng năm bằng chữ",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1B-PKI_De-Nghi-CTS-Cho-To-Chuc.docx",
+      "field_label": "Tên giao dịch đầy đủ",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Dòng tên giao dịch tổ chức",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1B-PKI_De-Nghi-CTS-Cho-To-Chuc.docx",
+      "field_label": "Lý do",
+      "tag": "${LyDo}",
+      "location": "Đoạn văn lý do",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1B-PKI_De-Nghi-CTS-Cho-To-Chuc.docx",
+      "field_label": "Họ và tên & Chức vụ",
+      "tag": "${TenCanBo / ChucVu}",
+      "location": "Dòng họ tên & chức vụ",
+      "source": "Hệ thống IT",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1B-PKI_De-Nghi-CTS-Cho-To-Chuc.docx",
+      "field_label": "Email & Di động",
+      "tag": "${EmailNV / SDT}",
+      "location": "Dòng email & di động",
+      "source": "Hệ thống IT",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-2A-PKI_Xac-Nhan-Da-Nhan-PKI.docx",
+      "field_label": "Ngày tháng năm bằng chữ",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-2A-PKI_Xac-Nhan-Da-Nhan-PKI.docx",
+      "field_label": "Họ và tên người dùng",
+      "tag": "${TenCanBo}",
+      "location": "Dòng nhãn họ tên",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-2A-PKI_Xac-Nhan-Da-Nhan-PKI.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Dòng nhãn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-2A-PKI_Xac-Nhan-Da-Nhan-PKI.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-2A-PKI_Xac-Nhan-Da-Nhan-PKI.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Dòng nhãn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-2B-PKI_Xac-Nhan-Da-Nhan-PKI-To-Chuc.docx",
+      "field_label": "Kính gửi chi nhánh",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng kính gửi",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-2B-PKI_Xac-Nhan-Da-Nhan-PKI-To-Chuc.docx",
+      "field_label": "Tên tổ chức",
+      "tag": "${TenChiNhanh}",
+      "location": "Dòng tên tổ chức",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-2B-PKI_Xac-Nhan-Da-Nhan-PKI-To-Chuc.docx",
+      "field_label": "Đại diện",
+      "tag": "${TenCanBo}",
+      "location": "Dòng đại diện",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-2B-PKI_Xac-Nhan-Da-Nhan-PKI-To-Chuc.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Dòng nhãn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-3A-PKI_Giay-De-Nghi-Mo-Khoa-PKI.docx",
+      "field_label": "Họ và tên & Phòng",
+      "tag": "${TenCanBo / PhongBan}",
+      "location": "Dòng Họ và tên & Phòng",
+      "source": "Hệ thống IT",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-3A-PKI_Giay-De-Nghi-Mo-Khoa-PKI.docx",
+      "field_label": "Đơn vị & Số điện thoại",
+      "tag": "${TenChiNhanh / SDT}",
+      "location": "Dòng Đơn vị & SĐT",
+      "source": "Hệ thống IT",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-3A-PKI_Giay-De-Nghi-Mo-Khoa-PKI.docx",
+      "field_label": "Email",
+      "tag": "${EmailNV}",
+      "location": "Dòng email",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Mã chi nhánh",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Tên Phần mềm nghiệp vụ",
+      "tag": "${TenChuongTrinh}",
+      "location": "Đoạn văn tên phần mềm",
+      "source": "Người dùng chọn / nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "<CHI NHÁNH>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 5, Cột \"Họ và tên\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Phòng ban / Bộ phận",
+      "tag": "${PhongBan}",
+      "location": "Bảng 5, Cột \"Phòng/ Đơn vị\", Dòng 3",
+      "source": "departments.department_code / department_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 5, Cột \"Mã nhân viên\", Dòng 3",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Email nhân viên",
+      "tag": "${EmailNV}",
+      "location": "Bảng 5, Cột \"Email AD\", Dòng 3",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Mã người dùng IPCAS",
+      "tag": "${IPCAS}",
+      "location": "Bảng 5, Cột \"User IPCAS\", Dòng 3",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Số điện thoại cá nhân",
+      "tag": "${SDT}",
+      "location": "Bảng 5, Cột \"Số ĐTDĐ\", Dòng 3",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "<ĐƠN VỊ>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 9, Cột \"Họ và tên\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Phòng ban / Bộ phận",
+      "tag": "${PhongBan}",
+      "location": "Bảng 9, Cột \"Phòng/ Đơn vị\", Dòng 3",
+      "source": "departments.department_code / department_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 9, Cột \"Mã nhân viên\", Dòng 3",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Email nhân viên",
+      "tag": "${EmailNV}",
+      "location": "Bảng 9, Cột \"Email AD\", Dòng 3",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Mã người dùng IPCAS",
+      "tag": "${IPCAS}",
+      "location": "Bảng 9, Cột \"User IPCAS\", Dòng 3",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Số điện thoại cá nhân",
+      "tag": "${SDT}",
+      "location": "Bảng 9, Cột \"Số ĐTDĐ\", Dòng 3",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 13, Cột \"Họ và tên\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Lý do đề nghị",
+      "tag": "${LyDo}",
+      "location": "Bảng 13, Cột \"Lý do  cập nhật\", Dòng 3",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Ngày tháng năm bằng chữ",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 17, Cột \"Họ và tên\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Lý do đề nghị",
+      "tag": "${LyDo}",
+      "location": "Bảng 17, Cột \"Lý do\", Dòng 3",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Mã chi nhánh",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Tên Phần mềm nghiệp vụ",
+      "tag": "${TenChuongTrinh}",
+      "location": "Đoạn văn tên phần mềm",
+      "source": "Người dùng chọn / nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "<CHI NHÁNH>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Họ và tên\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Phòng ban / Bộ phận",
+      "tag": "${PhongBan}",
+      "location": "Bảng 3, Cột \"Phòng/ Đơn vị\", Dòng 3",
+      "source": "departments.department_code / department_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 3, Cột \"Mã nhân viên\", Dòng 3",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Email nhân viên",
+      "tag": "${EmailNV}",
+      "location": "Bảng 3, Cột \"Email AD\", Dòng 3",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Mã người dùng IPCAS",
+      "tag": "${IPCAS}",
+      "location": "Bảng 3, Cột \"User IPCAS\", Dòng 3",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Số điện thoại cá nhân",
+      "tag": "${SDT}",
+      "location": "Bảng 3, Cột \"Số ĐTDĐ\", Dòng 3",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Mã chi nhánh",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Tên Phần mềm nghiệp vụ",
+      "tag": "${TenChuongTrinh}",
+      "location": "Đoạn văn tên phần mềm",
+      "source": "Người dùng chọn / nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "<ĐƠN VỊ>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Họ và tên\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Phòng ban / Bộ phận",
+      "tag": "${PhongBan}",
+      "location": "Bảng 3, Cột \"Phòng/ Đơn vị\", Dòng 3",
+      "source": "departments.department_code / department_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 3, Cột \"Mã nhân viên\", Dòng 3",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Email nhân viên",
+      "tag": "${EmailNV}",
+      "location": "Bảng 3, Cột \"Email AD\", Dòng 3",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Mã người dùng IPCAS",
+      "tag": "${IPCAS}",
+      "location": "Bảng 3, Cột \"User IPCAS\", Dòng 3",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Số điện thoại cá nhân",
+      "tag": "${SDT}",
+      "location": "Bảng 3, Cột \"Số ĐTDĐ\", Dòng 3",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+      "field_label": "Mã chi nhánh",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+      "field_label": "Tên Phần mềm nghiệp vụ",
+      "tag": "${TenChuongTrinh}",
+      "location": "Đoạn văn tên phần mềm",
+      "source": "Người dùng chọn / nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+      "field_label": "<ĐƠN VỊ>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Họ và tên\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+      "field_label": "Lý do đề nghị",
+      "tag": "${LyDo}",
+      "location": "Bảng 3, Cột \"Lý do  cập nhật\", Dòng 3",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+      "field_label": "Mã chi nhánh",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+      "field_label": "Tên Phần mềm nghiệp vụ",
+      "tag": "${TenChuongTrinh}",
+      "location": "Đoạn văn tên phần mềm",
+      "source": "Người dùng chọn / nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+      "field_label": "<ĐƠN VỊ>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+      "field_label": "Ngày tháng năm bằng chữ",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Họ và tên\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+      "field_label": "Lý do đề nghị",
+      "tag": "${LyDo}",
+      "location": "Bảng 3, Cột \"Lý do\", Dòng 3",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 1, Cột \"Mã người dùng IPCAS\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 1, Cột \"Mã người dùng IPCAS\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Họ và tên\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 2, Cột \"Mã nhân viên1\", Dòng 2",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "Nội dung chi tiết yêu cầu",
+      "tag": "${NoiDungYeuCau}",
+      "location": "Bảng 2, Cột \"Nội dung cập nhật\", Dòng 2",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+      "field_label": "<ĐƠN VỊ>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+      "field_label": "Mã chi nhánh",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 1, Cột \"Mã người dùng IPCAS\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 1, Cột \"Mã người dùng IPCAS\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 1, Cột \"Mã người dùng IPCAS\", Dòng 4",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Mã chi nhánh",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Họ và tên\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 2, Cột \"Mã nhân viên\", Dòng 3",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Email nhân viên",
+      "tag": "${EmailNV}",
+      "location": "Bảng 2, Cột \"Email AD\", Dòng 3",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Nội dung chi tiết yêu cầu",
+      "tag": "${NoiDungYeuCau}",
+      "location": "Bảng 2, Cột \"Nội dung cập nhật\", Dòng 3",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 3, Cột \"Họ và tên\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Phòng ban / Bộ phận",
+      "tag": "${PhongBan}",
+      "location": "Bảng 3, Cột \"Phòng/ Đơn vị\", Dòng 2",
+      "source": "departments.department_code / department_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 3, Cột \"Mã nhân viên1\", Dòng 2",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Email nhân viên",
+      "tag": "${EmailNV}",
+      "location": "Bảng 3, Cột \"Email AD\", Dòng 2",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Họ và tên Người dùng",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người dùng",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Đoạn văn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Số điện thoại liên hệ",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Mã người dùng",
+      "tag": "${IPCAS}",
+      "location": "Đoạn văn mã người dùng",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Lý do đổi lại",
+      "tag": "${LyDo}",
+      "location": "Đoạn văn lý do",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"NGƯỜI DÙNG\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"NGƯỜI DÙNG\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Họ và tên Người dùng",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người dùng",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Đoạn văn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Số điện thoại liên hệ",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Mã người dùng",
+      "tag": "${IPCAS}",
+      "location": "Đoạn văn mã người dùng",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"NGƯỜI DÙNG\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "<ĐƠN VỊ>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Ngày tháng năm bằng chữ",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx",
+      "field_label": "Mã chi nhánh",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng SmartForm\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 2, Cột \"Mã người dùng SmartForm\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx",
+      "field_label": "<ĐƠN VỊ>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx",
+      "field_label": "Ngày tháng năm bằng chữ",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-07_Phieu-Yeu-Cau-Ho-Tro.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-07_Phieu-Yeu-Cau-Ho-Tro.docx",
+      "field_label": "Mã chi nhánh",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-07_Phieu-Yeu-Cau-Ho-Tro.docx",
+      "field_label": "Yêu cầu cụ thể như sau",
+      "tag": "${NoiDungYeuCau}",
+      "location": "Đoạn văn nội dung yêu cầu",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-07_Phieu-Yeu-Cau-Ho-Tro.docx",
+      "field_label": "Thông tin liên hệ SĐT, email",
+      "tag": "${SDT}",
+      "location": "Đoạn văn liên hệ",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mau-07_Phieu-Yeu-Cau-Ho-Tro.docx",
+      "field_label": "Thông tin liên hệ SĐT, email",
+      "tag": "${EmailNV}",
+      "location": "Đoạn văn liên hệ",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Đơn vị yêu cầu",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Mã đơn vị trên IPCAS",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã IPCAS chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Người liên hệ",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người liên hệ",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Số điện thoại",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "<ĐƠN VỊ>",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Mã chi nhánh",
+      "tag": "${MaChiNhanh}",
+      "location": "Đoạn văn mã chi nhánh",
+      "source": "branches.branch_code / Session UserBranchCode",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Họ và tên Người dùng",
+      "tag": "${TenCanBo}",
+      "location": "Đoạn văn người dùng",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Chức vụ",
+      "tag": "${ChucVu}",
+      "location": "Đoạn văn chức vụ",
+      "source": "positions.position_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Đơn vị công tác",
+      "tag": "${TenChiNhanh}",
+      "location": "Đoạn văn nhãn đơn vị",
+      "source": "branches.branch_name / Session UserBranchName",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Số điện thoại liên hệ",
+      "tag": "${SDT}",
+      "location": "Đoạn văn số điện thoại",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Mã người dùng",
+      "tag": "${IPCAS}",
+      "location": "Đoạn văn mã người dùng",
+      "source": "users.user_ipcas / cache IPCAS",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Lý do đổi lại",
+      "tag": "${LyDo}",
+      "location": "Đoạn văn lý do",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Yêu cầu cụ thể như sau",
+      "tag": "${NoiDungYeuCau}",
+      "location": "Đoạn văn nội dung yêu cầu",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Thông tin liên hệ SĐT, email",
+      "tag": "${SDT}",
+      "location": "Đoạn văn liên hệ",
+      "source": "users.phone_no",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Thông tin liên hệ SĐT, email",
+      "tag": "${EmailNV}",
+      "location": "Đoạn văn liên hệ",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${DiaDanh}",
+      "location": "Dòng ngày tháng năm",
+      "source": "branches.branch_place / Session UserBranchPlace",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Địa danh ngày tháng năm",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"Mã người dùng IPCAS\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 4, Cột \"Mã người dùng IPCAS\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 5, Cột \"Họ và tên\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 5, Cột \"Mã nhân viên1\", Dòng 2",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Nội dung chi tiết yêu cầu",
+      "tag": "${NoiDungYeuCau}",
+      "location": "Bảng 5, Cột \"Nội dung cập nhật\", Dòng 2",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 8, Cột \"Mã người dùng IPCAS\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 8, Cột \"Mã người dùng IPCAS\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 8, Cột \"Mã người dùng IPCAS\", Dòng 4",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 12, Cột \"Họ và tên\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 12, Cột \"Mã nhân viên\", Dòng 3",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Email nhân viên",
+      "tag": "${EmailNV}",
+      "location": "Bảng 12, Cột \"Email AD\", Dòng 3",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Nội dung chi tiết yêu cầu",
+      "tag": "${NoiDungYeuCau}",
+      "location": "Bảng 12, Cột \"Nội dung cập nhật\", Dòng 3",
+      "source": "Người dùng nhập trên form",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Họ và tên cán bộ",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 13, Cột \"Họ và tên\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Phòng ban / Bộ phận",
+      "tag": "${PhongBan}",
+      "location": "Bảng 13, Cột \"Phòng/ Đơn vị\", Dòng 2",
+      "source": "departments.department_code / department_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Mã số nhân viên",
+      "tag": "${MaNV}",
+      "location": "Bảng 13, Cột \"Mã nhân viên1\", Dòng 2",
+      "source": "users.employee_code",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Email nhân viên",
+      "tag": "${EmailNV}",
+      "location": "Bảng 13, Cột \"Email AD\", Dòng 2",
+      "source": "users.email / Session user_email",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "< TÊN ĐƠN VỊ >",
+      "tag": "${TenChiNhanhHOA}",
+      "location": "Tiêu đề đơn vị cấp trên",
+      "source": "mb_strtoupper(branches.branch_name)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 16, Cột \"NGƯỜI DÙNG\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 16, Cột \"NGƯỜI DÙNG\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 18, Cột \"NGƯỜI DÙNG\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Ngày tháng năm bằng chữ",
+      "tag": "${NgayThangNam}",
+      "location": "Dòng ngày tháng năm",
+      "source": "SupportFormService::formatDateInWords(NgayYeuCau)",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 21, Cột \"Mã người dùng SmartForm\", Dòng 2",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Chữ ký / Họ tên người lập",
+      "tag": "${TenCanBo}",
+      "location": "Bảng 21, Cột \"Mã người dùng SmartForm\", Dòng 3",
+      "source": "users.name / Session user_name",
+      "status": "Đã xác định"
+    }
+  ],
+  "all_unconfirmed_records": [
+    {
+      "file": "Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: \t\t\tKính gửi: Trung tâm Thanh toán Agribank. ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "Mau-15-TT_Yeu-Cau-Cap-Quyen-Phe-Duyet-Chuyen-Tien-Moi.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"User AD\", Dòng 2",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: ............................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: .....................................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: YÊU CẦU THAY ĐỔI NHÓM QUYỀN TRUY CẬP CỦA NGƯỜI SỬ DỤNG:...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: …………………………………………..…....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: ……………………………………….………………......................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Mã người dùng BE-ADMIN",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Đề nghị bộ phận quản trị hệ thống cấp lại mật khẩu cho Mã ng...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: ………………………………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: …………………………………………………………..…….....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Mã người dùng BE-ADMIN",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Tôi xin xác nhận đã nhận được mã người dùng BE-ADMIN:………..……...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\CacMauBieuHTBeadmin_new.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri-BE-ADMIN.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: ............................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: .....................................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: ............................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-02_Yeu-Cau-Cap-Moi-Ma-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: ............................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nhom-Quyen-BE-ADMIN.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: YÊU CẦU THAY ĐỔI NHÓM QUYỀN TRUY CẬP CỦA NGƯỜI SỬ DỤNG:...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: …………………………………………..…....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: ……………………………………….………………......................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Mã người dùng BE-ADMIN",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Đề nghị bộ phận quản trị hệ thống cấp lại mật khẩu cho Mã ng...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: ………………………………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: …………………………………………………………..…….....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Mã người dùng BE-ADMIN",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Tôi xin xác nhận đã nhận được mã người dùng BE-ADMIN:………..……...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-04_Yeu-Cau-Cap-Lai-Mat-Khau-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-05_Yeu-Cau-Thay-Doi-Trang-Thai-Nguoi-Su-Dung-BE-ADMIN.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: ............................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-06_Phieu-Yeu-Cau-BeAdmin.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: 87204002...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "BeAdmin\\Mau-06_Phieu-Yeu-Cau-BeAdmin.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: Trung tâm Công nghệ thông tin....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-01_Yeu-Cau-Cap-Moi-Thay-Doi-Thong-Tin.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: \t\tSố ……………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi:...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: YÊU CẦU CẤP CHỨC NĂNG, QUYỀN NGHIỆP VỤ GIAO DỊCH CHO NGƯỜI D...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (2.4): Mô tả các chức năng giao dịch cần được cấp (tham ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (2.5): Trong trường hợp yêu cầu loại trừ một số chức năn...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (2.6): Mô tả các nghiệp vụ Người dùng cần thực hiện giao...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Phương thức xác thực",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Trường hợp thay đổi phương thức xác thực mã người dùng (chỉ ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: \t\tSố ……………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"Chức năng giao dịch/Nhóm chức năng nghiệp vụ đề nghị cấp\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"Chức năng giao dịch/Nhóm chức năng nghiệp vụ loại trừ\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-02_Yeu-Cau-Cap-Moi-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"Quyền nghiệp vụ giao dịch đề nghị cấp\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi:...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: YÊU CẦU THAY ĐỔI CHỨC NĂNG, QUYỀN NGHIỆP VỤ GIAO DỊCH CHO NG...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: \t\tSố ……………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"Chức năng giao dịch/Nhóm chức năng nghiệp vụ đề nghị thay đổi\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Thay-Doi-Thong-Tin.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"Quyền nghiệp vụ giao dịch đề nghị thay đổi\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi:...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: YÊU CẦU THAY ĐỔI CHỨC NĂNG, QUYỀN NGHIỆP VỤ GIAO DỊCH CHO NG...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (2.4): Mô tả các chức năng giao dịch cần được cấp (tham ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (2.5): Mô tả các nghiệp vụ Người dùng cần được bổ sung đ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Phương thức xác thực",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Trường hợp thay đổi phương thức xác thực mã người dùng (chỉ ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: \t\tSố ……………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"Chức năng giao dịch/Nhóm chức năng nghiệp vụ đề nghị thay đổi\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-03_Yeu-Cau-Thay-Doi-Thong-Tin-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"Quyền nghiệp vụ giao dịch đề nghị thay đổi\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi:...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-04_Bien-Ban-Phuc-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: \t\tSố ……………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi:...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-05_Bien-Ban-Xu-Ly-Su-Co-Ma-Nguoi-Dung.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: \t\tSố ……………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-07_Ban-Xac-Nhan-Tiep-Nhan-Ma-Nguoi-Dung.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi:...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-08_Thu-Hoi-Tam-Khoa-User.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: Bộ phận quản trị hệ thống tại đơn vị...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-08_Thu-Hoi-Tam-Khoa-User.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: \t\tSố ……………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-08_Yeu-Cau-Thu-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi:...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-08_Yeu-Cau-Thu-Hoi-Ma-Nguoi-Dung.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: \t\tSố ……………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Doi-Mat-Khau-IPCAS.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: \tBộ phận điện toán – Agribank Chi nhánh Đồng Tháp...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi:...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-09_Yeu-Cau-Thay-Doi-Mat-Khau-Nguoi-Dung.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: \t\tSố ……………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi:...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (1.4): Nếu sử dụng hệ thống chức năng giao dịch: người l...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Nếu sử dụng kết hợp hệ thống chức năng giao dịch và hệ thống...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (1.5): Nếu ở cột (1.4 ) người lập biểu sử dụng hệ thống ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Nếu ở cột (1.4 ) người lập biểu sử dụng hệ thống Nhóm chức n...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (1.6): Nếu ở cột (1.4) sử dụng Nhóm quyền nghiệp vụ và c...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Trường hợp bảng phân quyền gửi trong nội bộ đơn vị không cần...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mau-CSUS-10_Bang-Phan-Quyen-Nhom-Nguoi-Dung.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: \t\tSố ……………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi:...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: YÊU CẦU CẤP CHỨC NĂNG, QUYỀN NGHIỆP VỤ GIAO DỊCH CHO NGƯỜI D...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (2.4): Mô tả các chức năng giao dịch cần được cấp (tham ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (2.5): Trong trường hợp yêu cầu loại trừ một số chức năn...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (2.6): Mô tả các nghiệp vụ Người dùng cần thực hiện giao...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Phương thức xác thực",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Trường hợp thay đổi phương thức xác thực mã người dùng (chỉ ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: YÊU CẦU THAY ĐỔI CHỨC NĂNG, QUYỀN NGHIỆP VỤ GIAO DỊCH CHO NG...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (2.5): Mô tả các nghiệp vụ Người dùng cần được bổ sung đ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (1.4): Nếu sử dụng hệ thống chức năng giao dịch: người l...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Nếu sử dụng kết hợp hệ thống chức năng giao dịch và hệ thống...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (1.5): Nếu ở cột (1.4 ) người lập biểu sử dụng hệ thống ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Nếu ở cột (1.4 ) người lập biểu sử dụng hệ thống Nhóm chức n...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Cột (1.6): Nếu ở cột (1.4) sử dụng Nhóm quyền nghiệp vụ và c...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Trường hợp bảng phân quyền gửi trong nội bộ đơn vị không cần...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: \t\tSố ……………...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 9, Cột \"Chức năng giao dịch/Nhóm chức năng nghiệp vụ đề nghị cấp\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 9, Cột \"Chức năng giao dịch/Nhóm chức năng nghiệp vụ loại trừ\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 9, Cột \"Quyền nghiệp vụ giao dịch đề nghị cấp\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 13, Cột \"Chức năng giao dịch/Nhóm chức năng nghiệp vụ đề nghị thay đổi\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "IPCAS\\Mẫu Biểu IPCAS_CSUS01_10.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 13, Cột \"Quyền nghiệp vụ giao dịch đề nghị thay đổi\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-13A-PKI_Doi-Mat-Khau-PKI.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: Bộ phận điện toán - Agribank Đồng Tháp....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: Trung tâm Công nghệ Thông Tin....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "Ngày cấp CCCD/CMND",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số CCCD: ${CCCD}  Ngày cấp: .................. Nơi cấp: Cục ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "Nơi cấp CCCD/CMND",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số CCCD: ${CCCD}  Ngày cấp: .................. Nơi cấp: Cục ...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1A-PKI_Giay-De-Nghi-Cap-PKI.docx",
+      "field_label": "Số Serial Token / Chứng thư số",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Serial Number của chứng thư chữ ký điện tử : ..................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-1B-PKI_De-Nghi-CTS-Cho-To-Chuc.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: Trung tâm Công nghệ thông tin - Agribank....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-3A-PKI_Giay-De-Nghi-Mo-Khoa-PKI.docx",
+      "field_label": "Tên đăng nhập TMS",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Tên đăng nhập trên hệ thống TMS (nếu có):\t...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "Mẫu PKI\\Mau-3A-PKI_Giay-De-Nghi-Mo-Khoa-PKI.docx",
+      "field_label": "Số Serial Token / Chứng thư số",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số Serial number của thiết bị bảo mật:\t...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 5, Cột \"User AD\", Dòng 3",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Phương thức xác thực (PKI/SMS/IP…)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 5, Cột \"Phương thức xác thực (PKI/SMS/IP…)\", Dòng 3",
+      "source": "Chưa có TAG Phương thức xác thực trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 9, Cột \"User AD\", Dòng 3",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Phương thức xác thực (PKI/SMS/IP…)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 9, Cột \"Phương thức xác thực  (PKI/SMS/IP…)\", Dòng 3",
+      "source": "Chưa có TAG Phương thức xác thực trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 13, Cột \"User AD\", Dòng 3",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 17, Cột \"User AD\", Dòng 3",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau bieu 1072 Qtr Quan tri nguoi su dung tren PMNV Agribank.docx",
+      "field_label": "Yêu cầu",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 17, Cột \"Yêu cầu\", Dòng 3",
+      "source": "Trường tùy chọn nghiệp vụ / chưa có mã TAG hệ thống",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"User AD\", Dòng 3",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau-01-PMNV_Cap-Quyen-Nguoi-Quan-Tri.docx",
+      "field_label": "Phương thức xác thực (PKI/SMS/IP…)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"Phương thức xác thực (PKI/SMS/IP…)\", Dòng 3",
+      "source": "Chưa có TAG Phương thức xác thực trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"User AD\", Dòng 3",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau-02-PMNV_Cap-Quyen-Nguoi-Su-Dung.docx",
+      "field_label": "Phương thức xác thực (PKI/SMS/IP…)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"Phương thức xác thực  (PKI/SMS/IP…)\", Dòng 3",
+      "source": "Chưa có TAG Phương thức xác thực trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau-03-PMNV_Cap-Nhat-Thong-Tin-Nguoi-Su-Dung.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"User AD\", Dòng 3",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"User AD\", Dòng 3",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "PMNV\\Mau-04-PMNV_Cap-Nhat-Trang-Thai-Nguoi-Su-Dung.docx",
+      "field_label": "Yêu cầu",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"Yêu cầu\", Dòng 3",
+      "source": "Trường tùy chọn nghiệp vụ / chưa có mã TAG hệ thống",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: Ban Ngân hàng số Agribank...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: ............................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 2, Cột \"Mã đăng nhập\", Dòng 2",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-01-SMF_Cap-Moi-Thay-Doi-Thong-Tin-Nguoi-Quan-Tri.docx",
+      "field_label": "Loại thông tin cần cập nhật",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 2, Cột \"Loại thông tin cần cập nhật\", Dòng 2",
+      "source": "Trường tùy chọn nghiệp vụ / chưa có mã TAG hệ thống",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: .....................................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-02-SMF_Cap-Moi-Ma-Nguoi-Dung.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 2, Cột \"User Name\", Dòng 3",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Loại thông tin cần cập nhật",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 2, Cột \"Loại thông tin cần cập nhật\", Dòng 3",
+      "source": "Trường tùy chọn nghiệp vụ / chưa có mã TAG hệ thống",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"Chức năng, quyền giao dịch\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-03-SMF_Thay-Doi-Thong-Tin-Nhom-Quyen.docx",
+      "field_label": "Yêu cầu thay đổi",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 3, Cột \"Yêu cầu thay đổi\", Dòng 2",
+      "source": "Trường tùy chọn nghiệp vụ / chưa có mã TAG hệ thống",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: …………………………………………..…....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-04-SMF_Phieu-Yeu-Cau.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: …………………………………………………………….......",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: …………………………………………..…....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: ……………………………………………………………....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-05-SMF_Ban-Xac-Nhan.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mau-06-SMF_Thay-Doi-Trang-Thai-Ma-Nguoi-Dung.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: Ban Ngân hàng số Agribank...",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: ............................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: .....................................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Kính gửi (Đơn vị nhận)",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Kính gửi: …………………………………………..…....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: …………………………………………………………….......",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Mã liên ngân hàng",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Mã liên ngân hàng: ……………………………………………………………....",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Số công văn / Tờ trình",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Đoạn văn: Số:......................................",
+      "source": "Chưa cấu hình trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 5, Cột \"Mã đăng nhập\", Dòng 2",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Loại thông tin cần cập nhật",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 5, Cột \"Loại thông tin cần cập nhật\", Dòng 2",
+      "source": "Trường tùy chọn nghiệp vụ / chưa có mã TAG hệ thống",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "User AD / Mã đăng nhập",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 12, Cột \"User Name\", Dòng 3",
+      "source": "Chưa có TAG User AD trong bảng it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Loại thông tin cần cập nhật",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 12, Cột \"Loại thông tin cần cập nhật\", Dòng 3",
+      "source": "Trường tùy chọn nghiệp vụ / chưa có mã TAG hệ thống",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Nhóm chức năng / Quyền nghiệp vụ",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 13, Cột \"Chức năng, quyền giao dịch\", Dòng 2",
+      "source": "Chưa có TAG Nhóm quyền trong it_support_form_fields",
+      "status": "Cần xác nhận"
+    },
+    {
+      "file": "SMF\\Mẫu biểu đăng ký user SmartForm.docx",
+      "field_label": "Yêu cầu thay đổi",
+      "tag": "(Chưa hỗ trợ TAG)",
+      "location": "Bảng 13, Cột \"Yêu cầu thay đổi\", Dòng 2",
+      "source": "Trường tùy chọn nghiệp vụ / chưa có mã TAG hệ thống",
+      "status": "Cần xác nhận"
+    }
+  ]
+}

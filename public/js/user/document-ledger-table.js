@@ -60,7 +60,8 @@ $(function () {
         ajax: {
             url: page.data('register-url') || '/documents/ledger',
             data: function (request) {
-                request.q = $('#ledgerKeyword').val().trim();
+                request.q = $('#ledgerKeyword').val().trim() || (request.search && request.search.value) || '';
+
                 request.year = $('#ledgerYear').val();
                 request.book = $('#ledgerBook').val();
                 request.check = page.data('check-only');

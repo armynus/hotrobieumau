@@ -16,14 +16,23 @@ function setup(checkOnly, keyword = '') {
     const $ = selector => {
         if (typeof selector === 'function') return selector();
         if (selector === '#ledgerTable') return table;
-        if (selector === '#ledgerPage') return {data: key => key === 'check-only' ? checkOnly : '/documents/ledger?check=' + checkOnly};
-        if (selector === '#ledgerKeyword') return {val: () => keyword};
+        if (selector === '#ledgerPage') return {data: key => key === 'check-only' ? checkOnly : '/documents/ledger?check=' + checkOnly, on: () => {}};
+        if (selector === '#ledgerKeyword') return {val: () => keyword, on: () => {}};
         if (selector === '#ledgerCheckStatus') return {text: value => { state.text = value; }};
+
+
+
         if (selector === '.ledger-check-summary') return {toggleClass: (_name, value) => { state.warning = value; }};
         if (selector === '<div>') return {text: value => ({html: () => escape(value)})};
-        throw new Error('Unexpected selector: ' + selector);
+        return {
+            on: () => {}, off: () => {}, val: () => '', text: () => {},
+            data: () => '', length: 0, addClass: () => {}, removeClass: () => {}, toggleClass: () => {}
+        };
     };
-    vm.runInNewContext(script, {$, Swal: {fire: () => { state.alerts++; }}});
+
+    const win = {location: {search: '', pathname: ''}};
+    vm.runInNewContext(script, {$, window: win, location: win.location, Swal: {fire: () => { state.alerts++; }}});
+
     return state;
 }
 

@@ -64,15 +64,15 @@
 
 
     <!-- Page level plugins -->
-    <script src="{{asset('vendor/datatables/jquery.dataTables.min.js')}}"></script>
-    <script src="{{asset('vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
+    <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}?v={{ filemtime(public_path('vendor/datatables/jquery.dataTables.min.js')) }}"></script>
+    <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}?v={{ filemtime(public_path('vendor/datatables/dataTables.bootstrap4.min.js')) }}"></script>
 
     <!-- Page level custom scripts -->
-    <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
+    <script src="{{ asset('js/demo/datatables-demo.js') }}?v={{ filemtime(public_path('js/demo/datatables-demo.js')) }}"></script>
     <!-- include jQuery validate library -->
     
      <!-- jsQR library - Thư viện quét QR code mạnh mẽ -->
-    <script src="{{asset('js/jsQR.min.js')}}"></script>
+    <script src="{{ asset('js/jsQR.min.js') }}?v={{ filemtime(public_path('js/jsQR.min.js')) }}"></script>
     
     <script src="{{ asset('js/user/scan_camera.js') }}?v={{ filemtime(public_path('js/user/scan_camera.js')) }}"></script>
 

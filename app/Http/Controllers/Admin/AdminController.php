@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Branches;
 use App\Models\SupportForm;
-use App\Models\Users;
+use App\Models\User;
 use App\Models\FormField;
 use App\Models\FormType;
 use App\Services\FormWorkspaceService;
@@ -19,7 +19,7 @@ class AdminController extends Controller
 {
     public function index(){
         $branch_count = Branches::count();
-        $user_count   = Users::count();
+        $user_count   = User::count();
         $form_count   = SupportForm::count();
         $field_count   = FormField::count();
         return view('admin.dashboard', compact('branch_count','user_count','form_count','field_count'));

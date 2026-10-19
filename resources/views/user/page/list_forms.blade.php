@@ -31,7 +31,9 @@
         <div class="fw-surface fw-catalog-list" id="catalogRows">
         @forelse($list_forms as $item)
             <article class="fw-catalog-row" data-id="{{ $item->id }}" data-name="{{ $item->name }}" data-type="{{ $item->form_type }}" data-category="{{ $item->formType?->type_name }} {{ $item->supFormType?->name }}" data-used="{{ $recent[$item->id] ?? '' }}" data-popular="{{ $item->usage_count }}">
+                @if(auth_user_can('forms.bundle'))
                 <input class="fw-select-form" type="checkbox" name="form_ids[]" value="{{ $item->id }}" aria-label="Thêm {{ $item->name }} vào bộ hồ sơ">
+                @endif
                 <div class="fw-form-icon" aria-hidden="true"><i class="far fa-file-word"></i></div>
                 <div class="fw-form-info"><a class="fw-form-name" href="{{ route('support_forms.show', ['type' => $item->form_type, 'id' => $item->id]) }}">{{ $item->name }}</a><div class="fw-form-meta"><span>{{ $item->formType?->type_name ?? 'Biểu mẫu' }}</span><span>{{ count(\App\Services\FormWorkspaceService::fieldCodes($item->fields)) }} trường thông tin</span>@if(isset($recent[$item->id]))<span>Đã dùng {{ \Carbon\Carbon::parse($recent[$item->id])->format('d/m/Y') }}</span>@endif</div></div>
                 <button type="button" class="fw-pin" aria-pressed="false" aria-label="Ghim {{ $item->name }}" title="Ghim mẫu trên trình duyệt này"><span aria-hidden="true">☆</span></button>
@@ -43,10 +45,12 @@
         </div>
         <div id="catalogEmpty" class="fw-empty" hidden><strong>Không có biểu mẫu phù hợp</strong><p>Thử từ khóa khác hoặc bỏ bộ lọc nhóm nghiệp vụ.</p><button type="button" class="btn btn-outline-primary" id="clearCatalogFilters">Xóa bộ lọc</button></div>
         <div class="fw-pagination"><button type="button" id="catalogPrevious" class="btn btn-light">← Trước</button><span id="catalogPage"></span><button type="button" id="catalogNext" class="btn btn-light">Sau →</button></div>
+        @if(auth_user_can('forms.bundle'))
         <aside class="fw-bundle-bar">
             <div><strong id="bundleCount">Bộ hồ sơ của bạn</strong><p class="mb-0 small text-muted">Chọn 2–10 mẫu · nhập thông tin chung một lần · tải bộ Word</p><div id="bundleChips" class="fw-chips" aria-label="Biểu mẫu đã chọn"></div></div>
             <div class="fw-actions"><button type="button" id="clearBundle" class="btn btn-light"><i class="fas fa-times" aria-hidden="true"></i>Bỏ chọn</button><button type="submit" id="createBundle" class="btn btn-primary" disabled><i class="fas fa-layer-group" aria-hidden="true"></i>Tạo bộ hồ sơ →</button></div>
         </aside>
+        @endif
         <p id="catalogNotice" class="small text-muted" role="status" aria-live="polite"></p>
     </form>
     <noscript><p class="alert alert-info">Bật JavaScript để tìm kiếm, ghim mẫu và tạo bộ hồ sơ. Bạn vẫn có thể mở từng mẫu.</p></noscript>

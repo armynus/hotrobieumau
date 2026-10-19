@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ItSupport\ReplyItSupportTicketRequest;
+use App\Http\Requests\ItSupport\StoreItSupportTicketRequest;
 use App\Models\ItSupportRequest;
 use App\Services\ItSupportStorage;
 use Illuminate\Http\Request;
@@ -72,14 +74,7 @@ class ItSupportController extends Controller
 
     public function store(Request $request, ItSupportStorage $storage)
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string|min:10|max:5000',
-            'contact_phone' => 'nullable|string|max:20',
-            'category' => 'nullable|in:Phần cứng,Phần mềm,Mạng,Khác',
-            'attachments' => 'nullable|array|max:5',
-            'attachments.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:20480',
-        ]);
+        $data = $this->resolveFormRequest($request, StoreItSupportTicketRequest::class)->validated();
         $autoAttachment = $request->input('auto_attachment');
 
         $ticket = DB::transaction(function () use ($data, $request, $storage, $autoAttachment) {
@@ -120,7 +115,7 @@ class ItSupportController extends Controller
 
     public function reply(Request $request, int $id, ItSupportStorage $storage)
     {
-        $data = $request->validate(['message' => 'required|string|min:3|max:3000']);
+        $data = $this->resolveFormRequest($request, ReplyItSupportTicketRequest::class)->validated();
         $ticket = $this->ownedTicket($id);
         if ($ticket->status === 'closed') {
             return back()->withErrors(['message' => 'Phiếu đã đóng. Vui lòng tạo phiếu mới nếu cần hỗ trợ tiếp.']);

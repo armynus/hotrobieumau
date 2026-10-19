@@ -175,8 +175,15 @@ class DocumentQueryService
             $sortBy = 'created_at';
         }
 
-        if (in_array($sortBy, ['issued_date', 'received_date', 'forwarded_date'], true)) {
-            $query->orderByRaw($sortBy.' IS NULL ASC');
+        $nullSortExpression = match ($sortBy) {
+            'issued_date' => 'issued_date IS NULL ASC',
+            'received_date' => 'received_date IS NULL ASC',
+            'forwarded_date' => 'forwarded_date IS NULL ASC',
+            default => null,
+        };
+
+        if ($nullSortExpression !== null) {
+            $query->orderByRaw($nullSortExpression);
         }
         $query->orderBy($sortBy, $sortDir === 'asc' ? 'asc' : 'desc');
         if ($sortBy !== 'id') {

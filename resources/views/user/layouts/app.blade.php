@@ -33,6 +33,39 @@
                 <!-- Begin Page Content -->
         
                 <main id="user-main-content" tabindex="-1">
+                    @if (session('error'))
+                        <div class="container-fluid pt-3 pb-0">
+                            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                                <i class="fas fa-ban mr-2"></i>
+                                <strong>Thông báo:</strong> {{ session('error') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                    @endif
+                    @if (session('warning'))
+                        <div class="container-fluid pt-3 pb-0">
+                            <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                <strong>Cảnh báo:</strong> {{ session('warning') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                    @endif
+                    @if (session('success'))
+                        <div class="container-fluid pt-3 pb-0">
+                            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                <strong>Thành công:</strong> {{ session('success') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                    @endif
                     @yield('content') <!-- Các view con sẽ điền nội dung vào đây -->
                 </main>
 

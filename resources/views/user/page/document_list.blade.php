@@ -12,12 +12,12 @@
             <div class="small text-muted">Tra cứu và xử lý tập trung văn bản đến, đi và quyết định</div>
         </div>
         <div class="d-flex flex-wrap align-items-center mt-2 mt-sm-0">
-            @if($user && $user->isClerk())
+            @if(auth_user_can('documents.manage_ledger'))
             <button type="button" class="btn btn-sm btn-success shadow-sm mr-2" data-toggle="modal" data-target="#documentExportModal">
                 <i class="fas fa-file-excel mr-1"></i> Xuất sổ Excel
             </button>
             @endif
-            @if($user && $user->canUploadDocument())
+            @if(auth_user_can('documents.upload') && $user && $user->canUploadDocument())
             <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-primary shadow-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-plus fa-sm mr-1"></i> Đăng văn bản
@@ -149,7 +149,7 @@
 </div>
 
 @include('user.page.documents.partials.quick_action_modals')
-@if($user && $user->isClerk())
+@if(auth_user_can('documents.manage_ledger'))
     @include('user.page.documents.partials.export_modal')
 @endif
 @endsection
@@ -163,12 +163,12 @@
 
 @push('scripts')
 <link href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}"></script>
-<script src="{{ asset('vendor/flatpickr/vn.js') }}"></script>
-<script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
-<script src="{{ asset('js/user/document-distribution-editor.js') }}"></script>
+<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}?v={{ filemtime(public_path('vendor/datatables/jquery.dataTables.min.js')) }}"></script>
+<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}?v={{ filemtime(public_path('vendor/datatables/dataTables.bootstrap4.min.js')) }}"></script>
+<script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}?v={{ filemtime(public_path('vendor/flatpickr/flatpickr.min.js')) }}"></script>
+<script src="{{ asset('vendor/flatpickr/vn.js') }}?v={{ filemtime(public_path('vendor/flatpickr/vn.js')) }}"></script>
+<script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}?v={{ filemtime(public_path('vendor/sweetalert2/sweetalert2.all.min.js')) }}"></script>
+<script src="{{ asset('js/user/document-distribution-editor.js') }}?v={{ filemtime(public_path('js/user/document-distribution-editor.js')) }}"></script>
 <script src="{{ asset('js/user/document-list.js') }}?v={{ filemtime(public_path('js/user/document-list.js')) }}"></script>
 <script src="{{ asset('js/user/document-export.js') }}?v={{ filemtime(public_path('js/user/document-export.js')) }}"></script>
 @endpush

@@ -27,12 +27,12 @@
     </div>
 
     {{-- ===== HỖ TRỢ BIỂU MẪU ===== --}}
+    @if(auth_user_can('forms.view'))
     <x-sidebar-form-types />
-    <!-- Nav Item - Pages Collapse Menu -->
-
-
+    @endif
 
     {{-- ===== VĂN THƯ ===== --}}
+    @if(auth_user_can('documents.view') || (auth_user_can('documents.upload') && (!auth_user() || auth_user()->canUploadDocument())) || auth_user_can('documents.manage_ledger') || auth_user_can('documents.reports'))
     <li class="nav-item {{ request()->routeIs('documents_forward', 'documents_incoming*', 'documents_outgoing*', 'documents_decision*', 'documents_ledger*', 'document_register', 'document_detail', 'document_reports') ? 'active' : '' }}">
         <a class="nav-link {{ request()->routeIs('documents_forward', 'documents_incoming*', 'documents_outgoing*', 'documents_decision*', 'documents_ledger*', 'document_register', 'document_detail', 'document_reports') ? '' : 'collapsed' }}"
             href="#" data-toggle="collapse" data-target="#collapseDocuments"
@@ -45,6 +45,7 @@
             class="collapse @menuOpen('documents_forward', 'documents_incoming', 'documents_outgoing', 'documents_incoming_register', 'documents_outgoing_register', 'documents_decision_register', 'document_register', 'document_detail', 'document_reports', 'documents_ledger')"
             data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
+                @if(auth_user_can('documents.view'))
                 <a class="collapse-item {{ request()->routeIs('documents_incoming') ? 'active' : '' }}"
                     href="{{ route('documents_incoming') }}">
                     <i class="fas fa-inbox fa-fw text-primary mr-1"></i>
@@ -56,19 +57,21 @@
                     <i class="fas fa-list fa-fw mr-1"></i>
                     <span>Kho văn bản</span>
                 </a>
+                @endif
+
+                @if(auth_user_can('documents.reports'))
                 <a class="collapse-item @active('document_reports')"
                     href="{{ route('document_reports') }}">
                     <i class="fas fa-chart-bar fa-fw mr-1"></i>
                     <span>Báo cáo</span>
                 </a>
+                @endif
 
-                @php
-                $user = \App\Models\User::find(Session::get('user_id'));
-                @endphp
-                @if($user && $user->isClerk())
+                @if(auth_user_can('documents.manage_ledger'))
                 <a class="collapse-item @active('documents_ledger')" href="{{ route('documents_ledger') }}">Sổ văn bản</a>
                 @endif
-                @if($user && $user->canUploadDocument())
+
+                @if(auth_user_can('documents.upload') && (!auth_user() || auth_user()->canUploadDocument()))
                 <div class="collapse-divider"></div>
                 <h6 class="collapse-header">Đăng tải:</h6>
                 <a class="collapse-item {{ request()->routeIs('document_register', 'documents_incoming_register') ? 'active' : '' }}"
@@ -80,15 +83,20 @@
             </div>
         </div>
     </li>
+    @endif
+
     {{-- ===== MẪU BIỂU IT ===== --}}
+    @if(auth_user_can('it_support.templates'))
     <li class="nav-item {{ request()->routeIs('user.it_support.templates.*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('user.it_support.templates.index') }}">
             <i class="fas fa-fw fa-laptop-code" style="color:white;"></i>
             <span>Mẫu biểu IT</span>
         </a>
     </li>
+    @endif
 
     {{-- ===== GỬI HỖ TRỢ IT ===== --}}
+    @if(auth_user_can('it_support.request'))
     @php
         $isItSupportActive = request()->routeIs('user.it_support.*') && !request()->routeIs('user.it_support.templates.*');
     @endphp
@@ -115,7 +123,10 @@
             </div>
         </div>
     </li>
+    @endif
+
     {{-- ===== TRA CỨU XÃ/PHƯỜNG ===== --}}
+    @if(auth_user_can('data.merger_lookup'))
     <li class="nav-item {{ request()->routeIs('merger_lookup*') ? 'active' : '' }}">
         <a class="nav-link @active('merger_lookup*')"
             href="{{ route('merger_lookup') }}">
@@ -123,8 +134,10 @@
             <span>Tra cứu xã/phường</span>
         </a>
     </li>
-    {{-- ===== TỔNG HỢP DỮ LIỆU ===== --}}
+    @endif
 
+    {{-- ===== TỔNG HỢP DỮ LIỆU ===== --}}
+    @if(auth_user_can('data.customers.view') || auth_user_can('data.accounts.view'))
     <li class="nav-item {{ request()->routeIs('view_data_customer', 'view_data_account') ? 'active' : '' }}">
         <a class="nav-link {{ request()->routeIs('view_data_customer', 'view_data_account') ? '' : 'collapsed' }}"
             href="#" data-toggle="collapse" data-target="#collapseOne"
@@ -142,15 +155,21 @@
             class="collapse @menuOpen('view_data_customer', 'view_data_account')"
             data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
+                @if(auth_user_can('data.customers.view'))
                 <a class="collapse-item @active('view_data_customer')"
                     href="{{ route('view_data_customer') }}">Thông tin khách hàng</a>
+                @endif
+                @if(auth_user_can('data.accounts.view'))
                 <a class="collapse-item @active('view_data_account')"
                     href="{{ route('view_data_account') }}">Thông tin tài khoản</a>
+                @endif
             </div>
         </div>
     </li>
-    {{-- ===== CAMERA SCAN QR (chỉ role = 1) ===== --}}
-    @if(Session::get('user_role') == '1')
+    @endif
+
+    {{-- ===== CAMERA SCAN QR ===== --}}
+    @if(auth_user_can('data.scan_qr'))
     <li class="nav-item {{ request()->routeIs('scan_qr_code') ? 'active' : '' }}">
         <a class="nav-link @active('scan_qr_code')"
             href="{{ route('scan_qr_code') }}">

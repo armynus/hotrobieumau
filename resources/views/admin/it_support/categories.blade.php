@@ -354,64 +354,9 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-<script>
-$(document).ready(function() {
-    if (typeof $.fn.DataTable !== 'undefined' && !$.fn.DataTable.isDataTable('#itCategoryTable')) {
-        $('#itCategoryTable').DataTable({
-            language: {
-                processing: "Đang tải...",
-                search: "Tìm kiếm:",
-                lengthMenu: "Hiển thị _MENU_ dòng",
-                info: "Hiển thị _START_ - _END_ trong _TOTAL_ dòng",
-                infoEmpty: "Không có dữ liệu",
-                zeroRecords: "Không tìm thấy dữ liệu",
-                paginate: {
-                    first: "Đầu",
-                    last: "Cuối",
-                    next: "Sau",
-                    previous: "Trước"
-                }
-            }
-        });
-    }
-    // Sửa danh mục
-    $('.btn-edit-category').on('click', function() {
-        const id = $(this).data('id');
-        const name = $(this).data('name');
-        const description = $(this).data('description');
-        const icon = $(this).data('icon');
-        const order = $(this).data('order');
-        const status = $(this).data('status');
-
-        const updateUrl = '{{ route("admin.it_support.categories.update", ":id") }}'.replace(':id', id);
-        $('#editCategoryForm').attr('action', updateUrl);
-
-        $('#edit_name').val(name);
-        $('#edit_description').val(description || '');
-        $('#edit_icon').val(icon || 'fas fa-folder');
-        $('#edit_icon_preview i').attr('class', icon || 'fas fa-folder');
-        $('#edit_display_order').val(order || 10);
-        $('#edit_status').val(status || 'active');
-
-        $('#editCategoryModal').modal('show');
-    });
-
-    // Cập nhật live preview biểu tượng khi thay đổi lựa chọn trong dropdown
-    $(document).on('change', '.select-icon-picker', function() {
-        const iconClass = $(this).val() || 'fas fa-folder';
-        $(this).closest('.form-group').find('label span.badge i').attr('class', iconClass);
-    });
-
-    // Xác nhận xóa
-    $('.btn-delete-trigger').on('click', function(e) {
-        e.preventDefault();
-        const form = $(this).closest('form');
-        if (confirm('Bạn có chắc chắn muốn xóa danh mục này? Các biểu mẫu thuộc danh mục sẽ không bị mất mà chỉ được gỡ phân loại.')) {
-            form.submit();
-        }
-    });
-});
-</script>
+<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}?v={{ filemtime(public_path('vendor/datatables/jquery.dataTables.min.js')) }}"></script>
+<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}?v={{ filemtime(public_path('vendor/datatables/dataTables.bootstrap4.min.js')) }}"></script>
+<span id="admin-it-categories-config" hidden data-config="{{ json_encode(["updateUrlTemplate" => route("admin.it_support.categories.update", ":id")]) }}"></span>
+<script src="{{ asset('js/admin/it-categories-manager.js') }}?v={{ filemtime(public_path('js/admin/it-categories-manager.js')) }}"></script>
 @endpush
+

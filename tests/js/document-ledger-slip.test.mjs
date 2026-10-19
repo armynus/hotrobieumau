@@ -21,9 +21,10 @@ function setup(response) {
             prop: (_name, value) => { state.busy = value; return nodes[selector]; }, html: () => nodes[selector],
             serialize: () => '_token=csrf&print_date=2026-09-16&submitted_to=Ban+Gi%C3%A1m+%C4%91%E1%BB%91c',
             modal: value => { state.modal = value; },
-            DataTable: () => ({row: () => ({data: () => ({form_data: row})})}),
+            DataTable: () => ({row: () => ({data: () => ({form_data: row})}), ajax: {reload: () => { state.reloads++; }}}),
             trigger: (event, args) => state.handlers[selector + '|' + event]({}, ...args)
         };
+
         return nodes[selector];
     };
     const flatpickr = () => ({setDate: value => { state.date = value; }});

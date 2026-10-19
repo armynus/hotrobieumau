@@ -1,5 +1,4 @@
 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-    <link rel="shortcut icon" type="image/png" href="{{asset('hp-logo.png')}}"/>
     <!-- Sidebar Toggle (Topbar) -->
     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
         <i class="fa fa-bars"></i>
@@ -118,72 +117,5 @@
     </li>
 
     </ul>
-{{-- 
-    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
-
-    <script type="text/javascript">
-    var notificationsWrapper   = $('.dropdown-notifications');
-    var notificationsToggle    = notificationsWrapper.find('a[data-toggle]');
-    var notificationsCountElem = notificationsToggle.find('span[data-count]');
-    var notificationsCount     = parseInt(notificationsCountElem.data('count'));
-    var notifications          = $('.show_message');
-
-    Pusher.logToConsole = true;
-
-    //Thay giá trị PUSHER_APP_KEY vào chỗ xxx này nhé
-    var pusher = new Pusher('2247a9ca0f5a2d5d09db', {
-        encrypted: true,
-        cluster: "ap1"
-    });
-
-    // Subscribe to the channel we specified in our Laravel Event
-    var channel = pusher.subscribe('NotificationNewDocument');
-
-    // Bind a function to a Event (the full Laravel class)
-    channel.bind('notification-new-document', function(data_pusher) {
-        
-
-        $('.show_message').css('display','block');
-        
-        $('.notifi_texts').html(data_pusher.message);
-
-        setTimeout(function(){
-            $('.show_message').css('display','none');
-        }, 15000);
-        notificationsCount += 1;
-        var notificationsdataCount   = `
-            ${notificationsCount}
-        `;
-        notificationsCountElem.html(notificationsdataCount);
-        // notificationsCountElem.text(notificationsCount);
-        // notificationsWrapper.find('.notif-count').text(notificationsCount);
-        notificationsWrapper.show();
-    });
-    </script> --}}
-
-    {{-- <script>
-    $(document).ready(function(){
-    $('.view_detail_document_admin').on('click',function(){
-        
-        $.ajax({
-            url: '{{route('view_detail_document_admin')}}',
-            method: 'GET',
-            data:{
-            
-            },
-            success: function(data){
-                var $html = data.html;
-                $('.dropdown-notification').html($html);
-                
-            },
-            error: function(data){
-                var errors = data.responseJSON;
-                console.log(errors);
-            }
-        });                  
-                            
-    });
-                        
-    })
-    </script> --}}
 </nav>
+

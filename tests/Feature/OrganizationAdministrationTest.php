@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminTransactionOfficeController;
 use App\Models\TransactionOffice;
-use App\Models\Users;
+use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -75,6 +75,7 @@ class OrganizationAdministrationTest extends TestCase
             $table->string('password');
             $table->string('role_id');
             $table->string('document_role')->default('user');
+            $table->string('phone_no')->nullable();
             $table->integer('failed_login_attempts')->default(0);
             $table->string('status');
             $table->timestamps();
@@ -129,7 +130,7 @@ class OrganizationAdministrationTest extends TestCase
             'role_id' => 2, 'document_role' => 'user',
         ]);
         $response = app(AdminUserController::class)->store($valid);
-        $user = Users::sole();
+        $user = User::sole();
 
         $this->assertTrue($response->getData(true)['status']);
         $this->assertSame('IPCAS-A', $user->user_ipcas);
@@ -204,7 +205,7 @@ class OrganizationAdministrationTest extends TestCase
         ]);
         app(AdminUserController::class)->store($valid);
 
-        $this->assertSame(21, Users::where('email', 'c@example.test')->value('transaction_office_id'));
+        $this->assertSame(21, User::where('email', 'c@example.test')->value('transaction_office_id'));
 
         $move = Request::create('/admin/transaction-offices/update', 'POST', [
             'transaction_office_id' => 21,

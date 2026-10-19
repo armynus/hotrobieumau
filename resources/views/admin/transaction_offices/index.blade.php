@@ -117,62 +117,16 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-<script>
-$(function () {
-    const csrf = @json(csrf_token());
-    const fields = ['office_name', 'office_code', 'branch_id', 'office_address', 'office_place', 'office_phone', 'office_fax', 'office_email', 'manager_name'];
-
-    function requestData(prefix) {
-        const data = {_token: csrf, status: $('#' + prefix + 'office_status').val()};
-        fields.forEach(field => { data[field] = $('#' + prefix + field).val(); });
-        return data;
-    }
-
-    function showError(xhr, fallback) {
-        const response = xhr.responseJSON || {};
-        const errors = response.errors || {};
-        const firstKey = Object.keys(errors)[0];
-        swal(firstKey ? errors[firstKey][0] : (response.message || fallback), {icon: 'error'});
-    }
-
-    $('#dataTable').DataTable({
-        pageLength: 10,
-        order: [[2, 'asc'], [1, 'asc']],
-        language: {
-            search: 'Tìm kiếm:', lengthMenu: 'Hiển thị _MENU_ dòng',
-            info: 'Hiển thị _START_–_END_ trong _TOTAL_ phòng giao dịch', infoEmpty: 'Chưa có phòng giao dịch',
-            zeroRecords: 'Không tìm thấy phòng giao dịch phù hợp', paginate: {next: 'Sau', previous: 'Trước'}
-        }
-    });
-
-    $('#addOfficeBtn').on('click', function () {
-        $.ajax({url: @json(route('admin_transaction_offices_store')), method: 'POST', data: requestData('')})
-            .done(response => swal('Thành công!', response.message, {icon: 'success'}).then(() => location.reload()))
-            .fail(xhr => showError(xhr, 'Không thể thêm phòng giao dịch.'));
-    });
-
-    $(document).on('click', '.edit-office', function () {
-        $.get(@json(route('admin_transaction_offices_edit')), {transaction_office_id: $(this).data('id')})
-            .done(function (response) {
-                const office = response.office;
-                $('#edit_transaction_office_id').val(office.id);
-                fields.forEach(field => $('#edit_' + field).val(office[field] || ''));
-                $('#edit_office_status').val(office.status || 'active');
-                $('#edit_branch_id').prop('disabled', !!response.has_assigned_users);
-                $('#edit_branch_lock_help').toggleClass('d-none', !response.has_assigned_users);
-            })
-            .fail(xhr => showError(xhr, 'Không thể tải thông tin phòng giao dịch.'));
-    });
-
-    $('#updateOfficeBtn').on('click', function () {
-        const data = requestData('edit_');
-        data.transaction_office_id = $('#edit_transaction_office_id').val();
-        $.ajax({url: @json(route('admin_transaction_offices_update')), method: 'POST', data})
-            .done(response => swal('Thành công!', response.message, {icon: 'success'}).then(() => location.reload()))
-            .fail(xhr => showError(xhr, 'Không thể cập nhật phòng giao dịch.'));
-    });
-});
-</script>
+<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}?v={{ filemtime(public_path('vendor/datatables/jquery.dataTables.min.js')) }}"></script>
+<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}?v={{ filemtime(public_path('vendor/datatables/dataTables.bootstrap4.min.js')) }}"></script>
+@include('shared.sweetalert')
+<span class="admin-org-config-data" hidden data-config="{{ json_encode([
+    "routes" => [
+        "officeStore" => route("admin_transaction_offices_store"),
+        "officeEdit" => route("admin_transaction_offices_edit"),
+        "officeUpdate" => route("admin_transaction_offices_update")
+    ]
+]) }}"></span>
+<script src="{{ asset('js/admin/org-management.js') }}?v={{ filemtime(public_path('js/admin/org-management.js')) }}"></script>
 @endpush
+

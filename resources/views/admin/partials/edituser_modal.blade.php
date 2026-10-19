@@ -1,5 +1,5 @@
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow"> 
             <!-- Header -->
             <div class="modal-header" style="background-color: #36b9cc; color: #ffffff;">
@@ -31,18 +31,24 @@
                                 <input type="text" class="form-control form-control-sm" id="edit_name" name="edit_name" required autocomplete="off">
                             </div>
                             <div class="form-group col-md-6 mb-2">
+                                <label for="edit_phone_no" class="small font-weight-bold text-gray-700">
+                                    Số điện thoại liên hệ <small class="text-muted">(nếu có)</small>
+                                </label>
+                                <input type="tel" class="form-control form-control-sm" id="edit_phone_no" name="edit_phone_no" maxlength="20" placeholder="Ví dụ: 0912345678" autocomplete="tel">
+                            </div>
+                            <div class="form-group col-md-4 mb-0">
                                 <label for="edit_employee_code" class="small font-weight-bold text-gray-700">
                                     Mã nhân viên <small class="text-muted">(nếu có)</small>
                                 </label>
                                 <input type="text" class="form-control form-control-sm" id="edit_employee_code" name="edit_employee_code" maxlength="50" autocomplete="off">
                             </div>
-                            <div class="form-group col-md-6 mb-0">
+                            <div class="form-group col-md-4 mb-0">
                                 <label for="edit_citizen_id" class="small font-weight-bold text-gray-700">
                                     Số CCCD / CMND <small class="text-muted">(12 số)</small>
                                 </label>
                                 <input type="text" class="form-control form-control-sm" id="edit_citizen_id" name="edit_citizen_id" maxlength="20" autocomplete="off">
                             </div>
-                            <div class="form-group col-md-6 mb-0">
+                            <div class="form-group col-md-4 mb-0">
                                 <label for="edit_user_ipcas" class="small font-weight-bold text-gray-700">
                                     Mã người dùng IPCAS <small class="text-muted">(không bắt buộc)</small>
                                 </label>
@@ -134,25 +140,25 @@
                                 </label>
                                 <input type="password" class="form-control form-control-sm" id="edit_password" name="edit_password" autocomplete="new-password">
                             </div>
-                            <div class="form-group col-md-6 mb-0">
-                                <label for="edit_role_id" class="small font-weight-bold text-gray-700">
-                                    Quyền hệ thống <span class="text-danger">*</span>
+                            <div class="form-group col-12 mb-0">
+                                <label class="small font-weight-bold text-gray-700 mb-1">
+                                    <i class="fas fa-shield-alt text-primary mr-1"></i>Vai trò tài khoản <span class="text-danger">*</span> <small class="text-muted">(tích chọn một hoặc nhiều vai trò đảm nhiệm)</small>
                                 </label>
-                                <select class="form-control form-control-sm" id="edit_role_id" name="edit_role_id" required>
-                                    <option value="">-- Chọn quyền --</option>
-                                    <option value="1">Kiểm soát (Supervisor)</option>
-                                    <option value="2">Nhân viên (Staff)</option>
-                                    <option value="0" id="opt_edit_role_admin" style="display: none;">Quản trị viên (Admin)</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-6 mb-0">
-                                <label for="edit_document_role" class="small font-weight-bold text-gray-700">
-                                    Vai trò văn thư
-                                </label>
-                                <select class="form-control form-control-sm" id="edit_document_role" name="edit_document_role">
-                                    <option value="user">Người dùng bình thường (Chỉ xem)</option>
-                                    <option value="clerk">Văn thư chi nhánh (Đăng tải & Phân phối)</option>
-                                </select>
+                                <div class="d-flex flex-wrap border rounded p-2 bg-white" id="editUserRolesWrapper">
+                                    @if(isset($list_roles))
+                                        @foreach($list_roles as $r)
+                                            <div class="custom-control custom-checkbox mr-3 mb-1">
+                                                <input type="checkbox" class="custom-control-input edit-user-role-checkbox" id="edit_role_{{ $r->id }}" value="{{ $r->id }}" data-slug="{{ $r->slug }}">
+                                                <label class="custom-control-label small font-weight-bold cursor-pointer" for="edit_role_{{ $r->id }}">
+                                                    {{ $r->name }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                                <small class="form-text text-muted mt-1">
+                                    <i class="fas fa-info-circle text-info mr-1"></i>Thay đổi vai trò sẽ lập tức cập nhật quyền hạn và giao diện của người dùng.
+                                </small>
                             </div>
                         </div>
                     </div>

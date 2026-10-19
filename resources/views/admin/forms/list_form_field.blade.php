@@ -166,95 +166,19 @@
 @endsection
 
 @push('scripts')
-    <!-- Page level plugins -->
-    <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}?v={{ filemtime(public_path('vendor/datatables/jquery.dataTables.min.js')) }}"></script>
+    <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}?v={{ filemtime(public_path('vendor/datatables/dataTables.bootstrap4.min.js')) }}"></script>
+
+    <span class="admin-form-fields-config-data" hidden data-config="{{ json_encode([
+        "defaultTab" => $defaultTab ?? "transaction",
+        "routes" => [
+            "itFieldsIndex" => route("admin.it_support.form_fields.index"),
+            "transactionFieldsIndex" => route("admin_form_fields")
+        ]
+    ]) }}"></span>
 
     <!-- AJAX scripts -->
     @include('admin.forms.partials.ajax_form_field')
     @include('admin.forms.partials.ajax_it_form_field')
-
-    <script>
-        $(document).ready(function() {
-            // Khởi tạo DataTable cho bảng IT
-            if (!$.fn.DataTable.isDataTable('#dataTableIt')) {
-                $('#dataTableIt').DataTable({
-                    language: {
-                        processing: "Đang tải...",
-                        search: "Tìm kiếm:",
-                        lengthMenu: "Hiển thị _MENU_ dòng",
-                        info: "Hiển thị _START_ - _END_ trong _TOTAL_ dòng",
-                        infoEmpty: "Không có dữ liệu",
-                        zeroRecords: "Không tìm thấy dữ liệu",
-                        paginate: {
-                            first: "Đầu",
-                            last: "Cuối",
-                            next: "Sau",
-                            previous: "Trước"
-                        }
-                    },
-                    order: [[4, 'asc']] // Sắp xếp theo cột Thứ tự hiển thị
-                });
-            }
-
-            function syncSidebarState(tab) {
-                if (tab === 'it') {
-                    // Đóng menu "Biểu mẫu" giao dịch
-                    $('#collapseForm').collapse('hide');
-                    $('#sidebar-item-forms').removeClass('active');
-                    $('#sidebar-item-forms .nav-link').addClass('collapsed').attr('aria-expanded', 'false');
-                    $('#sidebar-link-transaction-fields').removeClass('active');
-
-                    // Mở menu "Biểu Mẫu IT" và active mục "Trường biểu mẫu IT"
-                    $('#collapseAdminItTemplates').collapse('show');
-                    $('#sidebar-item-it-templates').addClass('active');
-                    $('#sidebar-item-it-templates .nav-link').removeClass('collapsed').attr('aria-expanded', 'true');
-                    $('#sidebar-link-it-fields').addClass('active');
-                } else {
-                    // Đóng menu "Biểu Mẫu IT"
-                    $('#collapseAdminItTemplates').collapse('hide');
-                    $('#sidebar-item-it-templates').removeClass('active');
-                    $('#sidebar-item-it-templates .nav-link').addClass('collapsed').attr('aria-expanded', 'false');
-                    $('#sidebar-link-it-fields').removeClass('active');
-
-                    // Mở menu "Biểu mẫu" giao dịch và active mục "Danh sách trường dữ liệu"
-                    $('#collapseForm').collapse('show');
-                    $('#sidebar-item-forms').addClass('active');
-                    $('#sidebar-item-forms .nav-link').removeClass('collapsed').attr('aria-expanded', 'true');
-                    $('#sidebar-link-transaction-fields').addClass('active');
-                }
-            }
-
-            // Hỗ trợ lưu trữ tab active qua hash URL hoặc param
-            let hash = window.location.hash;
-            let urlParams = new URLSearchParams(window.location.search);
-            let tabParam = urlParams.get('tab');
-            let isItInitial = '{{ $defaultTab }}' === 'it' || hash === '#it' || tabParam === 'it';
-
-            if (isItInitial) {
-                $('#it-tab').tab('show');
-                syncSidebarState('it');
-            } else {
-                $('#transaction-tab').tab('show');
-                syncSidebarState('transaction');
-            }
-
-            $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
-                let targetId = $(e.target).attr('href');
-                if (targetId === '#tab-it') {
-                    window.history.replaceState(null, '', '{{ route("admin.it_support.form_fields.index") }}');
-                    syncSidebarState('it');
-                    if ($.fn.DataTable.isDataTable('#dataTableIt')) {
-                        $('#dataTableIt').DataTable().columns.adjust().draw();
-                    }
-                } else {
-                    window.history.replaceState(null, '', '{{ route("admin_form_fields") }}');
-                    syncSidebarState('transaction');
-                    if ($.fn.DataTable.isDataTable('#dataTable')) {
-                        $('#dataTable').DataTable().columns.adjust().draw();
-                    }
-                }
-            });
-        });
-    </script>
 @endpush
+

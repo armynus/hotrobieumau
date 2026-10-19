@@ -531,6 +531,10 @@
                                             $colClass = $isFullWidth ? 'col-12' : 'col-md-6';
                                             $cleanFieldName = str_replace(['${', '}'], '', $field['name']);
                                             $cleanPlaceholder = str_replace(['${', '}'], '', $field['placeholder'] ?? '');
+                                            $isPersonalPhone = in_array($code, ['SDT', 'phone_no', 'Phone_No', 'SoDienThoai', 'Phone', 'DienThoai', 'SoDienThoaiLienHe', 'SoDienThoaiNV', 'DienThoaiCanBo'], true);
+                                            if ($isPersonalPhone && empty($val)) {
+                                                $cleanPlaceholder = 'Chưa khai báo SĐT cá nhân trong hồ sơ';
+                                            }
                                         @endphp
 
                                         <div class="{{ $colClass }} it-field-group">
@@ -541,6 +545,10 @@
                                                 @if($isAutoFilled)
                                                     <span class="it-autofill-tag" title="Thông tin này được lấy tự động từ tài khoản của bạn">
                                                         <i class="fas fa-check-circle"></i> Tự điền
+                                                    </span>
+                                                @elseif($isPersonalPhone && empty($val))
+                                                    <span class="it-autofill-warning" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; padding: 2px 8px; border-radius: 99px; background: #fffbeb; color: #b45309; border: 1px solid #fde68a; font-weight: 600;" title="Số điện thoại cá nhân chưa được khai báo trong hồ sơ">
+                                                        <i class="fas fa-exclamation-triangle"></i> Chưa khai báo SĐT
                                                     </span>
                                                 @endif
                                             </div>
@@ -592,6 +600,12 @@
                                                            placeholder="{{ $cleanPlaceholder }}">
                                                 @endif
                                             </div>
+
+                                            @if($isPersonalPhone && empty($val))
+                                                <small class="form-text mt-1 text-muted" style="font-size: 0.765rem; color: #b45309 !important;">
+                                                    <i class="fas fa-info-circle mr-1"></i>Số điện thoại cá nhân chưa được khai báo trong hồ sơ. Bạn có thể nhập trực tiếp hoặc cập nhật tại <a href="{{ route('profile.show') }}" target="_blank" style="color: #a51c3e; font-weight: 600; text-decoration: underline;">Thông tin cá nhân</a>.
+                                                </small>
+                                            @endif
                                         </div>
                                     @endforeach
                                 </div>
@@ -711,227 +725,14 @@
 @endsection
 
 @push('scripts')
-<script>
-    $(document).ready(function() {
-        // 1. Tính toán tiến độ điền form theo thời gian thực
-        function updateProgress() {
-            let $inputs = $('.it-field-input');
-            let total = $inputs.length;
-            if (total === 0) return;
-
-            let filled = 0;
-            $inputs.each(function() {
-                let val = $(this).val();
-                if (val !== null && val.trim() !== '') {
-                    filled++;
-                }
-            });
-
-            let percent = Math.round((filled / total) * 100);
-
-            $('#filledCountText').text(filled);
-            $('#totalCountText').text(total);
-            $('#progressPercentBadge').text(percent + '%');
-            $('#progressBarFill').css('width', percent + '%');
-
-            if (percent === 100) {
-                $('#progressBarFill').css('background', 'linear-gradient(90deg, #10b981 0%, #059669 100%)');
-                $('#progressPercentBadge').removeClass('badge-primary badge-warning').addClass('badge-success');
-            } else if (percent > 50) {
-                $('#progressBarFill').css('background', 'linear-gradient(90deg, #3b82f6 0%, #10b981 100%)');
-                $('#progressPercentBadge').removeClass('badge-warning badge-success').addClass('badge-primary');
-            } else {
-                $('#progressBarFill').css('background', 'linear-gradient(90deg, #f59e0b 0%, #3b82f6 100%)');
-                $('#progressPercentBadge').removeClass('badge-primary badge-success').addClass('badge-warning');
-            }
-        }
-
-        // 1. Tự động nhớ và điền thông tin cán bộ (CCCD, SĐT, IP...) từ bộ nhớ trình duyệt (localStorage)
-        const OFFICER_PROFILE_KEY = 'it_officer_profile';
-        let localProfile = {};
-        try {
-            localProfile = JSON.parse(localStorage.getItem(OFFICER_PROFILE_KEY) || '{}');
-        } catch (e) {
-            localProfile = {};
-        }
-
-        // LƯU Ý QUAN TRỌNG:
-        // Mã số nhân viên (MaNV) là thông tin định danh chính thức của ngân hàng do Quản trị viên nhập trong bảng users (users.employee_code).
-        // Tuyệt đối không lấy nhầm tài khoản IPCAS (DTH...) hoặc bộ nhớ tạm trình duyệt làm Mã nhân viên.
-        // Nếu Quản trị viên chưa nhập (NULL/rỗng), trường Mã số nhân viên phải để trống hoàn toàn!
-        const employeeCodeAliases = ['MaNV', 'MSNV', 'MaNhanVien', 'MaCanBo', 'MaSoNV', 'MaSoNhanVien'];
-        employeeCodeAliases.forEach(function(k) {
-            delete localProfile[k];
-        });
-
-        // Xóa bất kỳ dữ liệu nào trong localProfile có giá trị bắt đầu bằng DTH (đây là tài khoản IPCAS Đồng Tháp, không phải thông tin khác)
-        const currentIpcasVal = @json($autoFill['IPCAS'] ?? '');
-        Object.keys(localProfile).forEach(function(k) {
-            if (typeof localProfile[k] === 'string') {
-                let v = localProfile[k].trim();
-                if (/^DTH/i.test(v) || (currentIpcasVal && v === currentIpcasVal)) {
-                    if (k !== 'IPCAS' && k !== 'UserIPCAS' && k !== 'MaNguoiDungIPCAS') {
-                        delete localProfile[k];
-                    }
-                }
-            }
-        });
-
-        // Nếu localProfile lưu tên phòng cũ thì cập nhật sang mã phòng tự điền
-        const currentDeptName = @json($autoFill['TenPhongBan'] ?? '');
-        const currentDeptCode = @json($autoFill['PhongBan'] ?? '');
-        if (currentDeptName && currentDeptCode && localProfile['PhongBan'] === currentDeptName) {
-            localProfile['PhongBan'] = currentDeptCode;
-        }
-
-        try {
-            localStorage.setItem(OFFICER_PROFILE_KEY, JSON.stringify(localProfile));
-        } catch (e) {}
-
-        // Tự động điền các trường cán bộ còn trống nếu đã từng nhập trước đây (ngoại trừ Mã NV vì Mã NV phụ thuộc 100% vào database)
-        $('.it-field-input').each(function() {
-            let code = $(this).data('code');
-            let currentVal = $(this).val();
-
-            // Bỏ qua Mã nhân viên: chỉ hiển thị nếu có trong tài khoản hệ thống (autoFill), không fallback từ localProfile
-            if (employeeCodeAliases.includes(code)) {
-                return;
-            }
-
-            // Tìm giá trị fallback từ profile lưu trữ cho các trường liên hệ/định danh khác
-            let fallbackVal = localProfile[code];
-            if (!fallbackVal) {
-                if (['CCCD', 'CMND', 'SoCCCD', 'SoCMND', 'CCCDCanBo', 'SoCCCDCanBo'].includes(code)) {
-                    fallbackVal = localProfile['CCCD'] || localProfile['CMND'] || localProfile['SoCCCD'];
-                } else if (['SoDienThoai', 'SDT', 'Phone', 'DienThoai', 'SoDienThoaiLienHe'].includes(code)) {
-                    fallbackVal = localProfile['SoDienThoai'] || localProfile['SDT'] || localProfile['Phone'];
-                } else if (['PhongBan', 'BoPhan', 'Department', 'PhongBanBoPhan', 'MaPhong', 'MaPhongBan'].includes(code)) {
-                    fallbackVal = localProfile['PhongBan'] || localProfile['MaPhong'] || localProfile['BoPhan'];
-                }
-            }
-
-            if ((!currentVal || currentVal.trim() === '') && fallbackVal) {
-                $(this).val(fallbackVal);
-                $(this).attr('data-default', fallbackVal);
-                let $group = $(this).closest('.it-field-group');
-                if ($group.find('.it-autofill-tag').length === 0) {
-                    $group.find('.it-field-label-wrapper').append(
-                        '<span class="it-autofill-tag" title="Thông tin này được ghi nhớ từ lần nhập trước của bạn">' +
-                        '<i class="fas fa-check-circle"></i> Tự điền</span>'
-                    );
-                }
-            }
-        });
-
-        // Lắng nghe sự kiện người dùng gõ / sửa dữ liệu và tự động ghi nhớ hồ sơ cán bộ
-        const officerFields = [
-            'CCCD', 'CMND', 'SoCCCD', 'SoCMND', 'CCCDCanBo', 'SoCCCDCanBo',
-            'SoDienThoai', 'SDT', 'Phone', 'DienThoai', 'SoDienThoaiLienHe',
-            'DiaChiIP', 'IP', 'IPMayTinh',
-            'IPCAS', 'UserIPCAS', 'MaNguoiDungIPCAS',
-            'PhongBan', 'BoPhan', 'Department', 'PhongBanBoPhan', 'MaPhong', 'MaPhongBan'
-        ];
-        $(document).on('input change', '.it-field-input', function() {
-            let code = $(this).data('code');
-            let val = $(this).val();
-            if (officerFields.includes(code) && val && val.trim() !== '') {
-                let trimmed = val.trim();
-                let normCode = code;
-                if (['CMND', 'SoCCCD', 'SoCMND', 'CCCDCanBo', 'SoCCCDCanBo'].includes(code)) normCode = 'CCCD';
-                if (['SDT', 'Phone', 'DienThoai', 'SoDienThoaiLienHe'].includes(code)) normCode = 'SoDienThoai';
-                if (['UserIPCAS', 'MaNguoiDungIPCAS'].includes(code)) normCode = 'IPCAS';
-                if (['BoPhan', 'Department', 'PhongBanBoPhan', 'MaPhong', 'MaPhongBan'].includes(code)) normCode = 'PhongBan';
-
-                localProfile[normCode] = trimmed;
-                localProfile[code] = trimmed;
-                try {
-                    localStorage.setItem(OFFICER_PROFILE_KEY, JSON.stringify(localProfile));
-                } catch (e) {}
-            }
-            updateProgress();
-        });
-
-        // Khởi tạo tiến độ ban đầu
-        updateProgress();
-
-        // 2. Cuộn mượt khi bấm link mục lục nhóm
-        $('.it-quick-nav__link').on('click', function(e) {
-            e.preventDefault();
-            let targetId = $(this).attr('href');
-            let $target = $(targetId);
-            if ($target.length) {
-                $('html, body').animate({
-                    scrollTop: $target.offset().top - 80
-                }, 400);
-
-                // Hiệu ứng highlight nhẹ thẻ đích
-                $target.css({
-                    'transition': 'box-shadow 0.3s ease, border-color 0.3s ease',
-                    'border-color': 'var(--it-brand-primary)',
-                    'box-shadow': '0 0 0 4px rgba(165, 28, 62, 0.15)'
-                });
-                setTimeout(function() {
-                    $target.css({
-                        'border-color': '',
-                        'box-shadow': ''
-                    });
-                }, 1200);
-            }
-        });
-
-        // 3. Tiện ích: Khôi phục dữ liệu tự điền ban đầu
-        $('#btnResetAutoFill').on('click', function() {
-            try {
-                swal({
-                    title: "Khôi phục dữ liệu?",
-                    text: "Bạn có chắc chắn muốn đặt lại các trường về giá trị tự động điền ban đầu?",
-                    icon: "info",
-                    buttons: ["Hủy", "Khôi phục"],
-                    dangerMode: false,
-                }).then(function(confirmed) {
-                    if (confirmed) {
-                        $('.it-field-input').each(function() {
-                            let defaultVal = $(this).data('default') || '';
-                            $(this).val(defaultVal);
-                        });
-                        updateProgress();
-                        swal("Đã khôi phục!", "Các trường đã được đưa về giá trị mặc định.", "success");
-                    }
-                });
-            } catch(e) {
-                if (confirm("Khôi phục lại các trường về giá trị tự động điền ban đầu?")) {
-                    $('.it-field-input').each(function() {
-                        let defaultVal = $(this).data('default') || '';
-                        $(this).val(defaultVal);
-                    });
-                    updateProgress();
-                }
-            }
-        });
-
-        // 4. Tiện ích: Xóa trắng toàn bộ các ô nhập
-        $('#btnClearAll').on('click', function() {
-            try {
-                swal({
-                    title: "Xóa toàn bộ nội dung?",
-                    text: "Tất cả các ô thông tin trên biểu mẫu sẽ bị xóa trắng.",
-                    icon: "warning",
-                    buttons: ["Hủy", "Xóa trắng"],
-                    dangerMode: true,
-                }).then(function(confirmed) {
-                    if (confirmed) {
-                        $('.it-field-input').val('');
-                        updateProgress();
-                        swal("Đã xóa!", "Đã xóa toàn bộ nội dung các trường.", "info");
-                    }
-                });
-            } catch(e) {
-                if (confirm("Bạn có chắc chắn muốn xóa toàn bộ nội dung trên biểu mẫu?")) {
-                    $('.it-field-input').val('');
-                    updateProgress();
-                }
-            }
-        });
-    });
-</script>
+@include('shared.sweetalert')
+<span id="it-template-fill-config" hidden data-config="{{ json_encode([
+    "userId" => auth()->id() ?? session("user_id") ?? 0,
+    "ipcas" => $autoFill["IPCAS"] ?? "",
+    "deptName" => $autoFill["TenPhongBan"] ?? "",
+    "deptCode" => $autoFill["PhongBan"] ?? "",
+    "branchPhone" => $autoFill["SDTCoQuan"] ?? $branchPhone ?? ""
+]) }}"></span>
+<script src="{{ asset('js/user/it-template-fill.js') }}?v={{ filemtime(public_path('js/user/it-template-fill.js')) }}"></script>
 @endpush
+

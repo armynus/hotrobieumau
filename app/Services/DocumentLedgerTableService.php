@@ -42,8 +42,13 @@ class DocumentLedgerTableService
             });
         }
         $filtered = $keyword === '' ? ($checkOnly ? $incomplete : $total) : (clone $query)->count();
-        if (in_array($column, ['registered_date', 'issued_date'], true)) {
-            $query->orderByRaw($column.' IS NULL ASC'); // Ngày thiếu luôn nằm cuối.
+        $nullSortExpression = match ($column) {
+            'registered_date' => 'registered_date IS NULL ASC',
+            'issued_date' => 'issued_date IS NULL ASC',
+            default => null,
+        };
+        if ($nullSortExpression !== null) {
+            $query->orderByRaw($nullSortExpression); // Ngày thiếu luôn nằm cuối.
         }
         $query->orderBy($column, $direction);
         if ($column !== 'sequence_number') {

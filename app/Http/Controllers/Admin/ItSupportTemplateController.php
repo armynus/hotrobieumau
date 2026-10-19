@@ -83,6 +83,10 @@ class ItSupportTemplateController extends Controller
                 $fieldLookup[strtolower(str_replace('_', '', $code))] = $code;
             }
 
+            // Tìm trường số điện thoại và phòng ban hiện có trong danh mục trường
+            $phoneField = collect(['SDT', 'SoDienThoai', 'Phone', 'DienThoai', 'SoDienThoaiLienHe'])->first(fn($c) => in_array($c, $allFieldCodes, true)) ?: 'SDT';
+            $deptField = collect(['PhongBan', 'BoPhan', 'Department', 'MaPhong', 'MaPhongBan'])->first(fn($c) => in_array($c, $allFieldCodes, true)) ?: 'PhongBan';
+
             // Ánh xạ các biến dẫn xuất (in hoa) hoặc alias về trường dữ liệu gốc trong từ điển IT
             $derivedAndAliasMap = [
                 // Họ tên in hoa -> TenCanBo
@@ -107,23 +111,26 @@ class ItSupportTemplateController extends Controller
                 'tendonvi'       => 'TenChiNhanh',
 
                 // Các alias thông dụng khác
-                'email'          => 'EmailNV',
-                'emailcanbo'     => 'EmailNV',
-                'emailnhanvien'  => 'EmailNV',
-                'sdt'            => 'SoDienThoai',
-                'phone'          => 'SoDienThoai',
-                'dienthoai'      => 'SoDienThoai',
-                'msnv'           => 'MaNV',
-                'manhanvien'     => 'MaNV',
-                'useripcas'      => 'IPCAS',
-                'bophan'         => 'PhongBan',
-                'department'     => 'PhongBan',
-                'maphong'        => 'PhongBan',
-                'maphongban'     => 'PhongBan',
-                'chucdanh'       => 'ChucVu',
-                'position'       => 'ChucVu',
-                'ngaylap'        => 'NgayYeuCau',
-                'ngaygiaodich'   => 'NgayYeuCau',
+                'email'             => 'EmailNV',
+                'emailcanbo'        => 'EmailNV',
+                'emailnhanvien'     => 'EmailNV',
+                'sdt'               => $phoneField,
+                'sodienthoai'       => $phoneField,
+                'phone'             => $phoneField,
+                'dienthoai'         => $phoneField,
+                'sodienthoailienhe' => $phoneField,
+                'msnv'              => 'MaNV',
+                'manhanvien'        => 'MaNV',
+                'useripcas'         => 'IPCAS',
+                'bophan'            => $deptField,
+                'department'        => $deptField,
+                'phongban'          => $deptField,
+                'maphong'           => $deptField,
+                'maphongban'        => $deptField,
+                'chucdanh'          => 'ChucVu',
+                'position'          => 'ChucVu',
+                'ngaylap'           => 'NgayYeuCau',
+                'ngaygiaodich'      => 'NgayYeuCau',
             ];
 
             foreach ($derivedAndAliasMap as $alias => $targetCode) {

@@ -2,6 +2,10 @@ import {readFields, restoreFields, DraftSaveQueue} from './support-form-draft-st
 
 const $ = window.jQuery;
 $(function () {
+    const cfgEl = document.getElementById('support-form-draft-config');
+    if (cfgEl && cfgEl.dataset && cfgEl.dataset.config) {
+        try { window.SupportFormDraftConfig = JSON.parse(cfgEl.dataset.config); } catch (e) {}
+    }
     const cfg = window.SupportFormDraftConfig || {};
     const form = document.getElementById('supportForm');
     if (!form || !cfg.saveUrl || !cfg.getUrlTemplate) return;

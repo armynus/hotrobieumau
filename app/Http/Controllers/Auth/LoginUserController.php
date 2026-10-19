@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 
-use App\Models\Users;
+use App\Models\User;
 use App\Models\Branches;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -19,7 +19,7 @@ class LoginUserController extends Controller
     }
     function logins(Request $request){
         $credentials = $request->only('email', 'password');
-        $result = Users::where('email', $credentials['email'])->first();
+        $result = User::where('email', $credentials['email'])->first();
         
         if($result != null){
             // Kiểm tra tài khoản đã bị khóa chưa
@@ -34,10 +34,17 @@ class LoginUserController extends Controller
                 $result->save();
                 
                 $branch = Branches::where('id', $result->branch_id)->first();          
+                $userVersion = \App\Models\User::userPermissionsVersion($result->id);
+                $globalVersion = \App\Models\Role::permissionsVersion();
                 $request->session()->put('user_id', $result->id);
                 $request->session()->put('user_name', $result->name);
                 $request->session()->put('user_email', $result->email);
                 $request->session()->put('user_role', $result->role_id);
+                $request->session()->put('user_document_role', $result->document_role);
+                $request->session()->put('user_permissions', $result->getAllPermissionSlugs());
+                $request->session()->put('user_permissions_version', $globalVersion);
+                $request->session()->put('user_individual_version', $userVersion);
+                $request->session()->put('user_roles', $result->roles()->where('status', 'active')->pluck('slug')->toArray());
                 $request->session()->put('user_has_avatar', (bool) $result->avatar_path);
                 $request->session()->put('user_avatar_version', optional($result->updated_at)->timestamp ?? time());
                 $request->session()->put('UserBranchId', $result->branch_id);
@@ -71,6 +78,11 @@ class LoginUserController extends Controller
         Session::forget('user_name');
         Session::forget('user_email');
         Session::forget('user_role');
+        Session::forget('user_document_role');
+        Session::forget('user_permissions');
+        Session::forget('user_permissions_version');
+        Session::forget('user_individual_version');
+        Session::forget('user_roles');
         Session::forget('user_has_avatar');
         Session::forget('user_avatar_version');
         Session::forget('UserBranchId');
@@ -87,7 +99,7 @@ class LoginUserController extends Controller
         if($user_id != $id){
             return redirect()->back()->with('error','Không đủ quyền truy cập');
         }
-        $user=Users::where('id',$user_id)
+        $user=User::where('id',$user_id)
         ->select('id','email','name')
         ->first();
         return view('user.auth.change_password_user',compact('user'));
@@ -104,7 +116,7 @@ class LoginUserController extends Controller
             'repassword.same' => 'Mật khẩu nhập lại không khớp.',
         ]);
 
-        $user = Users::findOrFail((int) Session::get('user_id'));
+        $user = User::findOrFail((int) Session::get('user_id'));
 
         if (! Hash::check($validated['old_password'], $user->password)) {
             return redirect()->back()->with('error', 'Mật khẩu hiện tại không đúng');

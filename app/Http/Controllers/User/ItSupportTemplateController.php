@@ -36,22 +36,11 @@ class ItSupportTemplateController extends Controller
         $user = $userId ? User::with(['branch', 'department', 'position', 'transactionOffice'])->find($userId) : null;
         $branch = $user?->branch ?: (Session::get('UserBranchId') ? Branches::find(Session::get('UserBranchId')) : null);
 
-        // Nạp hồ sơ cán bộ đã lưu từ Cache hoặc IT Support Request
+        // Nạp hồ sơ cán bộ đã lưu từ Cache
         $savedProfile = [];
         if ($userId) {
             $cached = Cache::get("it_officer_profile_{$userId}", []);
             $savedProfile = is_array($cached) ? $cached : [];
-
-            if (empty($savedProfile['SoDienThoai'])) {
-                $lastPhone = ItSupportRequest::where('user_id', $userId)
-                    ->whereNotNull('contact_phone')
-                    ->where('contact_phone', '!=', '')
-                    ->latest()
-                    ->value('contact_phone');
-                if ($lastPhone) {
-                    $savedProfile['SoDienThoai'] = $lastPhone;
-                }
-            }
         }
 
         $userName = $user?->name ?: Session::get('user_name', '');
@@ -87,7 +76,23 @@ class ItSupportTemplateController extends Controller
             $clientIp = $savedProfile['DiaChiIP'] ?? '';
         }
 
-        $phone = $savedProfile['SoDienThoai'] ?? $branchPhone;
+        // Dọn dẹp nếu users.phone_no hoặc cache vô tình bị lưu nhầm là số điện thoại chi nhánh
+        if ($user && $branchPhone && $user->phone_no === $branchPhone) {
+            $user->update(['phone_no' => null]);
+            $user->phone_no = null;
+        }
+        if ($branchPhone) {
+            foreach (['SoDienThoai', 'SDT', 'phone_no', 'Phone'] as $k) {
+                if (isset($savedProfile[$k]) && $savedProfile[$k] === $branchPhone) {
+                    unset($savedProfile[$k]);
+                }
+            }
+        }
+
+        // Số điện thoại cá nhân: CHỈ lấy từ trường users.phone_no của đúng nhân viên được chọn.
+        // Tuyệt đối KHÔNG lấy số của Branch thay thế. Nếu trống, để trống chuỗi rỗng ('').
+        $userPhone = ($user?->phone_no && $user->phone_no !== $branchPhone) ? $user->phone_no : '';
+        $phone = $userPhone;
         $cccd = $user?->citizen_id ?: ($savedProfile['CCCD'] ?? $savedProfile['CMND'] ?? '');
 
         // Tải từ điển các trường dữ liệu
@@ -183,11 +188,15 @@ class ItSupportTemplateController extends Controller
             'MaNguoiDungIPCAS'  => $userIpcas,
 
             // Số điện thoại
+            'phone_no'          => $phone,
+            'Phone_No'          => $phone,
             'SoDienThoai'       => $phone,
             'SDT'               => $phone,
             'Phone'             => $phone,
             'DienThoai'         => $phone,
             'SoDienThoaiLienHe' => $phone,
+            'SoDienThoaiNV'     => $phone,
+            'DienThoaiCanBo'    => $phone,
 
             // CCCD/CMND
             'CCCD'              => $cccd,
@@ -241,6 +250,17 @@ class ItSupportTemplateController extends Controller
             'DiaChi'            => $branchAddr,
             'DiaChiChiNhanh'    => $branchAddr,
             'BranchAddr'        => $branchAddr,
+
+            // Số điện thoại cơ quan / đơn vị / Chi nhánh (${SDTCoQuan})
+            'SDTCoQuan'         => $branchPhone,
+            'SoDienThoaiCoQuan' => $branchPhone,
+            'DienThoaiCoQuan'   => $branchPhone,
+            'SDTChiNhanh'       => $branchPhone,
+            'SoDienThoaiChiNhanh'=> $branchPhone,
+            'DienThoaiChiNhanh' => $branchPhone,
+            'BranchPhone'       => $branchPhone,
+            'DienThoaiDonVi'    => $branchPhone,
+            'SDTDonVi'          => $branchPhone,
 
             // Địa chỉ IP máy tính
             'DiaChiIP'          => $clientIp,
@@ -333,6 +353,11 @@ class ItSupportTemplateController extends Controller
             $formData['TenDonViHOA'] = mb_strtoupper($branchVal, 'UTF-8');
         }
 
+        $userId = auth()->id() ?? Session::get('user_id');
+        $user = $userId ? User::with(['branch', 'department'])->find($userId) : null;
+        $branch = $user?->branch ?: (Session::get('UserBranchId') ? Branches::find(Session::get('UserBranchId')) : null);
+        $branchPhone = $branch?->branch_phone ?: Session::get('UserBranchPhone', '');
+
         // Tự động gán đồng bộ các biến phòng ban / mã phòng
         $deptVal = $formData['PhongBan'] ?? $formData['BoPhan'] ?? $formData['MaPhong'] ?? $formData['MaPhongBan'] ?? '';
         if (!empty($deptVal) && is_string($deptVal)) {
@@ -342,9 +367,36 @@ class ItSupportTemplateController extends Controller
             $formData['MaPhongBan'] = $deptVal;
         }
 
-        $userId = auth()->id() ?? Session::get('user_id');
-        $user = $userId ? User::with(['branch', 'department'])->find($userId) : null;
-        $branch = $user?->branch ?: (Session::get('UserBranchId') ? Branches::find(Session::get('UserBranchId')) : null);
+        // Tự động gán đồng bộ các biến số điện thoại cá nhân liên hệ
+        $phoneVal = $formData['SDT'] ?? $formData['SoDienThoai'] ?? $formData['phone_no'] ?? $formData['Phone'] ?? $formData['DienThoai'] ?? $formData['SoDienThoaiLienHe'] ?? '';
+        if (empty($phoneVal)) {
+            // Chỉ lấy từ users.phone_no của nhân viên được chọn, tuyệt đối KHÔNG fallback sang số của Chi nhánh
+            $phoneVal = ($user?->phone_no && $user->phone_no !== $branchPhone) ? $user->phone_no : '';
+        }
+        if (!empty($phoneVal) && is_string($phoneVal)) {
+            $formData['SDT'] = $phoneVal;
+            $formData['SoDienThoai'] = $phoneVal;
+            $formData['phone_no'] = $phoneVal;
+            $formData['Phone'] = $phoneVal;
+            $formData['DienThoai'] = $phoneVal;
+            $formData['SoDienThoaiLienHe'] = $phoneVal;
+            $formData['SoDienThoaiNV'] = $phoneVal;
+            $formData['DienThoaiCanBo'] = $phoneVal;
+        }
+
+        // Tự động gán đồng bộ số điện thoại cơ quan / Chi nhánh vào ${SDTCoQuan}
+        $agencyPhone = $formData['SDTCoQuan'] ?? $formData['SoDienThoaiCoQuan'] ?? $formData['DienThoaiCoQuan'] ?? $formData['SDTChiNhanh'] ?? $branchPhone;
+        if (!empty($agencyPhone) && is_string($agencyPhone)) {
+            $formData['SDTCoQuan'] = $agencyPhone;
+            $formData['SoDienThoaiCoQuan'] = $agencyPhone;
+            $formData['DienThoaiCoQuan'] = $agencyPhone;
+            $formData['SDTChiNhanh'] = $agencyPhone;
+            $formData['SoDienThoaiChiNhanh'] = $agencyPhone;
+            $formData['DienThoaiChiNhanh'] = $agencyPhone;
+            $formData['BranchPhone'] = $agencyPhone;
+            $formData['DienThoaiDonVi'] = $agencyPhone;
+            $formData['SDTDonVi'] = $agencyPhone;
+        }
 
         if (empty($formData['TenPhongBan']) && $user?->department?->department_name) {
             $formData['TenPhongBan'] = $user->department->department_name;
@@ -380,7 +432,7 @@ class ItSupportTemplateController extends Controller
                 $fieldAliases = [
                     'CCCD'        => ['CCCD', 'CMND', 'SoCCCD', 'SoCMND', 'CCCDCanBo', 'SoCCCDCanBo'],
                     'MaNV'        => ['MaNV', 'MSNV', 'MaNhanVien', 'MaCanBo', 'MaSoNV', 'MaSoNhanVien'],
-                    'SoDienThoai' => ['SoDienThoai', 'SDT', 'Phone', 'DienThoai', 'SoDienThoaiLienHe'],
+                    'SoDienThoai' => ['SoDienThoai', 'SDT', 'phone_no', 'Phone', 'DienThoai', 'SoDienThoaiLienHe'],
                     'IPCAS'       => ['IPCAS', 'UserIPCAS', 'MaNguoiDungIPCAS'],
                     'EmailNV'     => ['EmailNV', 'Email', 'EmailNhanVien', 'EmailCanBo'],
                     'ChucVu'      => ['ChucVu', 'ChucDanh', 'Position'],
@@ -398,6 +450,10 @@ class ItSupportTemplateController extends Controller
                                 if ($normKey === 'MaNV' && $user && $val === $user->user_ipcas) {
                                     continue;
                                 }
+                                // Tuyệt đối không lưu số điện thoại cá nhân nếu trùng với số của Chi nhánh ($branchPhone)
+                                if ($normKey === 'SoDienThoai' && $branchPhone && $val === $branchPhone) {
+                                    continue;
+                                }
                                 $profileDataToSave[$normKey] = $val;
                                 break;
                             }
@@ -412,6 +468,15 @@ class ItSupportTemplateController extends Controller
                     if (isset($existingPayload['MaNV']) && $user && $existingPayload['MaNV'] === $user->user_ipcas) {
                         unset($existingPayload['MaNV']);
                     }
+                    // Dọn dẹp cache nếu từng bị lưu nhầm số điện thoại chi nhánh
+                    if ($branchPhone) {
+                        if (isset($existingPayload['SoDienThoai']) && $existingPayload['SoDienThoai'] === $branchPhone) {
+                            unset($existingPayload['SoDienThoai']);
+                        }
+                        if (isset($existingPayload['SDT']) && $existingPayload['SDT'] === $branchPhone) {
+                            unset($existingPayload['SDT']);
+                        }
+                    }
                     // Đồng bộ cache Mã phòng nếu trước đây lưu tên phòng
                     if (isset($existingPayload['PhongBan']) && $user?->department && !empty($user->department->department_code) && $existingPayload['PhongBan'] === $user->department->department_name) {
                         $existingPayload['PhongBan'] = $user->department->department_code;
@@ -419,15 +484,18 @@ class ItSupportTemplateController extends Controller
                     $merged = array_merge($existingPayload, $profileDataToSave);
                     Cache::forever("it_officer_profile_{$userId}", $merged);
 
-                    // Đồng bộ cập nhật vào tài khoản User nếu có dữ liệu mới
+                    // Đồng bộ cập nhật vào tài khoản User nếu có dữ liệu mới (CCCD, SĐT cá nhân)
+                    // Lưu ý: Không tự ý cập nhật employee_code vì đây là mã định danh duy nhất của hệ thống
                     if ($user) {
                         $userUpdates = [];
                         if (!empty($profileDataToSave['CCCD']) && $profileDataToSave['CCCD'] !== $user->citizen_id) {
                             $userUpdates['citizen_id'] = $profileDataToSave['CCCD'];
                         }
-                        if (!empty($profileDataToSave['MaNV']) && $profileDataToSave['MaNV'] !== $user->employee_code) {
-                            if ($profileDataToSave['MaNV'] !== $user->user_ipcas && !preg_match('/^DTH/i', $profileDataToSave['MaNV'])) {
-                                $userUpdates['employee_code'] = $profileDataToSave['MaNV'];
+                        if (!empty($profileDataToSave['SoDienThoai']) && $profileDataToSave['SoDienThoai'] !== $user->phone_no) {
+                            if ($branchPhone && $profileDataToSave['SoDienThoai'] === $branchPhone) {
+                                // Tuyệt đối không lưu số của Chi nhánh vào phone_no của user
+                            } else {
+                                $userUpdates['phone_no'] = $profileDataToSave['SoDienThoai'];
                             }
                         }
                         if (!empty($userUpdates)) {

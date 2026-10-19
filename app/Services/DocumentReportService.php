@@ -16,16 +16,19 @@ class DocumentReportService
         $yearStart = CarbonImmutable::create($selectedYear, 1, 1)->startOfDay();
         $nextYear = $yearStart->addYear();
         $driver = Document::query()->getConnection()->getDriverName();
-        $yearExpression = $driver === 'sqlite'
-            ? "CAST(strftime('%Y', issued_date) AS INTEGER)"
-            : 'YEAR(issued_date)';
-        $monthExpression = $driver === 'sqlite'
-            ? "CAST(strftime('%m', issued_date) AS INTEGER)"
-            : 'MONTH(issued_date)';
+        $yearSelect = $driver === 'sqlite'
+            ? "CAST(strftime('%Y', issued_date) AS INTEGER) as report_year"
+            : 'YEAR(issued_date) as report_year';
+        $monthSelect = $driver === 'sqlite'
+            ? "CAST(strftime('%m', issued_date) AS INTEGER) as report_month, direction, COUNT(*) as total"
+            : 'MONTH(issued_date) as report_month, direction, COUNT(*) as total';
+        $monthGroupBy = $driver === 'sqlite'
+            ? "CAST(strftime('%m', issued_date) AS INTEGER), direction"
+            : 'MONTH(issued_date), direction';
 
         $years = Document::query()
             ->whereNotNull('issued_date')
-            ->selectRaw($yearExpression.' as report_year')
+            ->selectRaw($yearSelect)
             ->distinct()
             ->orderByDesc('report_year')
             ->pluck('report_year')
@@ -44,8 +47,8 @@ class DocumentReportService
         $monthlyRows = Document::query()
             ->where('issued_date', '>=', $yearStart->toDateString())
             ->where('issued_date', '<', $nextYear->toDateString())
-            ->selectRaw($monthExpression.' as report_month, direction, COUNT(*) as total')
-            ->groupByRaw($monthExpression.', direction')
+            ->selectRaw($monthSelect)
+            ->groupByRaw($monthGroupBy)
             ->get();
 
         foreach ($monthlyRows as $row) {

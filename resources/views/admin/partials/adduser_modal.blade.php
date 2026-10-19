@@ -29,18 +29,24 @@
                                 <input type="text" class="form-control form-control-sm" id="name" name="name" required autocomplete="off">
                             </div>
                             <div class="form-group col-md-6 mb-2">
+                                <label for="phone_no" class="small font-weight-bold text-gray-700">
+                                    Số điện thoại liên hệ <small class="text-muted">(nếu có)</small>
+                                </label>
+                                <input type="tel" class="form-control form-control-sm" id="phone_no" name="phone_no" maxlength="20" placeholder="Ví dụ: 0912345678" autocomplete="tel">
+                            </div>
+                            <div class="form-group col-md-4 mb-0">
                                 <label for="employee_code" class="small font-weight-bold text-gray-700">
                                     Mã nhân viên <small class="text-muted">(nếu có)</small>
                                 </label>
                                 <input type="text" class="form-control form-control-sm" id="employee_code" name="employee_code" maxlength="50" autocomplete="off">
                             </div>
-                            <div class="form-group col-md-6 mb-0">
+                            <div class="form-group col-md-4 mb-0">
                                 <label for="citizen_id" class="small font-weight-bold text-gray-700">
                                     Số CCCD / CMND <small class="text-muted">(12 số)</small>
                                 </label>
                                 <input type="text" class="form-control form-control-sm" id="citizen_id" name="citizen_id" maxlength="20" autocomplete="off">
                             </div>
-                            <div class="form-group col-md-6 mb-0">
+                            <div class="form-group col-md-4 mb-0">
                                 <label for="user_ipcas" class="small font-weight-bold text-gray-700">
                                     Mã người dùng IPCAS <small class="text-muted">(không bắt buộc)</small>
                                 </label>
@@ -132,24 +138,25 @@
                                 </label>
                                 <input type="password" class="form-control form-control-sm" id="password" name="password" required autocomplete="new-password">
                             </div>
-                            <div class="form-group col-md-6 mb-0">
-                                <label for="role_id" class="small font-weight-bold text-gray-700">
-                                    Quyền hệ thống <span class="text-danger">*</span>
+                            <div class="form-group col-12 mb-0">
+                                <label class="small font-weight-bold text-gray-700 mb-1">
+                                    <i class="fas fa-shield-alt text-primary mr-1"></i>Vai trò tài khoản <span class="text-danger">*</span> <small class="text-muted">(tích chọn một hoặc nhiều vai trò đảm nhiệm)</small>
                                 </label>
-                                <select class="form-control form-control-sm" id="role_id" name="role_id" required>
-                                    <option value="">-- Chọn quyền --</option>
-                                    <option value="1">Kiểm soát (Supervisor)</option>
-                                    <option value="2">Nhân viên (Staff)</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-6 mb-0">
-                                <label for="document_role" class="small font-weight-bold text-gray-700">
-                                    Vai trò văn thư
-                                </label>
-                                <select class="form-control form-control-sm" id="document_role" name="document_role">
-                                    <option value="user">Người dùng bình thường (Chỉ xem)</option>
-                                    <option value="clerk">Văn thư chi nhánh (Đăng tải & Phân phối)</option>
-                                </select>
+                                <div class="d-flex flex-wrap border rounded p-2 bg-white" id="addUserRolesWrapper">
+                                    @if(isset($list_roles))
+                                        @foreach($list_roles as $r)
+                                            <div class="custom-control custom-checkbox mr-3 mb-1">
+                                                <input type="checkbox" class="custom-control-input add-user-role-checkbox" id="add_role_{{ $r->id }}" value="{{ $r->id }}" data-slug="{{ $r->slug }}" {{ $r->slug === 'staff' ? 'checked' : '' }}>
+                                                <label class="custom-control-label small font-weight-bold cursor-pointer" for="add_role_{{ $r->id }}">
+                                                    {{ $r->name }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                                <small class="form-text text-muted mt-1">
+                                    <i class="fas fa-info-circle text-info mr-1"></i>Ví dụ: Tài khoản có thể vừa là <strong>Nhân viên nghiệp vụ</strong> vừa kiêm nhiệm <strong>Văn thư chi nhánh</strong>.
+                                </small>
                             </div>
                         </div>
                     </div>

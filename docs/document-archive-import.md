@@ -268,4 +268,4 @@ Chưa thêm --fallback-mtime nhé: chỉ dùng khi mày chấp nhận lấy ngà
 
 Cập nhật từ file excel:
 
-php artisan documents:enrich-from-scanned-excel "duong_dan_excel.xlsx" --user=1 --commit
+php artisan documents:enrich-from-scanned-excel "duong_dan_excel.xlsx" --user=123 --commit

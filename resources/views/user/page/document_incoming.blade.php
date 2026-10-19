@@ -21,7 +21,7 @@ $user = \App\Models\User::find(Session::get('user_id'));
             <a href="{{ route('documents_forward') }}" class="btn btn-sm btn-outline-primary shadow-sm mr-2">
                 <i class="fas fa-layer-group mr-1"></i> Tất cả văn bản
             </a>
-            @if($user && $user->canUploadDocument())
+            @if(auth_user_can('documents.upload') && $user && $user->canUploadDocument())
             <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-primary shadow-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-plus fa-sm mr-1"></i> Đăng văn bản
@@ -257,11 +257,11 @@ $user = \App\Models\User::find(Session::get('user_id'));
 @endpush
 
 @push('scripts')
-<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}"></script>
-<script src="{{ asset('vendor/flatpickr/vn.js') }}"></script>
-<script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
-<script src="{{ asset('js/user/document-distribution-editor.js') }}"></script>
+<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}?v={{ filemtime(public_path('vendor/datatables/jquery.dataTables.min.js')) }}"></script>
+<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}?v={{ filemtime(public_path('vendor/datatables/dataTables.bootstrap4.min.js')) }}"></script>
+<script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}?v={{ filemtime(public_path('vendor/flatpickr/flatpickr.min.js')) }}"></script>
+<script src="{{ asset('vendor/flatpickr/vn.js') }}?v={{ filemtime(public_path('vendor/flatpickr/vn.js')) }}"></script>
+<script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}?v={{ filemtime(public_path('vendor/sweetalert2/sweetalert2.all.min.js')) }}"></script>
+<script src="{{ asset('js/user/document-distribution-editor.js') }}?v={{ filemtime(public_path('js/user/document-distribution-editor.js')) }}"></script>
 <script src="{{ asset('js/user/document-incoming.js') }}?v={{ filemtime(public_path('js/user/document-incoming.js')) }}"></script>
 @endpush

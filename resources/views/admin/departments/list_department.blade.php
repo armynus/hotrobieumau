@@ -90,63 +90,17 @@
 @endsection
 
 @push('scripts')
-<script src="{{asset('vendor/datatables/jquery.dataTables.min.js')}}"></script>
-<script src="{{asset('vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
-<script src="{{asset('js/demo/datatables-demo.js')}}"></script>
-<script>
-$(function () {
-    const departments = @json($departmentOptions);
-    const csrf = @json(csrf_token());
-
-    function populateParents(selector, branchId, selectedId, excludedId) {
-        const $select = $(selector).empty().append($('<option>', {value: '', text: 'Không có phòng cấp trên'}));
-        departments.filter(item => String(item.branch_id) === String(branchId) && String(item.id) !== String(excludedId || '')).forEach(item => {
-            $select.append($('<option>', {value: item.id, text: item.name}));
-        });
-        $select.val(selectedId || '');
-    }
-
-    function showError(xhr, fallback) {
-        const response = xhr.responseJSON || {};
-        const errors = response.errors || {};
-        const key = Object.keys(errors)[0];
-        swal(key ? errors[key][0] : (response.message || fallback), {icon: 'error'});
-    }
-
-    $('#branch_id').on('change', function () { populateParents('#parent_id', this.value); });
-    $('#edit_branch_id').on('change', function () { populateParents('#edit_parent_id', this.value, '', $('#edit_department_id').val()); });
-
-    $('#addDepartmentBtn').on('click', function () {
-        $.ajax({
-            url: @json(route('admin_department_store')), method: 'POST',
-            data: {_token: csrf, department_name: $('#department_name').val(), department_code: $('#department_code').val(), branch_id: $('#branch_id').val(), parent_id: $('#parent_id').val(), status: $('#department_status').val()},
-            success: response => swal('Thành công!', response.success, {icon: 'success'}).then(() => location.reload()),
-            error: xhr => showError(xhr, 'Không thể thêm phòng ban.')
-        });
-    });
-
-    $(document).on('click', '.edit_btn', function () {
-        $.get(@json(route('admin_department_edit')), {department_id: $(this).data('id')})
-            .done(function (response) {
-                const item = response.department;
-                $('#edit_department_id').val(item.id);
-                $('#edit_department_name').val(item.department_name);
-                $('#edit_department_code').val(item.department_code || '');
-                $('#edit_branch_id').val(item.branch_id);
-                $('#edit_department_status').val(item.status || 'active');
-                populateParents('#edit_parent_id', item.branch_id, item.parent_id, item.id);
-            })
-            .fail(xhr => showError(xhr, 'Không thể tải phòng ban.'));
-    });
-
-    $('#updateDepartmentBtn').on('click', function () {
-        $.ajax({
-            url: @json(route('admin_department_update')), method: 'POST',
-            data: {_token: csrf, department_id: $('#edit_department_id').val(), department_name: $('#edit_department_name').val(), department_code: $('#edit_department_code').val(), branch_id: $('#edit_branch_id').val(), parent_id: $('#edit_parent_id').val(), status: $('#edit_department_status').val()},
-            success: response => swal('Thành công!', response.message, {icon: 'success'}).then(() => location.reload()),
-            error: xhr => showError(xhr, 'Không thể cập nhật phòng ban.')
-        });
-    });
-});
-</script>
+<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}?v={{ filemtime(public_path('vendor/datatables/jquery.dataTables.min.js')) }}"></script>
+<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}?v={{ filemtime(public_path('vendor/datatables/dataTables.bootstrap4.min.js')) }}"></script>
+<script src="{{asset('js/demo/datatables-demo.js')}}?v={{ filemtime(public_path('js/demo/datatables-demo.js')) }}"></script>
+@include('shared.sweetalert')
+<span class="admin-org-config-data" hidden data-config="{{ json_encode([
+    "departmentOptions" => $departmentOptions,
+    "routes" => [
+        "deptStore" => route("admin_department_store"),
+        "deptEdit" => route("admin_department_edit"),
+        "deptUpdate" => route("admin_department_update")
+    ]
+]) }}"></span>
+<script src="{{ asset('js/admin/org-management.js') }}?v={{ filemtime(public_path('js/admin/org-management.js')) }}"></script>
 @endpush

@@ -81,11 +81,11 @@
 <style>.ledger-table th,.ledger-table td{vertical-align:middle}.ledger-table th{white-space:nowrap}.ledger-title{min-width:260px;max-width:550px}.ledger-import-issues{max-height:230px;overflow:auto}.ledger-stats{display:flex;gap:12px;flex-wrap:wrap}.ledger-stats>div{padding:8px 12px;background:#f8f9fc;border-radius:6px}</style>
 @endpush
 @push('scripts')
-<script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
-<script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}"></script>
-<script src="{{ asset('vendor/flatpickr/vn.js') }}"></script>
-<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}?v={{ filemtime(public_path('vendor/sweetalert2/sweetalert2.all.min.js')) }}"></script>
+<script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}?v={{ filemtime(public_path('vendor/flatpickr/flatpickr.min.js')) }}"></script>
+<script src="{{ asset('vendor/flatpickr/vn.js') }}?v={{ filemtime(public_path('vendor/flatpickr/vn.js')) }}"></script>
+<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}?v={{ filemtime(public_path('vendor/datatables/jquery.dataTables.min.js')) }}"></script>
+<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}?v={{ filemtime(public_path('vendor/datatables/dataTables.bootstrap4.min.js')) }}"></script>
 <script src="{{ asset('js/user/document-ledger-table.js') }}?v={{ filemtime(public_path('js/user/document-ledger-table.js')) }}"></script>
 <script src="{{ asset('js/user/document-ledger.js') }}?v={{ filemtime(public_path('js/user/document-ledger.js')) }}"></script>
 <script src="{{ asset('js/user/document-ledger-history.js') }}?v={{ filemtime(public_path('js/user/document-ledger-history.js')) }}"></script>

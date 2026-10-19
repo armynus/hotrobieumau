@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
-use App\Models\Users;
+use App\Models\User;
 
 class LoginAdminController extends Controller
 {
@@ -89,7 +89,7 @@ class LoginAdminController extends Controller
         if($admin_id != $id){
             return redirect()->back()->with('error','Không đủ quyền truy cập');
         }
-        $user=Users::where('id',$admin_id)
+        $user=User::where('id',$admin_id)
         ->select('id','email','name')
         ->first();
         return view('admin.auth.change_password_admin',compact('user'));
@@ -105,7 +105,7 @@ class LoginAdminController extends Controller
         if(Hash::check($old_password, $result->password )){
             $data=array();
             $data['password']=Hash::make($request->password);
-            Users::where('id',$id)->update($data);
+            User::where('id',$id)->update($data);
             return redirect()->back()->with('message','Đổi mật khẩu thành công') ;
         }else{
             return redirect()->back()->with('error','Mật khẩu hiện tại không đúng') ;

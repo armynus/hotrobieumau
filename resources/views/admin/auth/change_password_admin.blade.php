@@ -77,71 +77,8 @@
     </div>
 </div>
 @endsection
-{{-- js --}}
 @push('scripts')
-
-
-    <!-- Page level plugins -->
-    <script src="{{asset('vendor/datatables/jquery.dataTables.min.js')}}"></script>
-    <script src="{{asset('vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
-    <!-- include jQuery validate library -->
-    
-<script>
-    $("#form_add_user").validate({
-        rules: {
-            "name": {
-                required: true,
-                maxlength: 100,
-                minlength: 5,
-            },
-            "email": {
-                required: true,
-                email: true,
-            },
-            "old_password": {
-                required: true,
-                minlength: 6,
-            },
-            "password": {
-                required: true,
-                minlength: 6,
-            },
-            "repassword": {
-                required: true,
-                equalTo: "#exampleInputPassword"
-            },
-            
-        },
-        messages: {
-            "name": {
-                required: "Vui lòng nhập tên nhân viên",
-                maxlength: "Tên nhân viên không được quá 100 ký tự",
-                minlength: "Tên nhân viên phải có ít nhất 5 ký tự",
-            },
-            "email": {
-                required: "Vui lòng nhập email nhân viên",
-                email: "Vui lòng nhập đúng định dạng email",
-            },
-            "old_password": {
-                required: "Vui lòng nhập mật khẩu hiện tại",
-                minlength: "Mật khẩu phải có ít nhất 6 ký tự",
-            },
-            "password": {
-                required: "Vui lòng nhập mật khẩu",
-                minlength: "Mật khẩu phải có ít nhất 6 ký tự",
-            },
-            "repassword": {
-                required: "Vui lòng nhập lại mật khẩu",
-                equalTo: "Mật khẩu nhập lại không khớp",
-            },
-        },
-        submitHandler: function(form) {
-            $(form).submit();
-        }
-    
-    });
-    </script>
-@endpush
+    <!-- jQuery Validate library loaded on-demand for password change -->
+    <script src="{{ asset('js/jquery.validate.min.js') }}?v={{ filemtime(public_path('js/jquery.validate.min.js')) }}"></script>
+    <script src="{{ asset('js/shared/change-password-validation.js') }}?v={{ filemtime(public_path('js/shared/change-password-validation.js')) }}"></script>
+@endpush

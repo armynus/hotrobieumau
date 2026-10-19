@@ -104,17 +104,43 @@ class AdminFormFieldController extends Controller
             'display_order.integer' => 'Thứ tự hiển thị phải là số nguyên.',
         ]);
 
-        // Tìm bản ghi cần cập nhật theo field_id
-        $formField = FormField::findOrFail($request->field_id);
-        
-        // Cập nhật dữ liệu
-        $formField->update($request->only(['field_name', 'field_code', 'placeholder', 'data_type', 'value', 'content_group', 'display_order']));
-        
-        return response()->json([
-            'status'     => true,
-            'form_field' => $formField,
-            'message'    => 'Trường dữ liệu đã được cập nhật thành công!'
-        ]);
+        DB::beginTransaction();
+        try {
+            // Tìm bản ghi cần cập nhật theo field_id
+            $formField = FormField::findOrFail($request->field_id);
+            $oldCode = $formField->field_code;
+            $newCode = $request->field_code;
+            
+            // Cập nhật dữ liệu
+            $formField->update($request->only(['field_name', 'field_code', 'placeholder', 'data_type', 'value', 'content_group', 'display_order']));
+
+            // Nếu mã trường thay đổi, tự động đồng bộ cập nhật trong tất cả các biểu mẫu giao dịch đang sử dụng mã cũ
+            if ($oldCode && $newCode && $oldCode !== $newCode) {
+                $supportForms = SupportForm::whereNotNull('fields')->get();
+                foreach ($supportForms as $supportForm) {
+                    $fieldsArray = FormWorkspaceService::fieldCodes($supportForm->fields);
+                    if (in_array($oldCode, $fieldsArray, true)) {
+                        $updatedFields = array_map(fn($c) => $c === $oldCode ? $newCode : $c, $fieldsArray);
+                        $supportForm->fields = json_encode(array_values(array_unique($updatedFields)));
+                        $supportForm->save();
+                    }
+                }
+            }
+
+            DB::commit();
+            
+            return response()->json([
+                'status'     => true,
+                'form_field' => $formField,
+                'message'    => 'Trường dữ liệu đã được cập nhật thành công!'
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => false,
+                'message' => 'Không thể cập nhật trường dữ liệu. Vui lòng thử lại sau!'
+            ], 500);
+        }
     }
     
     
@@ -137,22 +163,12 @@ class AdminFormFieldController extends Controller
             // Lấy tất cả các SupportForm có trường 'fields'
             $supportForms = SupportForm::whereNotNull('fields')->get();
             foreach ($supportForms as $supportForm) {
-                // Chuyển đổi chuỗi JSON thành mảng
-                $fieldsArray = json_decode($supportForm->fields, true);
+                $fieldsArray = FormWorkspaceService::fieldCodes($supportForm->fields);
 
-                if (is_array($fieldsArray)) {
-                    $originalCount = count($fieldsArray);
-                    // Lọc bỏ phần tử có giá trị trùng khớp với $fieldCode (so sánh case sensitive)
-                    $filteredArray = array_filter($fieldsArray, function ($item) use ($fieldCode) {
-                        return $item !== $fieldCode;
-                    });
-
-                    // Nếu mảng sau khi lọc có số phần tử giảm, cập nhật lại trường 'fields'
-                    if (count($filteredArray) !== $originalCount) {
-                        // Re-index lại mảng và encode sang JSON
-                        $supportForm->fields = json_encode(array_values($filteredArray));
-                        $supportForm->save();
-                    }
+                if (in_array($fieldCode, $fieldsArray, true)) {
+                    $filteredArray = array_values(array_filter($fieldsArray, fn($item) => $item !== $fieldCode));
+                    $supportForm->fields = json_encode($filteredArray);
+                    $supportForm->save();
                 }
             }
 
@@ -165,7 +181,7 @@ class AdminFormFieldController extends Controller
                 'status'  => true,
                 'message' => 'Xóa trường dữ liệu thành công!'
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json([
                 'status'  => false,

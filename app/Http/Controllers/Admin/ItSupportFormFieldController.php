@@ -117,9 +117,23 @@ class ItSupportFormFieldController extends Controller
         ]);
 
         $formField = ItSupportFormField::findOrFail($request->field_id);
+        $oldCode = $formField->field_code;
+        $newCode = $request->field_code;
+
         $formField->update(
             $request->only(['field_name', 'field_code', 'placeholder', 'data_type', 'value', 'content_group', 'display_order'])
         );
+
+        // Nếu mã trường thay đổi, đồng bộ cập nhật trong tất cả các biểu mẫu đang sử dụng mã cũ
+        if ($oldCode && $newCode && $oldCode !== $newCode) {
+            $templates = \App\Models\ItSupportTemplate::all();
+            foreach ($templates as $template) {
+                if (is_array($template->fields) && in_array($oldCode, $template->fields, true)) {
+                    $updatedFields = array_map(fn($c) => $c === $oldCode ? $newCode : $c, $template->fields);
+                    $template->update(['fields' => array_values(array_unique($updatedFields))]);
+                }
+            }
+        }
 
         return response()->json([
             'status'     => true,

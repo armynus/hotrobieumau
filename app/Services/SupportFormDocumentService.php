@@ -176,6 +176,32 @@ class SupportFormDocumentService
                     $templateProcessor->setValue('MaPhong', $safeVal);
                     $templateProcessor->setValue('MaPhongBan', $safeVal);
                 }
+                // Nếu có key số điện thoại cá nhân cán bộ, đồng bộ các placeholder số điện thoại cá nhân liên quan
+                if (in_array($key, ['SoDienThoai', 'SDT', 'Phone', 'DienThoai', 'SoDienThoaiLienHe', 'phone_no', 'Phone_No', 'SoDienThoaiNV', 'DienThoaiCanBo'], true)) {
+                    $safeVal = $this->supportformService->wordSafe($value);
+                    $templateProcessor->setValue('SoDienThoai', $safeVal);
+                    $templateProcessor->setValue('SDT', $safeVal);
+                    $templateProcessor->setValue('Phone', $safeVal);
+                    $templateProcessor->setValue('DienThoai', $safeVal);
+                    $templateProcessor->setValue('SoDienThoaiLienHe', $safeVal);
+                    $templateProcessor->setValue('phone_no', $safeVal);
+                    $templateProcessor->setValue('Phone_No', $safeVal);
+                    $templateProcessor->setValue('SoDienThoaiNV', $safeVal);
+                    $templateProcessor->setValue('DienThoaiCanBo', $safeVal);
+                }
+                // Nếu có key số điện thoại cơ quan / đơn vị / chi nhánh, đồng bộ vào ${SDTCoQuan} và các biến thể liên quan
+                if (in_array($key, ['SDTCoQuan', 'SoDienThoaiCoQuan', 'DienThoaiCoQuan', 'SDTChiNhanh', 'SoDienThoaiChiNhanh', 'DienThoaiChiNhanh', 'BranchPhone', 'DienThoaiDonVi', 'SDTDonVi'], true)) {
+                    $safeVal = $this->supportformService->wordSafe($value);
+                    $templateProcessor->setValue('SDTCoQuan', $safeVal);
+                    $templateProcessor->setValue('SoDienThoaiCoQuan', $safeVal);
+                    $templateProcessor->setValue('DienThoaiCoQuan', $safeVal);
+                    $templateProcessor->setValue('SDTChiNhanh', $safeVal);
+                    $templateProcessor->setValue('SoDienThoaiChiNhanh', $safeVal);
+                    $templateProcessor->setValue('DienThoaiChiNhanh', $safeVal);
+                    $templateProcessor->setValue('BranchPhone', $safeVal);
+                    $templateProcessor->setValue('DienThoaiDonVi', $safeVal);
+                    $templateProcessor->setValue('SDTDonVi', $safeVal);
+                }
                 if ($key === 'SoTienDoi' || isset($formData['TyGia']) || isset($formData['LoaiTienNhan'])) {
                     $sotiendoi = is_numeric($formData['SoTienDoi'] ?? null) ? (float) $formData['SoTienDoi'] : 0;
                     $sotiendoi_chu = ucfirst(num_to_vietnamese_words((int) $sotiendoi)).' '.($formData['ccycd'] ?? '');
@@ -187,6 +213,17 @@ class SupportFormDocumentService
                     $value_in_words = ucfirst(num_to_vietnamese_words((int) $sotiennhan)).' '.($formData['LoaiTienNhan'] ?? '');
                     $templateProcessor->setValue('SoTienNhan_Chu', $value_in_words);
                 }
+            }
+
+            // Đảm bảo nếu template có biến SDTCoQuan mà chưa được gán, lấy từ formData['SDTCoQuan'] hoặc formData['BranchPhone']
+            $agencyPhoneVal = $formData['SDTCoQuan'] ?? $formData['SoDienThoaiCoQuan'] ?? $formData['SDTChiNhanh'] ?? $formData['BranchPhone'] ?? '';
+            if (!empty($agencyPhoneVal)) {
+                $safeAgencyPhone = $this->supportformService->wordSafe($agencyPhoneVal);
+                $templateProcessor->setValue('SDTCoQuan', $safeAgencyPhone);
+                $templateProcessor->setValue('SoDienThoaiCoQuan', $safeAgencyPhone);
+                $templateProcessor->setValue('DienThoaiCoQuan', $safeAgencyPhone);
+                $templateProcessor->setValue('SDTChiNhanh', $safeAgencyPhone);
+                $templateProcessor->setValue('BranchPhone', $safeAgencyPhone);
             }
             // Thay thế toàn bộ các placeholder còn lại trong mẫu bằng chuỗi rỗng để không để sót chuỗi ${...}
             $remainingVariables = $templateProcessor->getVariables();

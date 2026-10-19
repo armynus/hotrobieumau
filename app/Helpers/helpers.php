@@ -142,3 +142,125 @@ if (! function_exists('_read_chunk')) {
         return trim(implode(' ', $parts));
     }
 }
+
+if (! function_exists('auth_user_can')) {
+    /**
+     * Check if currently authenticated user or admin has a specific permission
+     */
+    function auth_user_can(string $permission): bool
+    {
+        // 0. If the permission/feature is inactive system-wide, return false immediately
+        if (!\App\Models\Permission::isFeatureActive($permission)) {
+            return false;
+        }
+
+        // 1. If logged in as user, strictly check user's permissions
+        $userId = session('user_id');
+        if ($userId) {
+            $syncResult = \App\Models\User::syncSessionPermissionsIfNeeded($userId);
+            if ($syncResult === false) {
+                return false;
+            }
+
+            $perms = is_array($syncResult) ? $syncResult : session('user_permissions');
+            if (is_array($perms)) {
+                return in_array('*', $perms, true) || in_array($permission, $perms, true);
+            }
+
+            return false;
+        }
+
+        // 2. Pure Admin session (e.g. browsing admin panel without user session)
+        if (session()->has('admin_id')) {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+if (! function_exists('auth_user_has_role')) {
+    /**
+     * Check if currently authenticated user or admin has a specific role
+     */
+    function auth_user_has_role(string|array $role): bool
+    {
+        $userId = session('user_id');
+        if ($userId) {
+            $syncResult = \App\Models\User::syncSessionPermissionsIfNeeded($userId);
+            if ($syncResult === false) {
+                return false;
+            }
+
+            $sessionRoles = session('user_roles');
+            $roleSlugs = (array) $role;
+            if (is_array($sessionRoles)) {
+                if (in_array('admin', $sessionRoles, true)) {
+                    return true;
+                }
+                foreach ($roleSlugs as $r) {
+                    if (in_array($r, $sessionRoles, true)) {
+                        return true;
+                    }
+                }
+            }
+
+            $user = auth_user();
+            return $user ? $user->hasRole($role) : false;
+        }
+
+        if (session()->has('admin_id')) {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+if (! function_exists('auth_user')) {
+    /**
+     * Get currently authenticated user instance
+     */
+    function auth_user(): ?\App\Models\User
+    {
+        $userId = session('user_id');
+        if (! $userId) {
+            return null;
+        }
+
+        \App\Models\User::syncSessionPermissionsIfNeeded($userId);
+
+        if (app()->bound('request')) {
+            $req = request();
+            if ($req->attributes->has('memoized_auth_user')) {
+                $cached = $req->attributes->get('memoized_auth_user');
+                if ($cached && $cached->id === $userId) {
+                    return $cached;
+                }
+            }
+        }
+
+        if (! \Illuminate\Support\Facades\Schema::hasTable('users')) {
+            return null;
+        }
+
+        $relations = [];
+        if (\Illuminate\Support\Facades\Schema::hasTable('branches')) {
+            $relations[] = 'branch';
+        }
+        if (\Illuminate\Support\Facades\Schema::hasTable('positions')) {
+            $relations[] = 'position';
+        }
+        if (\Illuminate\Support\Facades\Schema::hasTable('roles') && \Illuminate\Support\Facades\Schema::hasTable('user_role')) {
+            $relations[] = 'roles.permissions';
+        }
+
+        $user = empty($relations) ? \App\Models\User::find($userId) : \App\Models\User::with($relations)->find($userId);
+
+        if (app()->bound('request') && $user) {
+            request()->attributes->set('memoized_auth_user', $user);
+        }
+
+        return $user;
+    }
+}

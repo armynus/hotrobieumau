@@ -33,6 +33,24 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('menuOpen', function ($expression) {
             return "<?php echo request()->routeIs({$expression}) ? 'show' : ''; ?>";
         });
+
+        // Kiểm tra quyền hạn
+        // Dùng: @permission('documents.upload') ... @endpermission
+        Blade::directive('permission', function ($expression) {
+            return "<?php if (auth_user_can({$expression})): ?>";
+        });
+        Blade::directive('endpermission', function () {
+            return "<?php endif; ?>";
+        });
+
+        // Kiểm tra vai trò
+        // Dùng: @role('admin') ... @endrole
+        Blade::directive('role', function ($expression) {
+            return "<?php if (auth_user_has_role({$expression})): ?>";
+        });
+        Blade::directive('endrole', function () {
+            return "<?php endif; ?>";
+        });
     }
     public function wordSafe($value)
     {

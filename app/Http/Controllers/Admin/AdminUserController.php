@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreAdminUserRequest;
+use App\Http\Requests\Admin\UpdateAdminUserRequest;
 use App\Models\Branches;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\TransactionOffice;
-use App\Models\Users;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -38,21 +40,30 @@ class AdminUserController extends Controller
             ->select('id', 'branch_id', 'office_name', 'office_code', 'status')
             ->orderBy('office_name')
             ->get();
+        $list_roles = \Illuminate\Support\Facades\Schema::hasTable('roles')
+            ? \App\Models\Role::query()->where('status', 'active')->orderBy('id')->get()
+            : collect();
 
-        return view('admin.users.list_user', compact('list_branch', 'list_department', 'list_position', 'list_transaction_office'));
+        return view('admin.users.list_user', compact('list_branch', 'list_department', 'list_position', 'list_transaction_office', 'list_roles'));
     }
 
     public function data(Request $request)
     {
-        $users = Users::query()
-            ->leftJoin('branches', 'users.branch_id', '=', 'branches.id')
+        $hasRolesTable = \Illuminate\Support\Facades\Schema::hasTable('roles');
+        $users = User::query();
+
+        if ($hasRolesTable) {
+            $users->with(['roles' => fn($q) => $q->select('roles.id', 'roles.name', 'roles.slug', 'roles.is_system')]);
+        }
+
+        $users->leftJoin('branches', 'users.branch_id', '=', 'branches.id')
             ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
             ->leftJoin('transaction_offices', 'users.transaction_office_id', '=', 'transaction_offices.id')
             ->leftJoin('positions', 'users.position_id', '=', 'positions.id')
             ->select([
                 'users.id', 'users.name', 'users.citizen_id', 'users.employee_code',
-                'users.email', 'users.user_ipcas', 'users.role_id',
-                'users.document_role', 'users.status', 'users.created_at', 'users.updated_at',
+                'users.email', 'users.phone_no', 'users.user_ipcas', 'users.role_id',
+                'users.document_role', 'users.status', 'users.failed_login_attempts', 'users.created_at', 'users.updated_at',
                 'branches.branch_name', 'departments.department_name', 'transaction_offices.office_name as transaction_office_name', 'positions.position_name',
             ])
             ->whereNotNull('users.role_id');
@@ -98,6 +109,7 @@ class AdminUserController extends Controller
                 $users->where(function ($q) use ($keyword) {
                     $q->where('users.name', 'like', '%'.$keyword.'%')
                         ->orWhere('users.email', 'like', '%'.$keyword.'%')
+                        ->orWhere('users.phone_no', 'like', '%'.$keyword.'%')
                         ->orWhere('users.user_ipcas', 'like', '%'.$keyword.'%')
                         ->orWhere('users.citizen_id', 'like', '%'.$keyword.'%')
                         ->orWhere('users.employee_code', 'like', '%'.$keyword.'%');
@@ -105,7 +117,7 @@ class AdminUserController extends Controller
             }
         }
 
-        $stats = Users::whereNotNull('role_id')
+        $stats = User::whereNotNull('role_id')
             ->selectRaw("
                 COUNT(*) as total,
                 SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
@@ -115,7 +127,9 @@ class AdminUserController extends Controller
             ")
             ->first();
 
-        return DataTables::eloquent($users)
+        $dataTable = DataTables::eloquent($users);
+
+        return $dataTable
             ->filterColumn('name', fn ($query, $keyword) => $query->where(function ($nested) use ($keyword): void {
                 $nested->where('users.name', 'like', '%'.$keyword.'%')
                     ->orWhere('users.user_ipcas', 'like', '%'.$keyword.'%')
@@ -140,17 +154,25 @@ class AdminUserController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $this->validateUser($request);
+        $validated = $this->resolveFormRequest($request, StoreAdminUserRequest::class)->validated();
         $validated['password'] = Hash::make($validated['password']);
         $validated['status'] = 'active';
         $validated['citizen_id'] = $validated['citizen_id'] ?? null;
         $validated['employee_code'] = $validated['employee_code'] ?? null;
+        $validated['phone_no'] = !empty($validated['phone_no']) ? trim($validated['phone_no']) : null;
         $validated['user_ipcas'] = $validated['user_ipcas'] ?? null;
         $validated['department_id'] = $validated['department_id'] ?? null;
         $validated['transaction_office_id'] = $validated['transaction_office_id'] ?? null;
         $validated['position_id'] = $validated['position_id'] ?? null;
 
-        $user = Users::create($validated);
+        $user = User::create($validated);
+        $this->syncUserRoles($user, $request);
+        \App\Models\User::bumpUserPermissionsVersion($user->id);
+        \App\Models\Role::bumpPermissionsVersion();
+
+        if (\Illuminate\Support\Facades\Schema::hasTable('roles')) {
+            $user->load('roles');
+        }
 
         return response()->json([
             'success' => 'Thêm tài khoản thành công!',
@@ -161,36 +183,63 @@ class AdminUserController extends Controller
 
     public function edit(Request $request)
     {
-        $user = Users::query()
+        $user = User::query()
             ->where(function ($q) {
                 $q->where('role_id', '!=', 0)
                   ->orWhere('id', Session::get('admin_id'));
             })
             ->select([
-                'id', 'name', 'citizen_id', 'employee_code', 'email', 'user_ipcas',
+                'id', 'name', 'citizen_id', 'employee_code', 'email', 'phone_no', 'user_ipcas',
                 'branch_id', 'role_id', 'department_id', 'transaction_office_id',
-                'position_id', 'document_role', 'status', 'created_at', 'updated_at',
+                'position_id', 'document_role', 'status', 'failed_login_attempts', 'created_at', 'updated_at',
             ])
             ->findOrFail($request->integer('user_id'));
 
+        $roleIds = \Illuminate\Support\Facades\Schema::hasTable('user_role')
+            ? $user->roles()->pluck('roles.id')->toArray()
+            : [];
+
+        // Fallback for legacy user without user_role records
+        if (empty($roleIds) && \Illuminate\Support\Facades\Schema::hasTable('roles')) {
+            $slugs = [];
+            if ((int) $user->role_id === 0) {
+                $slugs[] = 'admin';
+            } elseif ((int) $user->role_id === 1) {
+                $slugs[] = 'supervisor';
+            } else {
+                $slugs[] = 'staff';
+            }
+            if (($user->document_role ?? '') === 'clerk') {
+                $slugs[] = 'clerk';
+            }
+            $roleIds = \App\Models\Role::whereIn('slug', array_unique($slugs))->pluck('id')->toArray();
+        }
+
+        if (\Illuminate\Support\Facades\Schema::hasTable('roles')) {
+            $user->load('roles');
+        }
+
         return response()->json([
             'user' => $user,
+            'role_ids' => $roleIds,
         ]);
     }
 
     public function update(Request $request)
     {
-        $user = Users::query()
+        $user = User::query()
             ->where(function ($q) {
                 $q->where('role_id', '!=', 0)
                   ->orWhere('id', Session::get('admin_id'));
             })
             ->findOrFail($request->integer('user_id'));
-        $validated = $this->validateUser($request, $user);
+
+        $validated = $this->resolveFormRequest($request, UpdateAdminUserRequest::class)->validated();
         $password = $validated['password'] ?? null;
         unset($validated['password']);
         $validated['citizen_id'] = $validated['citizen_id'] ?? null;
         $validated['employee_code'] = $validated['employee_code'] ?? null;
+        $validated['phone_no'] = !empty($validated['phone_no']) ? trim($validated['phone_no']) : null;
         $validated['user_ipcas'] = $validated['user_ipcas'] ?? null;
         $validated['department_id'] = $validated['department_id'] ?? null;
         $validated['transaction_office_id'] = $validated['transaction_office_id'] ?? null;
@@ -202,17 +251,25 @@ class AdminUserController extends Controller
         }
 
         $user->save();
+        $this->syncUserRoles($user, $request);
+        \App\Models\User::bumpUserPermissionsVersion($user->id);
+        \App\Models\Role::bumpPermissionsVersion();
+
+        $userFresh = $user->fresh();
+        if (\Illuminate\Support\Facades\Schema::hasTable('roles')) {
+            $userFresh->load('roles');
+        }
 
         return response()->json([
             'message' => 'Cập nhật tài khoản thành công!',
             'status' => true,
-            'user' => $user,
+            'user' => $userFresh,
         ]);
     }
 
     public function lock(Request $request)
     {
-        $user = Users::where('id', $request->user_id)->first();
+        $user = User::where('id', $request->user_id)->first();
         if (! $user) {
             return response()->json([
                 'message' => 'Tài khoản không tồn tại.',
@@ -220,14 +277,18 @@ class AdminUserController extends Controller
             ]);
         }
         if ($user->status == 'active') {
-            Users::where('id', $request->user_id)->update(['status' => 'inactive']);
+            User::where('id', $request->user_id)->update(['status' => 'inactive']);
+            \App\Models\User::bumpUserPermissionsVersion((int) $request->user_id);
+            \App\Models\Role::bumpPermissionsVersion();
 
             return response()->json([
                 'message' => 'Khóa tài khoản thành công.',
                 'status' => true,
             ]);
         } else {
-            Users::where('id', $request->user_id)->update(['status' => 'active', 'failed_login_attempts' => '0']);
+            User::where('id', $request->user_id)->update(['status' => 'active', 'failed_login_attempts' => '0']);
+            \App\Models\User::bumpUserPermissionsVersion((int) $request->user_id);
+            \App\Models\Role::bumpPermissionsVersion();
 
             return response()->json([
                 'message' => 'Mở khóa tài khoản thành công.',
@@ -236,47 +297,53 @@ class AdminUserController extends Controller
         }
     }
 
-    private function validateUser(Request $request, ?Users $user = null): array
+    private function syncUserRoles(User $user, Request $request): void
     {
-        $branchId = $request->integer('branch_id');
-        $allowedRoles = $user && $user->role_id == 0 ? ['0', '1', '2', 0, 1, 2] : ['1', '2', 1, 2];
+        if (!\Illuminate\Support\Facades\Schema::hasTable('roles') || !\Illuminate\Support\Facades\Schema::hasTable('user_role')) {
+            return;
+        }
 
-        return $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'citizen_id' => ['nullable', 'string', 'max:20', Rule::unique('users', 'citizen_id')->ignore($user?->id)],
-            'employee_code' => ['nullable', 'string', 'max:50', Rule::unique('users', 'employee_code')->ignore($user?->id)],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user?->id)],
-            'user_ipcas' => ['nullable', 'string', 'max:50', Rule::unique('users', 'user_ipcas')->ignore($user?->id)],
-            'password' => [$user ? 'nullable' : 'required', 'string', 'min:6', 'max:255'],
-            'branch_id' => ['required', 'integer', Rule::exists('branches', 'id')],
-            'department_id' => [
-                'nullable',
-                'integer',
-                Rule::exists('departments', 'id')->where(fn ($query) => $query->where('branch_id', $branchId)),
-            ],
-            'transaction_office_id' => [
-                'nullable',
-                'integer',
-                Rule::exists('transaction_offices', 'id')->where(function ($query) use ($branchId, $user): void {
-                    $query->where('branch_id', $branchId)
-                        ->where(function ($statusQuery) use ($user): void {
-                            $statusQuery->where('status', 'active');
-                            if ($user?->transaction_office_id) {
-                                $statusQuery->orWhere('id', $user->transaction_office_id);
-                            }
-                        });
-                }),
-            ],
-            'position_id' => ['nullable', 'integer', Rule::exists('positions', 'id')],
-            'role_id' => ['required', Rule::in($allowedRoles)],
-            'document_role' => ['required', Rule::in(['user', 'clerk'])],
-        ], [
-            'citizen_id.unique' => 'Số CCCD đã được sử dụng bởi tài khoản khác.',
-            'employee_code.unique' => 'Mã nhân viên đã được sử dụng bởi tài khoản khác.',
-            'department_id.exists' => 'Phòng ban không thuộc chi nhánh đã chọn.',
-            'transaction_office_id.exists' => 'Phòng giao dịch không hoạt động hoặc không thuộc chi nhánh đã chọn.',
-            'email.unique' => 'Email đã được sử dụng.',
-            'user_ipcas.unique' => 'Mã người dùng IPCAS đã được sử dụng.',
-        ]);
+        if ($request->has('role_ids')) {
+            $roleIds = array_filter((array) $request->input('role_ids'));
+            if (!empty($roleIds)) {
+                $user->roles()->sync($roleIds);
+                $roles = \App\Models\Role::whereIn('id', $roleIds)->pluck('slug')->toArray();
+                if (in_array('admin', $roles, true)) {
+                    $user->role_id = 0;
+                } elseif (in_array('supervisor', $roles, true)) {
+                    $user->role_id = 1;
+                } else {
+                    $user->role_id = 2;
+                }
+                if (in_array('clerk', $roles, true)) {
+                    $user->document_role = 'clerk';
+                } elseif ($request->has('document_role')) {
+                    $user->document_role = $request->input('document_role');
+                } else {
+                    $user->document_role = 'user';
+                }
+                $user->save();
+                return;
+            }
+        }
+
+        // Fallback sync for legacy form inputs (role_id, document_role)
+        $slugsToSync = [];
+        if ((int) $user->role_id === 0) {
+            $slugsToSync[] = 'admin';
+        } elseif ((int) $user->role_id === 1) {
+            $slugsToSync[] = 'supervisor';
+        } else {
+            $slugsToSync[] = 'staff';
+        }
+
+        if (($user->document_role ?? '') === 'clerk') {
+            $slugsToSync[] = 'clerk';
+        }
+
+        $roleIds = \App\Models\Role::whereIn('slug', array_unique($slugsToSync))->pluck('id')->toArray();
+        if (!empty($roleIds)) {
+            $user->roles()->sync($roleIds);
+        }
     }
 }

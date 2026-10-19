@@ -62,11 +62,11 @@
 
 
     <!-- Page level plugins -->
-    <script src="{{asset('vendor/datatables/jquery.dataTables.min.js')}}"></script>
-    <script src="{{asset('vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
+    <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}?v={{ filemtime(public_path('vendor/datatables/jquery.dataTables.min.js')) }}"></script>
+    <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}?v={{ filemtime(public_path('vendor/datatables/dataTables.bootstrap4.min.js')) }}"></script>
 
     <!-- Page level custom scripts -->
-    <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
+    <script src="{{ asset('js/demo/datatables-demo.js') }}?v={{ filemtime(public_path('js/demo/datatables-demo.js')) }}"></script>
     <!-- include jQuery validate library -->
     <!-- include Ajax  library -->
     @include('admin.form_type.partials.ajax_form_type')

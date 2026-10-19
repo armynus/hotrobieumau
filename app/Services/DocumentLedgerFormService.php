@@ -35,7 +35,7 @@ class DocumentLedgerFormService
             $data[$field] = $entry->{$field}?->format('Y-m-d');
         }
 
-        return array_merge($data, ['entry_id' => $entry->id, 'own_branch' => true]);
+        return array_merge($data, ['entry_id' => $entry->id, 'id' => $entry->id, 'own_branch' => true]);
     }
 
     public function save(User $user, ?Document $source, array $input, ?DocumentLedgerEntry $entry = null): DocumentLedgerEntry

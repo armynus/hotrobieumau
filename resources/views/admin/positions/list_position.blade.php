@@ -48,20 +48,16 @@
 @endsection
 
 @push('scripts')
-<script src="{{asset('vendor/datatables/jquery.dataTables.min.js')}}"></script><script src="{{asset('vendor/datatables/dataTables.bootstrap4.min.js')}}"></script><script src="{{asset('js/demo/datatables-demo.js')}}"></script>
-<script>
-$(function () {
-    const csrf = @json(csrf_token());
-    function showError(xhr, fallback) { const response = xhr.responseJSON || {}; const errors = response.errors || {}; const key = Object.keys(errors)[0]; swal(key ? errors[key][0] : (response.message || fallback), {icon: 'error'}); }
-    $('#addPositionBtn').on('click', function () {
-        $.ajax({url: @json(route('admin_position_store')), method: 'POST', data: {_token: csrf, position_name: $('#position_name').val(), position_code: $('#position_code').val(), level: $('#level').val(), status: $('#position_status').val()}, success: response => swal('Thành công!', response.success, {icon: 'success'}).then(() => location.reload()), error: xhr => showError(xhr, 'Không thể thêm chức vụ.')});
-    });
-    $(document).on('click', '.edit_btn', function () {
-        $.get(@json(route('admin_position_edit')), {position_id: $(this).data('id')}).done(function (response) { const item = response.position; $('#edit_position_id').val(item.id); $('#edit_position_name').val(item.position_name); $('#edit_position_code').val(item.position_code || ''); $('#edit_level').val(item.level); $('#edit_position_status').val(item.status || 'active'); }).fail(xhr => showError(xhr, 'Không thể tải chức vụ.'));
-    });
-    $('#updatePositionBtn').on('click', function () {
-        $.ajax({url: @json(route('admin_position_update')), method: 'POST', data: {_token: csrf, position_id: $('#edit_position_id').val(), position_name: $('#edit_position_name').val(), position_code: $('#edit_position_code').val(), level: $('#edit_level').val(), status: $('#edit_position_status').val()}, success: response => swal('Thành công!', response.message, {icon: 'success'}).then(() => location.reload()), error: xhr => showError(xhr, 'Không thể cập nhật chức vụ.')});
-    });
-});
-</script>
+<script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}?v={{ filemtime(public_path('vendor/datatables/jquery.dataTables.min.js')) }}"></script>
+<script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}?v={{ filemtime(public_path('vendor/datatables/dataTables.bootstrap4.min.js')) }}"></script>
+<script src="{{asset('js/demo/datatables-demo.js')}}?v={{ filemtime(public_path('js/demo/datatables-demo.js')) }}"></script>
+@include('shared.sweetalert')
+<span class="admin-org-config-data" hidden data-config="{{ json_encode([
+    "routes" => [
+        "posStore" => route("admin_position_store"),
+        "posEdit" => route("admin_position_edit"),
+        "posUpdate" => route("admin_position_update")
+    ]
+]) }}"></span>
+<script src="{{ asset('js/admin/org-management.js') }}?v={{ filemtime(public_path('js/admin/org-management.js')) }}"></script>
 @endpush

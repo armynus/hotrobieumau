@@ -36,6 +36,6 @@
 
 @once
     @push('scripts')
-        <script src="{{ asset('js/user/data-import-status.js') }}"></script>
+        <script src="{{ asset('js/user/data-import-status.js') }}?v={{ filemtime(public_path('js/user/data-import-status.js')) }}"></script>
     @endpush
 @endonce

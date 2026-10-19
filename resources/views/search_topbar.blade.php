@@ -134,7 +134,5 @@
 }
 </style>
 
-<script>
-window.FormSearchConfig = {url: @json(route('support_form.search'))};
-</script>
+<span id="form-search-config" hidden data-config="{{ json_encode(["url" => route("support_form.search")]) }}"></span>
 <script src="{{ asset('js/user/form-search.js') }}?v={{ filemtime(public_path('js/user/form-search.js')) }}"></script>

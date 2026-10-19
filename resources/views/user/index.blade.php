@@ -23,6 +23,7 @@
             </div>
         </div>
         <div class="col-xl-3 col-md-6 mb-4">
+            @if(auth_user_can('data.customers.view'))
             <a class="card user-dashboard-stat h-100" href="{{ route('view_data_customer') }}">
                 <span class="user-stat-icon user-stat-icon--customer"><i class="fas fa-users"></i></span>
                 <div>
@@ -30,8 +31,18 @@
                     <div class="user-stat-value">{{ number_format($customer_count) }}</div>
                 </div>
             </a>
+            @else
+            <div class="card user-dashboard-stat h-100">
+                <span class="user-stat-icon user-stat-icon--customer"><i class="fas fa-users"></i></span>
+                <div>
+                    <div class="user-stat-label">Khách hàng</div>
+                    <div class="user-stat-value">{{ number_format($customer_count) }}</div>
+                </div>
+            </div>
+            @endif
         </div>
         <div class="col-xl-3 col-md-6 mb-4">
+            @if(auth_user_can('data.accounts.view'))
             <a class="card user-dashboard-stat h-100" href="{{ route('view_data_account') }}">
                 <span class="user-stat-icon user-stat-icon--account"><i class="fas fa-address-card"></i></span>
                 <div>
@@ -39,8 +50,18 @@
                     <div class="user-stat-value">{{ number_format($account_count) }}</div>
                 </div>
             </a>
+            @else
+            <div class="card user-dashboard-stat h-100">
+                <span class="user-stat-icon user-stat-icon--account"><i class="fas fa-address-card"></i></span>
+                <div>
+                    <div class="user-stat-label">Tài khoản khách hàng</div>
+                    <div class="user-stat-value">{{ number_format($account_count) }}</div>
+                </div>
+            </div>
+            @endif
         </div>
         <div class="col-xl-3 col-md-6 mb-4">
+            @if(auth_user_can('forms.view'))
             <a class="card user-dashboard-stat h-100" href="{{ route('support_forms.catalog') }}">
                 <span class="user-stat-icon user-stat-icon--form"><i class="fas fa-clipboard-list"></i></span>
                 <div>
@@ -48,23 +69,43 @@
                     <div class="user-stat-value">{{ number_format($form_count) }}</div>
                 </div>
             </a>
+            @else
+            <div class="card user-dashboard-stat h-100">
+                <span class="user-stat-icon user-stat-icon--form"><i class="fas fa-clipboard-list"></i></span>
+                <div>
+                    <div class="user-stat-label">Biểu mẫu</div>
+                    <div class="user-stat-value">{{ number_format($form_count) }}</div>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 
+    @if(auth_user_can('forms.view') || auth_user_can('data.customers.view') || auth_user_can('documents.view') || auth_user_can('data.merger_lookup'))
     <section class="card mb-4" aria-labelledby="quick-actions-title">
         <div class="card-header py-3">
             <h2 class="h6 m-0 font-weight-bold text-gray-800" id="quick-actions-title">Truy cập nhanh</h2>
         </div>
         <div class="card-body">
             <div class="user-quick-actions">
+                @if(auth_user_can('forms.view'))
                 <a class="user-quick-action" href="{{ route('support_forms.catalog') }}"><i class="fas fa-file-signature"></i><span><strong>Kho biểu mẫu</strong><small>Tìm, ghim và tạo bộ hồ sơ</small></span></a>
+                @endif
+                @if(auth_user_can('data.customers.view'))
                 <a class="user-quick-action" href="{{ route('view_data_customer') }}"><i class="fas fa-search"></i><span><strong>Tra cứu khách hàng</strong><small>Tìm và cập nhật thông tin</small></span></a>
+                @endif
+                @if(auth_user_can('documents.view'))
                 <a class="user-quick-action" href="{{ route('documents_forward') }}"><i class="fas fa-folder-open"></i><span><strong>Danh sách văn bản</strong><small>Xem văn bản đến và đi</small></span></a>
+                @endif
+                @if(auth_user_can('data.merger_lookup'))
                 <a class="user-quick-action" href="{{ route('merger_lookup') }}"><i class="fas fa-map-marked-alt"></i><span><strong>Tra cứu địa giới</strong><small>Đối chiếu xã, phường mới</small></span></a>
+                @endif
             </div>
         </div>
     </section>
+    @endif
 
+    @if(auth_user_can('forms.view'))
     <section class="card mb-4" aria-labelledby="recent-forms-title">
         <div class="card-header py-3 d-flex align-items-center justify-content-between">
             <div>
@@ -88,13 +129,6 @@
             </div>
         </div>
     </section>
+    @endif
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    $(function() {
-        // Recent forms are now rendered server-side
-    });
-</script>
-@endpush

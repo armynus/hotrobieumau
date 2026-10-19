@@ -114,7 +114,7 @@ class DocumentRecipientTest extends TestCase
 
     public function test_admin_created_user_keeps_position_department_and_document_role_and_appears_in_directors(): void
     {
-        $user = \App\Models\Users::create([
+        $user = \App\Models\User::create([
             'name' => 'Giám đốc mới', 'branch_id' => 1, 'department_id' => 1,
             'position_id' => 1, 'document_role' => 'user',
         ]);

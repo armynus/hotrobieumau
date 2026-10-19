@@ -71,7 +71,6 @@
                             </td>
                         </tr>
                         @endforeach
-                        @include('admin.forms.partials.ajax_formmodal')
                     </tbody>
                 </table>
             </div>
@@ -80,50 +79,11 @@
 
 </div>
 @endsection
-{{-- js --}}
+
 @push('scripts')
-
-
-
     <!-- Page level plugins -->
-    <script src="{{asset('vendor/datatables/jquery.dataTables.min.js')}}"></script>
-    <script src="{{asset('vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="{{asset('js/demo/datatables-demo.js')}}"></script>
-    <!-- include jQuery validate library -->
-    <!-- include Ajax  library -->
-    <script>
-        document.querySelector("html").classList.add('js');
-
-        // Chọn tất cả các input và xử lý theo nhóm
-        var fileInputs = document.querySelectorAll(".input-file");
-        var fileTriggers = document.querySelectorAll(".input-file-trigger");
-        var fileReturns = document.querySelectorAll(".file-return");
-
-        // Lặp qua từng nhóm input
-        fileInputs.forEach((fileInput, index) => {
-            var button = fileTriggers[index];
-            var the_return = fileReturns[index];
-
-            // Gắn sự kiện cho button
-            button.addEventListener("keydown", function(event) {
-                if (event.keyCode === 13 || event.keyCode === 32) {
-                    fileInput.focus();
-                }
-            });
-
-            button.addEventListener("click", function(event) {
-                fileInput.click(); // Thay vì focus(), sử dụng click() để mở file selector
-                event.preventDefault(); // Ngăn chặn hành vi mặc định
-            });
-
-            // Gắn sự kiện khi file được chọn
-            fileInput.addEventListener("change", function() {
-                the_return.innerHTML = this.value.split("\\").pop(); // Chỉ hiển thị tên file
-            });
-        });
-
-    </script>
-    
+    <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}?v={{ filemtime(public_path('vendor/datatables/jquery.dataTables.min.js')) }}"></script>
+    <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}?v={{ filemtime(public_path('vendor/datatables/dataTables.bootstrap4.min.js')) }}"></script>
+    <script src="{{ asset('js/admin/form-list.js') }}?v={{ filemtime(public_path('js/admin/form-list.js')) }}"></script>
+    @include('admin.forms.partials.ajax_formmodal')
 @endpush
