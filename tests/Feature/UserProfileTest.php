@@ -65,6 +65,8 @@ class UserProfileTest extends TestCase
             $table->string('name');
             $table->string('email')->unique();
             $table->string('user_ipcas')->nullable();
+            $table->string('employee_code')->nullable();
+            $table->string('citizen_id')->nullable();
             $table->string('phone_no')->nullable();
             $table->string('avatar_path')->nullable();
             $table->string('password');
@@ -114,17 +116,23 @@ class UserProfileTest extends TestCase
             ->assertSee('12 Nguyễn Huệ, Đồng Tháp')
             ->assertSee('0277 123 4567')
             ->assertSee('Phòng Khách hàng')
-            ->assertSee('PKH')
-            ->assertSee('Giao dịch viên');
+            ->assertSee('Giao dịch viên')
+            ->assertSee('Quyền và bảo mật')
+            ->assertSee('Vai trò đảm nhiệm')
+            ->assertSee('Trạng thái')
+            ->assertDontSee('Vai trò văn thư')
+            ->assertSee('Đổi mật khẩu');
     }
 
-    public function test_user_can_update_name_and_avatar_without_changing_protected_fields(): void
+    public function test_user_can_update_phone_citizen_id_and_avatar_without_changing_protected_fields(): void
     {
         $avatar = UploadedFile::fake()->image('avatar.jpg', 320, 320)->size(180);
 
         $response = $this->withSession($this->sessionData())->put('/profile', [
-            'name' => 'Nguyễn Văn B',
+            'name' => 'Nguyễn Văn B (Attempted)',
+            'employee_code' => 'NV-FORGED',
             'phone_no' => '0987654321',
+            'citizen_id' => '087095001234',
             'avatar' => $avatar,
             'branch_id' => 999,
             'role_id' => '1',
@@ -134,12 +142,12 @@ class UserProfileTest extends TestCase
 
         $response->assertRedirect(route('profile.show'))
             ->assertSessionHas('success')
-            ->assertSessionHas('user_name', 'Nguyễn Văn B')
             ->assertSessionHas('user_has_avatar', true);
 
         $user = User::findOrFail(4);
-        $this->assertSame('Nguyễn Văn B', $user->name);
+        $this->assertSame('Nguyễn Văn A', $user->name);
         $this->assertSame('0987654321', $user->phone_no);
+        $this->assertSame('087095001234', $user->citizen_id);
         $this->assertSame('a@example.test', $user->email);
         $this->assertSame(1, $user->branch_id);
         $this->assertSame('2', $user->role_id);
@@ -161,7 +169,6 @@ class UserProfileTest extends TestCase
         User::findOrFail(4)->update(['avatar_path' => $oldPath]);
 
         $this->withSession($this->sessionData())->put('/profile', [
-            'name' => 'Nguyễn Văn A',
             'avatar' => UploadedFile::fake()->image('new.png', 300, 300),
         ])->assertRedirect(route('profile.show'));
 
@@ -170,7 +177,6 @@ class UserProfileTest extends TestCase
         Storage::disk('local')->assertExists($newPath);
 
         $this->withSession($this->sessionData())->put('/profile', [
-            'name' => 'Nguyễn Văn A',
             'remove_avatar' => '1',
         ])->assertRedirect(route('profile.show'));
 
@@ -181,12 +187,10 @@ class UserProfileTest extends TestCase
     public function test_avatar_validation_rejects_non_image_and_oversized_files(): void
     {
         $this->withSession($this->sessionData())->put('/profile', [
-            'name' => 'Nguyễn Văn A',
             'avatar' => UploadedFile::fake()->create('avatar.jpg', 100, 'text/plain'),
         ])->assertSessionHasErrors('avatar');
 
         $this->withSession($this->sessionData())->put('/profile', [
-            'name' => 'Nguyễn Văn A',
             'avatar' => UploadedFile::fake()->image('large.jpg', 300, 300)->size(2100),
         ])->assertSessionHasErrors('avatar');
 
@@ -196,7 +200,6 @@ class UserProfileTest extends TestCase
     public function test_user_phone_no_validation_rejects_invalid_format(): void
     {
         $this->withSession($this->sessionData())->put('/profile', [
-            'name' => 'Nguyễn Văn A',
             'phone_no' => 'abc1234',
         ])->assertSessionHasErrors('phone_no');
     }
@@ -218,6 +221,31 @@ class UserProfileTest extends TestCase
 
         $this->assertTrue(Hash::check('new-secret', User::findOrFail(4)->password));
         $this->assertTrue(Hash::check('other-secret', User::findOrFail(5)->password));
+    }
+
+    public function test_user_profile_displays_assigned_roles_without_icons_and_includes_clerk_under_assigned_roles(): void
+    {
+        User::findOrFail(4)->update([
+            'role_id' => '2',
+            'document_role' => 'clerk',
+        ]);
+
+        $response = $this->withSession($this->sessionData())
+            ->get('/profile')
+            ->assertOk();
+
+        // Kiểm tra hiển thị cả Nhân viên và Văn thư chi nhánh trong Vai trò đảm nhiệm
+        $response->assertSee('Vai trò đảm nhiệm');
+        $response->assertSee('Nhân viên');
+        $response->assertSee('Văn thư chi nhánh');
+        $response->assertDontSee('Vai trò văn thư');
+
+        // Đảm bảo không có icon trong huy hiệu vai trò
+        $response->assertDontSee('fa-user-shield mr-1');
+        $response->assertDontSee('fa-user-check mr-1');
+        $response->assertDontSee('fa-file-signature mr-1');
+        $response->assertDontSee('fa-laptop-code mr-1');
+        $response->assertDontSee('fa-user-tie mr-1');
     }
 
     /** @return array<string, mixed> */

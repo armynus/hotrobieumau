@@ -154,7 +154,20 @@ if (! function_exists('auth_user_can')) {
             return false;
         }
 
-        // 1. If logged in as user, strictly check user's permissions
+        // 1. In Admin panel context: prioritize admin_id
+        if (app()->bound('request') && request()->is('admin*') && session()->has('admin_id')) {
+            $adminId = (int) session('admin_id');
+            $admin = \App\Models\User::find($adminId);
+            if ($admin) {
+                if ((int) $admin->role_id === 0 || $admin->hasRole('admin')) {
+                    return true;
+                }
+                return $admin->hasPermission($permission);
+            }
+            return false;
+        }
+
+        // 2. User session check (regular user portal)
         $userId = session('user_id');
         if ($userId) {
             $syncResult = \App\Models\User::syncSessionPermissionsIfNeeded($userId);
@@ -170,8 +183,13 @@ if (! function_exists('auth_user_can')) {
             return false;
         }
 
-        // 2. Pure Admin session (e.g. browsing admin panel without user session)
+        // 3. Fallback for pure admin session without user_id
         if (session()->has('admin_id')) {
+            $adminId = (int) session('admin_id');
+            $admin = \App\Models\User::find($adminId);
+            if ($admin) {
+                return (int) $admin->role_id === 0 || $admin->hasRole('admin') || $admin->hasPermission($permission);
+            }
             return true;
         }
 
@@ -185,6 +203,20 @@ if (! function_exists('auth_user_has_role')) {
      */
     function auth_user_has_role(string|array $role): bool
     {
+        $roleSlugs = (array) $role;
+
+        // In Admin panel context: prioritize admin_id
+        if (app()->bound('request') && request()->is('admin*') && session()->has('admin_id')) {
+            $adminId = (int) session('admin_id');
+            $admin = \App\Models\User::find($adminId);
+            if ($admin) {
+                if ((int) $admin->role_id === 0 && in_array('admin', $roleSlugs, true)) {
+                    return true;
+                }
+                return $admin->hasRole($roleSlugs);
+            }
+        }
+
         $userId = session('user_id');
         if ($userId) {
             $syncResult = \App\Models\User::syncSessionPermissionsIfNeeded($userId);
@@ -193,7 +225,6 @@ if (! function_exists('auth_user_has_role')) {
             }
 
             $sessionRoles = session('user_roles');
-            $roleSlugs = (array) $role;
             if (is_array($sessionRoles)) {
                 if (in_array('admin', $sessionRoles, true)) {
                     return true;
@@ -210,7 +241,7 @@ if (! function_exists('auth_user_has_role')) {
         }
 
         if (session()->has('admin_id')) {
-            return true;
+            return in_array('admin', $roleSlugs, true);
         }
 
         return false;
@@ -240,18 +271,18 @@ if (! function_exists('auth_user')) {
             }
         }
 
-        if (! \Illuminate\Support\Facades\Schema::hasTable('users')) {
+        if (! \App\Models\User::hasTable('users')) {
             return null;
         }
 
         $relations = [];
-        if (\Illuminate\Support\Facades\Schema::hasTable('branches')) {
+        if (\App\Models\User::hasTable('branches')) {
             $relations[] = 'branch';
         }
-        if (\Illuminate\Support\Facades\Schema::hasTable('positions')) {
+        if (\App\Models\User::hasTable('positions')) {
             $relations[] = 'position';
         }
-        if (\Illuminate\Support\Facades\Schema::hasTable('roles') && \Illuminate\Support\Facades\Schema::hasTable('user_role')) {
+        if (\App\Models\User::hasRoleTables()) {
             $relations[] = 'roles.permissions';
         }
 

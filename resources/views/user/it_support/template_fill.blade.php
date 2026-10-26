@@ -535,12 +535,25 @@
                                             if ($isPersonalPhone && empty($val)) {
                                                 $cleanPlaceholder = 'Chưa khai báo SĐT cá nhân trong hồ sơ';
                                             }
+                                            $isUppercase = ($field['data_type'] === 'uppercase') 
+                                                || (bool) preg_match('/(_HOA|HOA)$/i', $code) 
+                                                || str_contains(mb_strtolower($cleanFieldName, 'UTF-8'), 'in hoa') 
+                                                || str_contains(mb_strtolower($cleanFieldName, 'UTF-8'), 'viết hoa');
+                                            if ($isUppercase && !empty($val) && is_string($val)) {
+                                                $val = mb_strtoupper($val, 'UTF-8');
+                                            }
+                                            if ((empty($val) || $val === '') && ($field['data_type'] === 'date_text' || str_contains($code, 'NgayThangNam'))) {
+                                                $val = 'ngày ' . date('d') . ' tháng ' . date('m') . ' năm ' . date('Y');
+                                            }
                                         @endphp
 
                                         <div class="{{ $colClass }} it-field-group">
                                             <div class="it-field-label-wrapper">
                                                 <label class="it-field-label" for="input_{{ $code }}">
                                                     <span>{{ $cleanFieldName }}</span>
+                                                    @if($isUppercase)
+                                                        <span class="badge badge-light ml-1" style="font-size: 0.68rem; color: #a51c3e; border: 1px solid #fecdd3; background: #fff1f2;">IN HOA</span>
+                                                    @endif
                                                 </label>
                                                 @if($isAutoFilled)
                                                     <span class="it-autofill-tag" title="Thông tin này được lấy tự động từ tài khoản của bạn">
@@ -579,13 +592,14 @@
                                                            data-code="{{ $code }}"
                                                            data-default="{{ $val }}"
                                                            placeholder="{{ $cleanPlaceholder }}">
-                                                @elseif($field['data_type'] === 'uppercase')
+                                                @elseif($isUppercase)
                                                     <input type="text" 
                                                            id="input_{{ $code }}" 
                                                            name="{{ $code }}" 
-                                                           class="it-form-control it-field-input {{ $isAutoFilled ? 'it-form-control--autofilled' : '' }}" 
+                                                           class="it-form-control it-field-input text-uppercase {{ $isAutoFilled ? 'it-form-control--autofilled' : '' }}" 
                                                            value="{{ $val }}" 
                                                            data-code="{{ $code }}"
+                                                           data-type="uppercase"
                                                            data-default="{{ $val }}"
                                                            placeholder="{{ $cleanPlaceholder }}" 
                                                            style="text-transform: uppercase;">

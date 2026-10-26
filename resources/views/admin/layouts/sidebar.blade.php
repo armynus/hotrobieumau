@@ -2,10 +2,10 @@
 
     <!-- Sidebar - Brand -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{route('admin')}}">
-        <div class="sidebar-brand-icon ">
-            <img src="{{asset('hp-logo.png')}}" alt="Agribank" width="50" height="50">
+        <div class="sidebar-brand-icon">
+            <img src="{{asset('hp-logo.png')}}" alt="Agribank" width="40" height="40">
         </div>
-        <div class="sidebar-brand-text mx-3">QUẢN TRỊ<br><small>Hệ thống nội bộ</small></div>
+        <div class="sidebar-brand-text mx-2">CỔNG QUẢN TRỊ<br><small>Hệ thống nội bộ</small></div>
     </a>
 
     <!-- Divider -->
@@ -15,124 +15,172 @@
     <li class="nav-item {{ request()->routeIs('admin') ? 'active' : '' }}">
         <a class="nav-link" href="{{route('admin')}}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Thống kê</span></a>
+            <span>Trang tổng quan</span>
+        </a>
     </li>
+
+    <!-- Heading: Quản trị hệ thống -->
+    <div class="sidebar-heading">
+        QUẢN TRỊ HỆ THỐNG
+    </div>
+
+    <!-- Người dùng & Phân quyền -->
+    @php
+        $isUserRoleActive = request()->routeIs('admin_list_staff', 'admin_position_list', 'admin.roles.*');
+    @endphp
+    <li class="nav-item {{ $isUserRoleActive ? 'active' : '' }}">
+        <a class="nav-link {{ $isUserRoleActive ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseUserRoles"
+            aria-expanded="{{ $isUserRoleActive ? 'true' : 'false' }}" aria-controls="collapseUserRoles">
+            <i class="fas fa-fw fa-users-cog"></i>
+            <span>Người dùng & Quyền</span>
+        </a>
+        <div id="collapseUserRoles" class="collapse {{ $isUserRoleActive ? 'show' : '' }}" aria-labelledby="headingUserRoles" data-parent="#accordionSidebar">
+            <div class="collapse-inner sidebar-submenu">
+                <a class="collapse-item {{ request()->routeIs('admin_list_staff') ? 'active' : '' }}" href="{{route('admin_list_staff')}}">
+                    <i class="fas fa-users fa-fw mr-1"></i>
+                    <span>Danh sách tài khoản</span>
+                </a>
+                <a class="collapse-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}" href="{{route('admin.roles.index')}}">
+                    <i class="fas fa-user-shield fa-fw mr-1"></i>
+                    <span>Phân quyền hệ thống</span>
+                </a>
+                <a class="collapse-item {{ request()->routeIs('admin_position_list') ? 'active' : '' }}" href="{{route('admin_position_list')}}">
+                    <i class="fas fa-id-badge fa-fw mr-1"></i>
+                    <span>Danh mục chức vụ</span>
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <!-- Giám sát hệ thống (Gom chung Phiên đăng nhập & Nhật ký hoạt động) -->
+    @if(auth_user_can('system.sessions.view') || auth_user_can('system.audit_logs.view'))
+    @php
+        $isMonitoringActive = request()->routeIs('admin.sessions.*', 'admin.audit_logs.*');
+    @endphp
+    <li class="nav-item {{ $isMonitoringActive ? 'active' : '' }}">
+        <a class="nav-link {{ $isMonitoringActive ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseSystemMonitoring"
+            aria-expanded="{{ $isMonitoringActive ? 'true' : 'false' }}" aria-controls="collapseSystemMonitoring">
+            <i class="fas fa-fw fa-shield-alt"></i>
+            <span>Giám sát hệ thống</span>
+        </a>
+        <div id="collapseSystemMonitoring" class="collapse {{ $isMonitoringActive ? 'show' : '' }}" aria-labelledby="headingSystemMonitoring" data-parent="#accordionSidebar">
+            <div class="collapse-inner sidebar-submenu">
+                @permission('system.sessions.view')
+                <a class="collapse-item {{ request()->routeIs('admin.sessions.*') ? 'active' : '' }}" href="{{ route('admin.sessions.index') }}">
+                    <i class="fas fa-desktop fa-fw mr-1"></i>
+                    <span>Phiên đăng nhập</span>
+                </a>
+                @endpermission
+
+                @permission('system.audit_logs.view')
+                <a class="collapse-item {{ request()->routeIs('admin.audit_logs.*') ? 'active' : '' }}" href="{{ route('admin.audit_logs.index') }}">
+                    <i class="fas fa-history fa-fw mr-1"></i>
+                    <span>Nhật ký hoạt động</span>
+                </a>
+                @endpermission
+            </div>
+        </div>
+    </li>
+    @endif
 
     <!-- Divider -->
     <hr class="sidebar-divider">
 
-    <!-- Heading -->
+    <!-- Heading: Nghiệp vụ & Vận hành -->
     <div class="sidebar-heading">
-        CHỨC NĂNG
+        NGHIỆP VỤ & VẬN HÀNH
     </div>
-    <!-- Nav Item - Pages Collapse Menu -->
-    {{-- <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
-                    aria-expanded="true" aria-controls="collapsePages">
-                    <i class="fas fa-fw fa-folder"></i>
-                    <span>Tài liệu </span>
-                </a>
-                <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                   
-                        <a class="collapse-item" href="">Thống kê tài liệu</a>
-                        <a class="collapse-item" href="">Lịch sử đăng tải</a>
-                        
-                    </div>
-                </div>
-            </li> --}}
 
-    <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item {{ request()->routeIs('admin_list_staff', 'admin_position_list', 'admin.roles.*') ? 'active' : '' }}">
-        <a class="nav-link  {{ request()->routeIs('admin_list_staff', 'admin_position_list', 'admin.roles.*') ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseTwo"
-            aria-expanded="{{ request()->routeIs('admin_list_staff', 'admin_position_list', 'admin.roles.*') ? 'true' : 'false' }}" aria-controls="collapseTwo">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
-                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
-            </svg>
-            <span>Người dùng & Quyền</span>
-        </a>
-        <div id="collapseTwo" class="collapse {{ request()->routeIs('admin_list_staff', 'admin_position_list', 'admin.roles.*') ? 'show' : '' }}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item {{ request()->routeIs('admin_list_staff') ? 'active' : '' }}" href="{{route('admin_list_staff')}}">Danh sách tài khoản</a>
-                <a class="collapse-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}" href="{{route('admin.roles.index')}}">
-                    <i class="fas fa-shield-alt text-primary mr-1"></i>Phân quyền hệ thống
-                </a>
-                <a class="collapse-item {{ request()->routeIs('admin_position_list') ? 'active' : '' }}" href="{{route('admin_position_list')}}">Chức vụ</a>
-            </div>
-        </div>
-    </li>
-
-    <li class="nav-item {{ request()->routeIs('admin_branches', 'admin_transaction_offices', 'admin_department_list') ? 'active' : '' }}">
-        <a class="nav-link {{ request()->routeIs('admin_branches', 'admin_transaction_offices', 'admin_department_list') ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseBranch"
-            aria-expanded="{{ request()->routeIs('admin_branches', 'admin_transaction_offices', 'admin_department_list') ? 'true' : 'false' }}" aria-controls="collapseBranch">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bank2" viewBox="0 0 16 16">
-                <path d="M8.277.084a.5.5 0 0 0-.554 0l-7.5 5A.5.5 0 0 0 .5 6h1.875v7H1.5a.5.5 0 0 0 0 1h13a.5.5 0 1 0 0-1h-.875V6H15.5a.5.5 0 0 0 .277-.916zM12.375 6v7h-1.25V6zm-2.5 0v7h-1.25V6zm-2.5 0v7h-1.25V6zm-2.5 0v7h-1.25V6zM8 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2M.5 15a.5.5 0 0 0 0 1h15a.5.5 0 1 0 0-1z" />
-            </svg>
-            <span>Chi nhánh</span>
-        </a>
-        <div id="collapseBranch" class="collapse {{ request()->routeIs('admin_branches', 'admin_transaction_offices', 'admin_department_list') ? 'show' : '' }}" aria-labelledby="headingBranch" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-
-                <a class="collapse-item @active('admin_branches')" href="{{route('admin_branches')}}">Danh sách chi nhánh</a>
-                <a class="collapse-item @active('admin_department_list')" href="{{route('admin_department_list')}}">Phòng ban</a>
-                <a class="collapse-item @active('admin_transaction_offices')" href="{{route('admin_transaction_offices')}}">Phòng giao dịch</a>
-
-            </div>
-        </div>
-    </li>
-
+    <!-- Cơ cấu tổ chức (Chi nhánh & Đơn vị) -->
     @php
-    $isTransactionFormsActive = request()->routeIs('admin_forms') || (request()->routeIs('admin_form_fields') && request()->query('tab') !== 'it' && !request()->routeIs('admin.it_support.*'));
+        $isBranchActive = request()->routeIs('admin_branches', 'admin_transaction_offices', 'admin_department_list');
+    @endphp
+    <li class="nav-item {{ $isBranchActive ? 'active' : '' }}">
+        <a class="nav-link {{ $isBranchActive ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseBranch"
+            aria-expanded="{{ $isBranchActive ? 'true' : 'false' }}" aria-controls="collapseBranch">
+            <i class="fas fa-fw fa-university"></i>
+            <span>Cơ cấu tổ chức</span>
+        </a>
+        <div id="collapseBranch" class="collapse {{ $isBranchActive ? 'show' : '' }}" aria-labelledby="headingBranch" data-parent="#accordionSidebar">
+            <div class="collapse-inner sidebar-submenu">
+                <a class="collapse-item @active('admin_branches')" href="{{route('admin_branches')}}">
+                    <i class="fas fa-building fa-fw mr-1"></i>
+                    <span>Danh sách chi nhánh</span>
+                </a>
+                <a class="collapse-item @active('admin_department_list')" href="{{route('admin_department_list')}}">
+                    <i class="fas fa-sitemap fa-fw mr-1"></i>
+                    <span>Phòng ban chuyên môn</span>
+                </a>
+                <a class="collapse-item @active('admin_transaction_offices')" href="{{route('admin_transaction_offices')}}">
+                    <i class="fas fa-store-alt fa-fw mr-1"></i>
+                    <span>Phòng giao dịch</span>
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <!-- Biểu mẫu giao dịch -->
+    @php
+        $isTransactionFormsActive = request()->routeIs('admin_forms') || (request()->routeIs('admin_form_fields') && request()->query('tab') !== 'it' && !request()->routeIs('admin.it_support.*'));
     @endphp
     <li class="nav-item {{ $isTransactionFormsActive ? 'active' : '' }}" id="sidebar-item-forms">
         <a class="nav-link {{ $isTransactionFormsActive ? '' : 'collapsed' }}"
             href="#" data-toggle="collapse" data-target="#collapseForm"
             aria-expanded="{{ $isTransactionFormsActive ? 'true' : 'false' }}"
             aria-controls="collapseForm">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-journal-bookmark-fill" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M6 1h6v7a.5.5 0 0 1-.757.429L9 7.083 6.757 8.43A.5.5 0 0 1 6 8z" />
-                <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2" />
-                <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z" />
-            </svg>
+            <i class="fas fa-fw fa-file-invoice"></i>
             <span>Biểu mẫu giao dịch</span>
         </a>
         <div id="collapseForm"
             class="collapse {{ $isTransactionFormsActive ? 'show' : '' }}"
             data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
+            <div class="collapse-inner sidebar-submenu">
                 <a class="collapse-item {{ request()->routeIs('admin_forms') ? 'active' : '' }}"
-                    href="{{ route('admin_forms') }}">Danh sách biểu mẫu</a>
+                    href="{{ route('admin_forms') }}">
+                    <i class="fas fa-list-alt fa-fw mr-1"></i>
+                    <span>Danh sách biểu mẫu</span>
+                </a>
                 <a class="collapse-item {{ request()->routeIs('admin_form_fields') && request()->query('tab') !== 'it' && !request()->routeIs('admin.it_support.*') ? 'active' : '' }}"
                     id="sidebar-link-transaction-fields"
-                    href="{{ route('admin_form_fields') }}">Danh sách trường dữ liệu</a>
+                    href="{{ route('admin_form_fields') }}">
+                    <i class="fas fa-stream fa-fw mr-1"></i>
+                    <span>Trường dữ liệu</span>
+                </a>
             </div>
         </div>
     </li>
-    <li class="nav-item {{ request()->routeIs('admin_form_type', 'admin_sup_form_type') ? 'active' : '' }}">
-        <a class="nav-link {{ request()->routeIs('admin_form_type', 'admin_sup_form_type') ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseFormType"
-            aria-expanded="{{ request()->routeIs('admin_form_type', 'admin_sup_form_type') ? 'true' : 'false' }}"
+
+    <!-- Phân loại biểu mẫu -->
+    @php
+        $isFormTypeActive = request()->routeIs('admin_form_type', 'admin_sup_form_type');
+    @endphp
+    <li class="nav-item {{ $isFormTypeActive ? 'active' : '' }}">
+        <a class="nav-link {{ $isFormTypeActive ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseFormType"
+            aria-expanded="{{ $isFormTypeActive ? 'true' : 'false' }}"
             aria-controls="collapseFormType">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-ol" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5" />
-                <path d="M1.713 11.865v-.474H2c.217 0 .363-.137.363-.317 0-.185-.158-.31-.361-.31-.223 0-.367.152-.373.31h-.59c.016-.467.373-.787.986-.787.588-.002.954.291.957.703a.595.595 0 0 1-.492.594v.033a.615.615 0 0 1 .569.631c.003.533-.502.8-1.051.8-.656 0-1-.37-1.008-.794h.582c.008.178.186.306.422.309.254 0 .424-.145.422-.35-.002-.195-.155-.348-.414-.348h-.3zm-.004-4.699h-.604v-.035c0-.408.295-.844.958-.844.583 0 .96.326.96.756 0 .389-.257.617-.476.848l-.537.572v.03h1.054V9H1.143v-.395l.957-.99c.138-.142.293-.304.293-.508 0-.18-.147-.32-.342-.32a.33.33 0 0 0-.342.338zM2.564 5h-.635V2.924h-.031l-.598.42v-.567l.629-.443h.635z" />
-            </svg>
-            <span>Loại biểu mẫu</span>
+            <i class="fas fa-fw fa-layer-group"></i>
+            <span>Phân loại biểu mẫu</span>
         </a>
         <div id="collapseFormType" class="collapse @menuOpen('admin_form_type', 'admin_sup_form_type')"
             data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
+            <div class="collapse-inner sidebar-submenu">
                 <a class="collapse-item @active('admin_form_type')"
-                    href="{{route('admin_form_type')}}">Thể loại biểu mẫu</a>
+                    href="{{route('admin_form_type')}}">
+                    <i class="fas fa-folder fa-fw mr-1"></i>
+                    <span>Thể loại chính</span>
+                </a>
                 <a class="collapse-item @active('admin_sup_form_type')"
-                    href="{{route('admin_sup_form_type')}}">Thể loại phụ biểu mẫu</a>
+                    href="{{route('admin_sup_form_type')}}">
+                    <i class="fas fa-folder-open fa-fw mr-1"></i>
+                    <span>Thể loại phụ</span>
+                </a>
             </div>
         </div>
     </li>
 
-
-
+    <!-- Hỗ trợ & Yêu cầu IT -->
     @php
-    $isItSupportActive = request()->routeIs('admin.it_support.manage');
+        $isItSupportActive = request()->routeIs('admin.it_support.manage');
     @endphp
     <li class="nav-item {{ $isItSupportActive ? 'active' : '' }}" id="sidebar-item-it-support">
         <a class="nav-link {{ $isItSupportActive ? '' : 'collapsed' }}"
@@ -140,27 +188,37 @@
             aria-expanded="{{ $isItSupportActive ? 'true' : 'false' }}"
             aria-controls="collapseAdminItSupport">
             <i class="fas fa-fw fa-headset"></i>
-            <span>Yêu cầu IT</span>
+            <span>Hỗ trợ & Yêu cầu IT</span>
         </a>
         <div id="collapseAdminItSupport"
             class="collapse {{ $isItSupportActive ? 'show' : '' }}"
             data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
+            <div class="collapse-inner sidebar-submenu">
                 <a class="collapse-item {{ request()->routeIs('admin.it_support.manage') && in_array(request()->query('status'), [null, 'all'], true) ? 'active' : '' }}"
-                    href="{{ route('admin.it_support.manage') }}">Tất cả phiếu</a>
+                    href="{{ route('admin.it_support.manage') }}">
+                    <i class="fas fa-inbox fa-fw mr-1"></i>
+                    <span>Tất cả yêu cầu</span>
+                </a>
                 <a class="collapse-item {{ request()->routeIs('admin.it_support.manage') && request()->query('status') === 'processing' ? 'active' : '' }}"
-                    href="{{ route('admin.it_support.manage', ['status' => 'processing']) }}">Đang xử lý</a>
+                    href="{{ route('admin.it_support.manage', ['status' => 'processing']) }}">
+                    <i class="fas fa-spinner fa-fw mr-1"></i>
+                    <span>Đang xử lý</span>
+                </a>
                 <a class="collapse-item {{ request()->routeIs('admin.it_support.manage') && in_array(request()->query('status'), ['resolved', 'closed'], true) ? 'active' : '' }}"
-                    href="{{ route('admin.it_support.manage', ['status' => 'resolved']) }}">Phiếu đã xử lý</a>
+                    href="{{ route('admin.it_support.manage', ['status' => 'resolved']) }}">
+                    <i class="fas fa-check-circle fa-fw mr-1"></i>
+                    <span>Đã giải quyết</span>
+                </a>
             </div>
         </div>
     </li>
 
+    <!-- Biểu mẫu IT -->
     @php
     $isItTemplatesActive = request()->routeIs('admin.it_support.categories.*')
-    || request()->routeIs('admin.it_support.templates*')
-    || request()->routeIs('admin.it_support.form_fields.*')
-    || (request()->routeIs('admin_form_fields') && request()->query('tab') === 'it');
+        || request()->routeIs('admin.it_support.templates*')
+        || request()->routeIs('admin.it_support.form_fields.*')
+        || (request()->routeIs('admin_form_fields') && request()->query('tab') === 'it');
     @endphp
     <li class="nav-item {{ $isItTemplatesActive ? 'active' : '' }}" id="sidebar-item-it-templates">
         <a class="nav-link {{ $isItTemplatesActive ? '' : 'collapsed' }}"
@@ -168,27 +226,37 @@
             aria-expanded="{{ $isItTemplatesActive ? 'true' : 'false' }}"
             aria-controls="collapseAdminItTemplates">
             <i class="fas fa-fw fa-laptop-code"></i>
-            <span>Biểu Mẫu IT</span>
+            <span>Biểu mẫu IT</span>
         </a>
         <div id="collapseAdminItTemplates"
             class="collapse {{ $isItTemplatesActive ? 'show' : '' }}"
             data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
+            <div class="collapse-inner sidebar-submenu">
                 <a class="collapse-item {{ request()->routeIs('admin.it_support.categories.*') ? 'active' : '' }}"
-                    href="{{ route('admin.it_support.categories.index') }}">Danh mục Mẫu biểu</a>
+                    href="{{ route('admin.it_support.categories.index') }}">
+                    <i class="fas fa-folder fa-fw mr-1"></i>
+                    <span>Danh mục biểu mẫu</span>
+                </a>
                 <a class="collapse-item {{ request()->routeIs('admin.it_support.templates*') ? 'active' : '' }}"
-                    href="{{ route('admin.it_support.templates') }}">Quản lý Mẫu biểu</a>
+                    href="{{ route('admin.it_support.templates') }}">
+                    <i class="fas fa-file-code fa-fw mr-1"></i>
+                    <span>Quản lý biểu mẫu</span>
+                </a>
                 <a class="collapse-item {{ request()->routeIs('admin.it_support.form_fields.index') || (request()->routeIs('admin_form_fields') && request()->query('tab') === 'it') ? 'active' : '' }}"
                     id="sidebar-link-it-fields"
-                    href="{{ route('admin.it_support.form_fields.index') }}">Trường biểu mẫu IT</a>
+                    href="{{ route('admin.it_support.form_fields.index') }}">
+                    <i class="fas fa-code-branch fa-fw mr-1"></i>
+                    <span>Trường dữ liệu IT</span>
+                </a>
             </div>
         </div>
     </li>
 
+    <!-- Dữ liệu địa giới hành chính (Xã/Phường) -->
     <li class="nav-item {{ request()->routeIs('admin.geography.*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('admin.geography.index') }}">
             <i class="fas fa-fw fa-map-marked-alt" aria-hidden="true"></i>
-            <span>Dữ liệu xã/phường</span>
+            <span>Dữ liệu xã / phường</span>
         </a>
     </li>
 
@@ -197,9 +265,7 @@
 
     <!-- Sidebar Toggler (Sidebar) -->
     <div class="text-center d-none d-md-inline">
-        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        <button class="rounded-circle border-0" id="sidebarToggle" aria-label="Thu gọn hoặc mở rộng thanh điều hướng"></button>
     </div>
-
-
 
 </ul>

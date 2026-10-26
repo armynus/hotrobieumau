@@ -38,8 +38,11 @@ class SupportFormController extends Controller
         $request->validate([
             'form_name'       => 'required|string|max:255',
             'form_type'       => 'required|integer|exists:form_type,id',
-            'form_file'       => 'required|file|mimes:doc,docx|max:5120',
+            'form_file'       => 'required|file|extensions:doc,docx|max:5120',
             'selected_fields' => 'required|array|min:1',
+        ], [
+            'form_file.extensions' => 'File mẫu phải có định dạng .doc hoặc .docx.',
+            'form_file.mimes'      => 'File mẫu phải có định dạng .doc hoặc .docx.',
         ]);
         
         // Đảm bảo tên form chưa xài
@@ -106,8 +109,11 @@ class SupportFormController extends Controller
         $request->validate([
             'form_name'       => 'required|string|max:255',
             'form_type'       => 'required|integer|exists:form_type,id',
-            'form_file'       => 'nullable|file|mimes:doc,docx|max:5120',
+            'form_file'       => 'nullable|file|extensions:doc,docx|max:5120',
             'selected_fields' => 'required|array|min:1',
+        ], [
+            'form_file.extensions' => 'File mẫu phải có định dạng .doc hoặc .docx.',
+            'form_file.mimes'      => 'File mẫu phải có định dạng .doc hoặc .docx.',
         ]);
 
         $form    = SupportForm::findOrFail($id);
@@ -183,7 +189,10 @@ class SupportFormController extends Controller
     public function parse_tags(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:doc,docx|max:5120',
+            'file' => 'required|file|extensions:doc,docx|max:5120',
+        ], [
+            'file.extensions' => 'File mẫu phải có định dạng .docx hoặc .doc.',
+            'file.mimes'      => 'File mẫu phải có định dạng .docx hoặc .doc.',
         ]);
 
         try {

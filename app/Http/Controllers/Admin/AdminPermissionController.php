@@ -53,6 +53,7 @@ class AdminPermissionController extends Controller
         }
 
         Role::bumpPermissionsVersion();
+        Permission::clearActiveFeaturesCache();
 
         return response()->json([
             'status' => true,
@@ -121,6 +122,7 @@ class AdminPermissionController extends Controller
         $permission->update($updateData);
 
         \Illuminate\Support\Facades\Cache::forget('perm_active_' . $permission->slug);
+        Permission::clearActiveFeaturesCache();
         \App\Models\Role::bumpPermissionsVersion();
 
         return response()->json([
@@ -139,6 +141,7 @@ class AdminPermissionController extends Controller
         $permission->update(['status' => $newStatus]);
 
         \Illuminate\Support\Facades\Cache::forget('perm_active_' . $permission->slug);
+        Permission::clearActiveFeaturesCache();
         \App\Models\Role::bumpPermissionsVersion();
 
         $actionLabel = ($newStatus === 'active') ? 'Bật tính năng / quyền hạn' : 'Tắt tính năng / quyền hạn';
@@ -171,6 +174,7 @@ class AdminPermissionController extends Controller
         $permission->delete();
 
         \Illuminate\Support\Facades\Cache::forget('perm_active_' . $slug);
+        Permission::clearActiveFeaturesCache();
         \App\Models\Role::bumpPermissionsVersion();
 
         return response()->json([

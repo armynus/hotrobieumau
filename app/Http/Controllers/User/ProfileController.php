@@ -16,7 +16,11 @@ class ProfileController extends Controller
     public function show(Request $request)
     {
         $user = $this->currentUser();
-        $user->load(['branch.parent', 'transactionOffice', 'department', 'position']);
+        if (\Illuminate\Support\Facades\Schema::hasTable('roles') && \Illuminate\Support\Facades\Schema::hasTable('user_role')) {
+            $user->load(['branch.parent', 'transactionOffice', 'department', 'position', 'roles']);
+        } else {
+            $user->load(['branch.parent', 'transactionOffice', 'department', 'position']);
+        }
 
         // Nếu phone_no của user bị lưu nhầm trùng với branch_phone của Chi nhánh, dọn dẹp về null
         if ($user->phone_no && $user->branch?->branch_phone && $user->phone_no === $user->branch->branch_phone) {
@@ -52,10 +56,6 @@ class ProfileController extends Controller
         }
 
         try {
-            $user->name = $validated['name'];
-            if ($request->has('employee_code')) {
-                $user->employee_code = !empty($validated['employee_code']) ? trim($validated['employee_code']) : null;
-            }
             if ($request->has('citizen_id')) {
                 $user->citizen_id = !empty($validated['citizen_id']) ? trim($validated['citizen_id']) : null;
             }
@@ -81,8 +81,6 @@ class ProfileController extends Controller
             }
             if ($user->employee_code) {
                 $cached['MaNV'] = $user->employee_code;
-            } else {
-                unset($cached['MaNV'], $cached['MSNV']);
             }
             if ($user->phone_no) {
                 $cached['SoDienThoai'] = $user->phone_no;

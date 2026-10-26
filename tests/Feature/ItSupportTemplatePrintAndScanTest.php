@@ -182,9 +182,9 @@ class ItSupportTemplatePrintAndScanTest extends TestCase
         $response->assertSee('(${EmailNV})');
         $response->assertSee('(${TenChiNhanh})');
 
-        // ChiNhanhHOA và TenCanBoHOA không phải trường độc lập nên không có checkbox trong modal
-        $response->assertDontSee('(${ChiNhanhHOA})');
-        $response->assertDontSee('(${TenCanBoHOA})');
+        // ChiNhanhHOA và TenCanBoHOA là trường viết HOA chuẩn trong từ điển
+        $response->assertSee('(${ChiNhanhHOA})');
+        $response->assertSee('(${TenCanBoHOA})');
 
         // Đã xóa mô tả bên dưới danh mục IT trong modal admin
         $response->assertDontSee('category-desc-hint');
@@ -414,9 +414,9 @@ class ItSupportTemplatePrintAndScanTest extends TestCase
     {
         $this->withoutMiddleware();
 
-        // 1. Khẳng định ChiNhanhHOA và TenCanBoHOA không tồn tại độc lập trong danh mục trường
-        $this->assertNull(ItSupportFormField::where('field_code', 'ChiNhanhHOA')->first());
-        $this->assertNull(ItSupportFormField::where('field_code', 'TenCanBoHOA')->first());
+        // 1. Khẳng định ChiNhanhHOA và TenCanBoHOA có kiểu dữ liệu uppercase
+        $this->assertEquals('uppercase', ItSupportFormField::where('field_code', 'ChiNhanhHOA')->value('data_type'));
+        $this->assertEquals('uppercase', ItSupportFormField::where('field_code', 'TenCanBoHOA')->value('data_type'));
 
         $user = User::with('branch')->first();
         $template = ItSupportTemplate::firstOrCreate(
@@ -612,4 +612,72 @@ class ItSupportTemplatePrintAndScanTest extends TestCase
         $response->assertOk();
         $this->assertStringContainsString('attachment;', $response->headers->get('Content-Disposition') ?? '');
     }
+
+    public function test_parse_tags_accepts_docx_upload_even_when_mime_detected_as_zip(): void
+    {
+        $this->withoutMiddleware();
+        $this->withSession(['admin_id' => 1]);
+
+        $filePath = storage_path('app/dummy.docx');
+        if (!file_exists($filePath)) {
+            $files = glob(storage_path('app/public/it_support_templates/*.docx'));
+            $filePath = !empty($files) ? $files[0] : storage_path('app/test_chinhanhhoa.docx');
+        }
+
+        // Tạo file upload giả lập với mime application/zip (hành vi mặc định của PHP finfo trên Windows)
+        $uploadedFile = new \Illuminate\Http\UploadedFile(
+            $filePath,
+            'Mau-CSUS-01-Test.docx',
+            'application/zip',
+            null,
+            true
+        );
+
+        $response = $this->post(route('admin.it_support.templates.parse_tags'), [
+            'file' => $uploadedFile,
+        ]);
+
+        $response->assertOk();
+        $response->assertJson(['status' => true]);
+    }
+
+    public function test_export_converts_chinhanhhoa_to_uppercase_and_keeps_ngaythangnam_content(): void
+    {
+        $this->withoutMiddleware();
+
+        $supportService = app(\App\Services\SupportFormService::class);
+        $documentService = app(\App\Services\SupportFormDocumentService::class);
+
+        $templatePath = storage_path('app/test_chinhanhhoa.docx');
+        if (!file_exists($templatePath)) {
+            $phpWord = new \PhpOffice\PhpWord\PhpWord();
+            $section = $phpWord->addSection();
+            $section->addText('CHI NHÁNH ${ChiNhanhHOA}');
+            $section->addText('${DiaDanh}, ${NgayThangNam}');
+            $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+            $objWriter->save($templatePath);
+        }
+
+        $formData = [
+            'ChiNhanhHOA'  => 'Đồng Tháp',
+            'DiaDanh'      => 'Đồng Tháp',
+            'NgayThangNam' => 'ngày 19 tháng 10 năm 2026',
+        ];
+
+        $outputFilePath = $documentService->generate($templatePath, $formData);
+
+        $this->assertFileExists($outputFilePath);
+
+        $zip = new \ZipArchive();
+        $this->assertTrue($zip->open($outputFilePath));
+        $xml = $zip->getFromName('word/document.xml');
+        $zip->close();
+        @unlink($outputFilePath);
+
+        // Khẳng định ChiNhanhHOA được tự động chuyển thành IN HOA có dấu ĐỒNG THÁP
+        $this->assertStringContainsString('CHI NHÁNH ĐỒNG THÁP', $xml);
+        // Khẳng định NgayThangNam không bị rỗng và giữ nguyên nội dung ngày tháng năm
+        $this->assertStringContainsString('ngày 19 tháng 10 năm 2026', $xml);
+    }
 }
+

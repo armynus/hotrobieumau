@@ -115,9 +115,58 @@
 .profile-access-row span { display: block; margin-bottom: 3px; color: #738096; font-size: .7rem; }
 .profile-access-row strong { color: #29384f; font-size: .87rem; }
 
+.profile-access-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    gap: 14px;
+    align-items: center;
+}
+
+.profile-access-col {
+    padding: 12px 16px;
+    border: 1px solid #e7ebf2;
+    border-radius: 12px;
+    background: #f8fafd;
+    min-height: 72px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.profile-access-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #68758a;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.profile-access-value {
+    min-height: 26px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.profile-access-action {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.profile-access-action .btn {
+    white-space: nowrap;
+    border-radius: 10px;
+}
+
 @media (max-width: 991.98px) {
     .profile-layout { grid-template-columns: 1fr; }
     .profile-editor { position: static; }
+    .profile-access-grid { grid-template-columns: 1fr 1fr; }
+    .profile-access-action { grid-column: 1 / -1; justify-content: stretch; }
+    .profile-access-action .btn { width: 100%; }
 }
 
 @media (max-width: 575.98px) {
@@ -128,4 +177,5 @@
     .profile-info-grid .profile-info-wide { grid-column: auto; }
     .profile-access-row { grid-template-columns: 1fr; }
     .profile-access-row .btn { width: 100%; }
+    .profile-access-grid { grid-template-columns: 1fr; }
 }

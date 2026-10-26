@@ -11,6 +11,7 @@ use App\Models\SupportFormUsage;
 use App\Imports\AccountInfoImport;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
@@ -18,9 +19,16 @@ use Yajra\DataTables\Facades\DataTables;
 class UserController extends Controller
 {
     function index (){
-        $customer_count = CustomerInfo::count();
-        $account_count = AccountInfo::count();
-        $form_count = SupportForm::count();
+        $branchId = Session::get('UserBranchId');
+        $customer_count = $branchId ? Cache::remember("branch_{$branchId}_customer_count", 300, function () {
+            try { return CustomerInfo::count(); } catch (\Throwable $e) { return 0; }
+        }) : 0;
+        $account_count = $branchId ? Cache::remember("branch_{$branchId}_account_count", 300, function () {
+            try { return AccountInfo::count(); } catch (\Throwable $e) { return 0; }
+        }) : 0;
+        $form_count = Cache::remember('support_form_count', 3600, function () {
+            return SupportForm::count();
+        });
         $branch = Session::get('UserBranchName');
         $branch_code = Session::get('UserBranchCode');
         $userId = Session::get('user_id');

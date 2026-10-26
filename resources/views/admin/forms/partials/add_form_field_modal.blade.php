@@ -35,6 +35,7 @@
                     <select class="form-control" id="data_type" name="data_type">
                         <option value="" disabled selected>Chọn kiểu dữ liệu</option>
                         <option value="text">text</option>
+                        <option value="uppercase">uppercase (Chữ IN HOA có dấu)</option>
                         <option value="tel">tel</option>
                         <option value="date">date</option>
                         <option value="number">number</option>

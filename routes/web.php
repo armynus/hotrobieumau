@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\AdminTransactionOfficeController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\SupportFormController;
 use App\Http\Controllers\Admin\GeographyController;
+use App\Http\Controllers\Admin\AdminSessionController;
+use App\Http\Controllers\Admin\AdminActivityLogController;
 use App\Http\Controllers\User\GeographyLookupController;
 
 use App\Http\Controllers\Auth\LoginAdminController;
@@ -114,6 +116,45 @@ Route::group(['middleware' => ['admin']], function () {
     Route::put('admin/permissions/{permission}', [\App\Http\Controllers\Admin\AdminPermissionController::class, 'update'])->name('admin.permissions.update');
     Route::post('admin/permissions/{permission}/toggle-status', [\App\Http\Controllers\Admin\AdminPermissionController::class, 'toggleStatus'])->name('admin.permissions.toggle_status');
     Route::delete('admin/permissions/{permission}', [\App\Http\Controllers\Admin\AdminPermissionController::class, 'destroy'])->name('admin.permissions.destroy');
+
+    // Quản lý phiên đăng nhập (Login Sessions Management)
+    Route::get('admin/sessions', [AdminSessionController::class, 'index'])
+        ->middleware('permission:system.sessions.view')
+        ->name('admin.sessions.index');
+    Route::get('admin/sessions/data', [AdminSessionController::class, 'data'])
+        ->middleware('permission:system.sessions.view')
+        ->name('admin.sessions.data');
+    Route::get('admin/sessions/{id}', [AdminSessionController::class, 'show'])
+        ->whereNumber('id')
+        ->middleware('permission:system.sessions.view')
+        ->name('admin.sessions.show');
+    Route::post('admin/sessions/{id}/revoke', [AdminSessionController::class, 'revoke'])
+        ->whereNumber('id')
+        ->middleware('permission:system.sessions.manage')
+        ->name('admin.sessions.revoke');
+    Route::post('admin/sessions/revoke-all/{userId}', [AdminSessionController::class, 'revokeAll'])
+        ->whereNumber('userId')
+        ->middleware('permission:system.sessions.manage')
+        ->name('admin.sessions.revoke_all');
+    Route::delete('admin/sessions/{id}', [AdminSessionController::class, 'destroy'])
+        ->whereNumber('id')
+        ->middleware('permission:system.sessions.manage')
+        ->name('admin.sessions.destroy');
+    Route::post('admin/sessions/clean', [AdminSessionController::class, 'clean'])
+        ->middleware('permission:system.sessions.manage')
+        ->name('admin.sessions.clean');
+
+    // Nhật ký hoạt động người dùng (User Activity & Audit Logs)
+    Route::get('admin/audit-logs', [AdminActivityLogController::class, 'index'])
+        ->middleware('permission:system.audit_logs.view')
+        ->name('admin.audit_logs.index');
+    Route::get('admin/audit-logs/data', [AdminActivityLogController::class, 'data'])
+        ->middleware('permission:system.audit_logs.view')
+        ->name('admin.audit_logs.data');
+    Route::get('admin/audit-logs/{id}', [AdminActivityLogController::class, 'show'])
+        ->whereNumber('id')
+        ->middleware('permission:system.audit_logs.view')
+        ->name('admin.audit_logs.show');
 
     // Department Routes
     Route::get('admin_department_list', [AdminDepartmentController::class, 'index'])->name('admin_department_list');

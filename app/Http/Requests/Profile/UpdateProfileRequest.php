@@ -25,8 +25,6 @@ class UpdateProfileRequest extends FormRequest
         $userId = (int) session('user_id');
 
         return [
-            'name' => ['required', 'string', 'max:100'],
-            'employee_code' => ['nullable', 'string', 'max:50', Rule::unique('users', 'employee_code')->ignore($userId)],
             'citizen_id' => ['nullable', 'string', 'regex:/^\d{9,20}$/', Rule::unique('users', 'citizen_id')->ignore($userId)],
             'phone_no' => ['nullable', 'string', 'max:20', 'regex:/^[0-9+() ._-]{8,20}$/'],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048', 'dimensions:min_width=80,min_height=80,max_width=4000,max_height=4000'],
@@ -42,10 +40,6 @@ class UpdateProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Vui lòng nhập tên hiển thị.',
-            'name.max' => 'Tên hiển thị không được quá 100 ký tự.',
-            'employee_code.max' => 'Mã nhân viên không được quá 50 ký tự.',
-            'employee_code.unique' => 'Mã nhân viên này đã được sử dụng bởi tài khoản khác.',
             'citizen_id.regex' => 'Số CCCD phải gồm từ 9 đến 20 chữ số.',
             'citizen_id.unique' => 'Số CCCD này đã được sử dụng bởi tài khoản khác.',
             'phone_no.regex' => 'Số điện thoại không đúng định dạng.',

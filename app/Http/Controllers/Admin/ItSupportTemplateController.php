@@ -25,10 +25,11 @@ class ItSupportTemplateController extends Controller
     public function parse_tags(Request $request)
     {
         $request->validate([
-            'file'        => 'nullable|file|mimes:doc,docx|max:5120',
+            'file'        => 'nullable|file|extensions:doc,docx|max:5120',
             'template_id' => 'nullable|exists:it_support_templates,id',
         ], [
-            'file.mimes' => 'File mẫu phải có định dạng .docx hoặc .doc.',
+            'file.extensions' => 'File mẫu phải có định dạng .docx hoặc .doc.',
+            'file.mimes'      => 'File mẫu phải có định dạng .docx hoặc .doc.',
         ]);
 
         try {
@@ -181,13 +182,14 @@ class ItSupportTemplateController extends Controller
         $request->validate([
             'name'            => 'required|string|max:255|unique:it_support_templates,name',
             'category_id'     => 'nullable|exists:it_support_categories,id',
-            'form_file'       => 'required|file|mimes:doc,docx|max:5120',
+            'form_file'       => 'required|file|extensions:doc,docx|max:5120',
             'selected_fields' => 'nullable|array',
         ], [
             'name.required'        => 'Vui lòng nhập tên biểu mẫu IT.',
             'name.unique'          => 'Tên biểu mẫu IT đã tồn tại.',
             'category_id.exists'   => 'Danh mục đã chọn không hợp lệ.',
             'form_file.required'   => 'Vui lòng chọn file mẫu Word (.docx).',
+            'form_file.extensions' => 'File mẫu phải có định dạng .doc hoặc .docx.',
             'form_file.mimes'      => 'File mẫu phải có định dạng .doc hoặc .docx.',
         ]);
 
@@ -231,12 +233,14 @@ class ItSupportTemplateController extends Controller
         $request->validate([
             'name'            => 'required|string|max:255|unique:it_support_templates,name,' . $id,
             'category_id'     => 'nullable|exists:it_support_categories,id',
-            'form_file'       => 'nullable|file|mimes:doc,docx|max:5120',
+            'form_file'       => 'nullable|file|extensions:doc,docx|max:5120',
             'selected_fields' => 'nullable|array',
         ], [
-            'name.required'      => 'Vui lòng nhập tên biểu mẫu IT.',
-            'name.unique'        => 'Tên biểu mẫu IT đã tồn tại.',
-            'category_id.exists' => 'Danh mục đã chọn không hợp lệ.',
+            'name.required'        => 'Vui lòng nhập tên biểu mẫu IT.',
+            'name.unique'          => 'Tên biểu mẫu IT đã tồn tại.',
+            'category_id.exists'   => 'Danh mục đã chọn không hợp lệ.',
+            'form_file.extensions' => 'File mẫu phải có định dạng .doc hoặc .docx.',
+            'form_file.mimes'      => 'File mẫu phải có định dạng .doc hoặc .docx.',
         ]);
 
         if ($request->hasFile('form_file')) {

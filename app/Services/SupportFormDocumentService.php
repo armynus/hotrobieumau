@@ -150,6 +150,11 @@ class SupportFormDocumentService
                     $value = $this->supportformService->formatNumber($value) ?? ' ';
                 }
 
+                // Tự động viết HOA cho bất kỳ trường nào có hậu tố HOA hoặc _HOA
+                if (is_string($value) && preg_match('/(_HOA|HOA)$/i', $key)) {
+                    $value = mb_strtoupper($value, 'UTF-8');
+                }
+
                 // Gán giá trị cuối cùng cho placeholder có tên trùng với $key
                 // $templateProcessor->setValue($key, (string) ($value ?? ' '));
                 $templateProcessor->setValue(
@@ -157,16 +162,21 @@ class SupportFormDocumentService
                     $this->supportformService->wordSafe($value)
                 );
                 // Nếu có key chi nhánh, tự động gán các biến 'ChiNhanhHOA' và 'TenChiNhanhHOA' in hoa
-                if ($key === 'branch' || $key === 'TenChiNhanh' || $key === 'ChiNhanh') {
+                if (in_array($key, ['branch', 'TenChiNhanh', 'ChiNhanh', 'TenDonVi', 'DonVi', 'BranchName', 'ChiNhanhHOA', 'TenChiNhanhHOA'], true)) {
                     $upperBranch = (string) $this->supportformService->convertToUppercase($value) ?? ' ';
                     $templateProcessor->setValue('ChiNhanhHOA', $upperBranch);
                     $templateProcessor->setValue('TenChiNhanhHOA', $upperBranch);
+                    $templateProcessor->setValue('BranchNameHOA', $upperBranch);
+                    $templateProcessor->setValue('TenDonViHOA', $upperBranch);
+                    $templateProcessor->setValue('DonViHOA', $upperBranch);
                 }
                 // Nếu có key cán bộ, tự động gán biến 'TenCanBoHOA' in hoa
-                if ($key === 'TenCanBo' || $key === 'CanBoYeuCau' || $key === 'HoTen') {
+                if (in_array($key, ['TenCanBo', 'CanBoYeuCau', 'HoTen', 'Name', 'TenNV', 'TenCanBoHOA', 'HoTenHOA'], true)) {
                     $upperOfficer = (string) $this->supportformService->convertToUppercase($value) ?? ' ';
                     $templateProcessor->setValue('TenCanBoHOA', $upperOfficer);
                     $templateProcessor->setValue('HoTenHOA', $upperOfficer);
+                    $templateProcessor->setValue('CanBoYeuCauHOA', $upperOfficer);
+                    $templateProcessor->setValue('TenNVHOA', $upperOfficer);
                 }
                 // Nếu có key phòng ban/mã phòng, đồng bộ các placeholder phòng ban liên quan
                 if ($key === 'PhongBan' || $key === 'BoPhan' || $key === 'MaPhong' || $key === 'MaPhongBan') {
@@ -225,9 +235,53 @@ class SupportFormDocumentService
                 $templateProcessor->setValue('SDTChiNhanh', $safeAgencyPhone);
                 $templateProcessor->setValue('BranchPhone', $safeAgencyPhone);
             }
+
+            // Đảm bảo nếu template có biến ChiNhanhHOA / TenChiNhanhHOA mà chưa được gán, tự động lấy giá trị chi nhánh viết HOA
+            $branchVal = $formData['ChiNhanhHOA'] ?? $formData['TenChiNhanh'] ?? $formData['ChiNhanh'] ?? $formData['branch'] ?? $formData['BranchName'] ?? $formData['TenDonVi'] ?? $formData['DonVi'] ?? '';
+            if (empty($branchVal) && session()->has('UserBranchName')) {
+                $branchVal = (string) session('UserBranchName');
+            }
+            if (!empty($branchVal) && is_string($branchVal)) {
+                $upperBranch = mb_strtoupper($branchVal, 'UTF-8');
+                $templateProcessor->setValue('ChiNhanhHOA', $this->supportformService->wordSafe($upperBranch));
+                $templateProcessor->setValue('TenChiNhanhHOA', $this->supportformService->wordSafe($upperBranch));
+                $templateProcessor->setValue('BranchNameHOA', $this->supportformService->wordSafe($upperBranch));
+                $templateProcessor->setValue('TenDonViHOA', $this->supportformService->wordSafe($upperBranch));
+                $templateProcessor->setValue('DonViHOA', $this->supportformService->wordSafe($upperBranch));
+            }
+
+            // Đảm bảo nếu template có biến TenCanBoHOA / HoTenHOA mà chưa được gán, tự động lấy họ tên cán bộ viết HOA
+            $officerVal = $formData['TenCanBoHOA'] ?? $formData['TenCanBo'] ?? $formData['CanBoYeuCau'] ?? $formData['HoTen'] ?? $formData['Name'] ?? $formData['TenNV'] ?? '';
+            if (empty($officerVal) && session()->has('user_name')) {
+                $officerVal = (string) session('user_name');
+            }
+            if (!empty($officerVal) && is_string($officerVal)) {
+                $upperOfficer = mb_strtoupper($officerVal, 'UTF-8');
+                $templateProcessor->setValue('TenCanBoHOA', $this->supportformService->wordSafe($upperOfficer));
+                $templateProcessor->setValue('HoTenHOA', $this->supportformService->wordSafe($upperOfficer));
+                $templateProcessor->setValue('CanBoYeuCauHOA', $this->supportformService->wordSafe($upperOfficer));
+                $templateProcessor->setValue('TenNVHOA', $this->supportformService->wordSafe($upperOfficer));
+            }
+
+            // Đảm bảo nếu template có biến NgayThangNam mà chưa được gán, tự động gán ngày hiện tại bằng chữ
+            $ngayThangNamVal = $formData['NgayThangNam'] ?? $formData['NgayYeuCau'] ?? $formData['NgayLap'] ?? $formData['NgayGiaoDich'] ?? '';
+            $formattedNgayThangNam = $this->supportformService->convertDateNowFormat($ngayThangNamVal);
+            if (empty($formattedNgayThangNam)) {
+                $formattedNgayThangNam = 'ngày ' . date('d') . ' tháng ' . date('m') . ' năm ' . date('Y');
+            }
+            $templateProcessor->setValue('NgayThangNam', $this->supportformService->wordSafe($formattedNgayThangNam));
+
             // Thay thế toàn bộ các placeholder còn lại trong mẫu bằng chuỗi rỗng để không để sót chuỗi ${...}
             $remainingVariables = $templateProcessor->getVariables();
             foreach ($remainingVariables as $remainingVar) {
+                // Nếu là biến có hậu tố HOA, thử tra cứu biến gốc trong formData
+                if (preg_match('/(_HOA|HOA)$/i', $remainingVar)) {
+                    $baseKey = preg_replace('/(_HOA|HOA)$/i', '', $remainingVar);
+                    if (!empty($formData[$baseKey]) && is_string($formData[$baseKey])) {
+                        $templateProcessor->setValue($remainingVar, $this->supportformService->wordSafe(mb_strtoupper($formData[$baseKey], 'UTF-8')));
+                        continue;
+                    }
+                }
                 $templateProcessor->setValue($remainingVar, '');
             }
 

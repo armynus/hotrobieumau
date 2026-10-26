@@ -47,7 +47,12 @@ class AdminFormFieldController extends Controller
             'display_order.integer' => 'Thứ tự hiển thị phải là số nguyên.',
         ]);
 
-        $formField = FormField::create($request->only(['field_name', 'field_code', 'placeholder', 'data_type', 'value', 'content_group', 'display_order']));
+        $data = $request->only(['field_name', 'field_code', 'placeholder', 'data_type', 'value', 'content_group', 'display_order']);
+        if (preg_match('/(_HOA|HOA)$/i', $data['field_code']) || str_contains(mb_strtolower($data['field_name'], 'UTF-8'), 'in hoa') || str_contains(mb_strtolower($data['field_name'], 'UTF-8'), 'viết hoa')) {
+            $data['data_type'] = 'uppercase';
+        }
+
+        $formField = FormField::create($data);
 
         return response()->json([
             'status' => true,
@@ -112,7 +117,11 @@ class AdminFormFieldController extends Controller
             $newCode = $request->field_code;
             
             // Cập nhật dữ liệu
-            $formField->update($request->only(['field_name', 'field_code', 'placeholder', 'data_type', 'value', 'content_group', 'display_order']));
+            $data = $request->only(['field_name', 'field_code', 'placeholder', 'data_type', 'value', 'content_group', 'display_order']);
+            if (preg_match('/(_HOA|HOA)$/i', $data['field_code']) || str_contains(mb_strtolower($data['field_name'], 'UTF-8'), 'in hoa') || str_contains(mb_strtolower($data['field_name'], 'UTF-8'), 'viết hoa')) {
+                $data['data_type'] = 'uppercase';
+            }
+            $formField->update($data);
 
             // Nếu mã trường thay đổi, tự động đồng bộ cập nhật trong tất cả các biểu mẫu giao dịch đang sử dụng mã cũ
             if ($oldCode && $newCode && $oldCode !== $newCode) {

@@ -17,11 +17,15 @@ class CheckPermission
      */
     public function handle(Request $request, Closure $next, ...$permissions): Response
     {
-        // 1. Admin login session has full access ONLY when there is no user session active
-        // (i.e. acting as pure admin). When logged in as a user, strictly check user permissions!
         $userId = $request->hasSession() ? $request->session()->get('user_id') : null;
-        if ($request->hasSession() && $request->session()->has('admin_id') && ! $userId) {
-            return $next($request);
+
+        // 1. Admin login session in Admin routes or pure admin session
+        if ($request->hasSession() && $request->session()->has('admin_id') && ($request->is('admin*') || ! $userId)) {
+            $adminId = (int) $request->session()->get('admin_id');
+            $admin = User::find($adminId);
+            if ($admin && ((int) $admin->role_id === 0 || $admin->hasRole('admin'))) {
+                return $next($request);
+            }
         }
 
         // 2. User login session

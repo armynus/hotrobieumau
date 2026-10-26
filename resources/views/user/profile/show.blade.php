@@ -19,14 +19,10 @@
         <div>
             <p class="profile-eyebrow">TÀI KHOẢN CỦA TÔI</p>
             <h1>Thông tin cá nhân</h1>
-            <p>Kiểm tra thông tin tài khoản và cập nhật thông tin cá nhân, mã nhân viên, số điện thoại, số CCCD hoặc ảnh đại diện.</p>
+            <p>Kiểm tra thông tin tài khoản và cập nhật số điện thoại liên hệ, số CCCD hoặc ảnh đại diện.</p>
         </div>
         <a class="btn btn-light" href="{{ route('index') }}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Về trang chủ</a>
     </header>
-
-    @if(session('success'))
-        <div class="alert alert-success profile-alert" role="status"><i class="fas fa-check-circle" aria-hidden="true"></i>{{ session('success') }}</div>
-    @endif
 
     @if($errors->any())
         <div class="alert alert-danger profile-alert" role="alert">
@@ -58,24 +54,6 @@
                 <p class="profile-help" id="avatarHelp">JPG, PNG hoặc WebP; tối đa 2 MB. Nên dùng ảnh vuông từ 300×300 px.</p>
 
                 <div class="form-group text-left">
-                    <label for="name">Tên hiển thị</label>
-                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" maxlength="100" value="{{ old('name', $user->name) }}" required autocomplete="name">
-                    @error('name')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                    <small class="form-text text-muted">Tên này hiển thị trên thanh điều hướng và trong các chức năng nghiệp vụ.</small>
-                </div>
-
-                <div class="form-group text-left">
-                    <label for="employee_code">Mã nhân viên</label>
-                    <input type="text" class="form-control @error('employee_code') is-invalid @enderror" id="employee_code" name="employee_code" maxlength="50" value="{{ old('employee_code', $user->employee_code) }}" placeholder="Ví dụ: NV-6500-089">
-                    @error('employee_code')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                    <small class="form-text text-muted">Dùng để tự động điền vào các phiếu yêu cầu IT.</small>
-                </div>
-
-                <div class="form-group text-left">
                     <label for="phone_no">Số điện thoại liên hệ</label>
                     <input type="tel" class="form-control @error('phone_no') is-invalid @enderror" id="phone_no" name="phone_no" maxlength="20" value="{{ old('phone_no', $user->phone_no) }}" placeholder="Ví dụ: 0912345678" autocomplete="tel">
                     @error('phone_no')
@@ -101,6 +79,7 @@
             <section class="card profile-card" aria-labelledby="accountInfoTitle">
                 <div class="profile-card-header"><div class="profile-card-icon profile-card-icon--blue"><i class="fas fa-id-card" aria-hidden="true"></i></div><div><h2 id="accountInfoTitle">Thông tin tài khoản</h2><p>Dữ liệu nhận diện và trạng thái đăng nhập.</p></div></div>
                 <dl class="profile-info-grid">
+                    <div><dt>Họ và tên</dt><dd>{{ $user->name }}</dd></div>
                     <div><dt>Mã nhân viên</dt><dd>{{ $user->employee_code ?: 'Chưa cập nhật' }}</dd></div>
                     <div><dt>Số điện thoại</dt><dd>{{ $user->phone_no ?: 'Chưa cập nhật' }}</dd></div>
                     <div><dt>Số CCCD / CMND</dt><dd>{{ $user->citizen_id ?: 'Chưa cập nhật' }}</dd></div>
@@ -109,7 +88,7 @@
                     <div><dt>Trạng thái</dt><dd><span class="profile-badge {{ $user->status === 'active' ? 'profile-badge--success' : 'profile-badge--muted' }}">{{ $user->status === 'active' ? 'Đang hoạt động' : 'Tạm khóa' }}</span></dd></div>
                     <div><dt>Ngày tạo tài khoản</dt><dd>{{ optional($user->created_at)->format('d/m/Y') ?: '—' }}</dd></div>
                 </dl>
-                <p class="profile-note"><i class="fas fa-info-circle" aria-hidden="true"></i>Email đăng nhập và mã IPCAS do quản trị viên quản lý. Bạn có thể tự cập nhật Họ tên, Mã nhân viên, Số điện thoại và Số CCCD để hệ thống tự động điền các biểu mẫu.</p>
+                <p class="profile-note"><i class="fas fa-info-circle" aria-hidden="true"></i>Họ tên, mã nhân viên, email và mã IPCAS do quản trị viên quản lý. Bạn có thể tự cập nhật Số điện thoại liên hệ và Số CCCD/CMND để hệ thống tự động điền các biểu mẫu.</p>
             </section>
 
             <section class="card profile-card" aria-labelledby="organizationInfoTitle">
@@ -134,11 +113,76 @@
             </section>
 
             <section class="card profile-card profile-access" aria-labelledby="accessInfoTitle">
-                <div class="profile-card-header"><div class="profile-card-icon profile-card-icon--amber"><i class="fas fa-shield-alt" aria-hidden="true"></i></div><div><h2 id="accessInfoTitle">Quyền và bảo mật</h2><p>Quyền hệ thống chỉ có thể thay đổi bởi quản trị viên.</p></div></div>
-                <div class="profile-access-row">
-                    <div><span>Quyền hệ thống</span><strong>{{ $systemRole }}</strong></div>
-                    <div><span>Vai trò văn thư</span><strong>{{ $documentRole }}</strong></div>
-                    <a class="btn btn-outline-primary" href="{{ route('change_password_user', $user->id) }}"><i class="fas fa-key" aria-hidden="true"></i> Đổi mật khẩu</a>
+                <div class="profile-card-header"><div class="profile-card-icon profile-card-icon--amber"><i class="fas fa-shield-alt" aria-hidden="true"></i></div><div><h2 id="accessInfoTitle">Quyền và bảo mật</h2><p>Quyền hạn và vai trò hệ thống được quản trị viên thiết lập theo vị trí công tác.</p></div></div>
+                <div class="profile-access-grid">
+                    <!-- Vai trò đảm nhiệm (RBAC + Văn thư hợp nhất) -->
+                    <div class="profile-access-col">
+                        <span class="profile-access-label"><i class="fas fa-user-tag text-primary mr-1"></i> Vai trò đảm nhiệm</span>
+                        <div class="profile-access-value">
+                            @php
+                                $rolesList = ($user->relationLoaded('roles') 
+                                    ? $user->roles 
+                                    : (\Illuminate\Support\Facades\Schema::hasTable('roles') && \Illuminate\Support\Facades\Schema::hasTable('user_role') ? $user->roles()->get() : collect()));
+
+                                if ($rolesList->isEmpty()) {
+                                    $primaryRoleName = match((int) ($user->role_id ?? 2)) {
+                                        0 => 'Quản trị viên Hệ thống',
+                                        1 => 'Kiểm soát viên',
+                                        default => 'Nhân viên nghiệp vụ',
+                                    };
+                                    $primaryRoleSlug = match((int) ($user->role_id ?? 2)) {
+                                        0 => 'admin',
+                                        1 => 'supervisor',
+                                        default => 'staff',
+                                    };
+                                    $rolesList = collect([
+                                        (object) ['name' => $primaryRoleName, 'slug' => $primaryRoleSlug]
+                                    ]);
+                                }
+
+                                if (($user->document_role ?? '') === 'clerk' && !$rolesList->contains(fn($r) => ($r->slug ?? '') === 'clerk')) {
+                                    $rolesList = $rolesList->concat([
+                                        (object) ['name' => 'Văn thư chi nhánh', 'slug' => 'clerk']
+                                    ]);
+                                }
+                            @endphp
+                            @foreach($rolesList as $role)
+                                @php
+                                    $slug = $role->slug ?? '';
+                                    $badgeClass = match($slug) {
+                                        'admin' => 'badge-primary',
+                                        'supervisor' => 'badge-warning text-dark',
+                                        'clerk' => 'badge-info',
+                                        'it_admin' => 'badge-dark',
+                                        'leader' => 'badge-secondary',
+                                        default => 'badge-light border text-dark',
+                                    };
+                                @endphp
+                                <span class="badge {{ $badgeClass }} px-2.5 py-1.5 mr-1 mb-1 font-weight-bold" style="font-size: 0.82rem;" title="Vai trò {{ $role->name }}">
+                                    {{ $role->name }}
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Trạng thái tài khoản -->
+                    <div class="profile-access-col">
+                        <span class="profile-access-label"><i class="fas fa-shield-alt text-success mr-1"></i> Trạng thái</span>
+                        <div class="profile-access-value">
+                            @if(($user->status ?? 'active') === 'active')
+                                <span class="badge badge-success px-2 py-1 font-weight-bold" style="font-size: 0.8rem;"><i class="fas fa-check-circle mr-1"></i> Đang hoạt động</span>
+                            @else
+                                <span class="badge badge-secondary px-2 py-1 font-weight-bold" style="font-size: 0.8rem;"><i class="fas fa-lock mr-1"></i> Đã bị khóa</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Đổi mật khẩu -->
+                    <div class="profile-access-action">
+                        <a class="btn btn-outline-primary font-weight-bold px-3 py-2" href="{{ route('change_password_user', $user->id) }}">
+                            <i class="fas fa-key mr-1" aria-hidden="true"></i> Đổi mật khẩu
+                        </a>
+                    </div>
                 </div>
             </section>
         </div>

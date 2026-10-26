@@ -1,9 +1,11 @@
-@include('shared.jquery-ui')
-
 <style>
 /* ========================================================
    AUTOCOMPLETE DROPDOWN & SEARCH ENHANCEMENTS
    ======================================================== */
+.navbar-search {
+    position: relative !important;
+}
+
 .ui-autocomplete {
     max-height: 420px;
     overflow-y: auto;

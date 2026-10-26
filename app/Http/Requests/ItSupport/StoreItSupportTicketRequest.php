@@ -27,7 +27,7 @@ class StoreItSupportTicketRequest extends FormRequest
             'contact_phone' => 'nullable|string|max:20',
             'category' => 'nullable|in:Phần cứng,Phần mềm,Mạng,Khác',
             'attachments' => 'nullable|array|max:5',
-            'attachments.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:20480',
+            'attachments.*' => 'file|extensions:pdf,doc,docx,jpg,jpeg,png|max:20480',
             'auto_attachment' => 'nullable|string',
             'auto_attachment_name' => 'nullable|string|max:255',
         ];
@@ -50,6 +50,7 @@ class StoreItSupportTicketRequest extends FormRequest
             'category.in' => 'Danh mục sự cố không hợp lệ.',
             'attachments.max' => 'Chỉ được đính kèm tối đa 5 tệp tin.',
             'attachments.*.file' => 'Tệp đính kèm không hợp lệ.',
+            'attachments.*.extensions' => 'Định dạng tệp đính kèm không hỗ trợ (chỉ nhận PDF, DOC, DOCX, JPG, JPEG, PNG).',
             'attachments.*.mimes' => 'Định dạng tệp đính kèm không hỗ trợ (chỉ nhận PDF, DOC, DOCX, JPG, JPEG, PNG).',
             'attachments.*.max' => 'Dung lượng mỗi tệp đính kèm không vượt quá 20MB.',
         ];

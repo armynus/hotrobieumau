@@ -32,6 +32,8 @@ class LoginUserController extends Controller
                 // Đăng nhập thành công, đặt lại số lần đăng nhập sai về 0
                 $result->failed_login_attempts = 0;
                 $result->save();
+
+                $request->session()->regenerate();
                 
                 $branch = Branches::where('id', $result->branch_id)->first();          
                 $userVersion = \App\Models\User::userPermissionsVersion($result->id);
@@ -48,50 +50,53 @@ class LoginUserController extends Controller
                 $request->session()->put('user_has_avatar', (bool) $result->avatar_path);
                 $request->session()->put('user_avatar_version', optional($result->updated_at)->timestamp ?? time());
                 $request->session()->put('UserBranchId', $result->branch_id);
-                $request->session()->put('UserBranchCode', $branch->branch_code);
-                $request->session()->put('UserBranchName', $branch->branch_name);
-                $request->session()->put('UserBranchAddr', $branch->branch_addr);
-                $request->session()->put('UserBranchPhone', $branch->branch_phone);
-                $request->session()->put('UserBranchFax', $branch->branch_fax);
-                $request->session()->put('UserBranchPlace', $branch->branch_place);
+                $request->session()->put('UserBranchCode', optional($branch)->branch_code);
+                $request->session()->put('UserBranchName', optional($branch)->branch_name);
+                $request->session()->put('UserBranchAddr', optional($branch)->branch_addr);
+                $request->session()->put('UserBranchPhone', optional($branch)->branch_phone);
+                $request->session()->put('UserBranchFax', optional($branch)->branch_fax);
+                $request->session()->put('UserBranchPlace', optional($branch)->branch_place);
+
+                // Ghi nhận phiên đăng nhập của người dùng (phục vụ ADMIN quản lý phiên)
+                \App\Services\SessionTrackingService::recordLogin($result, $request, 'user');
+
                 return redirect()->route('index');
             } else {
                 // Đăng nhập thất bại, tăng số lần đăng nhập sai
                 $result->failed_login_attempts = ($result->failed_login_attempts ?? 0) + 1;
                 
-                // Kiểm tra nếu đã sai 5 lần, khóa tài khoản
+                // Kiểm tra nếu đã sai 5 lần, khóa tài khoản và ghi 1 sự kiện bảo mật duy nhất
                 if ($result->failed_login_attempts >= 5) {
                     $result->status = 'inactive';
                     $result->save();
+
+                    \App\Services\ActivityLogService::logAuth('auth.account.locked', $result, $request, 'Tài khoản người dùng bị tự động khóa do nhập sai mật khẩu 5 lần', [
+                        'failed_attempts' => $result->failed_login_attempts,
+                    ], 'failed');
+
                     return redirect()->route('login')->with('error', 'Tài khoản đã bị khóa do đăng nhập sai quá 5 lần');
                 }
                 
                 $result->save();
+
                 return redirect()->route('login')->with('error', 'Email hoặc mật khẩu không đúng! Còn ' . (5 - $result->failed_login_attempts) . ' lần thử');
             }
         } else {
             return redirect()->route('login')->with('error', 'Email hoặc mật khẩu không đúng!');
         }
     }
-    function logout( ){
-        Session::forget('user_id');
-        Session::forget('user_name');
-        Session::forget('user_email');
-        Session::forget('user_role');
-        Session::forget('user_document_role');
-        Session::forget('user_permissions');
-        Session::forget('user_permissions_version');
-        Session::forget('user_individual_version');
-        Session::forget('user_roles');
-        Session::forget('user_has_avatar');
-        Session::forget('user_avatar_version');
-        Session::forget('UserBranchId');
-        Session::forget('UserBranchCode');
-        Session::forget('UserBranchName');
-        Session::forget('UserBranchAddr');
-        Session::forget('UserBranchPhone');
-        Session::forget('UserBranchFax');
-        Session::forget('UserBranchPlace');
+    function logout(Request $request){
+        $sessionId = $request->session()->getId();
+        $userId = $request->session()->get('user_id');
+
+        if ($sessionId) {
+            \App\Services\SessionTrackingService::recordLogout($sessionId, $userId);
+        }
+
+        $request->session()->flush();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect()->route('login');
     }
     function change_password_user($user_id){
@@ -119,11 +124,17 @@ class LoginUserController extends Controller
         $user = User::findOrFail((int) Session::get('user_id'));
 
         if (! Hash::check($validated['old_password'], $user->password)) {
+            \App\Services\ActivityLogService::logAuth('auth.password.change', $user, $request, 'Đổi mật khẩu thất bại: Mật khẩu hiện tại không đúng', [], 'failed');
             return redirect()->back()->with('error', 'Mật khẩu hiện tại không đúng');
         }
 
         $user->password = Hash::make($validated['password']);
+        if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'password_changed_at')) {
+            $user->password_changed_at = now();
+        }
         $user->save();
+
+        \App\Services\ActivityLogService::logAuth('auth.password.change', $user, $request, 'Người dùng đổi mật khẩu thành công');
 
         return redirect()->back()->with('message', 'Đổi mật khẩu thành công');
     }

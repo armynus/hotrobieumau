@@ -59,13 +59,19 @@ class AdminUserController extends Controller
         $users->leftJoin('branches', 'users.branch_id', '=', 'branches.id')
             ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
             ->leftJoin('transaction_offices', 'users.transaction_office_id', '=', 'transaction_offices.id')
-            ->leftJoin('positions', 'users.position_id', '=', 'positions.id')
-            ->select([
-                'users.id', 'users.name', 'users.citizen_id', 'users.employee_code',
-                'users.email', 'users.phone_no', 'users.user_ipcas', 'users.role_id',
-                'users.document_role', 'users.status', 'users.failed_login_attempts', 'users.created_at', 'users.updated_at',
-                'branches.branch_name', 'departments.department_name', 'transaction_offices.office_name as transaction_office_name', 'positions.position_name',
-            ])
+            ->leftJoin('positions', 'users.position_id', '=', 'positions.id');
+
+        $selects = [
+            'users.id', 'users.name', 'users.citizen_id', 'users.employee_code',
+            'users.email', 'users.phone_no', 'users.user_ipcas', 'users.role_id',
+            'users.document_role', 'users.status', 'users.failed_login_attempts', 'users.created_at', 'users.updated_at',
+            'branches.branch_name', 'departments.department_name', 'transaction_offices.office_name as transaction_office_name', 'positions.position_name',
+        ];
+        if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'password_changed_at')) {
+            $selects[] = 'users.password_changed_at';
+        }
+
+        $users->select($selects)
             ->whereNotNull('users.role_id');
 
         if ($request->filled('branch_id')) {
@@ -170,6 +176,16 @@ class AdminUserController extends Controller
         \App\Models\User::bumpUserPermissionsVersion($user->id);
         \App\Models\Role::bumpPermissionsVersion();
 
+        \App\Services\ActivityLogService::logBusiness(
+            'users',
+            'user.create',
+            'User',
+            (string) $user->id,
+            $user->name . ' (' . $user->email . ')',
+            "Tạo mới tài khoản nhân viên: {$user->name} ({$user->email})",
+            ['user_id' => $user->id, 'email' => $user->email, 'branch_id' => $user->branch_id, 'department_id' => $user->department_id]
+        );
+
         if (\Illuminate\Support\Facades\Schema::hasTable('roles')) {
             $user->load('roles');
         }
@@ -183,16 +199,21 @@ class AdminUserController extends Controller
 
     public function edit(Request $request)
     {
+        $editSelects = [
+            'id', 'name', 'citizen_id', 'employee_code', 'email', 'phone_no', 'user_ipcas',
+            'branch_id', 'role_id', 'department_id', 'transaction_office_id',
+            'position_id', 'document_role', 'status', 'failed_login_attempts', 'created_at', 'updated_at',
+        ];
+        if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'password_changed_at')) {
+            $editSelects[] = 'password_changed_at';
+        }
+
         $user = User::query()
             ->where(function ($q) {
                 $q->where('role_id', '!=', 0)
                   ->orWhere('id', Session::get('admin_id'));
             })
-            ->select([
-                'id', 'name', 'citizen_id', 'employee_code', 'email', 'phone_no', 'user_ipcas',
-                'branch_id', 'role_id', 'department_id', 'transaction_office_id',
-                'position_id', 'document_role', 'status', 'failed_login_attempts', 'created_at', 'updated_at',
-            ])
+            ->select($editSelects)
             ->findOrFail($request->integer('user_id'));
 
         $roleIds = \Illuminate\Support\Facades\Schema::hasTable('user_role')
@@ -248,12 +269,25 @@ class AdminUserController extends Controller
 
         if ($password) {
             $user->password = Hash::make($password);
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'password_changed_at')) {
+                $user->password_changed_at = now();
+            }
         }
 
         $user->save();
         $this->syncUserRoles($user, $request);
         \App\Models\User::bumpUserPermissionsVersion($user->id);
         \App\Models\Role::bumpPermissionsVersion();
+
+        \App\Services\ActivityLogService::logBusiness(
+            'users',
+            'user.update',
+            'User',
+            (string) $user->id,
+            $user->name . ' (' . $user->email . ')',
+            "Cập nhật hồ sơ tài khoản nhân viên: {$user->name}",
+            ['user_id' => $user->id, 'email' => $user->email, 'branch_id' => $user->branch_id]
+        );
 
         $userFresh = $user->fresh();
         if (\Illuminate\Support\Facades\Schema::hasTable('roles')) {
@@ -281,6 +315,19 @@ class AdminUserController extends Controller
             \App\Models\User::bumpUserPermissionsVersion((int) $request->user_id);
             \App\Models\Role::bumpPermissionsVersion();
 
+            // Tự động thu hồi toàn bộ phiên đăng nhập khi khóa tài khoản
+            \App\Services\SessionTrackingService::revokeAllUserSessions((int) $request->user_id, (int) (Session::get('admin_id') ?: 1), 'Tự động thu hồi do tài khoản bị khóa');
+
+            \App\Services\ActivityLogService::logBusiness(
+                'users',
+                'user.lock',
+                'User',
+                (string) $user->id,
+                $user->name,
+                "Khóa tài khoản nhân viên: {$user->name} ({$user->email})",
+                ['user_id' => $user->id, 'email' => $user->email]
+            );
+
             return response()->json([
                 'message' => 'Khóa tài khoản thành công.',
                 'status' => true,
@@ -289,6 +336,16 @@ class AdminUserController extends Controller
             User::where('id', $request->user_id)->update(['status' => 'active', 'failed_login_attempts' => '0']);
             \App\Models\User::bumpUserPermissionsVersion((int) $request->user_id);
             \App\Models\Role::bumpPermissionsVersion();
+
+            \App\Services\ActivityLogService::logBusiness(
+                'users',
+                'user.unlock',
+                'User',
+                (string) $user->id,
+                $user->name,
+                "Mở khóa tài khoản nhân viên: {$user->name} ({$user->email})",
+                ['user_id' => $user->id, 'email' => $user->email]
+            );
 
             return response()->json([
                 'message' => 'Mở khóa tài khoản thành công.',

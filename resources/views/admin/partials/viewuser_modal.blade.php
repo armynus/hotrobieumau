@@ -129,8 +129,11 @@
                                     <dt class="col-sm-5 text-muted mb-2 font-weight-semibold">Thời gian tạo:</dt>
                                     <dd class="col-sm-7 mb-2 text-gray-700" id="view_user_created_at">—</dd>
 
-                                    <dt class="col-sm-5 text-muted mb-0 font-weight-semibold">Cập nhật cuối:</dt>
-                                    <dd class="col-sm-7 mb-0 text-gray-700" id="view_user_updated_at">—</dd>
+                                    <dt class="col-sm-5 text-muted mb-2 font-weight-semibold">Cập nhật cuối:</dt>
+                                    <dd class="col-sm-7 mb-2 text-gray-700" id="view_user_updated_at">—</dd>
+
+                                    <dt class="col-sm-5 text-muted mb-0 font-weight-semibold">Đổi MK gần nhất:</dt>
+                                    <dd class="col-sm-7 mb-0 text-gray-700" id="view_user_password_changed_at"><span class="text-muted font-italic">Chưa có thông tin</span></dd>
                                 </dl>
                             </div>
                         </div>

@@ -12,19 +12,39 @@ class TenantDatabase
     public function handle($request, Closure $next)
     {
 
+        $session = $request->hasSession() ? $request->session() : session();
+        $userId = $session ? $session->get('user_id') : null;
+
         // Kiểm tra xem user đã đăng nhập chưa
-        if (EMPTY(session()->has('user_id'))) {
-            if ($request->expectsJson()) {
+        if (empty($userId)) {
+            if ($request->expectsJson() || $request->ajax()) {
                 return response()->json(['message' => 'Phiên đăng nhập đã hết. Vui lòng đăng nhập lại.'], 401);
             }
             return redirect()->route('login');
         }
 
-        $userId = session('user_id');
-        $syncResult = \App\Models\User::syncSessionPermissionsIfNeeded($userId, $request->hasSession() ? $request->session() : null);
+        $sessionId = $session ? $session->getId() : null;
+        if ($sessionId && \App\Services\SessionTrackingService::isSessionRevoked($sessionId)) {
+            if ($session) {
+                $session->flush();
+                $session->invalidate();
+            }
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Phiên đăng nhập của bạn đã bị kết thúc bởi Quản trị viên.'
+                ], 401);
+            }
+            return redirect()->route('login')->with('error', 'Phiên đăng nhập của bạn đã bị kết thúc bởi Quản trị viên.');
+        }
+
+        if ($sessionId) {
+            \App\Services\SessionTrackingService::touch($sessionId, (int) $userId);
+        }
+        $syncResult = \App\Models\User::syncSessionPermissionsIfNeeded($userId, $session);
         if ($syncResult === false) {
-            if ($request->hasSession()) {
-                $request->session()->flush();
+            if ($session) {
+                $session->flush();
             }
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Tài khoản của bạn đã bị khóa hoặc không còn hoạt động.'], 403);
@@ -33,22 +53,16 @@ class TenantDatabase
         }
 
         // Lấy thông tin chi nhánh của user từ session
-        $branchId = session('UserBranchId');
+        $branchId = $session ? $session->get('UserBranchId') : session('UserBranchId');
 
         if ($branchId) {
-            // Thiết lập kết nối đến database của chi nhánh
             $databaseName = 'branch_' . $branchId;
-            Config::set('database.connections.tenant.database', $databaseName);
+            $currentConfiguredDb = Config::get('database.connections.tenant.database');
 
-            // Đặt kết nối hiện tại là `tenant`
-            DB::purge('tenant');
-            DB::reconnect('tenant');
-            // // 3. Chạy migration chỉ trong thư mục `branch`
-            // config(['database.connections.tenant.database' => $databaseName]);
-            // Artisan::call('migrate', [
-            //     '--path' => 'database/migrations/branch', // Chỉ chạy migration của chi nhánh
-            //     '--database' => 'tenant',                // Chạy trên kết nối tenant
-            // ]);
+            if ($currentConfiguredDb !== $databaseName) {
+                Config::set('database.connections.tenant.database', $databaseName);
+                DB::purge('tenant');
+            }
         }
 
         return $next($request);

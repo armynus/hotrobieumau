@@ -57,6 +57,16 @@ class BranchController extends Controller
             ], 500);
         }
 
+        \App\Services\ActivityLogService::logBusiness(
+            'branches',
+            'branch.create',
+            'Branch',
+            (string) $branch->id,
+            $branch->branch_name,
+            "Thêm mới chi nhánh: {$branch->branch_name} ({$branch->branch_code})",
+            ['branch_id' => $branch->id, 'branch_code' => $branch->branch_code]
+        );
+
         return response()->json([
             'message' => 'Chi nhánh và cơ sở dữ liệu đã được thiết lập.',
             'branch' => $branch->fresh('parent'),
@@ -87,6 +97,16 @@ class BranchController extends Controller
         $branch->update($validated);
         $departmentTemplates->sync($branch->refresh());
 
+        \App\Services\ActivityLogService::logBusiness(
+            'branches',
+            'branch.update',
+            'Branch',
+            (string) $branch->id,
+            $branch->branch_name,
+            "Cập nhật thông tin chi nhánh: {$branch->branch_name}",
+            ['branch_id' => $branch->id, 'branch_code' => $branch->branch_code]
+        );
+
         return response()->json([
             'message' => 'Cập nhật chi nhánh thành công.',
             'status' => true,
@@ -97,7 +117,18 @@ class BranchController extends Controller
     public function lock(Request $request)
     {
         $branch = Branches::findOrFail($request->integer('branch_id'));
-        $branch->update(['status' => $branch->status === 'active' ? 'inactive' : 'active']);
+        $newStatus = $branch->status === 'active' ? 'inactive' : 'active';
+        $branch->update(['status' => $newStatus]);
+
+        \App\Services\ActivityLogService::logBusiness(
+            'branches',
+            $newStatus === 'active' ? 'branch.unlock' : 'branch.lock',
+            'Branch',
+            (string) $branch->id,
+            $branch->branch_name,
+            ($newStatus === 'active' ? 'Mở khóa' : 'Khóa') . " chi nhánh: {$branch->branch_name}",
+            ['branch_id' => $branch->id, 'status' => $newStatus]
+        );
 
         return response()->json([
             'message' => $branch->status === 'active' ? 'Mở khóa chi nhánh thành công.' : 'Khóa chi nhánh thành công.',

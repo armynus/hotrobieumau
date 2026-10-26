@@ -128,6 +128,42 @@
             'PhongBan', 'BoPhan', 'Department', 'PhongBanBoPhan', 'MaPhong', 'MaPhongBan'
         ];
 
+        // Tự động chuyển chữ hoa theo thời gian thực cho các trường có ràng buộc uppercase / HOA
+        $(document).on('input', '.it-field-input', function () {
+            var code = String($(this).data('code') || $(this).attr('name') || '');
+            var dataType = $(this).attr('data-type') || '';
+            var isUpper = dataType === 'uppercase' || /(_HOA|HOA)$/i.test(code) || $(this).hasClass('text-uppercase');
+            if (isUpper) {
+                var currentVal = $(this).val();
+                if (currentVal) {
+                    var start = this.selectionStart;
+                    var end = this.selectionEnd;
+                    var upperVal = currentVal.toLocaleUpperCase('vi-VN');
+                    if (upperVal !== currentVal) {
+                        $(this).val(upperVal);
+                        if (start !== null && end !== null) {
+                            this.setSelectionRange(start, end);
+                        }
+                    }
+                }
+            }
+        });
+
+        // Đảm bảo dữ liệu viết HOA chuẩn xác khi submit form
+        $('#itFillForm').on('submit', function () {
+            $('.it-field-input').each(function () {
+                var code = String($(this).data('code') || $(this).attr('name') || '');
+                var dataType = $(this).attr('data-type') || '';
+                var isUpper = dataType === 'uppercase' || /(_HOA|HOA)$/i.test(code) || $(this).hasClass('text-uppercase');
+                if (isUpper) {
+                    var val = $(this).val();
+                    if (val) {
+                        $(this).val(val.toLocaleUpperCase('vi-VN'));
+                    }
+                }
+            });
+        });
+
         $(document).on('input change', '.it-field-input', function () {
             var code = $(this).data('code');
             var val = $(this).val();

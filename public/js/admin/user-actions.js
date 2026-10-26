@@ -123,28 +123,37 @@
                     }
                 }
 
+                if (data && data.document_role === 'clerk') {
+                    var hasClerk = rolesList.some(function (r) { return (r.slug || '') === 'clerk'; });
+                    if (!hasClerk) {
+                        rolesList.push({ slug: 'clerk', name: 'Văn thư chi nhánh' });
+                    }
+                }
+
                 if (rolesList.length > 0) {
                     var rbacHtml = rolesList.map(function (r) {
                         var slug = r.slug || '';
-                        var badgeClass = slug === 'admin' ? 'badge-primary' : (slug === 'supervisor' ? 'badge-warning text-dark' : (slug === 'clerk' ? 'badge-info' : (slug === 'it_admin' ? 'badge-dark' : (slug === 'leader' ? 'badge-secondary' : 'badge-light border'))));
-                        var icon = slug === 'admin' ? 'fa-user-shield' : (slug === 'supervisor' ? 'fa-user-check' : (slug === 'clerk' ? 'fa-file-signature' : (slug === 'it_admin' ? 'fa-laptop-code' : (slug === 'leader' ? 'fa-user-tie' : 'fa-user'))));
+                        var badgeClass = slug === 'admin' ? 'badge-primary' : (slug === 'supervisor' ? 'badge-warning text-dark' : (slug === 'clerk' ? 'badge-info' : (slug === 'it_admin' ? 'badge-dark' : (slug === 'leader' ? 'badge-secondary' : 'badge-light border text-dark'))));
                         var roleName = r.name || slug;
-                        return '<span class="badge ' + badgeClass + ' px-2 py-1 mr-1 mb-1 font-weight-bold" title="Vai trò ' + escapeText(roleName) + '"><i class="fas ' + icon + ' mr-1"></i>' + escapeText(roleName) + '</span>';
+                        return '<span class="badge ' + badgeClass + ' px-2.5 py-1.5 mr-1 mb-1 font-weight-bold" title="Vai trò ' + escapeText(roleName) + '">' + escapeText(roleName) + '</span>';
                     }).join('');
                     $('#view_user_role').html('<div class="d-flex flex-wrap">' + rbacHtml + '</div>');
                 } else {
-                    var roleHtml = '<span class="badge badge-light border">Nhân viên</span>';
+                    var roleHtml = '<span class="badge badge-light border text-dark px-2.5 py-1.5 font-weight-bold">Nhân viên</span>';
                     if (Number(data.role_id) === 0) {
-                        roleHtml = '<span class="badge badge-primary">Quản trị viên (Admin)</span>';
+                        roleHtml = '<span class="badge badge-primary px-2.5 py-1.5 font-weight-bold">Quản trị viên (Admin)</span>';
                     } else if (Number(data.role_id) === 1) {
-                        roleHtml = '<span class="badge badge-warning text-dark">Kiểm soát (Supervisor)</span>';
+                        roleHtml = '<span class="badge badge-warning text-dark px-2.5 py-1.5 font-weight-bold">Kiểm soát (Supervisor)</span>';
+                    }
+                    if (data && data.document_role === 'clerk') {
+                        roleHtml += ' <span class="badge badge-info px-2.5 py-1.5 font-weight-bold">Văn thư chi nhánh</span>';
                     }
                     $('#view_user_role').html(roleHtml);
                 }
 
                 var docRoleHtml = data.document_role === 'clerk'
-                    ? '<span class="badge badge-info"><i class="fas fa-folder-open mr-1"></i>Văn thư chi nhánh</span>'
-                    : '<span class="badge badge-light border">Người dùng bình thường</span>';
+                    ? '<span class="badge badge-info px-2 py-1 font-weight-bold">Văn thư chi nhánh</span>'
+                    : '<span class="badge badge-light border px-2 py-1 text-muted">Người dùng bình thường</span>';
                 $('#view_user_document_role').html(docRoleHtml);
 
                 var isActive = data.status === 'active';
@@ -163,6 +172,11 @@
                 $('#view_user_id').text('#' + data.id);
                 $('#view_user_created_at').text(formatUserDateTime(data.created_at));
                 $('#view_user_updated_at').text(formatUserDateTime(data.updated_at));
+
+                var pwdChangedText = data.password_changed_at
+                    ? formatUserDateTime(data.password_changed_at)
+                    : '<span class="text-muted font-italic">Chưa đổi mật khẩu</span>';
+                $('#view_user_password_changed_at').html(pwdChangedText);
 
                 $('#btnEditFromView').data('user_id', data.id);
                 $('#viewUserModal').modal('show');

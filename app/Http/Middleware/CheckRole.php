@@ -17,10 +17,15 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // 1. Admin login session has full access ONLY when there is no user session active
         $userId = $request->hasSession() ? $request->session()->get('user_id') : null;
-        if ($request->hasSession() && $request->session()->has('admin_id') && ! $userId) {
-            return $next($request);
+
+        // 1. Admin login session in Admin routes or pure admin session
+        if ($request->hasSession() && $request->session()->has('admin_id') && ($request->is('admin*') || ! $userId)) {
+            $adminId = (int) $request->session()->get('admin_id');
+            $admin = User::find($adminId);
+            if ($admin && ((int) $admin->role_id === 0 || $admin->hasRole('admin') || $admin->hasRole($roles))) {
+                return $next($request);
+            }
         }
 
         // 2. User login session
@@ -48,25 +53,20 @@ class CheckRole
             if (in_array('admin', $sessionRoles, true)) {
                 return $next($request);
             }
-            foreach ($roles as $r) {
-                if (in_array($r, $sessionRoles, true)) {
+            foreach ($roles as $role) {
+                if (in_array($role, $sessionRoles, true)) {
                     return $next($request);
                 }
             }
         }
 
-        $user = User::with('roles')->find($userId);
-        if ($user && $user->hasRole($roles)) {
-            return $next($request);
-        }
-
         if ($request->expectsJson()) {
             return response()->json([
                 'status' => false,
-                'message' => 'Bạn không thuộc vai trò được phép truy cập chức năng này.'
+                'message' => 'Bạn không có vai trò phù hợp để truy cập chức năng này.'
             ], 403);
         }
 
-        return redirect()->route('index')->with('error', 'Bạn không có vai trò được phép truy cập chức năng này.');
+        return redirect()->route('index')->with('error', 'Bạn không có vai trò phù hợp để truy cập chức năng này.');
     }
 }

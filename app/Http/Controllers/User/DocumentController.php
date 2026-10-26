@@ -22,12 +22,12 @@ class DocumentController extends Controller
     {
         $userId = Session::get('user_id');
         if (! $userId) {
-            return redirect()->route('login_user');
+            return redirect()->route('login');
         }
 
         $user = \App\Models\User::with('branch')->find($userId);
         if (! $user) {
-            return redirect()->route('login_user');
+            return redirect()->route('login');
         }
 
         $documentTypes = DocumentType::query()->where('status', 'active')->orderBy('name')->get();
@@ -55,12 +55,12 @@ class DocumentController extends Controller
     {
         $userId = Session::get('user_id');
         if (! $userId) {
-            return redirect()->route('login_user');
+            return redirect()->route('login');
         }
 
         $user = \App\Models\User::with('branch')->find($userId);
         if (! $user) {
-            return redirect()->route('login_user');
+            return redirect()->route('login');
         }
 
         $documentTypes = DocumentType::query()->where('status', 'active')->orderBy('name')->get();
@@ -103,7 +103,7 @@ class DocumentController extends Controller
     {
         $userId = Session::get('user_id');
         if (! $userId) {
-            return redirect()->route('login_user');
+            return redirect()->route('login');
         }
 
         $user = \App\Models\User::find($userId);
@@ -123,7 +123,7 @@ class DocumentController extends Controller
     {
         $userId = Session::get('user_id');
         if (! $userId) {
-            return redirect()->route('login_user');
+            return redirect()->route('login');
         }
 
         $user = \App\Models\User::with(['branch', 'position'])->findOrFail($userId);
@@ -142,12 +142,12 @@ class DocumentController extends Controller
     {
         $userId = Session::get('user_id');
         if (! $userId) {
-            return redirect()->route('login_user');
+            return redirect()->route('login');
         }
 
         $user = \App\Models\User::with('branch')->find($userId);
         if (! $user) {
-            return redirect()->route('login_user');
+            return redirect()->route('login');
         }
 
         $type2Branches = Branches::query()

@@ -40,6 +40,11 @@ class MultiRoleAuthorizationAuditTest extends TestCase
         $clerkRole = Role::where('slug', 'clerk')->firstOrFail();
         $supervisorRole = Role::where('slug', 'supervisor')->firstOrFail();
         $itAdminRole = Role::where('slug', 'it_admin')->firstOrFail();
+        $itAdminPermIds = Permission::whereIn('slug', [
+            'it_support.request', 'it_support.templates', 'it_support.manage', 'it_support.categories_manage',
+            'forms.view', 'forms.print', 'data.merger_lookup', 'system.users.view',
+        ])->pluck('id');
+        $itAdminRole->permissions()->sync($itAdminPermIds);
 
         // 1. Staff user
         $this->staffUser = User::firstOrCreate(

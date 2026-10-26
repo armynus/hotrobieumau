@@ -55,6 +55,9 @@ class Role extends Model
         if (class_exists(User::class)) {
             User::clearUserPermissionsVersionCache();
         }
+        if (class_exists(Permission::class)) {
+            Permission::clearActiveFeaturesCache();
+        }
         $newVersion = (int) \Illuminate\Support\Facades\Cache::get('rbac_permissions_version', 1) + 1;
         \Illuminate\Support\Facades\Cache::forever('rbac_permissions_version', $newVersion);
         static::$memoizedPermissionsVersion = $newVersion;

@@ -337,21 +337,35 @@ class ItSupportTemplateController extends Controller
         }
 
         // Tự động gán biến in hoa cho Tên Cán Bộ nếu có trong template
-        $officerName = $formData['TenCanBo'] ?? $formData['CanBoYeuCau'] ?? $formData['HoTen'] ?? $formData['Name'] ?? '';
+        $officerName = $formData['TenCanBoHOA'] ?? $formData['TenCanBo'] ?? $formData['CanBoYeuCau'] ?? $formData['HoTen'] ?? $formData['Name'] ?? $formData['TenNV'] ?? '';
+        if (empty($officerName)) {
+            $officerName = auth()->user()?->name ?: Session::get('user_name', '');
+        }
         if (!empty($officerName) && is_string($officerName)) {
-            $formData['TenCanBoHOA'] = mb_strtoupper($officerName, 'UTF-8');
-            $formData['HoTenHOA'] = mb_strtoupper($officerName, 'UTF-8');
-            $formData['CanBoYeuCauHOA'] = mb_strtoupper($officerName, 'UTF-8');
+            $upperOfficer = mb_strtoupper($officerName, 'UTF-8');
+            $formData['TenCanBoHOA'] = $upperOfficer;
+            $formData['HoTenHOA'] = $upperOfficer;
+            $formData['CanBoYeuCauHOA'] = $upperOfficer;
+            $formData['TenNVHOA'] = $upperOfficer;
         }
 
         // Tự động gán biến in hoa cho Tên Chi Nhánh nếu có trong template
-        $branchVal = $formData['TenChiNhanh'] ?? $formData['ChiNhanh'] ?? $formData['branch'] ?? $formData['BranchName'] ?? $formData['TenDonVi'] ?? '';
-        if (!empty($branchVal) && is_string($branchVal)) {
-            $formData['ChiNhanhHOA'] = mb_strtoupper($branchVal, 'UTF-8');
-            $formData['TenChiNhanhHOA'] = mb_strtoupper($branchVal, 'UTF-8');
-            $formData['BranchNameHOA'] = mb_strtoupper($branchVal, 'UTF-8');
-            $formData['TenDonViHOA'] = mb_strtoupper($branchVal, 'UTF-8');
+        $branchVal = $formData['ChiNhanhHOA'] ?? $formData['TenChiNhanh'] ?? $formData['ChiNhanh'] ?? $formData['branch'] ?? $formData['BranchName'] ?? $formData['TenDonVi'] ?? $formData['DonVi'] ?? '';
+        if (empty($branchVal)) {
+            $branchVal = Session::get('UserBranchName', '');
         }
+        if (!empty($branchVal) && is_string($branchVal)) {
+            $upperBranch = mb_strtoupper($branchVal, 'UTF-8');
+            $formData['ChiNhanhHOA'] = $upperBranch;
+            $formData['TenChiNhanhHOA'] = $upperBranch;
+            $formData['BranchNameHOA'] = $upperBranch;
+            $formData['TenDonViHOA'] = $upperBranch;
+            $formData['DonViHOA'] = $upperBranch;
+        }
+
+        // Đảm bảo định dạng chữ cho ngày tháng năm
+        $ngayThangNamVal = $formData['NgayThangNam'] ?? $formData['NgayYeuCau'] ?? $formData['NgayLap'] ?? '';
+        $formData['NgayThangNam'] = $supportService->formatDateInWords($ngayThangNamVal);
 
         $userId = auth()->id() ?? Session::get('user_id');
         $user = $userId ? User::with(['branch', 'department'])->find($userId) : null;

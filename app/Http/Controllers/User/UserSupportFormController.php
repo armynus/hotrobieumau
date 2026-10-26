@@ -179,19 +179,37 @@ class UserSupportFormController extends Controller
             return response()->json([]);
         }
 
-        // Truy vấn khách hàng theo custno hoặc name (hoặc nameloc)
-        $customers = CustomerInfo::with('accounts')
-            ->where('custno', 'like', '%'.$query.'%')
-            ->orWhere('name', 'like', '%'.$query.'%')
-            ->orWhere('nameloc', 'like', '%'.$query.'%')
-            ->orWhere('identity_no', 'like', '%'.$query.'%')
-            ->limit(15)
-            ->get();
+        $isNumeric = ctype_digit($query);
+        $customerQuery = CustomerInfo::with(['accounts' => function ($q) {
+            $q->select('id', 'customer_info_id', 'idxacno', 'ccycd');
+        }]);
+
+        if ($isNumeric) {
+            // Khi tìm theo mã số (CIF hoặc CCCD/CMND), tìm prefix để tận dụng Index của MySQL
+            $customerQuery->where(function ($q) use ($query) {
+                $q->where('custno', 'like', $query . '%')
+                  ->orWhere('identity_no', 'like', $query . '%');
+            });
+        } else {
+            // Khi tìm theo tên khách hàng
+            $customerQuery->where(function ($q) use ($query) {
+                $q->where('nameloc', 'like', '%' . $query . '%')
+                  ->orWhere('name', 'like', '%' . $query . '%');
+            });
+        }
+
+        try {
+            $customers = $customerQuery->limit(15)->get();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Lỗi truy vấn tìm kiếm khách hàng: ' . $e->getMessage());
+            return response()->json([]);
+        }
+
         // Định dạng dữ liệu trả về
         $results = $customers->map(function ($customer) {
             return [
-                'label' => 'Mã KH '.$customer->custno.' - '.$customer->nameloc.' - '.'ID '.$customer->identity_no,
-                'value' => $customer->custno.' - '.$customer->nameloc,
+                'label' => 'Mã KH ' . $customer->custno . ' - ' . $customer->nameloc . ' - ID ' . $customer->identity_no,
+                'value' => $customer->custno . ' - ' . $customer->nameloc,
                 'customer' => $customer,
             ];
         });

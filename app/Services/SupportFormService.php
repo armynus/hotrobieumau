@@ -108,6 +108,11 @@ class SupportFormService
             return \Carbon\Carbon::createFromDate((int) $m[3], (int) $m[2], (int) $m[1]);
         }
 
+        // 4. Format "ngày dd tháng mm năm yyyy" (tiếng Việt đầy đủ)
+        if (preg_match('/ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+năm\s+(\d{4})/iu', $date, $m)) {
+            return \Carbon\Carbon::createFromDate((int) $m[3], (int) $m[2], (int) $m[1]);
+        }
+
         try {
             return \Carbon\Carbon::parse($date);
         } catch (\Throwable $e) {
@@ -117,9 +122,13 @@ class SupportFormService
 
     public function formatDateInWords(mixed $date): string
     {
+        if (empty($date)) {
+            return sprintf('ngày %s tháng %s năm %s', date('d'), date('m'), date('Y'));
+        }
+
         $carbon = $this->parseDateRobust($date);
         if (!$carbon) {
-            return is_string($date) ? $date : '';
+            return is_string($date) ? trim($date) : sprintf('ngày %s tháng %s năm %s', date('d'), date('m'), date('Y'));
         }
 
         return sprintf('ngày %s tháng %s năm %s', $carbon->format('d'), $carbon->format('m'), $carbon->format('Y'));
@@ -132,18 +141,21 @@ class SupportFormService
         }
 
         $carbon = $this->parseDateRobust($date);
-        return $carbon ? $carbon->format('d/m/Y') : '';
+        return $carbon ? $carbon->format('d/m/Y') : (is_string($date) ? trim($date) : '');
     }
 
     public function convertDateNowFormat($date)
     {
         if (! $date) {
-            return '';
+            $day = date('d');
+            $month = date('m');
+            $year = date('Y');
+            return "ngày $day tháng $month năm $year";
         }
 
         $carbon = $this->parseDateRobust($date);
         if (!$carbon) {
-            return '';
+            return is_string($date) && trim($date) !== '' ? trim($date) : ("ngày " . date('d') . " tháng " . date('m') . " năm " . date('Y'));
         }
 
         $day = $carbon->format('d');
@@ -155,13 +167,9 @@ class SupportFormService
 
     public function convertDateNowFormatEng($date)
     {
-        if (! $date) {
-            return '';
-        }
-
-        $carbon = $this->parseDateRobust($date);
+        $carbon = !empty($date) ? $this->parseDateRobust($date) : now();
         if (!$carbon) {
-            return '';
+            return is_string($date) ? trim($date) : '';
         }
 
         $day = $carbon->format('d');
@@ -173,13 +181,9 @@ class SupportFormService
 
     public function convertDateNowFormatVietEng($date)
     {
-        if (! $date) {
-            return '';
-        }
-
-        $carbon = $this->parseDateRobust($date);
+        $carbon = !empty($date) ? $this->parseDateRobust($date) : now();
         if (!$carbon) {
-            return '';
+            return is_string($date) ? trim($date) : '';
         }
 
         $day = $carbon->format('d');

@@ -5,7 +5,7 @@
 <div class="container-fluid it-page">
     <header class="it-hero"><div><p class="it-eyebrow">QUẢN TRỊ · HỖ TRỢ IT</p><h1>Phiếu yêu cầu hỗ trợ</h1><p>Tiếp nhận, phản hồi và lưu trữ kết quả xử lý cho các chi nhánh.</p></div></header>
     @if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
-    @if(in_array($status, ['all', 'open'], true))<p class="it-scope-note"><i class="fas fa-layer-group" aria-hidden="true"></i> {{ $status === 'all' ? 'Đang xem tất cả phiếu' : 'Đang xem phiếu đang mở' }}</p>@endif
+    @if(in_array($status, ['all', 'open'], true))<p class="it-scope-note"><i class="fas fa-layer-group" aria-hidden="true"></i> {{ $status === 'all' ? 'Đang xem Tất cả phiếu' : 'Đang xem phiếu đang mở' }}</p>@endif
     <nav class="it-tabs" aria-label="Lọc trạng thái phiếu">@foreach(['pending'=>'Chờ tiếp nhận','processing'=>'Đang xử lý','resolved'=>'Đã xử lý'] as $key=>$label)<a class="{{ $status === $key ? 'active' : '' }}" href="{{ route('admin.it_support.manage', ['status'=>$key]) }}">{{ $label }} <span>{{ $key === 'resolved' ? ($counts['resolved'] ?? 0) + ($counts['closed'] ?? 0) : ($counts[$key] ?? 0) }}</span></a>@endforeach</nav>
     <form class="it-filter-card" action="{{ route('admin.it_support.manage') }}" method="GET">
         <input type="hidden" name="status" value="{{ $status }}">

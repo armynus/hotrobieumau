@@ -83,6 +83,16 @@ class AdminRoleController extends Controller
         }
         Role::bumpPermissionsVersion();
 
+        \App\Services\ActivityLogService::logBusiness(
+            'roles',
+            'role.create',
+            'Role',
+            (string) $role->id,
+            $role->name,
+            "Tạo mới vai trò người dùng: {$role->name} (Mã: {$role->slug})",
+            ['role_id' => $role->id, 'slug' => $role->slug, 'permissions_count' => count($validated['permission_ids'] ?? [])]
+        );
+
         return response()->json([
             'status' => true,
             'message' => 'Thêm mới vai trò ' . $role->name . ' thành công!',
@@ -146,6 +156,16 @@ class AdminRoleController extends Controller
         }
         Role::bumpPermissionsVersion();
 
+        \App\Services\ActivityLogService::logBusiness(
+            'roles',
+            'role.update',
+            'Role',
+            (string) $role->id,
+            $role->name,
+            "Cập nhật thông tin vai trò: {$role->name}",
+            ['role_id' => $role->id, 'slug' => $role->slug]
+        );
+
         return response()->json([
             'status' => true,
             'message' => 'Cập nhật vai trò ' . $role->name . ' thành công!',
@@ -166,6 +186,16 @@ class AdminRoleController extends Controller
         $permissionIds = $validated['permission_ids'] ?? [];
         $role->permissions()->sync($permissionIds);
         Role::bumpPermissionsVersion();
+
+        \App\Services\ActivityLogService::logBusiness(
+            'roles',
+            'role.matrix.update',
+            'Role',
+            (string) $role->id,
+            $role->name,
+            "Cập nhật ma trận phân quyền cho vai trò: {$role->name} ({$role->slug})",
+            ['role_id' => $role->id, 'slug' => $role->slug, 'permissions_count' => count($permissionIds)]
+        );
 
         return response()->json([
             'status' => true,
@@ -196,9 +226,21 @@ class AdminRoleController extends Controller
         }
 
         $name = $role->name;
+        $slug = $role->slug;
+        $roleId = $role->id;
         $role->permissions()->detach();
         $role->delete();
         Role::bumpPermissionsVersion();
+
+        \App\Services\ActivityLogService::logBusiness(
+            'roles',
+            'role.delete',
+            'Role',
+            (string) $roleId,
+            $name,
+            "Xóa vai trò người dùng: {$name} (Mã: {$slug})",
+            ['role_id' => $roleId, 'slug' => $slug]
+        );
 
         return response()->json([
             'status' => true,
