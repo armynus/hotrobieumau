@@ -74,7 +74,7 @@ class SupportFormController extends Controller
             'name'          => $request->form_name,
             'form_type'     => $request->form_type,
             'file_template' => $filePath,
-            'fields'        => json_encode($selectedFields),
+            'fields'        => $selectedFields,
         ]);
 
         // Load formType relationship để trả về
@@ -173,7 +173,8 @@ class SupportFormController extends Controller
         // Cập nhật các field còn lại
         $form->name      = $request->form_name;
         $form->form_type = $newType;
-        $form->fields    = json_encode($request->input('selected_fields'));
+        $fieldsInput     = $request->input('selected_fields');
+        $form->fields    = is_array($fieldsInput) ? $fieldsInput : (json_decode($fieldsInput, true) ?: []);
         $form->save();
 
         $form = SupportForm::with('formType:id,type_name')->find($id);
@@ -207,6 +208,14 @@ class SupportFormController extends Controller
             $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($request->file('file')->getPathname());
             $variables = $templateProcessor->getVariables();
             $variables = array_values(array_unique($variables));
+
+            $invalidVars = array_filter($variables, fn($v) => str_contains($v, '<') || str_contains($v, '>') || str_contains($v, '${'));
+            if (!empty($invalidVars)) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'File Word có thẻ placeholder ${...} chưa đóng dấu "}" hoặc bị lỗi định dạng. Vui lòng kiểm tra lại file mẫu.'
+                ]);
+            }
 
             $mappedFields = $variables;
             

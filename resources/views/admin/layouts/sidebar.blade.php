@@ -53,7 +53,6 @@
     </li>
 
     <!-- Giám sát hệ thống (Gom chung Phiên đăng nhập & Nhật ký hoạt động) -->
-    @if(auth_user_can('system.sessions.view') || auth_user_can('system.audit_logs.view'))
     @php
         $isMonitoringActive = request()->routeIs('admin.sessions.*', 'admin.audit_logs.*');
     @endphp
@@ -65,23 +64,18 @@
         </a>
         <div id="collapseSystemMonitoring" class="collapse {{ $isMonitoringActive ? 'show' : '' }}" aria-labelledby="headingSystemMonitoring" data-parent="#accordionSidebar">
             <div class="collapse-inner sidebar-submenu">
-                @permission('system.sessions.view')
                 <a class="collapse-item {{ request()->routeIs('admin.sessions.*') ? 'active' : '' }}" href="{{ route('admin.sessions.index') }}">
                     <i class="fas fa-desktop fa-fw mr-1"></i>
                     <span>Phiên đăng nhập</span>
                 </a>
-                @endpermission
 
-                @permission('system.audit_logs.view')
                 <a class="collapse-item {{ request()->routeIs('admin.audit_logs.*') ? 'active' : '' }}" href="{{ route('admin.audit_logs.index') }}">
                     <i class="fas fa-history fa-fw mr-1"></i>
                     <span>Nhật ký hoạt động</span>
                 </a>
-                @endpermission
             </div>
         </div>
     </li>
-    @endif
 
     <!-- Divider -->
     <hr class="sidebar-divider">

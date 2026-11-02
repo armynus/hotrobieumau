@@ -12,6 +12,7 @@
         <a href="{{ route('admin') }}" class="{{ request()->routeIs('admin') ? 'active' : '' }}"><i class="fas fa-th-large" aria-hidden="true"></i> Tổng quan</a>
         <a href="{{ route('admin_list_staff') }}" class="{{ request()->routeIs('admin_list_staff') ? 'active' : '' }}"><i class="fas fa-users" aria-hidden="true"></i> Tài khoản</a>
         <a href="{{ route('admin.it_support.manage') }}" class="{{ request()->routeIs('admin.it_support.*') ? 'active' : '' }}"><i class="fas fa-headset" aria-hidden="true"></i> Hỗ trợ IT</a>
+        <a href="{{ route('admin.clear_cache') }}" title="Xóa view cache & làm mới hệ thống" onclick="return confirm('Bạn có chắc muốn làm mới bộ nhớ đệm giao diện không?');"><i class="fas fa-sync-alt" aria-hidden="true"></i> Làm mới Cache</a>
     </div>
 
     <ul class="navbar-nav ml-auto">
@@ -21,7 +22,8 @@
                 <img class="img-profile rounded-circle" src="{{ asset('user_icon.png') }}" alt="Ảnh đại diện quản trị viên">
             </a>
             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                <a class="dropdown-item" href="{{ route('change_password_admin', Session::get('admin_id')) }}"><i class="fas fa-key fa-sm fa-fw mr-2 text-gray-400" aria-hidden="true"></i> Đổi mật khẩu</a>
+                <a class="dropdown-item" href="{{ route('change_password_admin', Session::get('admin_id') ?: 1) }}"><i class="fas fa-key fa-sm fa-fw mr-2 text-gray-400" aria-hidden="true"></i> Đổi mật khẩu</a>
+                <a class="dropdown-item" href="{{ route('admin.clear_cache') }}" onclick="return confirm('Bạn có chắc muốn làm mới bộ nhớ đệm giao diện không?');"><i class="fas fa-sync-alt fa-sm fa-fw mr-2 text-gray-400" aria-hidden="true"></i> Làm mới Cache</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal"><i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400" aria-hidden="true"></i> Đăng xuất</a>
             </div>

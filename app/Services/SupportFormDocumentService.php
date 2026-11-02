@@ -274,6 +274,11 @@ class SupportFormDocumentService
             // Thay thế toàn bộ các placeholder còn lại trong mẫu bằng chuỗi rỗng để không để sót chuỗi ${...}
             $remainingVariables = $templateProcessor->getVariables();
             foreach ($remainingVariables as $remainingVar) {
+                // Tuyệt đối không thay thế nếu tên biến bị dính thẻ XML do lỗi soạn thảo Word (ví dụ thiếu dấu đóng })
+                if (str_contains($remainingVar, '<') || str_contains($remainingVar, '>') || str_contains($remainingVar, '${')) {
+                    continue;
+                }
+
                 // Nếu là biến có hậu tố HOA, thử tra cứu biến gốc trong formData
                 if (preg_match('/(_HOA|HOA)$/i', $remainingVar)) {
                     $baseKey = preg_replace('/(_HOA|HOA)$/i', '', $remainingVar);

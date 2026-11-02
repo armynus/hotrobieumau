@@ -19,6 +19,21 @@
     scrollbar-color: #cbd5e1 transparent;
 }
 
+.navbar-search .ui-autocomplete {
+    width: max(100%, 580px) !important;
+    min-width: 280px !important;
+    max-width: min(650px, calc(100vw - 32px)) !important;
+}
+
+@media (max-width: 575.98px) {
+    .navbar-search .ui-autocomplete,
+    .form-search-mobile .ui-autocomplete {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+}
+
 .ui-autocomplete::-webkit-scrollbar {
     width: 6px;
 }
@@ -109,6 +124,38 @@
 .ui-menu .ui-menu-item:hover svg,
 .ui-menu .ui-menu-item:hover i {
     color: #a51c3e !important;
+}
+
+/* Highlight matching query characters (Chỉ tô màu chữ nổi bật, tuyệt đối không dùng nền vàng) */
+mark,
+.ui-autocomplete mark,
+.navbar-search mark,
+.search-highlight,
+mark.search-highlight,
+.ui-menu .search-highlight,
+.ui-menu mark.search-highlight {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #c8102e !important; /* Đỏ Agribank nổi bật rõ trên nền chữ thường #1e293b */
+    font-weight: 700 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    display: inline !important;
+}
+
+.ui-menu .ui-menu-item-wrapper.ui-state-focus .search-highlight,
+.ui-menu .ui-menu-item-wrapper.ui-state-focus mark,
+.ui-menu .ui-menu-item-wrapper.ui-state-active .search-highlight,
+.ui-menu .ui-menu-item-wrapper.ui-state-active mark,
+.ui-menu .ui-menu-item:hover .search-highlight,
+.ui-menu .ui-menu-item:hover mark {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #7f1d1d !important; /* Đỏ đậm nét khi hover */
+    font-weight: 800 !important;
+    text-decoration: underline !important;
 }
 
 /* Search Status Pill (Zero Layout Shift) */

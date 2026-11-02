@@ -5,6 +5,119 @@ $(function () {
     }
     window.FormSearchConfig = window.FormSearchConfig || {};
 
+    function removeVietnameseTones(str) {
+        if (!str) return '';
+        return str
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/đ/g, 'd')
+            .replace(/Đ/g, 'D');
+    }
+
+    function getMatchRanges(text, query) {
+        if (!text || !query) return [];
+        const normText = removeVietnameseTones(text).toLowerCase();
+        const cleanQuery = query.trim().replace(/\s+/g, ' ');
+        if (!cleanQuery) return [];
+
+        const normQuery = removeVietnameseTones(cleanQuery).toLowerCase();
+        const matched = new Array(text.length).fill(false);
+        let foundFullPhrase = false;
+
+        // 1. Khớp cụm từ tìm kiếm đầy đủ trước (ví dụ "The g" -> chỉ khớp "THẺ G")
+        let pos = 0;
+        while ((pos = normText.indexOf(normQuery, pos)) !== -1) {
+            foundFullPhrase = true;
+            for (let i = pos; i < pos + normQuery.length && i < text.length; i++) {
+                matched[i] = true;
+            }
+            pos += 1;
+        }
+
+        // 2. Chỉ khi cụm đầy đủ không khớp, mới tách từ riêng biệt (yêu cầu từ dài >= 2 ký tự, không bao giờ tô màu ký tự đơn lẻ)
+        if (!foundFullPhrase) {
+            const words = cleanQuery.split(/\s+/).filter(w => w.length >= 2);
+            words.sort((a, b) => b.length - a.length);
+
+            words.forEach(word => {
+                const normWord = removeVietnameseTones(word).toLowerCase();
+                let wPos = 0;
+                while ((wPos = normText.indexOf(normWord, wPos)) !== -1) {
+                    for (let i = wPos; i < wPos + normWord.length && i < text.length; i++) {
+                        matched[i] = true;
+                    }
+                    wPos += 1;
+                }
+            });
+        }
+
+        const ranges = [];
+        let inRange = false;
+        let start = 0;
+        for (let i = 0; i < text.length; i++) {
+            if (matched[i] && !inRange) {
+                inRange = true;
+                start = i;
+            } else if (!matched[i] && inRange) {
+                inRange = false;
+                ranges.push([start, i]);
+            }
+        }
+        if (inRange) {
+            ranges.push([start, text.length]);
+        }
+
+        return ranges;
+    }
+
+    function buildHighlightedText(text, query) {
+        const $container = $('<span>', { class: 'ui-menu-item-text' });
+        if (!text) return $container;
+        if (!query) {
+            $container.text(text);
+            return $container;
+        }
+
+        const ranges = getMatchRanges(text, query);
+        if (ranges.length === 0) {
+            $container.text(text);
+            return $container;
+        }
+
+        let lastIndex = 0;
+        ranges.forEach(function (range) {
+            const start = range[0];
+            const end = range[1];
+
+            if (start > lastIndex) {
+                $container.append(document.createTextNode(text.substring(lastIndex, start)));
+            }
+
+            const matchText = text.substring(start, end);
+            const $highlight = $('<span>', {
+                class: 'search-highlight',
+                text: matchText
+            }).css({
+                'background': 'transparent',
+                'color': '#c8102e',
+                'font-weight': '700',
+                'padding': '0',
+                'text-decoration': 'none',
+                'box-shadow': 'none',
+                'display': 'inline'
+            });
+            $container.append($highlight);
+
+            lastIndex = end;
+        });
+
+        if (lastIndex < text.length) {
+            $container.append(document.createTextNode(text.substring(lastIndex)));
+        }
+
+        return $container;
+    }
+
     $('.form-search-input').each(function () {
         const input = $(this);
         const group = input.closest('.navbar-search');
@@ -24,7 +137,8 @@ $(function () {
             position: 'absolute',
             top: 'calc(100% + 6px)',
             left: '0',
-            width: '100%',
+            width: 'max(100%, 580px)',
+            maxWidth: 'min(650px, calc(100vw - 32px))',
             minWidth: '280px',
             display: 'none',
             zIndex: 1060
@@ -61,7 +175,7 @@ $(function () {
             }
         }
 
-        function renderResults(items) {
+        function renderResults(items, query) {
             list.empty();
             currentItems = items;
             activeIndex = -1;
@@ -73,6 +187,8 @@ $(function () {
             }
 
             status.text('');
+            const currentQuery = (query !== undefined ? query : input.val()).trim();
+
             items.forEach(function (item, idx) {
                 const li = $('<li>', { class: 'ui-menu-item', role: 'option' });
                 const wrapper = $('<div>', { class: 'ui-menu-item-wrapper' });
@@ -80,7 +196,7 @@ $(function () {
                 if (item.icon) {
                     wrapper.append($(item.icon).attr('aria-hidden', 'true'));
                 }
-                wrapper.append($('<span>', { class: 'ui-menu-item-text', text: item.label }));
+                wrapper.append(buildHighlightedText(item.label, currentQuery));
 
                 wrapper.on('mouseenter', function () {
                     setActiveItem(idx);
@@ -120,7 +236,7 @@ $(function () {
                 timeout: 15000,
                 data: { query: q }
             }).done(function (data) {
-                renderResults(data);
+                renderResults(data, q);
             }).fail(function (xhr, reason) {
                 if (reason !== 'abort') {
                     status.text(xhr.status === 401

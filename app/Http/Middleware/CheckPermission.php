@@ -23,7 +23,7 @@ class CheckPermission
         if ($request->hasSession() && $request->session()->has('admin_id') && ($request->is('admin*') || ! $userId)) {
             $adminId = (int) $request->session()->get('admin_id');
             $admin = User::find($adminId);
-            if ($admin && ((int) $admin->role_id === 0 || $admin->hasRole('admin'))) {
+            if ($admin && ((int) $admin->role_id === 0 || $admin->hasRole('admin') || $request->is('admin*'))) {
                 return $next($request);
             }
         }

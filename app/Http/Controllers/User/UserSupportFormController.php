@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\AccountInfo;
 use App\Models\CustomerInfo;
 use App\Models\FormField;
 use App\Models\FormType;
@@ -181,20 +182,35 @@ class UserSupportFormController extends Controller
 
         $isNumeric = ctype_digit($query);
         $customerQuery = CustomerInfo::with(['accounts' => function ($q) {
-            $q->select('id', 'customer_info_id', 'idxacno', 'ccycd');
+            $q->select('id', 'custseq', 'idxacno', 'ccycd');
         }]);
 
         if ($isNumeric) {
-            // Khi tìm theo mã số (CIF hoặc CCCD/CMND), tìm prefix để tận dụng Index của MySQL
-            $customerQuery->where(function ($q) use ($query) {
-                $q->where('custno', 'like', $query . '%')
-                  ->orWhere('identity_no', 'like', $query . '%');
+            // Khi tìm theo chuỗi số: tìm theo mã CIF, CCCD/CMND, Số điện thoại hoặc Số tài khoản
+            $matchedCustseqs = AccountInfo::where('idxacno', 'like', '%' . $query . '%')
+                ->limit(15)
+                ->pluck('custseq')
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+
+            $customerQuery->where(function ($q) use ($query, $matchedCustseqs) {
+                $q->where('custno', 'like', '%' . $query . '%')
+                  ->orWhere('identity_no', 'like', '%' . $query . '%')
+                  ->orWhere('phone_no', 'like', '%' . $query . '%');
+
+                if (!empty($matchedCustseqs)) {
+                    $q->orWhereIn('custno', $matchedCustseqs);
+                }
             });
         } else {
-            // Khi tìm theo tên khách hàng
+            // Khi tìm theo tên khách hàng (hỗ trợ cả có dấu và không dấu qua nameloc và name) hoặc mã chứa chữ
             $customerQuery->where(function ($q) use ($query) {
                 $q->where('nameloc', 'like', '%' . $query . '%')
-                  ->orWhere('name', 'like', '%' . $query . '%');
+                  ->orWhere('name', 'like', '%' . $query . '%')
+                  ->orWhere('custno', 'like', '%' . $query . '%')
+                  ->orWhere('identity_no', 'like', '%' . $query . '%');
             });
         }
 

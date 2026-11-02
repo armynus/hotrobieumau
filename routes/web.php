@@ -48,6 +48,14 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('change_password_admin/{admin_id}', [LoginAdminController::class, 'change_password_admin'])->name('change_password_admin');
     Route::post('reset_password_admin', [LoginAdminController::class, 'reset_password_admin'])->middleware('throttle:5,1')->name('reset_password_admin');
     Route::get('admin', [AdminController::class, 'index'])->name('admin');
+    Route::get('admin/clear-cache', function () {
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
+        }
+        return redirect()->route('admin')->with('success', 'Đã làm mới bộ nhớ đệm (View Cache & OPcache) thành công!');
+    })->name('admin.clear_cache');
     
     // IT Support Management
     Route::get('admin/it-support', [AdminItSupportController::class, 'manage'])->name('admin.it_support.manage');
