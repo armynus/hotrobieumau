@@ -73,7 +73,8 @@ class FormBundleController extends Controller
                 $files[] = $file;
             }
             $document = $bundleRenderer->merge($files);
-            // Only a complete bundle counts as an export. No customer/account writes.
+            $allowedCodes = $forms->flatMap(fn ($item) => FormWorkspaceService::fieldCodes($item->fields))->unique()->values()->all();
+            app(\App\Services\SupportFormCustomerService::class)->saveFromExport($data['payload'], $allowedCodes);
             DB::connection('mysql')->transaction(function () use ($forms) {
                 foreach ($forms as $form) {
                     $form->timestamps = false;

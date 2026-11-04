@@ -247,12 +247,39 @@ class FormBundleTest extends TestCase
         $this->postJson('/form-bundle/download', [])->assertStatus(401);
     }
 
-    public function test_single_download_creates_word_without_customer_database_writes(): void
+    public function test_single_download_creates_word_and_automatically_saves_customer_and_account_when_cif_is_valid(): void
     {
-        $form = $this->makeForm('Mẫu đơn', ['nameloc', 'custno']);
-        $response = $this->postJson('/transaction_form_print', ['form_id' => $form->id, 'nameloc' => 'Tên chỉ dùng để in', 'custno' => '000123'])->assertOk();
+        $this->tenantTables();
+        $form = $this->makeForm('Mẫu đơn', ['nameloc', 'custno', 'phone_no', 'idxacno', 'ccycd']);
+        $response = $this->postJson('/transaction_form_print', [
+            'form_id' => $form->id,
+            'nameloc' => 'Nguyễn Văn Lưu Tự Động',
+            'custno' => '000123',
+            'phone_no' => '0912345678',
+            'idxacno' => '6500205000123',
+            'ccycd' => 'VND',
+        ])->assertOk();
         $this->temporaryFiles[] = $response->baseResponse->getFile()->getPathname();
         $this->assertSame(1, $form->fresh()->usage_count);
+
+        $customer = \App\Models\CustomerInfo::where('custno', '000123')->first();
+        $this->assertNotNull($customer);
+        $this->assertSame('Nguyễn Văn Lưu Tự Động', $customer->nameloc);
+        $this->assertSame('0912345678', $customer->phone_no);
+
+        $account = \App\Models\AccountInfo::where('idxacno', '6500205000123')->first();
+        $this->assertNotNull($account);
+        $this->assertSame('000123', $account->custseq);
+        $this->assertSame('VND', $account->ccycd);
+
+        // In không có CIF vẫn xuất Word bình thường mà không báo lỗi
+        $responseNoCif = $this->postJson('/transaction_form_print', [
+            'form_id' => $form->id,
+            'nameloc' => 'Khách lẻ chưa có CIF',
+            'custno' => '',
+        ])->assertOk();
+        $this->temporaryFiles[] = $responseNoCif->baseResponse->getFile()->getPathname();
+        $this->assertSame(1, \App\Models\CustomerInfo::count());
     }
 
     private function tenantTables(): void

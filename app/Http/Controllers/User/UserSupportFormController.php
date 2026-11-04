@@ -243,6 +243,10 @@ class UserSupportFormController extends Controller
         $tempFile = null;
         try {
             $tempFile = app(\App\Services\SupportFormDocumentService::class)->generate($filePath, $workspace->payloadFor($form, $formData));
+            app(\App\Services\SupportFormCustomerService::class)->saveFromExport(
+                $formData,
+                \App\Services\FormWorkspaceService::fieldCodes($form->fields)
+            );
             DB::connection('mysql')->transaction(function () use ($form) {
                 $form->timestamps = false;
                 $form->increment('usage_count');

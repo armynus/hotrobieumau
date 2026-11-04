@@ -141,6 +141,34 @@ class FormDraftTest extends TestCase
         $this->assertTrue(strpos($html, 'jquery.min.js') < strpos($html, 'bootstrap.bundle.min.js'));
         $this->assertStringContainsString('id="search_topbar_mobile"', $html);
         $this->assertStringContainsString('id="draftStatusText"', $html);
+        $this->assertStringContainsString('id="scanCccdQrBtn"', $html);
+        $this->assertStringContainsString('id="cccdScannerModal"', $html);
+        $this->assertSame(1, substr_count($html, 'js/jsQR.min.js'));
+    }
+
+    public function test_rendered_scan_qr_code_page_includes_cccd_bridge_without_duplicate_head_or_datatables(): void
+    {
+        Schema::create('documents', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+        cache()->put('form_types', collect(), 60);
+        $this->withSession(['user_id' => 1]);
+        $forms = collect([
+            (object) [
+                'id' => 1,
+                'name' => 'Đề nghị mở tài khoản',
+                'form_type' => 1,
+                'formType' => (object) ['type_name' => 'Khách hàng cá nhân'],
+            ],
+        ]);
+        $html = view('user.page.scan_qr_code', compact('forms'))->render();
+        $this->assertSame(1, substr_count($html, '<head>'));
+        $this->assertStringNotContainsString('jquery.dataTables.min.js', $html);
+        $this->assertStringContainsString('id="cccd-info-card"', $html);
+        $this->assertStringContainsString('id="target-form-select"', $html);
+        $this->assertStringContainsString('id="apply-to-selected-form"', $html);
+        $this->assertStringContainsString('js/user/cccd-qr-parser.js', $html);
     }
 
     private function saveDraft(

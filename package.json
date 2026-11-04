@@ -3,7 +3,8 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "vendor:zxing": "node scripts/vendor-zxing.mjs"
     },
     "devDependencies": {
         "autoprefixer": "^10.4.20",
@@ -15,6 +16,7 @@
         "vite": "^6.0"
     },
     "dependencies": {
-        "tesseract.js": "7.0.0"
+        "tesseract.js": "7.0.0",
+        "zxing-wasm": "3.1.6"
     }
 }

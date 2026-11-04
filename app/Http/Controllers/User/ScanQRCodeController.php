@@ -1,25 +1,29 @@
 <?php
 
 namespace App\Http\Controllers\User;
-use App\Http\Controllers\Controller;
 
+use App\Http\Controllers\Controller;
+use App\Models\SupportForm;
 use Illuminate\Http\Request;
 
 class ScanQRCodeController extends Controller
 {
     public function index()
     {
-        return view('user.page.scan_qr_code');
+        $forms = SupportForm::with(['formType', 'supFormType'])
+            ->orderBy('name')
+            ->get(['id', 'name', 'form_type', 'sup_form_type_id', 'fields']);
+
+        return view('user.page.scan_qr_code', compact('forms'));
     }
 
     public function scan(Request $request)
     {
-        // Handle the scanned QR code data
-        $qrCodeData = $request->input('qr_code_data');
+        $qrCodeData = (string) $request->input('qr_code_data', '');
 
-        // Process the QR code data as needed
-        // For example, you can save it to the database or perform some action
-
-        return response()->json(['message' => 'QR code scanned successfully!', 'data' => $qrCodeData]);
+        return response()->json([
+            'message' => 'QR code scanned successfully!',
+            'data' => $qrCodeData,
+        ]);
     }
 }

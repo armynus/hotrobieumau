@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\View\DynamicComponent;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,7 +15,59 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Tự động nhận diện thay đổi file .blade.php khi copy đè sang máy Production
+        // (kể cả khi Date Modified của file copy cũ hơn file cache trên Production hoặc bị giữ bởi OPcache)
+        $this->app->singleton('blade.compiler', function ($app) {
+            return tap(new class(
+                $app['files'],
+                $app['config']['view.compiled'],
+                $app['config']->get('view.relative_hash', false) ? $app->basePath() : '',
+                $app['config']->get('view.cache', true),
+                $app['config']->get('view.compiled_extension', 'php'),
+            ) extends BladeCompiler {
+                protected function getViewPrefix($path): string
+                {
+                    return hash('xxh128', 'v2'.Str::after($path, $this->basePath));
+                }
+
+                public function getCompiledPath($path)
+                {
+                    $mtime = @filemtime($path) ?: 0;
+                    $size = @filesize($path) ?: 0;
+                    $prefix = $this->getViewPrefix($path);
+                    $version = substr(hash('xxh128', $mtime.':'.$size), 0, 12);
+
+                    return $this->cachePath.'/'.$prefix.'_'.$version.'.'.$this->compiledExtension;
+                }
+
+                public function isExpired($path)
+                {
+                    if (! $this->shouldCache) {
+                        return true;
+                    }
+
+                    return ! $this->files->exists($this->getCompiledPath($path));
+                }
+
+                public function compile($path = null)
+                {
+                    if ($path) {
+                        $this->setPath($path);
+                    }
+
+                    if (! is_null($this->cachePath) && ! empty($this->getPath())) {
+                        $prefix = $this->getViewPrefix($this->getPath());
+                        foreach ($this->files->glob($this->cachePath.'/'.$prefix.'*.'.$this->compiledExtension) as $oldCompiled) {
+                            @$this->files->delete($oldCompiled);
+                        }
+                    }
+
+                    parent::compile($path);
+                }
+            }, function ($blade) {
+                $blade->component('dynamic-component', DynamicComponent::class);
+            });
+        });
     }
 
     /**

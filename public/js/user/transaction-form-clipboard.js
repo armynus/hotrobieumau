@@ -102,7 +102,7 @@
     function initTransactionForm() {
         var cfgEl = document.getElementById('transaction-form-clipboard-config');
         if (cfgEl && cfgEl.dataset && cfgEl.dataset.config) {
-            try { window.TransactionFormClipboardConfig = JSON.parse(cfgEl.dataset.config); } catch (e) {}
+            try { window.TransactionFormClipboardConfig = JSON.parse(cfgEl.dataset.config); } catch (e) { }
         }
         var cfg = window.TransactionFormClipboardConfig || {};
         var customerSearchUrl = cfg.customerSearchUrl || '/customers/search';
@@ -216,13 +216,24 @@
                                         $(addrInput).trigger('change');
                                     }
                                 } else if (input) {
-                                    input.value = value;
-                                    $(input).trigger('change');
+                                    if (input.tagName === 'SELECT' && mappedField === 'idxacno' && value && !Array.from(input.options).some(function (opt) { return opt.value === value; })) {
+                                        renderInput('idxacno', value);
+                                        input = document.getElementById('idxacno');
+                                    } else {
+                                        input.value = value;
+                                    }
+                                    if (input) $(input).trigger('change');
                                 }
 
                                 if (['custno'].includes(header)) {
                                     var custnoInput = document.querySelector("#supportForm input[name='custno_hidden']");
                                     if (custnoInput) custnoInput.value = value;
+                                    var maKhdnHidden = document.querySelector("#supportForm input[name='MaKHDN_hidden']");
+                                    if (maKhdnHidden) maKhdnHidden.value = '';
+                                }
+                                if (['idxacno'].includes(header)) {
+                                    var idxacnoInput = document.querySelector("#supportForm input[name='idxacno_hidden']");
+                                    if (idxacnoInput) idxacnoInput.value = value;
                                 }
                             }
                         });
@@ -342,6 +353,12 @@
                                 if (['custno'].includes(header)) {
                                     var MaKHDNInput = document.querySelector("#supportForm input[name='MaKHDN_hidden']");
                                     if (MaKHDNInput) MaKHDNInput.value = value;
+                                    var custnoHidden = document.querySelector("#supportForm input[name='custno_hidden']");
+                                    if (custnoHidden) custnoHidden.value = '';
+                                }
+                                if (['idxacno'].includes(header)) {
+                                    var idxacnoInputDN = document.querySelector("#supportForm input[name='idxacno_hidden']");
+                                    if (idxacnoInputDN) idxacnoInputDN.value = value;
                                 }
                             }
                         });
@@ -480,6 +497,9 @@
 
                     if (accounts.length > 1) {
                         renderSelect('idxacno');
+                        $("#idxacno_hidden").val(accounts[0].idxacno || '');
+                        var ccyFirst = (accounts[0].ccycd && String(accounts[0].ccycd).trim()) ? accounts[0].ccycd.trim() : 'VND';
+                        $("#ccycd").val(ccyFirst);
                     } else if (accounts.length === 1) {
                         renderInput('idxacno', accounts[0].idxacno || '');
                         $("#idxacno_hidden").val(accounts[0].idxacno || '');
@@ -494,10 +514,10 @@
             });
         }
 
-        // 6. Bật/Tắt Nhập Thủ Công Cho Các Select Fields
+        // 6. Bật/Tắt Nhập Thủ Công Cho Các Select Fields (chỉ áp dụng trong #supportForm)
         var forceManualFields = ["identity_place", "NoiCapCCCDMoi", "NgheNghiepKH"];
 
-        $("select[id]").each(function () {
+        $("#supportForm select[id]").each(function () {
             var $s = $(this);
             var id = $s.attr("id");
             if (!id) return;
@@ -557,6 +577,17 @@
                 }
             }
             $("#" + id).focus();
+        });
+
+        // 8. Đồng bộ các ô nhập thủ công custno, MaKHDN, idxacno, TKTC với các trường hidden tương ứng
+        $(document).on("input change", "#supportForm #custno", function () {
+            $("#custno_hidden").val($(this).val() || '');
+        });
+        $(document).on("input change", "#supportForm #MaKHDN", function () {
+            $("#MaKHDN_hidden").val($(this).val() || '');
+        });
+        $(document).on("input change", "#supportForm #idxacno, #supportForm #TKTC", function () {
+            $("#idxacno_hidden").val($(this).val() || '');
         });
     }
 
